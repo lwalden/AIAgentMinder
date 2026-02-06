@@ -1,6 +1,8 @@
 # Claude Code Project Templates
 
-These templates enable Claude Code to work autonomously on your projects with session continuity, architectural decision tracking, and comprehensive permissions.
+Repo template that provides a pre-configured framework for Claude Code to work autonomously on your projects with session continuity, architectural decision tracking, and comprehensive permissions. 
+
+Move from your project from the planning to the doing phase in minutes.
 
 ## Quick Start
 
@@ -23,9 +25,9 @@ These templates enable Claude Code to work autonomously on your projects with se
 
 2. **Customize the templates:**
    - `docs/strategy-roadmap.md` - Define your project vision, goals, and architecture - I recommend having a conversation about your project ideas and vision with the AI you plan to use when coding. Attach these files or reference your repo hat has these files as context. Have the AI interview you to fill out the road map. Go back and forth with it until you feel you have enough to get your project going.
-   - `CLAUDE.md` - Adjust developer profile and tech stack sections (works for me as is, but this landscape changes hourly, update as you like)
-   - `PROGRESS.md` - Update initial tasks for your project (works for me as is, but this landscape changes hourly, update as you like)
-   - `DECISIONS.md` - Pre-populate with any known decisions (works for me as is, but this landscape changes hourly, update as you like)
+   - `CLAUDE.md` - Adjust developer profile and tech stack sections
+   - `PROGRESS.md` - Update initial tasks for your project (100% optional)
+   - `DECISIONS.md` - Pre-populate with any known decisions (100% optional)
 
 3. **Start Claude Code and point it to your project**
 
