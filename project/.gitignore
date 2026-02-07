@@ -1,6 +1,3 @@
-# Windows artifacts
-nul
-
 # Environment and Secrets
 .env
 .env.local
