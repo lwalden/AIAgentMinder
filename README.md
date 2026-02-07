@@ -54,29 +54,33 @@ Choose the scenario that matches your situation. Each one uses `/setup` to copy 
 
 1. Open Claude Code (in VS Code or CLI)
 2. Tell Claude: "I want to set up a new project using the template at `/path/to/claude-code-quick-start-template`"
-3. Run `/setup` and choose "Create a new GitHub repository"
-4. Claude asks for your project name, tech stack, and preferences, then creates the repo and sets everything up
+3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
+4. Run `/setup` and choose "Create a new GitHub repository"
+5. Claude asks for your project name, tech stack, and preferences, then creates the repo and sets everything up
 
 **B) Add to an existing repo**
 
 1. Open Claude Code in your existing repo
 2. Tell Claude: "Add the project template from `/path/to/claude-code-quick-start-template` to this repo"
-3. Run `/setup` and choose "Add to an existing repository"
-4. Claude copies template files in, asking before overwriting anything you already have
+3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
+4. Run `/setup` and choose "Add to an existing repository"
+5. Claude copies template files in, asking before overwriting anything you already have
 
 **C) Start a new local project (no GitHub yet)**
 
 1. Open Claude Code (in VS Code or CLI)
 2. Tell Claude: "Create a new project using the template at `/path/to/claude-code-quick-start-template`"
-3. Run `/setup` and choose "Create a new local project"
-4. Claude creates the directory, runs `git init`, and sets up all files
+3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
+4. Run `/setup` and choose "Create a new local project"
+5. Claude creates the directory, runs `git init`, and sets up all files
 
 **D) Set up a blank local repo**
 
 1. Open Claude Code in your blank/empty repo
 2. Tell Claude: "Set up this repo using the template at `/path/to/claude-code-quick-start-template`"
-3. Run `/setup` and choose "Initialize in current directory"
-4. Claude copies template files in and customizes them
+3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
+4. Run `/setup` and choose "Initialize in current directory"
+5. Claude copies template files in and customizes them
 
 ### 4. Plan your project
 
@@ -103,7 +107,9 @@ Copy-Item -Recurse -Force /path/to/template/project/* /path/to/your-repo/
 Then customize:
 - **`CLAUDE.md`** -- Fill in the Project Identity section (project name, stack, developer profile)
 - **`.claude/settings.json`** -- Remove permission entries for stacks and platforms you don't use
-- **`docs/strategy-roadmap.md`** -- Run `/plan` to fill this in interactively (the slash commands were copied in and work normally), or edit it manually using [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) as a reference
+- **`docs/strategy-roadmap.md`** -- Run `/plan` to fill this in interactively, or edit it manually using [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) as a reference
+
+> **VS Code users:** After copying the template files, close and reopen the Claude Code panel so the new slash commands (`/plan`, `/setup`, etc.) are detected.
 
 ---
 
@@ -219,6 +225,8 @@ For more details see:
 ---
 
 ## Troubleshooting
+
+**Slash commands not showing up (VS Code)** -- Close and reopen the Claude Code panel. The extension scans `.claude/commands/` at startup, so new commands aren't detected until you restart the panel.
 
 **Claude keeps asking for permission** -- Add the command pattern to `.claude/settings.json`
 
