@@ -6,13 +6,36 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.1.1] - 2026-02-07
+
+### Added
+- **Prerequisites section** in README -- links to Claude Code VS Code extension, CLI docs, and GitHub CLI
+- **"What It Looks Like" example** in README -- sample `/plan` conversation showing the full Q&A flow
+- **CONTRIBUTING.md** -- guidelines for reporting issues, suggesting improvements, and submitting PRs
+- **License and version badges** in README header
+- **Windows PowerShell commands** in README manual setup (alongside macOS/Linux)
+- **Platform-specific permissions note** in customization guide -- reminder to remove irrelevant OS entries
+
+### Changed
+- README Quick Start rewritten for beginners -- added `git clone` command, Download ZIP option, example prompts showing what to tell Claude in each scenario
+- Strategy roadmap sections renumbered: Part 3 (Risk), Part 4 (Quality & Testing), Part 5 (Timeline), Part 6 (Human Actions) -- eliminates the "Part 3.5" patch numbering
+- Deny list description in how-it-works.md corrected from "blocked even if user approves" to "Claude will refuse to run"
+- README Version History replaced with link to CHANGELOG.md
+- README footer consolidated (Contributing, License sections)
+
+### Removed
+- "Migrating from v1.0" section from README (v1.0 was never publicly released)
+- `nul` file artifact (Windows error output leftover)
+
+---
+
 ## [2.1.0] - 2026-02-07
 
 ### Added
 - **Adaptive planning depth** in `/plan` -- pre-interview assessment gauges how formed the user's idea is (rough concept through detailed spec) and adjusts question depth accordingly
 - **Quality & Testing Strategy** round in `/plan` -- determines quality tier (Lightweight / Standard / Rigorous / Comprehensive) based on project complexity, audience, and reliability needs
 - **Quality tier table** in `/plan` with signal-to-tier mapping and testing approach for each level
-- **Part 3.5: Quality & Testing Strategy** section in `docs/strategy-roadmap.md` template with checklist for unit, integration, E2E, security scanning, and performance testing
+- **Part 4: Quality & Testing Strategy** section in `docs/strategy-roadmap.md` template with checklist for unit, integration, E2E, security scanning, and performance testing
 - **Verification-First Development** behavioral rule in `CLAUDE.md` -- restate requirements before implementing, write tests first for Standard+ tiers, reference acceptance criteria in PRs
 - **Session Management** guidance in `CLAUDE.md` Context Budget -- `/clear` for task switching, compaction awareness, fresh session recommendations
 - **"Why This Template" comparison table** in README -- feature-by-feature comparison vs. Claude Code's built-in `/init`
@@ -101,7 +124,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [1.0.0] - 2026-01-01
+## [1.0.0]
 
 ### Added
 - Initial release with comprehensive templates
