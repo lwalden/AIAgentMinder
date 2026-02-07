@@ -31,7 +31,8 @@ Ask all of these in one grouped prompt:
 5. **Developer profile:**
    - Experience level with chosen stack
    - How much autonomy Claude should have (conservative / medium / aggressive)
-6. **GitHub username/org** (only for Scenario A)
+6. **Project scale:** Will this be a personal tool, a small team tool, or a public-facing product?
+7. **GitHub username/org** (only for Scenario A)
 
 ---
 
@@ -112,6 +113,17 @@ Add the relevant package ecosystem entry:
 - Rust: cargo
 - Go: gomod
 
+### docs/ARCHITECTURE.md -- Include for Complex Project Types
+Include `docs/ARCHITECTURE.md` for project types `web-app`, `api`, and `mobile-app`.
+Skip it for `cli-tool` and `library` unless the user described something complex.
+
+### docs/strategy-roadmap.md -- Set Initial Quality Tier
+Based on the project scale answer from Step 2, set the quality tier placeholder:
+- Personal tool → Lightweight
+- Small team tool → Standard
+- Public-facing product → Rigorous
+This is a starting point -- `/plan` will refine it based on deeper questioning.
+
 ---
 
 ## Step 5: Initial Commit
@@ -140,6 +152,7 @@ Created files:
 - PROGRESS.md (session tracking)
 - DECISIONS.md (architectural decisions)
 - docs/strategy-roadmap.md (project planning template)
+- docs/ARCHITECTURE.md (living architecture doc -- web-app, api, mobile-app only)
 - .claude/settings.json (permissions)
 - .claude/commands/ (5 slash commands)
 - .env.example (environment template)

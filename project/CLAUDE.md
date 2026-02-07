@@ -12,6 +12,7 @@
 | `PROGRESS.md` | **Every session (first thing)** | Current state, active tasks, blockers, next steps |
 | `DECISIONS.md` | Before making architectural choices | Prevents re-debating resolved decisions |
 | `docs/strategy-roadmap.md` | When you need the "why" behind a decision | Business context, goals, architecture rationale |
+| `docs/ARCHITECTURE.md` | When making structural changes | System components, data flow, key decisions |
 | This file | Auto-loaded every session | Behavioral rules and workflow |
 
 ---
@@ -83,6 +84,12 @@ Files on disk and staged changes are preserved. Next session: `git status` and `
 - Be proactive about dependencies: "Before X, we need Y"
 - Flag risks early rather than discovering them mid-implementation
 
+### Verification-First Development
+- Before implementing a feature, confirm requirements by restating what you'll build
+- Write tests appropriate to the project's quality tier (see strategy-roadmap.md)
+- When the quality tier is Standard or above: write failing tests first, then implement
+- Every PR should reference the acceptance criteria from strategy-roadmap.md
+
 ---
 
 ## Context Budget
@@ -94,6 +101,11 @@ Keep per-session context lean:
 | CLAUDE.md | ~120 lines | Don't add to this file without removing something |
 | PROGRESS.md | ~60 lines active | Run `/archive` when it exceeds 100 lines |
 | DECISIONS.md | Grows over time | Move superseded ADRs to `docs/archive/` |
+
+**Session Management:**
+- Use `/clear` to reset conversation when switching to an unrelated task
+- For long sessions, Claude Code will auto-compact history -- this is normal
+- If a session gets slow or unfocused, run `/checkpoint` and start a fresh session
 
 **Rules:**
 - Do NOT re-read this file mid-session (you already have it)

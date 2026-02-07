@@ -1,6 +1,23 @@
-# Claude Code Project Template v2.0
+# Claude Code Project Template v2.1
 
 A template that gives Claude Code session memory, structured planning, and security-conscious permissions so it can work semi-autonomously on any software project. Go from idea to building in minutes.
+
+## Why Use This (vs. `claude /init`)
+
+Claude Code's built-in `/init` command scans your codebase and generates a basic CLAUDE.md. This template goes further:
+
+| Feature | `/init` | This Template |
+|---------|---------|---------------|
+| Session memory across conversations | No | Yes -- PROGRESS.md tracks state between sessions |
+| Architectural decision tracking | No | Yes -- DECISIONS.md prevents re-debating |
+| Guided project planning Q&A | No | Yes -- `/plan` interviews you at any detail level |
+| Adaptive testing strategy | No | Yes -- quality tier matched to project complexity |
+| Security-hardened permissions | No | Yes -- dangerous operations blocked by default |
+| Session lifecycle commands | No | Yes -- `/checkpoint`, `/archive`, `/status` |
+| CI/CD scaffolding | No | Yes -- GitHub Actions, Dependabot, deploy workflows |
+| Pre-built onboarding flow | No | Yes -- `/setup` handles 4 repo scenarios |
+
+---
 
 ## Quick Start
 
@@ -59,7 +76,8 @@ Then customize: edit `CLAUDE.md` (Project Identity section), `docs/strategy-road
 | `CLAUDE.md` | Project instructions -- session protocol, behavioral rules, context budget |
 | `PROGRESS.md` | Session memory -- active tasks, blockers, next steps |
 | `DECISIONS.md` | Architectural decision log -- prevents re-debating |
-| `docs/strategy-roadmap.md` | Project planning -- goals, architecture, timeline |
+| `docs/strategy-roadmap.md` | Project planning -- goals, architecture, timeline, testing strategy |
+| `docs/ARCHITECTURE.md` | Living architecture doc (web-app, api, mobile-app) |
 | `.claude/settings.json` | Pre-approved permissions for development commands |
 | `.claude/commands/setup.md` | `/setup` -- guided project initialization |
 | `.claude/commands/plan.md` | `/plan` -- interactive strategy roadmap creation |
@@ -81,6 +99,19 @@ Then customize: edit `CLAUDE.md` (Project Identity section), `docs/strategy-road
 3. **Run `/status`** at any time to check project state
 4. **Run `/checkpoint`** at the end of each work session
 5. **Run `/archive`** when PROGRESS.md gets long
+
+---
+
+## Planning Your Project
+
+The template's biggest strength is the `/plan` command -- an interactive Q&A that works regardless of how much planning you've already done:
+
+- **"I just have a vague idea"** -- Claude interviews you from scratch, asking about users, features, tech stack, and testing needs
+- **"I have a rough concept"** -- Claude asks targeted questions to fill in the gaps
+- **"I have a partial spec"** -- Share what you have and Claude completes the missing pieces
+- **"I have a full business plan"** -- Paste or point Claude at your docs and it translates them into an actionable development roadmap
+
+The output is always `docs/strategy-roadmap.md` -- a structured document with acceptance criteria, testing strategy, timeline, and human action items that Claude references throughout development.
 
 ---
 
@@ -126,6 +157,7 @@ v2.0 moved all project scaffolding into the `project/` directory and replaced `s
 
 ## Version History
 
+- **v2.1** -- Adaptive planning (any starting point from napkin sketch to full spec), quality tiers with testing strategy, verification-first development, ARCHITECTURE.md template, "Why This Template" differentiation
 - **v2.0** -- Restructured into `project/` directory, added 5 slash commands, security-hardened permissions, context budget management, trimmed all templates for efficiency
 - **v1.0** -- Initial release with comprehensive templates
 
