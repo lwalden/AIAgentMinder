@@ -25,6 +25,18 @@ Write 2-3 sentences about what the project does, who it's for, and what makes it
 ### Part 3: Risk Management
 Identify 3-5 risks with likelihood, impact, and mitigation strategy.
 
+### Part 3.5: Quality & Testing Strategy
+Choose a quality tier that matches your project's needs:
+
+| Quality Tier | When to Use | What It Means |
+|-------------|-------------|---------------|
+| **Lightweight** | Personal tools, prototypes, solo use | Manual testing, smoke tests, no formal test suite |
+| **Standard** | Team tools, moderate complexity | Unit tests for core logic, basic integration tests, CI runs tests on PR |
+| **Rigorous** | Public products, user data, payments | Unit + integration + E2E tests, security scanning, CI/CD gates |
+| **Comprehensive** | Safety-critical, compliance, enterprise | All of Rigorous + load testing, audit logging, code coverage targets |
+
+The `/plan` command will recommend a tier based on your answers. You can always adjust it -- the goal is that lightweight projects stay lightweight and rigorous projects get the support they need.
+
 ### Part 4: Development Timeline
 Break work into phases with weekly deliverables. Phase 1 should be the minimum viable product.
 

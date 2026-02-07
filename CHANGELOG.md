@@ -6,6 +6,30 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [2.1.0] - 2026-02-07
+
+### Added
+- **Adaptive planning depth** in `/plan` -- pre-interview assessment gauges how formed the user's idea is (rough concept through detailed spec) and adjusts question depth accordingly
+- **Quality & Testing Strategy** round in `/plan` -- determines quality tier (Lightweight / Standard / Rigorous / Comprehensive) based on project complexity, audience, and reliability needs
+- **Quality tier table** in `/plan` with signal-to-tier mapping and testing approach for each level
+- **Part 3.5: Quality & Testing Strategy** section in `docs/strategy-roadmap.md` template with checklist for unit, integration, E2E, security scanning, and performance testing
+- **Verification-First Development** behavioral rule in `CLAUDE.md` -- restate requirements before implementing, write tests first for Standard+ tiers, reference acceptance criteria in PRs
+- **Session Management** guidance in `CLAUDE.md` Context Budget -- `/clear` for task switching, compaction awareness, fresh session recommendations
+- **"Why This Template" comparison table** in README -- feature-by-feature comparison vs. Claude Code's built-in `/init`
+- **"Planning Your Project" section** in README -- highlights the `/plan` Q&A flow as a first-class feature, explains all 4 starting points
+- **`docs/ARCHITECTURE.md`** template -- living architecture document for complex project types (web-app, api, mobile-app)
+- **Project scale question** in `/setup` Step 2 -- personal tool / team tool / public product, used to set initial quality tier
+- **ARCHITECTURE.md generation** in `/setup` Step 4 -- conditionally included based on project type
+- **Initial quality tier** set by `/setup` based on project scale, refined later by `/plan`
+- **Quality & Testing guidance** in `docs/strategy-creation-guide.md` -- explains quality tiers and when to use each
+
+### Changed
+- `/plan` question flow restructured: Round 3 is now Quality & Testing, former Round 3 (Unknowns) moved to Round 4
+- `/plan` Project Type Adaptation table updated to include Quality & Testing row
+- README version bumped to v2.1, version history updated
+
+---
+
 ## [2.0.0] - 2026-02-07
 
 ### Added
