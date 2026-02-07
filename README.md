@@ -32,45 +32,57 @@ Claude Code's built-in `/init` command scans your codebase and generates a basic
 
 ## Quick Start
 
-Get this template onto your machine, then let Claude set everything up:
+### 1. Get the template
+
+Clone or download this repository -- it's a source of files that Claude will copy into your actual project:
 
 ```bash
 git clone https://github.com/lwalden/claude-code-quick-start-template.git
 ```
 
-Or click the green **Code** button on GitHub and choose **Download ZIP**.
+You can also click the green **Code** button on GitHub and choose **Download ZIP**.
 
-Then pick the scenario that fits:
+### 2. Know what you want to build
 
-### A) Claude Creates a New GitHub Repo
+Come with something that describes your project -- anything from a single sentence ("I want to build a recipe sharing app") to a full business plan or technical spec. The `/plan` command (Step 4) will interview you and fill in whatever's missing, so don't worry about having everything figured out.
+
+### 3. Pick a setup scenario and follow the steps
+
+Choose the scenario that matches your situation. Each one uses `/setup` to copy template files into your project and customize them for your stack.
+
+**A) Start a brand-new project with a GitHub repo**
 
 1. Open Claude Code (in VS Code or CLI)
 2. Tell Claude: "I want to set up a new project using the template at `/path/to/claude-code-quick-start-template`"
 3. Run `/setup` and choose "Create a new GitHub repository"
 4. Claude asks for your project name, tech stack, and preferences, then creates the repo and sets everything up
 
-### B) Add to an Existing Repo
+**B) Add to an existing repo**
 
 1. Open Claude Code in your existing repo
 2. Tell Claude: "Add the project template from `/path/to/claude-code-quick-start-template` to this repo"
 3. Run `/setup` and choose "Add to an existing repository"
 4. Claude copies template files in, asking before overwriting anything you already have
 
-### C) New Local Project (No GitHub Yet)
+**C) Start a new local project (no GitHub yet)**
 
 1. Open Claude Code (in VS Code or CLI)
 2. Tell Claude: "Create a new project using the template at `/path/to/claude-code-quick-start-template`"
 3. Run `/setup` and choose "Create a new local project"
 4. Claude creates the directory, runs `git init`, and sets up all files
 
-### D) Blank Local Repo
+**D) Set up a blank local repo**
 
 1. Open Claude Code in your blank/empty repo
 2. Tell Claude: "Set up this repo using the template at `/path/to/claude-code-quick-start-template`"
 3. Run `/setup` and choose "Initialize in current directory"
 4. Claude copies template files in and customizes them
 
-### Manual Setup (No Slash Commands)
+### 4. Plan your project
+
+Once setup is complete, run `/plan`. Claude will interview you about what you're building -- share your idea, paste a spec, or point it at existing documents. It generates `docs/strategy-roadmap.md` with acceptance criteria, testing strategy, timeline, and action items that Claude references throughout development. See [Planning Your Project](#planning-your-project) for details.
+
+### Manual Setup (Without `/setup`)
 
 If you prefer to set things up yourself, copy the contents of the `project/` folder into your repo. Make sure to include the hidden directories (`.claude/` and `.github/`):
 
@@ -84,15 +96,14 @@ cp /path/to/template/project/.env.example /path/to/your-repo/
 ```
 
 ```powershell
-# Windows (PowerShell)
+# Windows (PowerShell) -- * matches dotfiles on Windows, so one command copies everything
 Copy-Item -Recurse -Force /path/to/template/project/* /path/to/your-repo/
-Copy-Item -Recurse -Force /path/to/template/project/.claude /path/to/your-repo/
-Copy-Item -Recurse -Force /path/to/template/project/.github /path/to/your-repo/
-Copy-Item -Force /path/to/template/project/.gitignore /path/to/your-repo/
-Copy-Item -Force /path/to/template/project/.env.example /path/to/your-repo/
 ```
 
-Then customize: edit `CLAUDE.md` (Project Identity section), `docs/strategy-roadmap.md`, and `.claude/settings.json`.
+Then customize:
+- **`CLAUDE.md`** -- Fill in the Project Identity section (project name, stack, developer profile)
+- **`.claude/settings.json`** -- Remove permission entries for stacks and platforms you don't use
+- **`docs/strategy-roadmap.md`** -- Run `/plan` to fill this in interactively (the slash commands were copied in and work normally), or edit it manually using [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) as a reference
 
 ---
 
@@ -119,13 +130,12 @@ Then customize: edit `CLAUDE.md` (Project Identity section), `docs/strategy-road
 
 ---
 
-## After Setup
+## After Setup and Planning
 
-1. **Run `/plan`** to create your strategy roadmap interactively
-2. **Tell Claude** "start Phase 1" to begin building
-3. **Run `/status`** at any time to check project state
-4. **Run `/checkpoint`** at the end of each work session
-5. **Run `/archive`** when PROGRESS.md gets long
+1. **Tell Claude** "start Phase 1" to begin building
+2. **Run `/status`** at any time to check project state
+3. **Run `/checkpoint`** at the end of each work session
+4. **Run `/archive`** when PROGRESS.md gets long
 
 ---
 
