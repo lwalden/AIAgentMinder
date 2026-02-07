@@ -83,6 +83,6 @@ These operations are deliberately excluded so Claude must ask first:
 - **Infrastructure destruction** (`terraform destroy`, `kubectl delete`) -- prevents resource deletion
 
 ### Explicit Deny List
-These are blocked even if the user tries to approve them:
+Claude will refuse to run these commands:
 - `rm -rf /` and `rm -rf ~` -- catastrophic deletion
 - `git push --force` to protected branches -- prevents history loss

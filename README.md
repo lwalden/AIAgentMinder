@@ -1,4 +1,7 @@
-# Claude Code Project Template v2.1
+# Claude Code Project Template
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+![Version](https://img.shields.io/badge/version-2.1-blue)
 
 A template that gives Claude Code session memory, structured planning, and security-conscious permissions so it can work semi-autonomously on any software project. Go from idea to building in minutes.
 
@@ -19,50 +22,74 @@ Claude Code's built-in `/init` command scans your codebase and generates a basic
 
 ---
 
+## Prerequisites
+
+- **Claude Code** -- either the [VS Code extension](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) or the [CLI](https://docs.anthropic.com/en/docs/claude-code)
+- **Git** installed and configured (`git --version` to check)
+- **GitHub CLI** (optional, needed for Scenario A) -- install from [cli.github.com](https://cli.github.com)
+
+---
+
 ## Quick Start
 
-Everything inside the `project/` folder gets copied into your repo. Pick the scenario that fits:
+Get this template onto your machine, then let Claude set everything up:
+
+```bash
+git clone https://github.com/lwalden/claude-code-quick-start-template.git
+```
+
+Or click the green **Code** button on GitHub and choose **Download ZIP**.
+
+Then pick the scenario that fits:
 
 ### A) Claude Creates a New GitHub Repo
 
-1. Clone or download this template
-2. Open Claude Code and tell it where this template is
+1. Open Claude Code (in VS Code or CLI)
+2. Tell Claude: "I want to set up a new project using the template at `/path/to/claude-code-quick-start-template`"
 3. Run `/setup` and choose "Create a new GitHub repository"
-4. Claude will ask for project name, tech stack, and preferences
-5. Claude creates the repo, copies files, and customizes everything
+4. Claude asks for your project name, tech stack, and preferences, then creates the repo and sets everything up
 
 ### B) Add to an Existing Repo
 
 1. Open Claude Code in your existing repo
-2. Tell Claude the path to this template (or clone it nearby)
+2. Tell Claude: "Add the project template from `/path/to/claude-code-quick-start-template` to this repo"
 3. Run `/setup` and choose "Add to an existing repository"
-4. Claude copies template files, asks before overwriting anything
+4. Claude copies template files in, asking before overwriting anything you already have
 
 ### C) New Local Project (No GitHub Yet)
 
-1. Clone or download this template
-2. Open Claude Code
+1. Open Claude Code (in VS Code or CLI)
+2. Tell Claude: "Create a new project using the template at `/path/to/claude-code-quick-start-template`"
 3. Run `/setup` and choose "Create a new local project"
-4. Claude creates the directory, runs `git init`, and sets up files
+4. Claude creates the directory, runs `git init`, and sets up all files
 
 ### D) Blank Local Repo
 
 1. Open Claude Code in your blank/empty repo
-2. Tell Claude the path to this template
+2. Tell Claude: "Set up this repo using the template at `/path/to/claude-code-quick-start-template`"
 3. Run `/setup` and choose "Initialize in current directory"
-4. Claude copies template files and customizes them
+4. Claude copies template files in and customizes them
 
 ### Manual Setup (No Slash Commands)
 
-If you prefer to set things up yourself:
+If you prefer to set things up yourself, copy the contents of the `project/` folder into your repo. Make sure to include the hidden directories (`.claude/` and `.github/`):
 
 ```bash
-# Copy project files to your repo
+# macOS / Linux
 cp -r /path/to/template/project/* /path/to/your-repo/
 cp -r /path/to/template/project/.claude /path/to/your-repo/
 cp -r /path/to/template/project/.github /path/to/your-repo/
 cp /path/to/template/project/.gitignore /path/to/your-repo/
 cp /path/to/template/project/.env.example /path/to/your-repo/
+```
+
+```powershell
+# Windows (PowerShell)
+Copy-Item -Recurse -Force /path/to/template/project/* /path/to/your-repo/
+Copy-Item -Recurse -Force /path/to/template/project/.claude /path/to/your-repo/
+Copy-Item -Recurse -Force /path/to/template/project/.github /path/to/your-repo/
+Copy-Item -Force /path/to/template/project/.gitignore /path/to/your-repo/
+Copy-Item -Force /path/to/template/project/.env.example /path/to/your-repo/
 ```
 
 Then customize: edit `CLAUDE.md` (Project Identity section), `docs/strategy-roadmap.md`, and `.claude/settings.json`.
@@ -113,6 +140,57 @@ The template's biggest strength is the `/plan` command -- an interactive Q&A tha
 
 The output is always `docs/strategy-roadmap.md` -- a structured document with acceptance criteria, testing strategy, timeline, and human action items that Claude references throughout development.
 
+### What It Looks Like
+
+Here's a typical `/plan` interaction:
+
+```
+You:  /plan
+Claude: Before we start, where are you with your project idea?
+        A) Just a rough concept
+        B) Clear idea, no details
+        C) Partial plan or spec
+        D) Detailed plan or spec
+
+You:  B -- I want to build a recipe sharing app
+
+Claude: Great! Let me ask a few questions to understand the full picture.
+
+        Round 1 -- Core Understanding:
+        1. What does this app do? (elevator pitch)
+        2. Who will use it?
+        3. What problem does it solve?
+        4. What makes it different from existing recipe sites?
+
+You:  [answers]
+
+Claude: Round 2 -- Scope & Technical:
+        1. What are the 3-5 must-have features for v1?
+        2. Any features that can wait?
+        ...
+
+You:  [answers]
+
+Claude: Round 3 -- Quality & Testing:
+        Based on what you've described (public-facing, user accounts, image uploads),
+        I'd recommend the **Rigorous** quality tier:
+        - Unit tests for core logic
+        - Integration tests for API endpoints
+        - E2E tests for key user flows
+        - Security scanning in CI
+        Does that sound right?
+
+You:  Yes, that works.
+
+Claude: Here's my understanding of the project: [summary]
+        Does this capture everything? Anything to add or change?
+
+You:  Looks good!
+
+Claude: Writing docs/strategy-roadmap.md...
+        Your roadmap is ready. Tell me to start Phase 1 when you're ready.
+```
+
 ---
 
 ## How It Works
@@ -127,17 +205,6 @@ For more details see:
 - [docs/how-it-works.md](docs/how-it-works.md) -- Session continuity, context budget, security model
 - [docs/customization-guide.md](docs/customization-guide.md) -- What and how to customize
 - [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) -- Creating your strategy roadmap
-
----
-
-## Migrating from v1.0
-
-v2.0 moved all project scaffolding into the `project/` directory and replaced `settings_local.json` with `.claude/settings.json`. If you're using v1.0:
-
-1. Copy files from `project/` to your repo (same as a fresh setup)
-2. The `.claude/commands/` directory is new -- copy it to get slash commands
-3. Replace your `settings_local.json` with `.claude/settings.json` (security-hardened)
-4. Your existing `PROGRESS.md` and `DECISIONS.md` content is still valid
 
 ---
 
@@ -157,10 +224,18 @@ v2.0 moved all project scaffolding into the `project/` directory and replaced `s
 
 ## Version History
 
-- **v2.1** -- Adaptive planning (any starting point from napkin sketch to full spec), quality tiers with testing strategy, verification-first development, ARCHITECTURE.md template, "Why This Template" differentiation
-- **v2.0** -- Restructured into `project/` directory, added 5 slash commands, security-hardened permissions, context budget management, trimmed all templates for efficiency
-- **v1.0** -- Initial release with comprehensive templates
+See [CHANGELOG.md](CHANGELOG.md) for detailed release notes.
 
 ---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## License
+
+MIT -- see [LICENSE](LICENSE).
 
 *Works with Claude Code (VS Code extension) and Claude Code CLI.*

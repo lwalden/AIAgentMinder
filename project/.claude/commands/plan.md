@@ -107,7 +107,7 @@ Based on the project type in CLAUDE.md, adjust which strategy-roadmap.md section
 Read the template at `docs/strategy-roadmap.md`. Fill it in based on the user's answers.
 
 ### Quality & Testing Strategy Section
-Fill the "Part 3.5: Quality & Testing Strategy" section based on the tier determined in Round 3:
+Fill the "Part 4: Quality & Testing Strategy" section based on the tier determined in Round 3:
 
 **Lightweight:** Check only "Unit tests" with note "smoke tests for critical paths only". Uncheck all others.
 **Standard:** Check "Unit tests" and "Integration tests". Set coverage target to core logic only.

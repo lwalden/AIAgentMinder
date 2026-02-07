@@ -25,7 +25,7 @@ Write 2-3 sentences about what the project does, who it's for, and what makes it
 ### Part 3: Risk Management
 Identify 3-5 risks with likelihood, impact, and mitigation strategy.
 
-### Part 3.5: Quality & Testing Strategy
+### Part 4: Quality & Testing Strategy
 Choose a quality tier that matches your project's needs:
 
 | Quality Tier | When to Use | What It Means |
@@ -37,10 +37,10 @@ Choose a quality tier that matches your project's needs:
 
 The `/plan` command will recommend a tier based on your answers. You can always adjust it -- the goal is that lightweight projects stay lightweight and rigorous projects get the support they need.
 
-### Part 4: Development Timeline
+### Part 5: Development Timeline
 Break work into phases with weekly deliverables. Phase 1 should be the minimum viable product.
 
-### Part 5: Human Actions Required
+### Part 6: Human Actions Required
 List everything the human needs to do (service signups, API keys, decisions) with timing.
 
 ---

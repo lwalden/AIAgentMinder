@@ -51,6 +51,8 @@ Add project-specific tools:
 
 Remove permissions for stacks you don't use to keep the file lean. A Python project doesn't need .NET, Rust, or Go permissions.
 
+The template also includes platform-specific entries (`powershell.exe`, `cmd.exe`, `wsl` for Windows; `brew` for macOS). Remove entries for platforms you don't use.
+
 ### CI/CD Workflows
 
 The `/setup` command generates stack-specific CI jobs. You can also edit the workflows directly:
