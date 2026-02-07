@@ -1,0 +1,162 @@
+# [Project Name]: Strategy & Technical Roadmap
+
+> This document provides business context, goals, and technical architecture.
+> Claude references this for the "why" behind development decisions.
+> **Context budget:** Read on-demand, not every session. ~200 lines.
+>
+> Run `/plan` to fill this in interactively, or edit manually.
+
+**Project Type:** [web-app | api | cli-tool | library | mobile-app | other]
+
+---
+
+## Executive Summary
+
+**Vision:** [One-paragraph description of what this project aims to achieve]
+
+**Key Differentiators:**
+1. [What makes this unique vs alternatives]
+2. [Second differentiator]
+3. [Third differentiator]
+
+**Success Criteria:**
+- [Metric 1]: [Target value] by [timeframe]
+- [Metric 2]: [Target value] by [timeframe]
+
+---
+
+## Part 1: Product Strategy
+
+### 1.1 Problem Statement
+
+**The Problem:** [What problem does this solve? Who has this problem?]
+
+**Current Solutions & Their Gaps:**
+| Current Approach | Limitation | Our Advantage |
+|------------------|------------|---------------|
+| [Alternative 1] | [Gap] | [How we're better] |
+| [Alternative 2] | [Gap] | [How we're better] |
+
+### 1.2 Target Users
+
+- [User persona 1]: [Brief description and primary need]
+- [User persona 2]: [Brief description and primary need]
+
+### 1.3 Features
+
+**MVP (Phase 1):**
+1. [Feature 1] - [Brief description]
+   - Acceptance: [Testable criterion]
+2. [Feature 2] - [Brief description]
+   - Acceptance: [Testable criterion]
+3. [Feature 3] - [Brief description]
+   - Acceptance: [Testable criterion]
+
+**Phase 2:**
+1. [Feature] - [Brief description]
+2. [Feature] - [Brief description]
+
+**Phase 3:**
+1. [Feature] - [Brief description]
+2. [Feature] - [Brief description]
+
+**Out of Scope:**
+- [Explicitly excluded items]
+
+---
+
+## Part 2: Technical Architecture
+
+### 2.1 System Overview
+
+```
+[Architecture diagram -- replace with your project's actual architecture]
+```
+
+### 2.2 Technology Choices
+
+| Component | Technology | Rationale |
+|-----------|------------|-----------|
+| Backend | [Language/Framework] | [Why] |
+| Database | [Database] | [Why] |
+| Frontend | [Framework] | [Why] |
+| Hosting | [Platform] | [Why] |
+
+### 2.3 Data Models
+
+[Define core entities and their relationships]
+
+### 2.4 API Design
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| [GET/POST/etc] | [/api/v1/...] | [What it does] |
+
+### 2.5 Security
+
+**Authentication:** [Method and approach]
+**Authorization:** [Permission model]
+**Data Protection:** [Encryption, PII handling]
+
+---
+
+## Part 3: Risk Management
+
+| Risk | Likelihood | Impact | Mitigation |
+|------|------------|--------|------------|
+| [Risk 1] | Low/Med/High | Low/Med/High | [Strategy] |
+| [Risk 2] | [L/M/H] | [L/M/H] | [Strategy] |
+
+**Technical Debt Checkpoints:**
+- End of Phase 1: Review shortcuts, refactor critical paths
+- End of Phase 2: Performance testing, security review
+
+---
+
+## Part 4: Development Timeline
+
+### Phase 1: Foundation
+**Duration:** [X weeks]
+
+| Week | Focus | Deliverables |
+|------|-------|--------------|
+| 1 | Setup | Project structure, environment, CI/CD |
+| 2 | Core | [Core functionality] |
+| 3 | [Focus] | [Deliverables] |
+
+### Phase 2: Core Features
+**Duration:** [X weeks]
+
+| Week | Focus | Deliverables |
+|------|-------|--------------|
+| [N] | [Focus] | [Deliverables] |
+
+### Phase 3: Polish & Release
+**Duration:** [X weeks]
+
+| Week | Focus | Deliverables |
+|------|-------|--------------|
+| [N] | [Focus] | [Deliverables] |
+
+---
+
+## Part 5: Human Actions Required
+
+| Action | What's Needed | When |
+|--------|---------------|------|
+| [Service signup] | [Create account, get API key] | [Before Phase X] |
+| [Decision needed] | [Choose between options] | [Before Week X] |
+
+---
+
+## Unknowns & TODOs
+
+<!-- TODO: [What needs to be decided]
+     WHEN: [When this needs resolution]
+     BLOCKER: [What this blocks]
+     OPTIONS: [Known options]
+-->
+
+---
+
+*Version: 1.0 | Last Updated: [DATE]*
