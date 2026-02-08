@@ -8,16 +8,12 @@ Perform end-of-session housekeeping. Run this before ending a work session.
 
 ### 1. Update PROGRESS.md
 
-- Move any newly completed tasks from "Active Tasks" to a session summary entry
-- Add any new blockers to "Blocked / Awaiting Human"
-- Write "Next Session Should" priorities based on what makes sense after this session's work
-- Add a session summary entry:
+- Update "Active Tasks" with completed work (move to done status or remove)
+- Update "Blockers" if any issues arose
+- Update "Next Priorities" based on what comes next
+- Add a brief session note at the bottom (keep last 3 sessions only):
   ```markdown
-  ### Session: [today's date]
-  **Focus:** [what was worked on]
-  **Outcome:** [brief result]
-  - [key action taken]
-  - [key action taken]
+  - [DATE] [what was accomplished] → [what's next]
   ```
 
 ### 2. Update DECISIONS.md (if applicable)

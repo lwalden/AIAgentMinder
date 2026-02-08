@@ -213,7 +213,7 @@ Claude: Writing docs/strategy-roadmap.md...
 
 **Session continuity:** Claude reads `PROGRESS.md` at the start of every session to know what's done, what's blocked, and what to work on next. At session end, `/checkpoint` updates the file. Between sessions, your progress is preserved.
 
-**Context management:** Files are sized for minimal context consumption. `CLAUDE.md` (~100 lines) and `PROGRESS.md` (~60 lines) are read every session. Larger files like `strategy-roadmap.md` are read on-demand. The `/archive` command keeps `PROGRESS.md` from growing unbounded.
+**Context management:** Files are sized for minimal context consumption. `CLAUDE.md` (~80 lines) and `PROGRESS.md` (~15-20 lines) are read every session. Larger files like `strategy-roadmap.md` are read on-demand. The `/archive` command keeps `PROGRESS.md` from growing unbounded.
 
 **Security:** The `.claude/settings.json` pre-approves common development commands (git, package managers, build tools) so Claude doesn't ask permission for routine work. Dangerous operations (`rm`, `git reset --hard`, `kill`, force-push) are excluded and require explicit approval. See [docs/how-it-works.md](docs/how-it-works.md) for details.
 
