@@ -88,8 +88,8 @@ Keep per-session context lean:
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~120 lines | Don't add to this file without removing something |
-| PROGRESS.md | ~60 lines active | Run `/archive` when it exceeds 100 lines |
+| CLAUDE.md | ~79 lines | Don't add to this file without removing something |
+| PROGRESS.md | ~15-20 lines active | Run `/archive` when it exceeds 100 lines |
 | DECISIONS.md | Grows over time | Move superseded ADRs to `docs/archive/` |
 
 **Session Management:**

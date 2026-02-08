@@ -12,22 +12,22 @@ This keeps the active file under the ~80 line target for context efficiency.
 mkdir -p docs/archive
 ```
 
-### 2. Archive Old Session Summaries
+### 2. Archive Old Session Notes
 
-Read PROGRESS.md. Keep only the **3 most recent** session summaries in the file.
-Move all older session summaries to `docs/archive/progress-archive.md`:
+Read PROGRESS.md. Keep only the **3 most recent session notes** at the bottom.
+Move all older notes to `docs/archive/progress-archive.md`:
 
-- If the archive file exists, prepend the old entries at the top (newest archived first)
-- If it doesn't exist, create it with a header:
+- If the archive file exists, prepend new entries at the top (newest first)
+- If it doesn't exist, create it:
   ```markdown
   # Progress Archive
 
-  > Archived session summaries from PROGRESS.md.
+  > Archived session notes from PROGRESS.md (keep last 3 active).
   > Newest entries at top.
 
   ---
   ```
-- Then append the old session entries
+- Then append the old session notes
 
 ### 3. Archive Completed Tasks
 
