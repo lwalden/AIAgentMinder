@@ -2,18 +2,8 @@
 
 > Claude reads this file automatically at the start of every session.
 > Keep it concise -- every line here costs context tokens on every session.
-
----
-
-## Context Map
-
-| File | Read When | Purpose |
-|------|-----------|---------|
-| `PROGRESS.md` | **Every session (first thing)** | Current state, active tasks, blockers, next steps |
-| `DECISIONS.md` | Before making architectural choices | Prevents re-debating resolved decisions |
-| `docs/strategy-roadmap.md` | When you need the "why" behind a decision | Business context, goals, architecture rationale |
-| `docs/ARCHITECTURE.md` | When making structural changes | System components, data flow, key decisions |
-| This file | Auto-loaded every session | Behavioral rules and workflow |
+>
+> **File Reading Order:** PROGRESS.md first → DECISIONS.md when making architectural choices → other docs on-demand.
 
 ---
 
@@ -98,8 +88,8 @@ Keep per-session context lean:
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~120 lines | Don't add to this file without removing something |
-| PROGRESS.md | ~60 lines active | Run `/archive` when it exceeds 100 lines |
+| CLAUDE.md | ~79 lines | Don't add to this file without removing something |
+| PROGRESS.md | ~15-20 lines active | Run `/archive` when it exceeds 100 lines |
 | DECISIONS.md | Grows over time | Move superseded ADRs to `docs/archive/` |
 
 **Session Management:**
@@ -107,8 +97,8 @@ Keep per-session context lean:
 - For long sessions, Claude Code will auto-compact history -- this is normal
 - If a session gets slow or unfocused, run `/checkpoint` and start a fresh session
 
-**Rules:**
-- Do NOT re-read this file mid-session (you already have it)
-- Read `strategy-roadmap.md` only when making decisions that need business/product context
-- Read `DECISIONS.md` only when about to make an architectural choice (to check if it was already decided)
-- Never read `docs/archive/*` unless specifically asked about historical context
+**File Reading Strategy:**
+- PROGRESS.md: Read every session (first thing)
+- DECISIONS.md: Read before architectural choices (prevent re-debating)
+- strategy-roadmap.md & ARCHITECTURE.md: Read on-demand for context
+- Never read `docs/archive/*` unless asked
