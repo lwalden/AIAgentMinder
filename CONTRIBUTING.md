@@ -1,10 +1,10 @@
 # Contributing
 
-Thanks for your interest in improving the Claude Code Project Template!
+Thanks for your interest in improving AIAgentMinder!
 
 ## Reporting Issues
 
-Open an [issue](https://github.com/lwalden/claude-code-quick-start-template/issues) with:
+Open an [issue](https://github.com/lwalden/claude-code-quick-start-template/issues) to suggest fixes or features for AIAgentMinder.
 - What you expected to happen
 - What actually happened
 - Steps to reproduce (if applicable)

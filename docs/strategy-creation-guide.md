@@ -4,6 +4,57 @@
 
 Open Claude Code in your project and run `/plan`. Claude will interview you about your project and generate `docs/strategy-roadmap.md` interactively. This is the recommended approach.
 
+### What `/plan` Looks Like
+
+Here's a typical interaction:
+
+```
+You:  /plan
+Claude: Before we start, where are you with your project idea?
+        A) Just a rough concept
+        B) Clear idea, no details
+        C) Partial plan or spec
+        D) Detailed plan or spec
+
+You:  B -- I want to build a recipe sharing app
+
+Claude: Great! Let me ask a few questions to understand the full picture.
+
+        Round 1 -- Core Understanding:
+        1. What does this app do? (elevator pitch)
+        2. Who will use it?
+        3. What problem does it solve?
+        4. What makes it different from existing recipe sites?
+
+You:  [answers]
+
+Claude: Round 2 -- Scope & Technical:
+        1. What are the 3-5 must-have features for v1?
+        2. Any features that can wait?
+        ...
+
+You:  [answers]
+
+Claude: Round 3 -- Quality & Testing:
+        Based on what you've described (public-facing, user accounts, image uploads),
+        I'd recommend the **Rigorous** quality tier:
+        - Unit tests for core logic
+        - Integration tests for API endpoints
+        - E2E tests for key user flows
+        - Security scanning in CI
+        Does that sound right?
+
+You:  Yes, that works.
+
+Claude: Here's my understanding of the project: [summary]
+        Does this capture everything? Anything to add or change?
+
+You:  Looks good!
+
+Claude: Writing docs/strategy-roadmap.md...
+        Your roadmap is ready. Tell me to start Phase 1 when you're ready.
+```
+
 ## The Manual Way
 
 If you prefer to fill out `docs/strategy-roadmap.md` yourself, here's guidance on each section.

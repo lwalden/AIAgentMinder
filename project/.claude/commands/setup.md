@@ -1,6 +1,6 @@
 # /setup - Project Initialization
 
-You are helping the user set up a new project using the Claude Code project template.
+You are helping the user set up a new project using AIAgentMinder, a governance and lifecycle framework for Claude Code.
 Follow these steps in order. Ask questions in grouped batches, not one at a time.
 
 ---

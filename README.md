@@ -1,32 +1,24 @@
-# Claude Code Project Template
+# AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-2.1-blue)
 
-A template that gives Claude Code session memory, structured planning, and security-conscious permissions so it can work semi-autonomously on any software project. Go from idea to building in minutes.
+A governance and lifecycle control framework for Claude Code. AIAgentMinder adds persistent auditable memory, architectural decision tracking, risk-aware testing, and structured planning to transform Claude from helpful assistant into a production-ready project engine. Deploy AI-assisted projects that stay organized, maintainable, and accountable across sessions.
 
-## Why Use This (vs. `claude /init`)
+## Why Use This
 
-Claude Code's built-in `/init` command scans your codebase and generates a basic CLAUDE.md. This template goes further:
+Claude Code out of the box is powerful, but production projects need governance. AIAgentMinder provides:
 
-| Feature | `/init` | This Template |
-|---------|---------|---------------|
-| Session memory across conversations | No | Yes -- PROGRESS.md tracks state between sessions |
-| Architectural decision tracking | No | Yes -- DECISIONS.md prevents re-debating |
-| Guided project planning Q&A | No | Yes -- `/plan` interviews you at any detail level |
-| Adaptive testing strategy | No | Yes -- quality tier matched to project complexity |
-| Security-hardened permissions | No | Yes -- dangerous operations blocked by default |
-| Session lifecycle commands | No | Yes -- `/checkpoint`, `/archive`, `/status` |
-| CI/CD scaffolding | No | Yes -- GitHub Actions, Dependabot, deploy workflows |
-| Pre-built onboarding flow | No | Yes -- `/setup` handles 4 repo scenarios |
-
----
-
-## Prerequisites
-
-- **Claude Code** -- either the [VS Code extension](https://marketplace.visualstudio.com/items?itemName=anthropic.claude-code) or the [CLI](https://docs.anthropic.com/en/docs/claude-code)
-- **Git** installed and configured (`git --version` to check)
-- **GitHub CLI** (optional, needed for Scenario A) -- install from [cli.github.com](https://cli.github.com)
+| Capability | Native Claude Code CLI (OOTB) | AIAgentMinder |
+|---|---|---|
+| Session Persistence | Automatic & Hidden: Uses MEMORY.md to auto-summarize context. Hard to audit or manually "undo" specific facts. | Explicit & Versioned: PROGRESS.md provides a human-readable audit trail that lives in your Git history. |
+| Architectural Guardrails | Static: Uses CLAUDE.md for general rules, but often ignores them during deep "agentic" loops. | Active Log: DECISIONS.md acts as an ADR (Architectural Decision Record) to prevent "logic drift" in long-running projects. |
+| Project Planning | Reactive: Native "Plan Mode" scans files but often jumps to implementation without deep requirement gathering. | Guided Interview: The /plan command forces a discovery phase, ensuring edge cases are caught before tokens are spent. |
+| Lifecycle Control | Ephemeral: Relies on internal history. If the session crashes or resets, specific sub-task state can be lost. | Milestone-Based: Dedicated /checkpoint and /archive commands ensure work is segmented and context stays lean. |
+| Testing Strategy | Ad-hoc: Runs whatever test command you tell it, regardless of the change's scope or risk level. | Tiered & Risk-Aware: Pre-defined quality tiers (Unit vs. E2E) matched to the complexity of the current task. |
+| CI/CD & DevOps | None: The CLI is strictly a local agent; it does not set up project infrastructure. | Scaffolded: Includes pre-built GitHub Actions, Dependabot configs, and Azure-ready deployment workflows. |
+| Security/Perms | Basic: Standard sandbox blocks for dangerous commands (e.g., rm -rf), but lacks project-specific guardrails. | Hardened: Project-level allowedTools overrides and explicit blocks on sensitive enterprise operations. |
+| Onboarding | Manual: Requires you to explain the repo structure every time you start a new major feature. | Automated: The /setup command instantly indexes the repo based on 4 pre-defined "Project Archetypes." |
 
 ---
 
@@ -34,10 +26,11 @@ Claude Code's built-in `/init` command scans your codebase and generates a basic
 
 ### 1. Get the template
 
-Clone or download this repository -- it's a source of files that Claude will copy into your actual project:
+Clone or download the AIAgentMinder repository -- it contains the framework files that you'll customize for your project:
 
 ```bash
 git clone https://github.com/lwalden/claude-code-quick-start-template.git
+cd claude-code-quick-start-template
 ```
 
 You can also click the green **Code** button on GitHub and choose **Download ZIP**.
@@ -46,166 +39,65 @@ You can also click the green **Code** button on GitHub and choose **Download ZIP
 
 Come with something that describes your project -- anything from a single sentence ("I want to build a recipe sharing app") to a full business plan or technical spec. The `/plan` command (Step 4) will interview you and fill in whatever's missing, so don't worry about having everything figured out.
 
-### 3. Pick a setup scenario and follow the steps
+### 3. Run `/setup` in your project
 
-Choose the scenario that matches your situation. Each one uses `/setup` to copy template files into your project and customize them for your stack.
+Open Claude Code in your target project (new or existing repo) and run `/setup`. Choose your scenario:
 
-**A) Start a brand-new project with a GitHub repo**
+- **New GitHub repo** – Claude creates repo and customizes files
+- **Add to existing repo** – Claude copies files with confirmations  
+- **New local project** – Claude creates directory and initializes git
+- **Initialize current directory** – Claude fits template into your existing structure
 
-1. Open Claude Code (in VS Code or CLI)
-2. Tell Claude: "I want to set up a new project using the template at `/path/to/claude-code-quick-start-template`"
-3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
-4. Run `/setup` and choose "Create a new GitHub repository"
-5. Claude asks for your project name, tech stack, and preferences, then creates the repo and sets everything up
-
-**B) Add to an existing repo**
-
-1. Open Claude Code in your existing repo
-2. Tell Claude: "Add the project template from `/path/to/claude-code-quick-start-template` to this repo"
-3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
-4. Run `/setup` and choose "Add to an existing repository"
-5. Claude copies template files in, asking before overwriting anything you already have
-
-**C) Start a new local project (no GitHub yet)**
-
-1. Open Claude Code (in VS Code or CLI)
-2. Tell Claude: "Create a new project using the template at `/path/to/claude-code-quick-start-template`"
-3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
-4. Run `/setup` and choose "Create a new local project"
-5. Claude creates the directory, runs `git init`, and sets up all files
-
-**D) Set up a blank local repo**
-
-1. Open Claude Code in your blank/empty repo
-2. Tell Claude: "Set up this repo using the template at `/path/to/claude-code-quick-start-template`"
-3. **VS Code only:** Close and reopen the Claude Code panel so the new slash commands are detected
-4. Run `/setup` and choose "Initialize in current directory"
-5. Claude copies template files in and customizes them
+**Note (VS Code):** After setup, close and reopen the Claude Code panel so new slash commands are detected.
 
 ### 4. Plan your project
 
-Once setup is complete, run `/plan`. Claude will interview you about what you're building -- share your idea, paste a spec, or point it at existing documents. It generates `docs/strategy-roadmap.md` with acceptance criteria, testing strategy, timeline, and action items that Claude references throughout development. See [Planning Your Project](#planning-your-project) for details.
+Run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
 
-### Manual Setup (Without `/setup`)
+### Manual Setup (Optional)
 
-If you prefer to set things up yourself, copy the contents of the `project/` folder into your repo. Make sure to include the hidden directories (`.claude/` and `.github/`):
+If you prefer manual setup, copy `project/` contents (including `.claude/` and `.github/`) into your repo:
 
 ```bash
 # macOS / Linux
-cp -r /path/to/template/project/* /path/to/your-repo/
-cp -r /path/to/template/project/.claude /path/to/your-repo/
-cp -r /path/to/template/project/.github /path/to/your-repo/
-cp /path/to/template/project/.gitignore /path/to/your-repo/
-cp /path/to/template/project/.env.example /path/to/your-repo/
+cp -r /path/to/template/project/* /path/to/your-repo/ && cp -r /path/to/template/project/.claude /path/to/your-repo/
 ```
 
 ```powershell
-# Windows (PowerShell) -- * matches dotfiles on Windows, so one command copies everything
+# Windows (PowerShell)
 Copy-Item -Recurse -Force /path/to/template/project/* /path/to/your-repo/
 ```
 
-Then customize:
-- **`CLAUDE.md`** -- Fill in the Project Identity section (project name, stack, developer profile)
-- **`.claude/settings.json`** -- Remove permission entries for stacks and platforms you don't use
-- **`docs/strategy-roadmap.md`** -- Run `/plan` to fill this in interactively, or edit it manually using [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) as a reference
-
-> **VS Code users:** After copying the template files, close and reopen the Claude Code panel so the new slash commands (`/plan`, `/setup`, etc.) are detected.
+Then customize `CLAUDE.md`, `.claude/settings.json`, and run `/plan` to generate your strategy.
 
 ---
 
 ## What You Get
 
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | Project instructions -- session protocol, behavioral rules, context budget |
-| `PROGRESS.md` | Session memory -- active tasks, blockers, next steps |
-| `DECISIONS.md` | Architectural decision log -- prevents re-debating |
-| `docs/strategy-roadmap.md` | Project planning -- goals, architecture, timeline, testing strategy |
-| `docs/ARCHITECTURE.md` | Living architecture doc (web-app, api, mobile-app) |
-| `.claude/settings.json` | Pre-approved permissions for development commands |
-| `.claude/commands/setup.md` | `/setup` -- guided project initialization |
-| `.claude/commands/plan.md` | `/plan` -- interactive strategy roadmap creation |
-| `.claude/commands/status.md` | `/status` -- quick project state summary |
-| `.claude/commands/checkpoint.md` | `/checkpoint` -- session end housekeeping |
-| `.claude/commands/archive.md` | `/archive` -- clean old progress entries |
-| `.github/workflows/ci.yml` | CI pipeline skeleton (security scanning included) |
-| `.github/workflows/deploy.yml` | Deployment workflow scaffold |
-| `.github/dependabot.yml` | Automated dependency updates |
-| `.gitignore` | Comprehensive exclusions for all major stacks |
-| `.env.example` | Environment variable starter template |
+Once set up, you'll have:
+
+- **Session memory** ([PROGRESS.md](project/PROGRESS.md)) -- Claude remembers what's done and what's next
+- **Decision tracking** ([DECISIONS.md](project/DECISIONS.md)) -- Prevents re-debating architectural choices
+- **Interactive planning** (`/plan` command) -- structured strategy roadmap with goals, timeline, and quality tiers
+- **Project lifecycle commands** -- `/status`, `/checkpoint`, `/archive` for session management
+- **Pre-approved permissions** ([.claude/settings.json](project/.claude/settings.json)) -- Safe defaults for git, package managers, build tools
+- **CI/CD scaffolding** – GitHub Actions workflows, Dependabot, deploy templates
+- **Comprehensive templates** – CLAUDE.md, strategy roadmap, architecture docs
 
 ---
 
-## After Setup and Planning
+## Next Steps
 
-1. **Tell Claude** "start Phase 1" to begin building
-2. **Run `/status`** at any time to check project state
-3. **Run `/checkpoint`** at the end of each work session
-4. **Run `/archive`** when PROGRESS.md gets long
-
----
-
-## Planning Your Project
-
-The template's biggest strength is the `/plan` command -- an interactive Q&A that works regardless of how much planning you've already done:
-
-- **"I just have a vague idea"** -- Claude interviews you from scratch, asking about users, features, tech stack, and testing needs
-- **"I have a rough concept"** -- Claude asks targeted questions to fill in the gaps
-- **"I have a partial spec"** -- Share what you have and Claude completes the missing pieces
-- **"I have a full business plan"** -- Paste or point Claude at your docs and it translates them into an actionable development roadmap
-
-The output is always `docs/strategy-roadmap.md` -- a structured document with acceptance criteria, testing strategy, timeline, and human action items that Claude references throughout development.
-
-### What It Looks Like
-
-Here's a typical `/plan` interaction:
+After setup and planning:
 
 ```
-You:  /plan
-Claude: Before we start, where are you with your project idea?
-        A) Just a rough concept
-        B) Clear idea, no details
-        C) Partial plan or spec
-        D) Detailed plan or spec
-
-You:  B -- I want to build a recipe sharing app
-
-Claude: Great! Let me ask a few questions to understand the full picture.
-
-        Round 1 -- Core Understanding:
-        1. What does this app do? (elevator pitch)
-        2. Who will use it?
-        3. What problem does it solve?
-        4. What makes it different from existing recipe sites?
-
-You:  [answers]
-
-Claude: Round 2 -- Scope & Technical:
-        1. What are the 3-5 must-have features for v1?
-        2. Any features that can wait?
-        ...
-
-You:  [answers]
-
-Claude: Round 3 -- Quality & Testing:
-        Based on what you've described (public-facing, user accounts, image uploads),
-        I'd recommend the **Rigorous** quality tier:
-        - Unit tests for core logic
-        - Integration tests for API endpoints
-        - E2E tests for key user flows
-        - Security scanning in CI
-        Does that sound right?
-
-You:  Yes, that works.
-
-Claude: Here's my understanding of the project: [summary]
-        Does this capture everything? Anything to add or change?
-
-You:  Looks good!
-
-Claude: Writing docs/strategy-roadmap.md...
-        Your roadmap is ready. Tell me to start Phase 1 when you're ready.
+Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
 ```
+
+Use these commands anytime:
+- `/status` — View project state and blockers
+- `/checkpoint` — Save session work (updates PROGRESS.md)
+- `/archive` — Move old entries when PROGRESS.md grows
 
 ---
 
@@ -256,4 +148,4 @@ See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 MIT -- see [LICENSE](LICENSE).
 
-*Works with Claude Code (VS Code extension) and Claude Code CLI.*
+*Works with Claude Code (VS Code extension) and Claude Code CLI. AIAgentMinder is an independent open-source project and is not affiliated with Anthropic.*
