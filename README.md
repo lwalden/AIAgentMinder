@@ -46,13 +46,12 @@ Open Claude Code **in the AIAgentMinder directory you just cloned** and run `/se
 - **New GitHub repo** – Claude creates the repo and sets up all files
 - **Add to existing repo** – Claude copies files into your repo with confirmations
 - **New local project** – Claude creates the directory, runs `git init`, and sets up files
-- **Initialize current directory** – Claude fits the template into your current structure
 
 **Note (VS Code):** After setup completes, open your target project in VS Code and close/reopen the Claude Code panel so the new slash commands (`/plan`, `/status`, etc.) are detected.
 
 ### 4. Plan your project
 
-Run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
+Open your target project and run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
 
 ### Manual Setup (Alternative)
 
