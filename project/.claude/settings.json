@@ -1,140 +1,53 @@
 {
   "permissions": {
     "allow": [
-      // Version control
+      // Version control -- always needed
       "Bash(git:*)",
       "Bash(gh:*)",
 
-      // Shell utilities (safe operations)
+      // Safe read-only shell utilities
       "Bash(ls:*)",
-      "Bash(dir:*)",
       "Bash(pwd:*)",
+      "Bash(cat:*)",
+      "Bash(echo:*)",
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(wc:*)",
+      "Bash(diff:*)",
+      "Bash(date:*)",
+      "Bash(which:*)",
+      "Bash(env:*)",
+
+      // Safe file operations
       "Bash(mkdir:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(touch:*)",
-      "Bash(ln:*)",
-      "Bash(cat:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)",
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(tree:*)",
-      "Bash(wc:*)",
-      "Bash(sort:*)",
-      "Bash(uniq:*)",
-      "Bash(diff:*)",
-      "Bash(file:*)",
-      "Bash(stat:*)",
-      "Bash(du:*)",
-      "Bash(df:*)",
-      "Bash(echo:*)",
-      "Bash(printf:*)",
-      "Bash(env:*)",
-      "Bash(which:*)",
-      "Bash(where:*)",
-      "Bash(type:*)",
-      "Bash(date:*)",
-      "Bash(curl:*)",
-      "Bash(wget:*)",
+
+      // Text processing (read-only transformations)
       "Bash(jq:*)",
-      "Bash(yq:*)",
-      "Bash(cut:*)",
-      "Bash(tr:*)",
-      "Bash(awk:*)",
-      "Bash(sed:*)",
-      "Bash(xargs:*)",
-      "Bash(tee:*)",
-      "Bash(unzip:*)",
-      "Bash(zip:*)",
-      "Bash(tar:*)",
-      "Bash(gzip:*)",
-      "Bash(gunzip:*)",
-      "Bash(base64:*)",
-      "Bash(sha256sum:*)",
-      "Bash(shasum:*)",
-      "Bash(openssl:*)",
+      "Bash(sort:*)",
+      "Bash(head:*)",
+      "Bash(tail:*)"
 
-      // Containers & orchestration
-      "Bash(docker:*)",
-      "Bash(docker-compose:*)",
-      "Bash(kubectl:*)",
-      "Bash(helm:*)",
-
-      // Package managers & build tools
-      "Bash(npm:*)",
-      "Bash(npx:*)",
-      "Bash(yarn:*)",
-      "Bash(pnpm:*)",
-      "Bash(pip:*)",
-      "Bash(poetry:*)",
-      "Bash(uv:*)",
-      "Bash(cargo:*)",
-      "Bash(rustup:*)",
-      "Bash(dotnet:*)",
-      "Bash(go:*)",
-      "Bash(node:*)",
-      "Bash(deno:*)",
-      "Bash(bun:*)",
-      "Bash(make:*)",
-      "Bash(cmake:*)",
-      "Bash(just:*)",
-
-      // Build & test runners
-      "Bash(pytest:*)",
-      "Bash(eslint:*)",
-      "Bash(prettier:*)",
-      "Bash(tsc:*)",
-      "Bash(tsx:*)",
-      "Bash(jest:*)",
-      "Bash(vitest:*)",
-      "Bash(playwright:*)",
-      "Bash(vite:*)",
-      "Bash(webpack:*)",
-      "Bash(esbuild:*)",
-      "Bash(ruff:*)",
-      "Bash(mypy:*)",
-      "Bash(black:*)",
-      "Bash(prisma:*)",
-      "Bash(drizzle-kit:*)",
-      "Bash(pre-commit:*)",
-
-      // Cloud CLIs & deployment
-      "Bash(az:*)",
-      "Bash(aws:*)",
-      "Bash(gcloud:*)",
-      "Bash(vercel:*)",
-      "Bash(netlify:*)",
-      "Bash(railway:*)",
-      "Bash(fly:*)",
-      "Bash(flyctl:*)",
-      "Bash(wrangler:*)",
-      "Bash(supabase:*)",
-      "Bash(firebase:*)",
-      "Bash(terraform:*)",
-
-      // Environment & platform tools
-      "Bash(brew:*)",
-      "Bash(apt:*)",
-      "Bash(apt-get:*)",
-      "Bash(winget:*)",
-      "Bash(choco:*)",
-      "Bash(scoop:*)",
-      "Bash(nvm:*)",
-      "Bash(fnm:*)",
-      "Bash(pyenv:*)",
-      "Bash(volta:*)",
-      "Bash(mise:*)",
-      "Bash(asdf:*)",
-      "Bash(powershell.exe:*)",
-      "Bash(pwsh:*)",
-      "Bash(cmd.exe:*)",
-      "Bash(wsl:*)"
+      // Stack-specific tools are added by /setup based on your project's tech stack.
+      // Examples added by /setup:
+      //   "Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)"  -- Node.js
+      //   "Bash(pip:*)", "Bash(python:*)", "Bash(pytest:*)"  -- Python
+      //   "Bash(dotnet:*)"  -- .NET / C#
+      //   "Bash(cargo:*)", "Bash(rustup:*)"  -- Rust
+      //   "Bash(go:*)"  -- Go
+      //   "Bash(docker:*)"  -- if using containers
+      //
+      // Add additional tools here as your project needs them.
+      // See docs/customization-guide.md for guidance.
     ],
     "deny": [
+      // Catastrophic deletions -- always refused
       "Bash(rm -rf /:*)",
       "Bash(rm -rf ~:*)",
       "Bash(rm -rf C::*)",
+      // History rewriting -- always requires human approval
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"
     ]

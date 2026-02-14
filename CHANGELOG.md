@@ -6,6 +6,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [3.0.0] - 2026-02-14
+
+### Added
+- **Root-level `/setup` command** in `.claude/commands/setup.md` -- resolves the chicken-and-egg problem of setting up from the template repo itself
+- **MCP server awareness** in `/setup` and `/plan` -- asks about MCP servers during initialization and planning; stores them in CLAUDE.md for Claude to reference
+- **Native Claude Code feature guidance** in `CLAUDE.md` -- explains how MEMORY.md, native plan mode, compact history, hooks, and MCP servers interact with this template
+- **Hooks documentation** in `CLAUDE.md`, `docs/how-it-works.md`, and `docs/customization-guide.md`
+- **Stack-specific `.gitignore` generation** in `/setup` -- appends language-specific entries instead of shipping a 239-line kitchen-sink file
+- **CI/CD on-demand pattern** -- documented: generate CI when you have real code, not at project init
+
+### Changed
+- `project/.claude/settings.json` rebuilt from 132 entries to ~20 focused entries -- baseline is git, gh, safe shell utilities; stack tools added by `/setup`
+- `project/.gitignore` reduced from 239 lines to ~50-line core; stack entries appended by `/setup`
+- `project/DECISIONS.md` simplified: dropped ADR/PDR number scheme, flat entry format
+- README rewritten for v3.0: updated comparison table, What You Get, permissions description
+- `docs/how-it-works.md`, `docs/customization-guide.md`, `docs/strategy-creation-guide.md` updated throughout
+
+### Removed
+- `project/.claude/commands/setup.md` -- `/setup` is a meta-command; including it in copied template was dead weight
+- `project/.github/` directory (ci.yml, deploy.yml, dependabot.yml) -- placeholder CI skeletons were misleading; CI generated on-demand now
+- `project/.env.example` -- added no value; Claude generates accurate env files from project context
+- `project/docs/ARCHITECTURE.md` -- generic placeholder; Claude generates better architecture docs from actual code
+
+---
+
 ## [2.1.1] - 2026-02-07
 
 ### Added

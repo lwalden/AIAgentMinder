@@ -1,24 +1,23 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-2.1-blue)
+![Version](https://img.shields.io/badge/version-3.0-blue)
 
-A governance and lifecycle control framework for Claude Code. AIAgentMinder adds persistent auditable memory, architectural decision tracking, risk-aware testing, and structured planning to transform Claude from helpful assistant into a production-ready project engine. Deploy AI-assisted projects that stay organized, maintainable, and accountable across sessions.
+A governance and lifecycle framework for Claude Code. AIAgentMinder adds persistent auditable memory, architectural decision tracking, risk-aware testing strategy, and structured planning to help you take a project from idea to MVP and beyond -- efficiently, with a quality end product in mind.
 
 ## Why Use This
 
 Claude Code out of the box is powerful, but production projects need governance. AIAgentMinder provides:
 
-| Capability | Native Claude Code CLI (OOTB) | AIAgentMinder |
+| Capability | Native Claude Code (OOTB) | AIAgentMinder |
 |---|---|---|
-| Session Persistence | Automatic & Hidden: Uses MEMORY.md to auto-summarize context. Hard to audit or manually "undo" specific facts. | Explicit & Versioned: PROGRESS.md provides a human-readable audit trail that lives in your Git history. |
-| Architectural Guardrails | Static: Uses CLAUDE.md for general rules, but often ignores them during deep "agentic" loops. | Active Log: DECISIONS.md acts as an ADR (Architectural Decision Record) to prevent "logic drift" in long-running projects. |
-| Project Planning | Reactive: Native "Plan Mode" scans files but often jumps to implementation without deep requirement gathering. | Guided Interview: The /plan command forces a discovery phase, ensuring edge cases are caught before tokens are spent. |
-| Lifecycle Control | Ephemeral: Relies on internal history. If the session crashes or resets, specific sub-task state can be lost. | Milestone-Based: Dedicated /checkpoint and /archive commands ensure work is segmented and context stays lean. |
-| Testing Strategy | Ad-hoc: Runs whatever test command you tell it, regardless of the change's scope or risk level. | Tiered & Risk-Aware: Pre-defined quality tiers (Unit vs. E2E) matched to the complexity of the current task. |
-| CI/CD & DevOps | None: The CLI is strictly a local agent; it does not set up project infrastructure. | Scaffolded: Includes pre-built GitHub Actions, Dependabot configs, and Azure-ready deployment workflows. |
-| Security/Perms | Basic: Standard sandbox blocks for dangerous commands (e.g., rm -rf), but lacks project-specific guardrails. | Hardened: Project-level allowedTools overrides and explicit blocks on sensitive enterprise operations. |
-| Onboarding | Manual: Requires you to explain the repo structure every time you start a new major feature. | Automated: The /setup command instantly indexes the repo based on 4 pre-defined "Project Archetypes." |
+| Session Persistence | Automatic & hidden: MEMORY.md auto-summarizes context. Hard to audit or manually adjust. | Explicit & versioned: PROGRESS.md is a human-readable audit trail that lives in your Git history. |
+| Architectural Guardrails | Static: CLAUDE.md sets general rules, but long agentic loops can drift. | Active log: DECISIONS.md prevents re-debating past choices in long-running projects. |
+| Project Planning | Reactive: Native Plan Mode scans files but jumps to implementation without deep requirement gathering. | Guided interview: `/plan` forces a discovery phase -- goals, quality tiers, unknowns -- before tokens are spent building. |
+| Lifecycle Control | Ephemeral: If a session crashes or gets compacted, sub-task state can be lost. | Milestone-based: `/checkpoint` and `/archive` keep work segmented and context lean. |
+| Testing Strategy | Ad-hoc: Runs whatever test command you ask, regardless of change scope or risk. | Tiered & risk-aware: Quality tiers (Lightweight → Comprehensive) matched to project complexity. |
+| Permissions | Basic sandbox: Blocks `rm -rf` style commands but lacks project-specific guardrails. | Minimal & explicit: Starts with ~20 safe permissions, stack tools added by `/setup`. No accidental cloud resource creation. |
+| MCP & Hooks | Supported but undocumented per-project. | Awareness built into `/setup`, `/plan`, and CLAUDE.md -- Claude knows to use MCP tools and respect project hooks. |
 
 ---
 
@@ -26,7 +25,7 @@ Claude Code out of the box is powerful, but production projects need governance.
 
 ### 1. Get the template
 
-Clone or download the AIAgentMinder repository -- it contains the framework files that you'll customize for your project:
+Clone or download the AIAgentMinder repository -- it contains the framework files you'll customize for your project:
 
 ```bash
 git clone https://github.com/lwalden/claude-code-quick-start-template.git
@@ -37,21 +36,22 @@ You can also click the green **Code** button on GitHub and choose **Download ZIP
 
 ### 2. Know what you want to build
 
-Come with something that describes your project -- anything from a single sentence ("I want to build a recipe sharing app") to a full business plan or technical spec. The `/plan` command (Step 4) will interview you and fill in whatever's missing, so don't worry about having everything figured out.
+Come with something that describes your project -- anything from a single sentence to a full spec. The `/plan` command (Step 4) will interview you and fill in whatever's missing.
 
 ### 3. Run `/setup`
 
 Open Claude Code **in the AIAgentMinder directory you just cloned** and run `/setup`. The command will ask about your target project and copy the framework files there. Choose your scenario:
 
-- **New GitHub repo** – Claude creates the repo and sets up all files
-- **Add to existing repo** – Claude copies files into your repo with confirmations
-- **New local project** – Claude creates the directory, runs `git init`, and sets up files
+- **New GitHub repo** -- Claude creates the repo and sets up all files
+- **Add to existing repo** -- Claude copies files into your repo with confirmations
+- **New local project** -- Claude creates the directory, runs `git init`, and sets up files
+- **Initialize current directory** -- Claude fits the template into your existing structure
 
 **Note (VS Code):** After setup completes, open your target project in VS Code and close/reopen the Claude Code panel so the new slash commands (`/plan`, `/status`, etc.) are detected.
 
 ### 4. Plan your project
 
-Open your target project and run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
+Open Claude Code in your target project directory and run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
 
 ### Manual Setup (Alternative)
 
@@ -77,11 +77,12 @@ Once set up, you'll have:
 
 - **Session memory** ([PROGRESS.md](project/PROGRESS.md)) -- Claude remembers what's done and what's next
 - **Decision tracking** ([DECISIONS.md](project/DECISIONS.md)) -- Prevents re-debating architectural choices
-- **Interactive planning** (`/plan` command) -- structured strategy roadmap with goals, timeline, and quality tiers
+- **Interactive planning** (`/plan` command) -- Structured strategy roadmap with goals, timeline, and quality tiers
 - **Project lifecycle commands** -- `/status`, `/checkpoint`, `/archive` for session management
-- **Pre-approved permissions** ([.claude/settings.json](project/.claude/settings.json)) -- Safe defaults for git, package managers, build tools
-- **CI/CD scaffolding** – GitHub Actions workflows, Dependabot, deploy templates
-- **Comprehensive templates** – CLAUDE.md, strategy roadmap, architecture docs
+- **Minimal permissions** ([.claude/settings.json](project/.claude/settings.json)) -- Safe baseline; stack tools added during setup
+- **Lean gitignore** -- Core secrets/IDE/OS rules plus stack-specific entries added by `/setup`
+
+CI/CD is **not** scaffolded upfront. When you're ready, tell Claude: "Set up GitHub Actions CI for this project." Claude generates an accurate workflow from your actual project structure, not a placeholder skeleton.
 
 ---
 
@@ -94,19 +95,21 @@ Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
 ```
 
 Use these commands anytime:
-- `/status` — View project state and blockers
-- `/checkpoint` — Save session work (updates PROGRESS.md)
-- `/archive` — Move old entries when PROGRESS.md grows
+- `/status` -- View project state and blockers
+- `/checkpoint` -- Save session work (updates PROGRESS.md)
+- `/archive` -- Move old entries when PROGRESS.md grows
 
 ---
 
 ## How It Works
 
-**Session continuity:** Claude reads `PROGRESS.md` at the start of every session to know what's done, what's blocked, and what to work on next. At session end, `/checkpoint` updates the file. Between sessions, your progress is preserved.
+**Session continuity:** Claude reads `PROGRESS.md` at the start of every session to know what's done, what's blocked, and what to work on next. At session end, `/checkpoint` updates the file. Between sessions, your progress is preserved in Git.
 
-**Context management:** Files are sized for minimal context consumption. `CLAUDE.md` (~80 lines) and `PROGRESS.md` (~15-20 lines) are read every session. Larger files like `strategy-roadmap.md` are read on-demand. The `/archive` command keeps `PROGRESS.md` from growing unbounded.
+**Context management:** Files are sized for minimal context consumption. `CLAUDE.md` (~110 lines) and `PROGRESS.md` (~15-20 lines) are read every session. Larger files like `strategy-roadmap.md` are read on-demand. The `/archive` command keeps `PROGRESS.md` from growing unbounded.
 
-**Security:** The `.claude/settings.json` pre-approves common development commands (git, package managers, build tools) so Claude doesn't ask permission for routine work. Dangerous operations (`rm`, `git reset --hard`, `kill`, force-push) are excluded and require explicit approval. See [docs/how-it-works.md](docs/how-it-works.md) for details.
+**Permissions:** The `.claude/settings.json` starts with ~20 safe permissions (git, gh, basic shell utilities). Stack-specific tools (npm, dotnet, cargo, etc.) are added during `/setup`. Dangerous operations (`rm`, `git reset --hard`, `kill`, force-push) are excluded and always require explicit approval.
+
+**Native Claude Code integration:** This template works alongside Claude Code's built-in features -- plan mode, compact history, hooks, and MCP servers. CLAUDE.md explicitly tells Claude how each native feature interacts with the project's governance files.
 
 For more details see:
 - [docs/how-it-works.md](docs/how-it-works.md) -- Session continuity, context budget, security model
@@ -117,7 +120,7 @@ For more details see:
 
 ## Troubleshooting
 
-**Slash commands not showing up (VS Code)** -- Close and reopen the Claude Code panel. The extension scans `.claude/commands/` at startup, so new commands aren't detected until you restart the panel.
+**Slash commands not showing up (VS Code)** -- Close and reopen the Claude Code panel. The extension scans `.claude/commands/` at startup.
 
 **Claude keeps asking for permission** -- Add the command pattern to `.claude/settings.json`
 

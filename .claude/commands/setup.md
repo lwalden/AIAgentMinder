@@ -37,7 +37,8 @@ Ask all of these in one grouped prompt:
    - Experience level with chosen stack
    - How much autonomy Claude should have (conservative / medium / aggressive)
 6. **Project scale:** Will this be a personal tool, a small team tool, or a public-facing product?
-7. **GitHub username/org** (only for Scenario A)
+7. **MCP servers:** Will you be using any MCP servers? (e.g., a database MCP, browser automation, custom API integration -- or "none")
+8. **GitHub username/org** (only for Scenario A)
 
 ---
 
@@ -82,45 +83,34 @@ Replace the placeholder block with actual values:
 **Description:** [actual description]
 **Type:** [actual type]
 **Stack:** [actual stack details]
+**MCP Servers:** [list MCP servers, or omit line if none]
 
 **Developer Profile:**
 - [actual experience info]
 - [actual autonomy preference]
 ```
 
-### .env.example -- Generate Stack-Specific Variables
-Start with the base template, then add sections relevant to the chosen stack:
-- **Python + PostgreSQL**: Add DATABASE_URL, REDIS_URL if caching mentioned
-- **Node.js + MongoDB**: Add MONGODB_URI
-- **C# + Azure**: Add AZURE_* variables
-- **Any web app**: Add JWT_SECRET, SESSION_SECRET
-- Only include what the stack actually needs. Do not include Web3, Telegram, or other unrelated sections.
+### .claude/settings.json -- Add Stack-Specific Permissions
+The template starts with a minimal set of safe permissions (git, gh, basic shell utilities).
+Add permissions for the chosen stack by appending to the `allow` array:
+- **Node.js**: `"Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)", "Bash(pnpm:*)"` (or yarn/bun)
+- **Python**: `"Bash(pip:*)", "Bash(python:*)", "Bash(pytest:*)", "Bash(uv:*)"`
+- **.NET / C#**: `"Bash(dotnet:*)"`
+- **Rust**: `"Bash(cargo:*)", "Bash(rustup:*)"`
+- **Go**: `"Bash(go:*)"`
+- **Docker** (if using containers): `"Bash(docker:*)", "Bash(docker-compose:*)"`
+Only add what the project actually uses.
 
-### .claude/settings.json -- Trim Permissions
-The template includes permissions for all supported stacks. Remove permission blocks for stacks the user is NOT using:
-- Python project? Remove .NET, Rust, Go, Node.js permissions
-- Node.js project? Remove .NET, Python, Rust, Go permissions
-- Keep: git, GitHub CLI, shell utilities, Docker (always useful)
+### .gitignore -- Append Stack-Specific Entries
+The template `.gitignore` covers secrets, IDE files, OS artifacts, and logs.
+Append stack-specific ignores at the bottom after the marker line:
 
-### .github/workflows/ci.yml -- Enable Stack Job
-The CI workflow has a skeleton structure. Add the build/test job for the chosen stack:
-- Python: pip install, pytest
-- Node.js: npm ci, npm test
-- .NET: dotnet restore, dotnet build, dotnet test
-- Rust: cargo build, cargo test
-- Go: go build, go test
-
-### .github/dependabot.yml -- Add Package Ecosystem
-Add the relevant package ecosystem entry:
-- Python: pip
-- Node.js: npm
-- .NET: nuget
-- Rust: cargo
-- Go: gomod
-
-### docs/ARCHITECTURE.md -- Include for Complex Project Types
-Include `docs/ARCHITECTURE.md` for project types `web-app`, `api`, and `mobile-app`.
-Skip it for `cli-tool` and `library` unless the user described something complex.
+- **Node.js**: `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo`, `.eslintcache`
+- **Python**: `__pycache__/`, `*.py[cod]`, `*.egg-info/`, `.venv/`, `.mypy_cache/`, `.ruff_cache/`, `.pytest_cache/`, `htmlcov/`
+- **.NET**: `bin/`, `obj/`, `*.user`, `*.suo`, `.vs/`, `*.nupkg`
+- **Rust**: `target/`, `*.rs.bk`
+- **Go**: `*.exe`, `*.test`, `*.out`
+- **Terraform**: `.terraform/`, `*.tfstate`, `*.tfstate.*`
 
 ### docs/strategy-roadmap.md -- Set Initial Quality Tier
 Based on the project scale answer from Step 2, set the quality tier placeholder:
@@ -159,12 +149,13 @@ Created files:
 - PROGRESS.md (session tracking)
 - DECISIONS.md (architectural decisions)
 - docs/strategy-roadmap.md (project planning template)
-- docs/ARCHITECTURE.md (living architecture doc -- web-app, api, mobile-app only)
-- .claude/settings.json (permissions)
-- .claude/commands/ (5 slash commands)
-- .env.example (environment template)
-- .github/ (CI/CD workflows)
-- .gitignore
+- .claude/settings.json (permissions -- stack tools added)
+- .claude/commands/ (4 slash commands: /plan, /status, /checkpoint, /archive)
+- .gitignore (core + [stack] entries)
+
+CI/CD: Not included. When ready, open the project in Claude Code and say:
+"Set up GitHub Actions CI for this project." Claude will generate an accurate
+workflow based on your actual project structure.
 
 Next steps:
 1. Open Claude Code in your new project directory
