@@ -88,6 +88,58 @@ Useful hook ideas:
 - Auto-update PROGRESS.md timestamp after file writes
 - Send a notification when a session ends
 
+#### Risk-Aware Pre-commit Hook
+
+This hook scans staged changes for common risk patterns before committing. Add it as `.claude/hooks/pre-commit.sh` (or wire it into `.git/hooks/pre-commit`):
+
+```bash
+#!/usr/bin/env bash
+# Risk-aware pre-commit scan
+# Exits non-zero if high-risk patterns are detected, prompting human review.
+
+set -euo pipefail
+
+DIFF=$(git diff --cached)
+WARNINGS=()
+
+# Credential / secret patterns
+if echo "$DIFF" | grep -qiE '(API_KEY|SECRET|PASSWORD|TOKEN)\s*=\s*["\x27][^"\x27]{8,}'; then
+  WARNINGS+=("Possible credential in diff (API_KEY/SECRET/PASSWORD/TOKEN with a value)")
+fi
+
+# Dangerous shell patterns
+if echo "$DIFF" | grep -qE 'rm\s+-rf\s+/'; then
+  WARNINGS+=("Dangerous 'rm -rf /' pattern detected")
+fi
+
+# Large deletion (>50 lines removed in a single file)
+LARGE_DELETE=$(git diff --cached --numstat | awk '$2 > 50 {print $3}')
+if [ -n "$LARGE_DELETE" ]; then
+  WARNINGS+=("Large deletion (>50 lines) in: $LARGE_DELETE")
+fi
+
+if [ ${#WARNINGS[@]} -gt 0 ]; then
+  echo ""
+  echo "⚠️  Pre-commit risk scan flagged the following:"
+  for W in "${WARNINGS[@]}"; do
+    echo "   - $W"
+  done
+  echo ""
+  echo "Review the diff carefully. To commit anyway: git commit --no-verify"
+  echo ""
+  exit 1
+fi
+
+echo "✓ Pre-commit risk scan passed."
+exit 0
+```
+
+Once the hook is in place, add a note to CLAUDE.md so Claude knows to respect it:
+
+```markdown
+**Hooks:** `.claude/hooks/pre-commit.sh` -- risk scan (credentials, large deletions). Claude should run this before committing and address any warnings rather than bypassing with --no-verify.
+```
+
 ### Custom Slash Commands
 
 Create new `.claude/commands/your-command.md` files to add project-specific workflows. For example:

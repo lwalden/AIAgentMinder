@@ -18,8 +18,14 @@ Perform end-of-session housekeeping. Run this before ending a work session.
 
 ### 2. Update DECISIONS.md (if applicable)
 
-If any architectural or design decisions were made this session, add ADR entries.
-Only log significant decisions -- not every small implementation choice.
+Ask yourself: did this session include any of these?
+- Choosing a library or framework
+- Designing an API shape or data contract
+- Selecting an authentication or authorization approach
+- Changing a data model or schema
+- Making a build, deploy, or infrastructure decision
+
+If yes to any, add an ADR entry before committing. Use the format preference recorded at the top of DECISIONS.md (lightweight one-liner or formal Context/Decision/Consequences).
 
 ### 3. Check PROGRESS.md Size
 

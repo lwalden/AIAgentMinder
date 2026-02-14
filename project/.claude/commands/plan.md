@@ -148,7 +148,9 @@ Fill the "Part 4: Quality & Testing Strategy" section based on the tier determin
 ## After Generation
 
 1. Write the completed `docs/strategy-roadmap.md`
-2. Update `PROGRESS.md` to note that strategy roadmap was created
-3. Update `DECISIONS.md` with any architectural decisions made during planning
-4. If MCP servers were mentioned, add a **MCP Servers:** line to the Project Identity section of `CLAUDE.md` listing them (e.g., `postgres, puppeteer`). This signals Claude to use MCP tools for those tasks instead of shell commands.
-5. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready, or run /status to review the project state."
+2. Ask the user: "Do you prefer **lightweight one-liner ADRs** (fast, minimal) or **formal ADRs** (Context / Decision / Consequences format)?" Record the answer as a `## ADR Format` note at the top of `DECISIONS.md` so all future entries are consistent.
+3. Populate the `## MVP Goals` section in `CLAUDE.md` with the Phase 1 deliverables from the roadmap (3-5 bullet points, each a testable outcome).
+4. Update `PROGRESS.md` to note that strategy roadmap was created
+5. Update `DECISIONS.md` with any architectural decisions made during planning (using the format chosen in step 2)
+6. If MCP servers were mentioned, add a **MCP Servers:** line to the Project Identity section of `CLAUDE.md` listing them (e.g., `postgres, puppeteer`). This signals Claude to use MCP tools for those tasks instead of shell commands.
+7. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready, or run /status to review the project state."

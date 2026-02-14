@@ -1,9 +1,15 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.0-blue)
+![Version](https://img.shields.io/badge/version-3.1-blue)
 
 A governance and lifecycle framework for Claude Code. AIAgentMinder adds persistent auditable memory, architectural decision tracking, risk-aware testing strategy, and structured planning to help you take a project from idea to MVP and beyond -- efficiently, with a quality end product in mind.
+
+> **What AIAgentMinder is NOT:**
+> - Not a CLI wrapper or executable -- there is no code to run
+> - Not an AI proxy or MCP server -- it gives Claude files to read, not tools to call
+> - Not a replacement for Claude Code's native memory -- PROGRESS.md is a git-tracked audit trail, not context stuffing
+> - Not a code generator -- it's a governance template that shapes how Claude works with *your* code
 
 ## Why Use This
 
@@ -12,7 +18,7 @@ Claude Code out of the box is powerful, but production projects need governance.
 | Capability | Native Claude Code (OOTB) | AIAgentMinder |
 |---|---|---|
 | Session Persistence | Automatic & hidden: MEMORY.md auto-summarizes context. Hard to audit or manually adjust. | Explicit & versioned: PROGRESS.md is a human-readable audit trail that lives in your Git history. |
-| Architectural Guardrails | Static: CLAUDE.md sets general rules, but long agentic loops can drift. | Active log: DECISIONS.md prevents re-debating past choices in long-running projects. |
+| Architectural Guardrails | Static: CLAUDE.md sets general rules, but long agentic loops can drift. | Active log: DECISIONS.md with explicit trigger criteria prevents re-debating past choices. Trigger: library/framework choice, API design, auth approach, data model change, build/deploy decision. |
 | Project Planning | Reactive: Native Plan Mode scans files but jumps to implementation without deep requirement gathering. | Guided interview: `/plan` forces a discovery phase -- goals, quality tiers, unknowns -- before tokens are spent building. |
 | Lifecycle Control | Ephemeral: If a session crashes or gets compacted, sub-task state can be lost. | Milestone-based: `/checkpoint` and `/archive` keep work segmented and context lean. |
 | Testing Strategy | Ad-hoc: Runs whatever test command you ask, regardless of change scope or risk. | Tiered & risk-aware: Quality tiers (Lightweight → Comprehensive) matched to project complexity. |
@@ -76,7 +82,7 @@ Then open Claude Code in your target repo (restart the Claude Code panel in VS C
 Once set up, you'll have:
 
 - **Session memory** ([PROGRESS.md](project/PROGRESS.md)) -- Claude remembers what's done and what's next
-- **Decision tracking** ([DECISIONS.md](project/DECISIONS.md)) -- Prevents re-debating architectural choices
+- **Decision tracking** ([DECISIONS.md](project/DECISIONS.md)) -- Prevents re-debating architectural choices; explicit trigger criteria so nothing important slips through
 - **Interactive planning** (`/plan` command) -- Structured strategy roadmap with goals, timeline, and quality tiers
 - **Project lifecycle commands** -- `/status`, `/checkpoint`, `/archive` for session management
 - **Minimal permissions** ([.claude/settings.json](project/.claude/settings.json)) -- Safe baseline; stack tools added during setup
@@ -131,6 +137,14 @@ For more details see:
 **Session ended mid-task** -- Run `git status` and `git diff`, tell Claude "continue from where we left off"
 
 **PROGRESS.md is getting long** -- Run `/archive` to move old entries to `docs/archive/`
+
+---
+
+## Roadmap
+
+**v3.1 (current):** ADR trigger criteria, MVP Goals tracking in CLAUDE.md, risk-aware pre-commit hook example, README clarity.
+
+**v4.0 (planned):** Optional `aiagentminder-mcp` companion server -- a TypeScript MCP server that reads/writes the same governance files but exposes them as Claude tools (`log_adr`, `check_mvp_scope`, `get_status`, `risk_scan`). This would make governance proactive (mid-session) rather than reactive (at checkpoint). The markdown files remain the source of truth; the MCP server is an optional active interface. Zero changes needed to the markdown baseline -- v3.x projects would work with the MCP server without modification.
 
 ---
 

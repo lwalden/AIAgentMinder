@@ -25,7 +25,7 @@
 ### Ending a Session
 Run `/checkpoint` or manually:
 1. Update PROGRESS.md with completed tasks, blockers, and next priorities
-2. Update DECISIONS.md if any architectural decisions were made
+2. Update DECISIONS.md if any of these occurred: choosing a library/framework, designing an API, selecting an auth approach, changing a data model, making a build/deploy decision
 3. Commit tracking changes
 
 ### If Session Ends Unexpectedly (Token Limits)
@@ -45,6 +45,17 @@ Files on disk and staged changes are preserved. Next session: `git status` and `
 - [Experience level and tech expertise]
 - [Availability and collaboration preferences]
 - [Risk tolerance: conservative / medium / aggressive]
+
+---
+
+## MVP Goals
+
+<!-- Populated by /plan -- Phase 1 deliverables. Check these before implementing features. -->
+<!-- Example:
+- User can register and log in
+- Core CRUD operations work end-to-end
+- Deployed and accessible at a public URL
+-->
 
 ---
 
@@ -100,7 +111,7 @@ Keep per-session context lean:
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~110 lines | Don't add without removing something |
+| CLAUDE.md | ~125 lines | Don't add without removing something |
 | PROGRESS.md | ~15-20 lines active | Run `/archive` when it exceeds 100 lines |
 | DECISIONS.md | Grows over time | Move superseded entries to `docs/archive/` |
 
