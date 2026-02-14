@@ -38,36 +38,36 @@ You can also click the green **Code** button on GitHub and choose **Download ZIP
 
 Come with something that describes your project -- anything from a single sentence to a full spec. The `/plan` command (Step 4) will interview you and fill in whatever's missing.
 
-### 3. Run `/setup` in your project
+### 3. Run `/setup`
 
-Open Claude Code in the AIAgentMinder directory and run `/setup`. Choose your scenario:
+Open Claude Code **in the AIAgentMinder directory you just cloned** and run `/setup`. The command will ask about your target project and copy the framework files there. Choose your scenario:
 
-- **New GitHub repo** -- Claude creates repo and customizes files
-- **Add to existing repo** -- Claude copies files with confirmations
-- **New local project** -- Claude creates directory and initializes git
-- **Initialize current directory** -- Claude fits template into your existing structure
+- **New GitHub repo** -- Claude creates the repo and sets up all files
+- **Add to existing repo** -- Claude copies files into your repo with confirmations
+- **New local project** -- Claude creates the directory, runs `git init`, and sets up files
+- **Initialize current directory** -- Claude fits the template into your existing structure
 
-**Note (VS Code):** After setup, close and reopen the Claude Code panel so new slash commands are detected.
+**Note (VS Code):** After setup completes, open your target project in VS Code and close/reopen the Claude Code panel so the new slash commands (`/plan`, `/status`, etc.) are detected.
 
 ### 4. Plan your project
 
-Open Claude Code in your new project directory and run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
+Open Claude Code in your target project directory and run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md` with goals, timeline, and testing strategy. See [docs/strategy-creation-guide.md](docs/strategy-creation-guide.md) for details and examples.
 
-### Manual Setup (Optional)
+### Manual Setup (Alternative)
 
-If you prefer manual setup, copy `project/` contents (including `.claude/` and hidden files) into your repo:
+If you prefer to copy files manually instead of running `/setup`:
 
 ```bash
 # macOS / Linux
-cp -r /path/to/template/project/. /path/to/your-repo/
+cp -r /path/to/aiagentminder/project/* /path/to/your-repo/ && cp -r /path/to/aiagentminder/project/.claude /path/to/your-repo/
 ```
 
 ```powershell
 # Windows (PowerShell)
-Copy-Item -Recurse -Force /path/to/template/project/* /path/to/your-repo/
+Copy-Item -Recurse -Force /path/to/aiagentminder/project/* /path/to/your-repo/
 ```
 
-Then customize `CLAUDE.md`, add stack permissions to `.claude/settings.json`, and run `/plan` to generate your strategy.
+Then open Claude Code in your target repo (restart the Claude Code panel in VS Code so slash commands are detected), customize `CLAUDE.md` and `.claude/settings.json`, and run `/plan` to generate your strategy.
 
 ---
 
