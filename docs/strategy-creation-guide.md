@@ -72,6 +72,7 @@ Write 2-3 sentences about what the project does, who it's for, and what makes it
 - **Data Models:** Sketch out your core entities and relationships.
 - **API Design:** If applicable, outline key endpoints.
 - **Security:** Note authentication method, authorization model, and data protection approach.
+- **MCP Servers:** If applicable, list any MCP servers and what they're used for.
 
 ### Part 3: Risk Management
 Identify 3-5 risks with likelihood, impact, and mitigation strategy.
@@ -89,7 +90,7 @@ Choose a quality tier that matches your project's needs:
 The `/plan` command will recommend a tier based on your answers. You can always adjust it -- the goal is that lightweight projects stay lightweight and rigorous projects get the support they need.
 
 ### Part 5: Development Timeline
-Break work into phases with weekly deliverables. Phase 1 should be the minimum viable product.
+Break work into phases with weekly deliverables. Phase 1 should be the minimum viable product. Do NOT schedule CI/CD setup in Phase 1 -- generate it on-demand when the project has real code.
 
 ### Part 6: Human Actions Required
 List everything the human needs to do (service signups, API keys, decisions) with timing.
@@ -125,7 +126,7 @@ Claude Code will prompt you to resolve TODOs at the appropriate time during deve
 
 ## After Creating Your Roadmap
 
-Place the completed `strategy-roadmap.md` in `docs/` and tell Claude:
+Place the completed `strategy-roadmap.md` in `docs/` and open your project in Claude Code. Tell Claude:
 "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
 
 Claude will reference the strategy for context on all decisions, resolve TODOs by prompting you at the right time, and track progress in PROGRESS.md.

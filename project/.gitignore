@@ -1,4 +1,10 @@
-# Environment and Secrets
+# ==============================================================================
+# Core .gitignore -- secrets, IDE files, OS artifacts
+# Stack-specific entries are added by /setup based on your tech stack.
+# For comprehensive language gitignores, see: https://github.com/github/gitignore
+# ==============================================================================
+
+# Secrets and environment variables -- NEVER commit these
 .env
 .env.local
 .env.*.local
@@ -8,231 +14,38 @@
 secrets/
 *.pem
 *.key
-*.crt
 *.p12
 *.pfx
-
-# Local configuration (keep .example versions)
 local.settings.json
-appsettings.Development.json
-appsettings.Local.json
-*.local.json
-config.local.*
 
-# IDE and Editor
+# IDE and editor artifacts
 .idea/
 .vscode/
 *.swp
 *.swo
 *~
-.project
-.classpath
-.settings/
-*.sublime-workspace
-*.sublime-project
 .vs/
 *.user
 *.suo
-*.userosscache
-*.sln.docstates
-
-# Build outputs
-bin/
-obj/
-out/
-dist/
-build/
-target/
-*.dll
-*.exe
-*.pdb
-*.mdb
-*.so
-*.dylib
-
-# Dependencies
-node_modules/
-vendor/
-packages/
-.pnp
-.pnp.js
-bower_components/
-jspm_packages/
-
-# Package manager locks (uncomment the ones you DON'T use)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
-# Cargo.lock
-# poetry.lock
-# Pipfile.lock
-# composer.lock
-# Gemfile.lock
-
-# Test and Coverage
-coverage/
-*.lcov
-.nyc_output/
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-*.cover
-*.py,cover
-.hypothesis/
-.pytest_cache/
-test-results/
-TestResults/
-
-# Logs
-logs/
-*.log
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
-.pnpm-debug.log*
 
 # OS generated
 .DS_Store
-.DS_Store?
 ._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 desktop.ini
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
-.eggs/
-.Python
-pip-log.txt
-pip-delete-this-directory.txt
-.mypy_cache/
-.ruff_cache/
-.dmypy.json
-dmypy.json
-
-# .NET
-*.nupkg
-*.snupkg
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-# Rust
-debug/
-*.rs.bk
-
-# Java
-*.class
-*.jar
-*.war
-*.ear
-hs_err_pid*
-
-# Ruby
-*.gem
-.bundle/
-tmp/
-
-# Go
-*.exe~
-*.test
-*.out
-
-# Terraform
-.terraform/
-*.tfstate
-*.tfstate.*
-crash.log
-override.tf
-override.tf.json
-*_override.tf
-*_override.tf.json
-.terraformrc
-terraform.rc
-
-# Docker
-.docker/
+# Logs
+*.log
+logs/
 
 # Temporary files
 tmp/
 temp/
 *.tmp
-*.temp
 *.bak
-*.backup
-*.old
 
-# Cache
-.cache/
-*.cache
-.parcel-cache/
-.eslintcache
-.stylelintcache
-*.tsbuildinfo
+# Claude Code auto memory (project-specific, not for version control)
+# Uncomment if you use Claude Code's auto memory feature:
+# .claude/memory/
 
-# Documentation builds
-docs/_build/
-site/
-_site/
-
-# Misc
-*.pid
-*.seed
-*.pid.lock
-
-# Azure
-.azure/
-azurite/
-__azurite*
-__blobstorage__/
-__queuestorage__/
-__tablestorage__/
-
-# AWS
-.aws-sam/
-samconfig.toml
-
-# Serverless Framework
-.serverless/
-
-# Vercel
-.vercel/
-
-# Next.js
-.next/
-out/
-
-# Nuxt.js
-.nuxt/
-
-# Gatsby
-.gatsby/
-public/
-
-# VuePress
-.vuepress/dist/
-
-# Storybook
-storybook-static/
-
-# Turborepo
-.turbo/
-
-# Debug
-.debug/
-*.dmp
-
-# Local development databases
-*.db
-*.sqlite
-*.sqlite3
-*.mdf
-*.ldf
+# Stack-specific entries added below by /setup:

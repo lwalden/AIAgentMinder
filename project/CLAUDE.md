@@ -82,15 +82,27 @@ Files on disk and staged changes are preserved. Next session: `git status` and `
 
 ---
 
+## Native Claude Code Features
+
+This template works alongside Claude Code's built-in capabilities:
+
+- **MEMORY.md** -- Claude Code auto-summarizes context here. This project uses PROGRESS.md instead (explicit, versioned, auditable). Do NOT write project state to MEMORY.md in this project.
+- **Plan mode** (`/plan` native) -- Good for scoping a single task. Use this project's `/plan` command for full project planning (structured interview, strategy roadmap, quality tiers).
+- **Compact history** -- Claude Code compresses old messages automatically. This is normal; run `/checkpoint` before context gets large to ensure work is saved to files first.
+- **Hooks** -- If `.claude/hooks/` exists in this project, hooks run automatically on tool events (file writes, session end, etc.). Check for hook scripts before assuming manual steps are needed.
+- **MCP servers** -- If `.claude/mcp.json` defines MCP servers, use them for database queries, API calls, or custom tools rather than shell commands when possible.
+
+---
+
 ## Context Budget
 
 Keep per-session context lean:
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~79 lines | Don't add to this file without removing something |
+| CLAUDE.md | ~110 lines | Don't add without removing something |
 | PROGRESS.md | ~15-20 lines active | Run `/archive` when it exceeds 100 lines |
-| DECISIONS.md | Grows over time | Move superseded ADRs to `docs/archive/` |
+| DECISIONS.md | Grows over time | Move superseded entries to `docs/archive/` |
 
 **Session Management:**
 - Use `/clear` to reset conversation when switching to an unrelated task
@@ -100,5 +112,5 @@ Keep per-session context lean:
 **File Reading Strategy:**
 - PROGRESS.md: Read every session (first thing)
 - DECISIONS.md: Read before architectural choices (prevent re-debating)
-- strategy-roadmap.md & ARCHITECTURE.md: Read on-demand for context
+- strategy-roadmap.md: Read on-demand for context
 - Never read `docs/archive/*` unless asked

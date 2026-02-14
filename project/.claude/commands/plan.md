@@ -52,7 +52,8 @@ Ask all at once:
 - What are the 3-5 must-have features for the first version?
 - What features are tempting but can wait?
 - Do you have constraints? (budget, hosting, compliance, timeline)
-- Any external services this needs to integrate with?
+- Any external services or APIs this needs to integrate with?
+- Will you use any MCP servers? (e.g., database tools, browser automation, custom API integrations -- or "none")
 - Is there a target launch date?
 
 ### Round 3: Quality & Testing
@@ -149,4 +150,5 @@ Fill the "Part 4: Quality & Testing Strategy" section based on the tier determin
 1. Write the completed `docs/strategy-roadmap.md`
 2. Update `PROGRESS.md` to note that strategy roadmap was created
 3. Update `DECISIONS.md` with any architectural decisions made during planning
-4. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready, or run /status to review the project state."
+4. If MCP servers were mentioned, add a **MCP Servers:** line to the Project Identity section of `CLAUDE.md` listing them (e.g., `postgres, puppeteer`). This signals Claude to use MCP tools for those tasks instead of shell commands.
+5. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready, or run /status to review the project state."

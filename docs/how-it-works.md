@@ -43,8 +43,8 @@ Files are sized to minimize per-session token consumption:
 
 | File | Target Lines | Read Frequency |
 |------|-------------|---------------|
-| CLAUDE.md | ~120 | Every session (auto-loaded) |
-| PROGRESS.md | ~60 active | Every session (first thing) |
+| CLAUDE.md | ~110 | Every session (auto-loaded) |
+| PROGRESS.md | ~20 active | Every session (first thing) |
 | DECISIONS.md | Grows over time | On-demand |
 | strategy-roadmap.md | ~160 | On-demand |
 
@@ -54,7 +54,7 @@ When `PROGRESS.md` exceeds 100 lines, run `/archive` to move old session summari
 
 | Command | Purpose | Modifies Files? |
 |---------|---------|----------------|
-| `/setup` | Initialize a new project from the template | Yes |
+| `/setup` | Initialize a new project from the template (run from AIAgentMinder repo) | Yes |
 | `/plan` | Create or update strategy-roadmap.md interactively | Yes |
 | `/status` | Print project state summary | No (read-only) |
 | `/checkpoint` | Session end housekeeping | Yes |
@@ -62,27 +62,37 @@ When `PROGRESS.md` exceeds 100 lines, run `/archive` to move old session summari
 
 ## Security Model
 
-The `.claude/settings.json` file pre-approves development commands so Claude can work without constant permission prompts.
+The `.claude/settings.json` file pre-approves a minimal set of development commands so Claude can work without constant permission prompts for routine operations.
 
-### What's Allowed
-- Git operations (status, diff, log, branch, checkout, add, commit, push, pull, merge, stash, tag)
-- GitHub CLI (PR creation, issue management, repo viewing)
-- Package managers (npm, pip, cargo, dotnet, go, etc.)
-- Build and test tools
-- Shell utilities (ls, cat, grep, find, mkdir, cp, mv, etc.)
-- Docker and container tools
-- Cloud CLIs (az, aws, gcloud)
-- Deployment tools (vercel, netlify, fly, etc.)
+### What's Allowed (baseline)
+- Git operations (all `git` subcommands)
+- GitHub CLI (`gh`)
+- Safe read utilities (ls, cat, grep, find, diff, etc.)
+- Safe file operations (mkdir, cp, mv, touch)
+- Text processing (jq, sort, head, tail)
+
+Stack-specific tools (npm, dotnet, cargo, pytest, docker, etc.) are added during `/setup` based on your project's tech stack.
 
 ### What Requires Approval
 These operations are deliberately excluded so Claude must ask first:
 - **File deletion** (`rm`) -- prevents accidental data loss
+- **Network tools** (`curl`, `wget`) -- prevents data exfiltration
+- **Cloud CLIs** (`az`, `aws`, `gcloud`, `terraform`) -- prevents billable resource creation
 - **Destructive git** (`git reset`, `git rebase`) -- prevents history rewriting
 - **Process management** (`kill`, `pkill`) -- prevents accidental termination
 - **Permission changes** (`chmod`, `chown`) -- prevents security issues
-- **Infrastructure destruction** (`terraform destroy`, `kubectl delete`) -- prevents resource deletion
 
 ### Explicit Deny List
-Claude will refuse to run these commands:
-- `rm -rf /` and `rm -rf ~` -- catastrophic deletion
-- `git push --force` to protected branches -- prevents history loss
+Claude will refuse to run these commands regardless of approval:
+- `rm -rf /`, `rm -rf ~`, `rm -rf C:` -- catastrophic deletion
+- `git push --force` -- prevents history loss on shared branches
+
+## Native Claude Code Features
+
+This template works alongside Claude Code's built-in features:
+
+- **MEMORY.md** -- Claude Code auto-summarizes context into this file. This template uses PROGRESS.md instead for explicit, versioned, auditable session state. CLAUDE.md tells Claude not to use MEMORY.md for project state.
+- **Plan mode** -- Native plan mode is good for scoping individual tasks. The `/plan` command handles full project planning (structured interview, strategy roadmap, quality tiers).
+- **Compact history** -- Claude Code automatically compresses old messages when context fills. `/checkpoint` saves state to files before this happens.
+- **Hooks** -- If the project defines `.claude/hooks/` scripts, Claude respects them. Common uses: pre-commit validation, auto-checkpoint on session end.
+- **MCP servers** -- If `CLAUDE.md` lists MCP servers in the Project Identity section, Claude uses them for the appropriate tasks instead of shell commands.
