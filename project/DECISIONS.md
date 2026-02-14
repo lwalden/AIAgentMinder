@@ -1,27 +1,23 @@
-# DECISIONS.md - Architectural Decision Record
+# DECISIONS.md - Architectural Decision Log
 
-> Track significant decisions to avoid re-debating.
-> Move superseded decisions to `docs/archive/decisions-archive.md`.
+> Record significant decisions to prevent re-debating them later.
+> Claude reads this before making architectural choices.
+> Move superseded entries to `docs/archive/decisions-archive.md`.
 
-## Decisions
+---
 
-Add entries when making significant choices (tech selection, design patterns, auth approaches, etc.).
+Add entries as decisions are made. Keep them short -- the goal is to capture *what was decided and why*, not to write essays.
 
 **Format:**
 ```
-### ADR-NNN: [Title]
-**Date:** [DATE] | **Status:** Decided | **Rationale:** [Why chosen]
-[Details]
+### [Short decision title]
+**Date:** YYYY-MM-DD | **Status:** Active | **Chose:** [what was chosen]
+**Why:** [1-2 sentence rationale. What alternatives were rejected and why?]
 ```
+
+**Status values:** Active | Superseded | Revisit
 
 ---
 
-## Pending Decisions
+<!-- Decisions go here -->
 
-List decisions that need to be made. Format:
-```
-### PDR-NNN: [Title]
-**Blocking:** [What this affects] | **Needs:** [What info is required]
-```
-
----
