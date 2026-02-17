@@ -27,22 +27,14 @@ Did this session include any of these?
 
 If yes, add an ADR entry using the format recorded in DECISIONS.md.
 
-### 3. Check PROGRESS.md Size
-
-If PROGRESS.md exceeds 100 lines, archive old session notes:
-- Create `docs/archive/` if needed
-- Move all but the 3 most recent session notes to `docs/archive/progress-archive.md`
-- Move superseded ADRs from DECISIONS.md to `docs/archive/decisions-archive.md`
-- Verify PROGRESS.md is under 80 lines after cleanup
-
-### 4. Commit Tracking Changes
+### 3. Commit Tracking Changes
 
 ```bash
 git add PROGRESS.md DECISIONS.md
 git commit -m "chore: session checkpoint [today's date]"
 ```
 
-### 5. Print Summary
+### 4. Print Summary
 
 ```
 Session checkpoint complete.

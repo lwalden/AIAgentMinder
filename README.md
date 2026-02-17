@@ -16,7 +16,7 @@ Claude Code is powerful out of the box, but multi-session projects need structur
 | Claude forgets what happened last session | **PROGRESS.md** -- git-tracked audit trail Claude reads first every session |
 | Claude re-debates past decisions | **DECISIONS.md** -- ADR log with trigger criteria prevents re-debating |
 | Projects start without clear goals | **/plan** -- structured interview that produces a strategy roadmap with quality tiers |
-| Sessions end with loose ends | **/checkpoint** -- end-of-session housekeeping with archival |
+| Sessions end with loose ends | **/checkpoint** -- end-of-session housekeeping |
 | Dangerous commands slip through | **settings.json** -- minimal permissions baseline with explicit deny list |
 | Context lost after compaction | **Governance hooks** -- auto re-inject project state after context compaction |
 
@@ -93,7 +93,7 @@ Starts with ~20 safe commands (git, gh, basic utilities). Stack-specific tools a
 |---------|---------|
 | `/setup` | Initialize a project (run from this template repo) |
 | `/plan` | Create strategy roadmap via structured interview |
-| `/checkpoint` | End-of-session: update tracking files, archive if needed, commit |
+| `/checkpoint` | End-of-session: update tracking files, commit |
 
 ---
 
@@ -101,7 +101,7 @@ Starts with ~20 safe commands (git, gh, basic utilities). Stack-specific tools a
 
 **Session continuity:** Claude reads PROGRESS.md at session start. At session end, `/checkpoint` (or the auto-commit hook) preserves state. Between sessions, progress lives in Git.
 
-**Context budget:** Files are sized for minimal token consumption. CLAUDE.md (~90 lines) and PROGRESS.md (~20 lines) are read every session. Larger files are on-demand. When PROGRESS.md exceeds 100 lines, `/checkpoint` archives old entries.
+**Context budget:** Files are sized for minimal token consumption. CLAUDE.md (~90 lines) and PROGRESS.md (~20 lines) are read every session. Larger files are on-demand. PROGRESS.md self-trims: Claude keeps only the 3 most recent session notes when writing.
 
 **Decision tracking:** DECISIONS.md prevents re-debating. Claude checks it before architectural choices. Trigger criteria: library/framework choice, API design, auth approach, data model change, build/deploy decision.
 
@@ -115,7 +115,7 @@ For details: [docs/how-it-works.md](docs/how-it-works.md) | [docs/customization-
 - **Claude keeps asking permission** -- Add the command to `.claude/settings.json` allow list
 - **Claude lost track** -- `git status`, `git log --oneline -5`, update PROGRESS.md
 - **Claude re-debates decisions** -- Add to DECISIONS.md with rationale
-- **PROGRESS.md too long** -- Run `/checkpoint` (it archives automatically when >100 lines)
+
 
 ---
 
