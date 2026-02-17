@@ -1,11 +1,8 @@
 {
   "permissions": {
     "allow": [
-      // Version control -- always needed
       "Bash(git:*)",
       "Bash(gh:*)",
-
-      // Safe read-only shell utilities
       "Bash(ls:*)",
       "Bash(pwd:*)",
       "Bash(cat:*)",
@@ -17,105 +14,68 @@
       "Bash(date:*)",
       "Bash(which:*)",
       "Bash(env:*)",
-
-      // Safe file operations
       "Bash(mkdir:*)",
       "Bash(cp:*)",
       "Bash(mv:*)",
       "Bash(touch:*)",
-
-      // Text processing (read-only transformations)
       "Bash(jq:*)",
       "Bash(sort:*)",
       "Bash(head:*)",
       "Bash(tail:*)"
-
-      // Stack-specific tools are added by /setup based on your project's tech stack.
-      // Examples added by /setup:
-      //   "Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)"  -- Node.js
-      //   "Bash(pip:*)", "Bash(python:*)", "Bash(pytest:*)"  -- Python
-      //   "Bash(dotnet:*)"  -- .NET / C#
-      //   "Bash(cargo:*)", "Bash(rustup:*)"  -- Rust
-      //   "Bash(go:*)"  -- Go
-      //   "Bash(docker:*)"  -- if using containers
-      //
-      // Add additional tools here as your project needs them.
-      // See docs/customization-guide.md for guidance.
     ],
     "deny": [
-      // Catastrophic deletions -- always refused
       "Bash(rm -rf /:*)",
       "Bash(rm -rf ~:*)",
+      "Bash(rm -rf $HOME:*)",
       "Bash(rm -rf C::*)",
-      // History rewriting -- always requires human approval
+      "Bash(rm -rf .:*)",
       "Bash(git push --force:*)",
-      "Bash(git push -f:*)"
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard origin:*)",
+      "Bash(git clean -fd:*)",
+      "Bash(chmod -R 777:*)"
     ]
   },
   "hooks": {
-    // ── Session lifecycle hooks ──
-
     "Stop": [
       {
-        // Auto-update PROGRESS.md timestamp when session ends
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-timestamp.sh\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-timestamp.js\"",
             "timeout": 10
           }
         ]
       },
       {
-        // Auto git commit checkpoint when session ends -- never lose work
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-commit.sh\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-commit.js\"",
             "timeout": 30
           }
         ]
       }
     ],
-
     "SessionStart": [
       {
-        // Inject PROGRESS.md and DECISIONS.md after context compaction or resume
         "matcher": "compact|resume",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start-context.sh\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start-context.js\"",
             "timeout": 10
           }
         ]
       }
     ],
-
-    // ── Tool-use hooks ──
-
-    "PreToolUse": [
-      {
-        // Guard against risky Bash commands, auto-approve safe ones
-        "matcher": "Bash",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-risky-bash.sh\"",
-            "timeout": 10
-          }
-        ]
-      }
-    ],
-
     "PostToolUse": [
       {
-        // Auto-format/lint files after Write or Edit
         "matcher": "Write|Edit",
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.sh\"",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.js\"",
             "timeout": 30
           }
         ]
