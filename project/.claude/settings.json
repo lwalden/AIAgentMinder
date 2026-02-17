@@ -51,5 +51,75 @@
       "Bash(git push --force:*)",
       "Bash(git push -f:*)"
     ]
+  },
+  "hooks": {
+    // ── Session lifecycle hooks ──
+
+    "Stop": [
+      {
+        // Auto-update PROGRESS.md timestamp when session ends
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-timestamp.sh\"",
+            "timeout": 10
+          }
+        ]
+      },
+      {
+        // Auto git commit checkpoint when session ends -- never lose work
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-commit.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ],
+
+    "SessionStart": [
+      {
+        // Inject PROGRESS.md and DECISIONS.md after context compaction or resume
+        "matcher": "compact|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start-context.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+
+    // ── Tool-use hooks ──
+
+    "PreToolUse": [
+      {
+        // Guard against risky Bash commands, auto-approve safe ones
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-risky-bash.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+
+    "PostToolUse": [
+      {
+        // Auto-format/lint files after Write or Edit
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.sh\"",
+            "timeout": 30
+          }
+        ]
+      }
+    ]
   }
 }
