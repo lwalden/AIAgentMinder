@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.1-blue)
+![Version](https://img.shields.io/badge/version-3.2-blue)
 
 A governance and lifecycle framework for Claude Code. AIAgentMinder adds persistent auditable memory, architectural decision tracking, risk-aware testing strategy, and structured planning to help you take a project from idea to MVP and beyond -- efficiently, with a quality end product in mind.
 
@@ -23,7 +23,7 @@ Claude Code out of the box is powerful, but production projects need governance.
 | Lifecycle Control | Ephemeral: If a session crashes or gets compacted, sub-task state can be lost. | Milestone-based: `/checkpoint` and `/archive` keep work segmented and context lean. |
 | Testing Strategy | Ad-hoc: Runs whatever test command you ask, regardless of change scope or risk. | Tiered & risk-aware: Quality tiers (Lightweight → Comprehensive) matched to project complexity. |
 | Permissions | Basic sandbox: Blocks `rm -rf` style commands but lacks project-specific guardrails. | Minimal & explicit: Starts with ~20 safe permissions, stack tools added by `/setup`. No accidental cloud resource creation. |
-| MCP & Hooks | Supported but undocumented per-project. | Awareness built into `/setup`, `/plan`, and CLAUDE.md -- Claude knows to use MCP tools and respect project hooks. |
+| MCP & Hooks | Supported but undocumented per-project. | Five governance hooks ship out of the box: auto-commit checkpoint, PROGRESS.md timestamp, context re-injection, risky command guard, and auto-format. MCP awareness built into `/setup` and CLAUDE.md. |
 
 ---
 
@@ -86,6 +86,7 @@ Once set up, you'll have:
 - **Interactive planning** (`/plan` command) -- Structured strategy roadmap with goals, timeline, and quality tiers
 - **Project lifecycle commands** -- `/status`, `/checkpoint`, `/archive` for session management
 - **Minimal permissions** ([.claude/settings.json](project/.claude/settings.json)) -- Safe baseline; stack tools added during setup
+- **Governance hooks** ([.claude/hooks/](project/.claude/hooks/)) -- Auto-commit on session end, PROGRESS.md timestamp, context re-injection after compaction, risky command guard, and auto-format/lint
 - **Lean gitignore** -- Core secrets/IDE/OS rules plus stack-specific entries added by `/setup`
 
 CI/CD is **not** scaffolded upfront. When you're ready, tell Claude: "Set up GitHub Actions CI for this project." Claude generates an accurate workflow from your actual project structure, not a placeholder skeleton.
@@ -115,6 +116,8 @@ Use these commands anytime:
 
 **Permissions:** The `.claude/settings.json` starts with ~20 safe permissions (git, gh, basic shell utilities). Stack-specific tools (npm, dotnet, cargo, etc.) are added during `/setup`. Dangerous operations (`rm`, `git reset --hard`, `kill`, force-push) are excluded and always require explicit approval.
 
+**Hooks:** Five governance hooks run automatically via `.claude/hooks/`: auto-commit and PROGRESS.md timestamp on session end, context re-injection after compaction, risky command guard on Bash, and auto-format after file edits. See [docs/customization-guide.md](docs/customization-guide.md) for configuration.
+
 **Native Claude Code integration:** This template works alongside Claude Code's built-in features -- plan mode, compact history, hooks, and MCP servers. CLAUDE.md explicitly tells Claude how each native feature interacts with the project's governance files.
 
 For more details see:
@@ -142,7 +145,9 @@ For more details see:
 
 ## Roadmap
 
-**v3.1 (current):** ADR trigger criteria, MVP Goals tracking in CLAUDE.md, risk-aware pre-commit hook example, README clarity.
+**v3.2 (current):** Five governance hooks ship out of the box -- auto-commit checkpoint (Stop), PROGRESS.md timestamp (Stop), context re-injection (SessionStart), risky command guard (PreToolUse), auto-format/lint (PostToolUse).
+
+**v3.1:** ADR trigger criteria, MVP Goals tracking in CLAUDE.md, risk-aware pre-commit hook example, README clarity.
 
 **v4.0 (planned):** Optional `aiagentminder-mcp` companion server -- a TypeScript MCP server that reads/writes the same governance files but exposes them as Claude tools (`log_adr`, `check_mvp_scope`, `get_status`, `risk_scan`). This would make governance proactive (mid-session) rather than reactive (at checkpoint). The markdown files remain the source of truth; the MCP server is an optional active interface. Zero changes needed to the markdown baseline -- v3.x projects would work with the MCP server without modification.
 
