@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "hooks": {
+    "Stop": [
+      {
+        "type": "command",
+        "bash": "node \".claude/hooks/session-end-timestamp.js\"",
+        "timeoutSec": 10
+      },
+      {
+        "type": "command",
+        "bash": "node \".claude/hooks/session-end-commit.js\"",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}

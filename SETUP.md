@@ -1,6 +1,9 @@
-# /setup - Project Initialization
+# Setup - Project Initialization
 
-You are running this command from the **AIAgentMinder template repository**. Your job is to help the user set up AIAgentMinder in a target project by copying and customizing the template files from the `project/` directory in this repo.
+> **For non-Claude agents:** Read this file and follow the instructions to initialize AIAgentMinder in a target project.
+> **Claude Code users:** Run `/setup` instead — this file is not needed.
+
+You are running setup from the **AIAgentMinder template repository**. Your job is to help the user set up AIAgentMinder in a target project by copying and customizing the template files from the `project/` directory in this repo.
 
 Follow these steps in order. Ask questions in grouped batches, not one at a time.
 
@@ -51,7 +54,7 @@ Then copy all files from this repo's `project/` directory into the new repo.
 Copy template files into the user's repo. Before copying each file, check if it already exists:
 - If it exists, ask: "You already have [file]. Should I merge, replace, or skip it?"
 - Never overwrite without asking
-- Always copy `.claude/` directory (commands, settings, hooks)
+- Always copy `.claude/` and `.github/` directories
 
 ### Scenario C: New Local Project
 ```bash
@@ -72,7 +75,7 @@ The governance hooks require Node.js. Check if `node` is available:
 ```bash
 node --version
 ```
-If Node.js is not found, warn the user: "Governance hooks require Node.js. The hooks will be copied but won't run until Node.js is installed. You can disable them by removing the hooks section from .claude/settings.json."
+If Node.js is not found, warn the user: "Governance hooks require Node.js. The hooks will be copied but won't run until Node.js is installed. You can disable them by removing the hooks sections from `.claude/settings.json` and `.github/hooks/`."
 
 ---
 
@@ -95,7 +98,7 @@ Replace the placeholder block with actual values:
 ```
 
 ### .github/copilot-instructions.md -- Project Identity Section
-Apply the same Project Identity values as above to the matching placeholder block in this file.
+Apply the same Project Identity values to the matching placeholder block in this file.
 
 ### .claude/settings.json -- Add Stack-Specific Permissions
 Append to the `allow` array based on the chosen stack:
@@ -142,9 +145,9 @@ Print:
 Project initialized successfully!
 
 Created files:
-- AGENTS.md (core project instructions -- works with Claude Code, Codex, Cursor, and all AGENTS.md agents)
+- AGENTS.md (core project instructions -- works with all agents)
 - CLAUDE.md (thin Claude Code wrapper -- imports AGENTS.md automatically)
-- PLAN.md (planning interview for non-Claude agents)
+- PLAN.md (run planning interview with any agent)
 - .github/copilot-instructions.md (GitHub Copilot instructions)
 - .github/hooks/ (3 Copilot hooks: session-end, session-start, post-tool-use)
 - PROGRESS.md (session tracking -- shared across all agents)
