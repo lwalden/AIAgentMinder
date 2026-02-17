@@ -32,7 +32,7 @@ Claude reads `CLAUDE.md` automatically every session and `PROGRESS.md` first thi
 | DECISIONS.md | Grows over time | On-demand |
 | strategy-roadmap.md | ~75 | On-demand |
 
-When PROGRESS.md exceeds 100 lines, `/checkpoint` archives old entries to `docs/archive/`.
+PROGRESS.md self-trims: Claude keeps only 3 session notes, dropping older ones (preserved in git history).
 
 ## Commands
 
@@ -40,7 +40,7 @@ When PROGRESS.md exceeds 100 lines, `/checkpoint` archives old entries to `docs/
 |---------|---------|----------------|
 | `/setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
 | `/plan` | Create or update strategy-roadmap.md interactively | Yes |
-| `/checkpoint` | Session end: update tracking, archive if needed, commit | Yes |
+| `/checkpoint` | Session end: update tracking, commit | Yes |
 
 ## Security Model
 

@@ -71,14 +71,14 @@ Run `/checkpoint` or manually update PROGRESS.md and DECISIONS.md, then commit.
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
 | CLAUDE.md | ~80 lines | Don't add without removing something |
-| PROGRESS.md | ~15-20 lines active | Archive old entries when it exceeds 100 lines |
-| DECISIONS.md | Grows over time | Move superseded entries to `docs/archive/` |
+| PROGRESS.md | ~20 lines active | Self-trimming: only 3 session notes kept |
+| DECISIONS.md | Grows over time | Delete superseded entries (git history preserves them) |
 
 **Reading Strategy:**
 - PROGRESS.md: Every session (first thing)
 - DECISIONS.md: Before architectural choices
 - strategy-roadmap.md: On-demand
-- Never read `docs/archive/*` unless asked
+
 
 ---
 
