@@ -8,7 +8,7 @@ Perform end-of-session housekeeping. Run this before ending a work session.
 
 ### 1. Update PROGRESS.md
 
-- Update "Active Tasks" with completed work (move to done status or remove)
+- Update "Active Tasks" with completed work (move to done or remove)
 - Update "Blockers" if any issues arose
 - Update "Next Priorities" based on what comes next
 - Add a brief session note at the bottom (keep last 3 sessions only):
@@ -18,18 +18,22 @@ Perform end-of-session housekeeping. Run this before ending a work session.
 
 ### 2. Update DECISIONS.md (if applicable)
 
-Ask yourself: did this session include any of these?
+Did this session include any of these?
 - Choosing a library or framework
-- Designing an API shape or data contract
-- Selecting an authentication or authorization approach
-- Changing a data model or schema
-- Making a build, deploy, or infrastructure decision
+- Designing an API or data contract
+- Selecting an auth approach
+- Changing a data model
+- Making a build/deploy decision
 
-If yes to any, add an ADR entry before committing. Use the format preference recorded at the top of DECISIONS.md (lightweight one-liner or formal Context/Decision/Consequences).
+If yes, add an ADR entry using the format recorded in DECISIONS.md.
 
 ### 3. Check PROGRESS.md Size
 
-If PROGRESS.md now exceeds 100 lines, suggest running `/archive` before committing.
+If PROGRESS.md exceeds 100 lines, archive old session notes:
+- Create `docs/archive/` if needed
+- Move all but the 3 most recent session notes to `docs/archive/progress-archive.md`
+- Move superseded ADRs from DECISIONS.md to `docs/archive/decisions-archive.md`
+- Verify PROGRESS.md is under 80 lines after cleanup
 
 ### 4. Commit Tracking Changes
 
@@ -50,6 +54,4 @@ Completed this session:
 Next session should:
 1. [priority 1]
 2. [priority 2]
-
-[If applicable: "Note: PROGRESS.md is [X] lines. Consider running /archive."]
 ```

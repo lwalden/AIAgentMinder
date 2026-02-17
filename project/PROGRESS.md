@@ -1,6 +1,6 @@
 # PROGRESS.md - Session Continuity
 
-> Claude reads this FIRST every session. Run `/archive` when exceeding 100 lines.
+> Claude reads this FIRST every session. Archive old entries when exceeding 100 lines.
 
 **Phase:** 1 - Foundation
 **Last Updated:** [DATE]

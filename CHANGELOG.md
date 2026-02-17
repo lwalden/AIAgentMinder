@@ -6,26 +6,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [3.2.0] - 2026-02-16
+## [4.0.0] - 2026-02-16
 
 ### Added
-- **Five governance hooks** shipping out of the box in `.claude/hooks/`:
-  - `session-end-timestamp.sh` (Stop) -- auto-updates PROGRESS.md "Last Updated" timestamp on session end
-  - `session-end-commit.sh` (Stop) -- auto git commit checkpoint on session end so no work is lost
-  - `session-start-context.sh` (SessionStart) -- re-injects PROGRESS.md and DECISIONS.md after context compaction or session resume
-  - `guard-risky-bash.sh` (PreToolUse/Bash) -- auto-approves safe read-only commands, blocks dangerous patterns (rm -rf, force push, etc.)
-  - `post-edit-lint.sh` (PostToolUse/Write|Edit) -- auto-runs project formatters (prettier, eslint, black, ruff, rustfmt, gofmt, dotnet format) after file edits
-- **Hook configuration** in `.claude/settings.json` under the `hooks` key -- all five hooks are pre-wired and ready to use
-- **Hook documentation** in `docs/customization-guide.md` -- table of included hooks, customization instructions, and optional Git pre-commit hook example
+- **Cross-platform hooks (Node.js)** -- all hooks rewritten from bash to Node.js for Windows, macOS, and Linux support
+- **Branch safety in auto-commit** -- session-end-commit hook now skips main/master branches, stages only tracked files (`git add -u` instead of `git add -A`), and respects git hooks (no `--no-verify`)
+- **Node.js prerequisite check** in `/setup` -- warns if Node.js is not available for hooks
 
 ### Changed
-- `CLAUDE.md` Native Claude Code Features section updated to list all five governance hooks with descriptions
-- `docs/how-it-works.md` hooks entry expanded to describe all shipped hooks
-- `docs/customization-guide.md` hooks section rewritten from "how to add hooks" to "what's included and how to customize"
-- README comparison table updated: hooks row now lists shipped hooks instead of "awareness"
-- README "What You Get" section now includes governance hooks
-- README "How It Works" section now describes hooks
-- README roadmap updated with v3.2
+- **settings.json is now valid JSON** -- removed all `//` comments that could break strict parsers
+- **Consolidated deny patterns** -- extended deny list (git reset --hard, git clean -fd, chmod -R 777, rm -rf .) moved from guard-risky-bash hook into settings.json deny list
+- **CLAUDE.md trimmed to ~90 lines** -- removed "Native Claude Code Features" section (Claude knows its own features), removed commented placeholder examples, removed MEMORY.md prohibition
+- **strategy-roadmap.md trimmed to ~77 lines** -- removed placeholder tables and bracket-fill sections; kept section headers for /plan to populate
+- **DECISIONS.md simplified to ~24 lines** -- removed lengthy format reference and examples
+- **PROGRESS.md updated** -- removed reference to removed /archive command
+- **/plan command streamlined** -- auto-defaults to Lightweight tier for personal/CLI/library projects (skips Quality & Testing round), removed 20-line Project Type Adaptation table
+- **/checkpoint now includes archival** -- handles PROGRESS.md cleanup inline (previously separate /archive command)
+- **/setup updated** -- reflects 4 hooks (not 5), 2 commands (not 4), adds hook prerequisite check
+- **README rewritten** -- concise problem-solution format, accurate file counts and descriptions
+- **All docs trimmed** -- how-it-works.md (67 lines), customization-guide.md (107 lines), strategy-creation-guide.md (66 lines)
+
+### Removed
+- **guard-risky-bash.sh** -- redundant with settings.json deny list; bypassable regex patterns provided false security
+- **/status command** -- lightweight read-only snapshot didn't justify a separate command; users can ask Claude directly
+- **/archive command** -- archival logic folded into /checkpoint
+- **settings.local.json** -- development artifact with local paths; should not be in template repo
+- **All bash hook scripts** -- replaced by cross-platform Node.js equivalents
+- **"Do NOT write to MEMORY.md" instruction** -- counterproductive; MEMORY.md can serve as backup safety net
 
 ---
 

@@ -17,7 +17,7 @@ Ask the user which applies:
 
 For scenarios A, B, and C: ask the user for the **full path** to the target directory (or where they want it created).
 
-For scenario D: confirm with the user -- "This will set up AIAgentMinder files in this template repository's directory. Is that what you want, or did you mean to target a different project?" If they want a different project, ask for the path and treat it as scenario B or C.
+For scenario D: confirm with the user -- "This will set up AIAgentMinder files in this template repository's directory. Is that what you want, or did you mean to target a different project?"
 
 ---
 
@@ -28,23 +28,17 @@ Ask all of these in one grouped prompt:
 1. **Project name** (short, kebab-case friendly)
 2. **One-sentence description** of what it does
 3. **Project type:** web-app | api | cli-tool | library | mobile-app | other
-4. **Primary tech stack:**
-   - Language (e.g., TypeScript, Python, C#, Rust, Go)
-   - Framework (e.g., Next.js, FastAPI, ASP.NET, Axum)
-   - Database (if any)
-   - Other key dependencies
-5. **Developer profile:**
-   - Experience level with chosen stack
-   - How much autonomy Claude should have (conservative / medium / aggressive)
-6. **Project scale:** Will this be a personal tool, a small team tool, or a public-facing product?
-7. **MCP servers:** Will you be using any MCP servers? (e.g., a database MCP, browser automation, custom API integration -- or "none")
+4. **Primary tech stack:** Language, Framework, Database, other key dependencies
+5. **Developer profile:** Experience level, autonomy preference (conservative / medium / aggressive)
+6. **Project scale:** Personal tool, small team tool, or public-facing product?
+7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
 8. **GitHub username/org** (only for Scenario A)
 
 ---
 
 ## Step 3: Set Up Repository
 
-The template files are in the `project/` directory of this repository (the AIAgentMinder repo you're currently in). Copy them to the target location based on the scenario.
+The template files are in the `project/` directory of this repository. Copy them to the target location based on the scenario.
 
 ### Scenario A: New GitHub Repo
 ```bash
@@ -54,10 +48,10 @@ cd [name]
 Then copy all files from this repo's `project/` directory into the new repo.
 
 ### Scenario B: Existing Repo
-Copy template files from this repo's `project/` directory into the user's repo. Before copying each file, check if it already exists in the target:
-- If the file exists, ask the user: "You already have [file]. Should I merge the template content, replace it, or skip it?"
+Copy template files into the user's repo. Before copying each file, check if it already exists:
+- If it exists, ask: "You already have [file]. Should I merge, replace, or skip it?"
 - Never overwrite without asking
-- Always copy `.claude/` directory (commands and settings)
+- Always copy `.claude/` directory (commands, settings, hooks)
 
 ### Scenario C: New Local Project
 ```bash
@@ -72,7 +66,17 @@ Copy all files from this repo's `project/` directory into the confirmed target d
 
 ---
 
-## Step 4: Customize Files
+## Step 4: Check Hook Prerequisites
+
+The governance hooks require Node.js. Check if `node` is available:
+```bash
+node --version
+```
+If Node.js is not found, warn the user: "Governance hooks require Node.js. The hooks will be copied but won't run until Node.js is installed. You can disable them by removing the hooks section from .claude/settings.json."
+
+---
+
+## Step 5: Customize Files
 
 Using the project identity from Step 2, update these files **in the target project** (not in this template repo):
 
@@ -87,44 +91,35 @@ Replace the placeholder block with actual values:
 
 **Developer Profile:**
 - [actual experience info]
-- [actual autonomy preference]
+- [actual risk tolerance]
 ```
 
 ### .claude/settings.json -- Add Stack-Specific Permissions
-The template starts with a minimal set of safe permissions (git, gh, basic shell utilities).
-Add permissions for the chosen stack by appending to the `allow` array:
-- **Node.js**: `"Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)", "Bash(pnpm:*)"` (or yarn/bun)
+Append to the `allow` array based on the chosen stack:
+- **Node.js**: `"Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)"` (add pnpm/yarn/bun as applicable)
 - **Python**: `"Bash(pip:*)", "Bash(python:*)", "Bash(pytest:*)", "Bash(uv:*)"`
 - **.NET / C#**: `"Bash(dotnet:*)"`
 - **Rust**: `"Bash(cargo:*)", "Bash(rustup:*)"`
 - **Go**: `"Bash(go:*)"`
-- **Docker** (if using containers): `"Bash(docker:*)", "Bash(docker-compose:*)"`
+- **Docker**: `"Bash(docker:*)", "Bash(docker-compose:*)"`
 Only add what the project actually uses.
 
 ### .gitignore -- Append Stack-Specific Entries
-The template `.gitignore` covers secrets, IDE files, OS artifacts, and logs.
-Append stack-specific ignores at the bottom after the marker line:
-
-- **Node.js**: `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo`, `.eslintcache`
-- **Python**: `__pycache__/`, `*.py[cod]`, `*.egg-info/`, `.venv/`, `.mypy_cache/`, `.ruff_cache/`, `.pytest_cache/`, `htmlcov/`
-- **.NET**: `bin/`, `obj/`, `*.user`, `*.suo`, `.vs/`, `*.nupkg`
+The template `.gitignore` covers secrets, IDE files, OS artifacts. Append stack-specific entries:
+- **Node.js**: `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo`
+- **Python**: `__pycache__/`, `*.py[cod]`, `.venv/`, `.pytest_cache/`
+- **.NET**: `bin/`, `obj/`, `*.user`, `.vs/`
 - **Rust**: `target/`, `*.rs.bk`
 - **Go**: `*.exe`, `*.test`, `*.out`
-- **Terraform**: `.terraform/`, `*.tfstate`, `*.tfstate.*`
 
 ### docs/strategy-roadmap.md -- Set Initial Quality Tier
-Based on the project scale answer from Step 2, set the quality tier placeholder:
-- Personal tool → Lightweight
-- Small team tool → Standard
-- Public-facing product → Rigorous
-This is a starting point -- `/plan` will refine it based on deeper questioning.
+Based on project scale: Personal → Lightweight, Small team → Standard, Public → Rigorous.
 
 ---
 
-## Step 5: Initial Commit
+## Step 6: Initial Commit
 
-In the **target project directory**, run:
-
+In the **target project directory**:
 ```bash
 git add -A
 git commit -m "chore: initialize project with AIAgentMinder template"
@@ -137,31 +132,24 @@ git push -u origin main
 
 ---
 
-## Step 6: Summary
+## Step 7: Summary
 
-Print a summary like this:
-
+Print:
 ```
 Project initialized successfully!
 
 Created files:
-- CLAUDE.md (project instructions)
+- CLAUDE.md (project instructions -- ~80 lines)
 - PROGRESS.md (session tracking)
 - DECISIONS.md (architectural decisions)
-- docs/strategy-roadmap.md (project planning template)
-- .claude/settings.json (permissions + hooks configuration)
-- .claude/commands/ (4 slash commands: /plan, /status, /checkpoint, /archive)
-- .claude/hooks/ (5 governance hooks: auto-commit, timestamp, context injection, command guard, auto-lint)
+- docs/strategy-roadmap.md (planning template)
+- .claude/settings.json (permissions + hooks)
+- .claude/commands/ (2 commands: /plan, /checkpoint)
+- .claude/hooks/ (4 Node.js hooks: timestamp, auto-commit, context re-injection, auto-lint)
 - .gitignore (core + [stack] entries)
-
-CI/CD: Not included. When ready, open the project in Claude Code and say:
-"Set up GitHub Actions CI for this project." Claude will generate an accurate
-workflow based on your actual project structure.
 
 Next steps:
 1. Open Claude Code in your new project directory
-2. Close and reopen the Claude Code panel (VS Code) so new slash commands are detected
-3. Run /plan to create your strategy roadmap
-4. Or tell Claude "start Phase 1" if you already have a plan
-5. Run /status at any time to see project state
+2. Run /plan to create your strategy roadmap
+3. Or tell Claude "start Phase 1" if you already have a plan
 ```
