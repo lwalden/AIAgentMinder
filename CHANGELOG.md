@@ -3,10 +3,39 @@
 All notable changes to AIAgentMinder will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
+Versions follow [Semantic Versioning](https://semver.org/) from 0.5.0 onward (pre-1.0 releases increment minor for new features, patch for fixes and non-breaking changes).
 
 ---
 
-## [4.0.0] - 2026-02-16
+## [0.5.0] - 2026-02-17
+
+### Added
+- **AGENTS.md** -- shared core instructions file, agent-agnostic; auto-read by Codex, Cursor, and any AGENTS.md-compatible agent
+- **SETUP.md** -- full setup protocol for non-Claude agents; invoke with `"Read SETUP.md and follow the instructions"` from the template repo
+- **project/PLAN.md** -- full planning interview for non-Claude agents; invoke with `"Read PLAN.md and follow the instructions"` from the target project
+- **project/.github/copilot-instructions.md** -- standalone instructions file auto-read by GitHub Copilot in VS Code
+- **project/.github/hooks/** -- three Copilot JSON hooks (session-end, session-start, post-tool-use) wiring the existing Node.js scripts for GitHub Copilot's hook system
+- **project/docs/agent-setup.md** -- per-agent quick-reference guide covering Claude Code, Copilot, Codex, and Cursor
+- **Multi-agent support section** in README with feature parity table and parallel quick start steps for all agents
+- **Session resilience note** in README documenting hook-based protection against abrupt session ends (rate limits, crashes) vs. manual-protocol agents
+
+### Changed
+- **CLAUDE.md** is now a ~15-line thin wrapper that `@imports` AGENTS.md -- identical token cost for Claude users (~95 lines total), zero overhead
+- **`/setup` command** now customizes `AGENTS.md` and `.github/copilot-instructions.md` during project init (in addition to `.claude/settings.json`)
+- **README** rewritten for agent-agnostic framing: "Why Use This" table uses generic solution names; Commands section restructured as Claude Code vs. other-agents action table; Governance Hooks table adds per-agent Auto/Manual/N/A columns
+- **Versioning** switched to semver from 0.5.0 (previous releases retroactively treated as 0.1.0–0.4.0)
+
+### Unchanged
+- All 4 Node.js governance hooks (session-end-timestamp, session-end-commit, session-start-context, post-edit-lint)
+- `.claude/settings.json` permissions and hook configuration
+- `/plan` and `/checkpoint` Claude Code commands
+- `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`
+
+---
+
+## [0.4.0] - 2026-02-16
+
+> Previously released as v4.0.0
 
 ### Added
 - **Cross-platform hooks (Node.js)** -- all hooks rewritten from bash to Node.js for Windows, macOS, and Linux support
@@ -36,7 +65,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [3.1.0] - 2026-02-14
+## [0.3.1] - 2026-02-14
+
+> Previously released as v3.1.0
 
 ### Added
 - **ADR trigger criteria** in CLAUDE.md, `/checkpoint`, and DECISIONS.md -- explicit list of when to log decisions
@@ -53,7 +84,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [3.0.0] - 2026-02-14
+## [0.3.0] - 2026-02-14
+
+> Previously released as v3.0.0
 
 ### Added
 - **Root-level `/setup` command** in `.claude/commands/setup.md` -- resolves the chicken-and-egg problem of setting up from the template repo itself
@@ -78,7 +111,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [2.1.1] - 2026-02-07
+## [0.2.1] - 2026-02-07
+
+> Previously released as v2.1.1
 
 ### Added
 - **Prerequisites section** in README -- links to Claude Code VS Code extension, CLI docs, and GitHub CLI
@@ -101,7 +136,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [2.1.0] - 2026-02-07
+## [0.2.0] - 2026-02-07
+
+> Previously released as v2.1.0
 
 ### Added
 - **Adaptive planning depth** in `/plan` -- pre-interview assessment gauges how formed the user's idea is (rough concept through detailed spec) and adjusts question depth accordingly
@@ -125,7 +162,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [2.0.0] - 2026-02-07
+## [0.1.0] - 2026-02-07
+
+> Previously released as v2.0.0
 
 ### Added
 - `project/` directory to clearly separate scaffolding files from template documentation
@@ -196,7 +235,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [1.0.0]
+## [0.0.1]
+
+> Previously released as v1.0.0
 
 ### Added
 - Initial release with comprehensive templates
