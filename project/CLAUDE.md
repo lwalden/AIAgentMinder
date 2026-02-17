@@ -95,7 +95,7 @@ Files on disk and staged changes are preserved. Next session: `git status` and `
 
 ## Native Claude Code Features
 
-This template works alongside Claude Code's built-in capabilities:
+This template works alongside Claude Code's built-in capabilities; if slash commands or hooks are unavailable, manually update PROGRESS.md and DECISIONS.md before ending a session:
 
 - **MEMORY.md** -- Claude Code auto-summarizes context here. This project uses PROGRESS.md instead (explicit, versioned, auditable). Do NOT write project state to MEMORY.md in this project.
 - **Plan mode** (`/plan` native) -- Good for scoping a single task. Use this project's `/plan` command for full project planning (structured interview, strategy roadmap, quality tiers).
