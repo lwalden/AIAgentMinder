@@ -2,97 +2,65 @@
 
 ## The Context System
 
-The template uses four files that work together:
+Four files work together:
 
 | File | Role | Analogy |
 |------|------|---------|
-| `CLAUDE.md` | Behavioral rules and workflow | The "employee handbook" |
-| `PROGRESS.md` | Current state and session memory | The "daily standup notes" |
-| `DECISIONS.md` | Architectural decision log | The "meeting minutes" |
-| `docs/strategy-roadmap.md` | Project goals and architecture | The "product spec" |
+| `CLAUDE.md` | Behavioral rules and workflow | Employee handbook |
+| `PROGRESS.md` | Current state and session memory | Daily standup notes |
+| `DECISIONS.md` | Architectural decision log | Meeting minutes |
+| `docs/strategy-roadmap.md` | Project goals and architecture | Product spec |
 
-Claude reads `CLAUDE.md` automatically every session. It reads `PROGRESS.md` first thing. The other files are read on-demand when Claude needs to make a decision or understand the "why" behind something.
+Claude reads `CLAUDE.md` automatically every session and `PROGRESS.md` first thing. Other files are read on-demand.
 
 ## Session Continuity
 
-### Starting a Session
-1. Claude reads `PROGRESS.md` -- learns current phase, active tasks, blockers
-2. Runs `git status` -- finds any uncommitted work from previous sessions
-3. Runs `gh pr list` -- checks for open PRs awaiting review
-4. Asks about blocked items
-5. Resumes from "Next Session Should" priorities
+**Starting:** Claude reads PROGRESS.md (current phase, tasks, blockers) → `git status` (uncommitted work) → `gh pr list` (open PRs) → asks about blocked items → resumes from priorities.
 
-### During a Session
-- Code is written to files immediately (not held in memory)
-- Commits happen at natural checkpoints
-- Feature branches are used; no direct commits to main
-- `PROGRESS.md` is updated before complex multi-step operations
+**During:** Code written to files immediately. Commits at natural checkpoints. Feature branches only.
 
-### Ending a Session
-Run `/checkpoint` to:
-- Update PROGRESS.md with completed work and next priorities
-- Record any architectural decisions in DECISIONS.md
-- Commit tracking changes
+**Ending:** Run `/checkpoint` to update PROGRESS.md and DECISIONS.md, then commit.
 
-### Unexpected Session End
-If Claude runs out of tokens mid-task, files on disk and staged git changes are preserved. Next session: `git status` shows what's done.
+**Unexpected end:** Files on disk and staged git changes are preserved. Next session: `git status` shows partial work.
 
 ## Context Budget
 
-Files are sized to minimize per-session token consumption:
-
 | File | Target Lines | Read Frequency |
 |------|-------------|---------------|
-| CLAUDE.md | ~110 | Every session (auto-loaded) |
+| CLAUDE.md | ~90 | Every session (auto) |
 | PROGRESS.md | ~20 active | Every session (first thing) |
 | DECISIONS.md | Grows over time | On-demand |
-| strategy-roadmap.md | ~160 | On-demand |
+| strategy-roadmap.md | ~75 | On-demand |
 
-When `PROGRESS.md` exceeds 100 lines, run `/archive` to move old session summaries to `docs/archive/progress-archive.md`.
+When PROGRESS.md exceeds 100 lines, `/checkpoint` archives old entries to `docs/archive/`.
 
-## Slash Commands
+## Commands
 
 | Command | Purpose | Modifies Files? |
 |---------|---------|----------------|
-| `/setup` | Initialize a new project from the template (run from AIAgentMinder repo) | Yes |
+| `/setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
 | `/plan` | Create or update strategy-roadmap.md interactively | Yes |
-| `/status` | Print project state summary | No (read-only) |
-| `/checkpoint` | Session end housekeeping | Yes |
-| `/archive` | Move old progress entries to archive | Yes |
+| `/checkpoint` | Session end: update tracking, archive if needed, commit | Yes |
 
 ## Security Model
 
-The `.claude/settings.json` file pre-approves a minimal set of development commands so Claude can work without constant permission prompts for routine operations.
+`.claude/settings.json` pre-approves ~20 safe commands. Stack tools added by `/setup`.
 
-### What's Allowed (baseline)
-- Git operations (all `git` subcommands)
-- GitHub CLI (`gh`)
-- Safe read utilities (ls, cat, grep, find, diff, etc.)
-- Safe file operations (mkdir, cp, mv, touch)
-- Text processing (jq, sort, head, tail)
+**Allowed:** git, gh, ls, cat, grep, find, diff, mkdir, cp, mv, touch, jq, sort, head, tail.
 
-Stack-specific tools (npm, dotnet, cargo, pytest, docker, etc.) are added during `/setup` based on your project's tech stack.
+**Requires approval:** rm, curl, wget, cloud CLIs, destructive git, kill, chmod.
 
-### What Requires Approval
-These operations are deliberately excluded so Claude must ask first:
-- **File deletion** (`rm`) -- prevents accidental data loss
-- **Network tools** (`curl`, `wget`) -- prevents data exfiltration
-- **Cloud CLIs** (`az`, `aws`, `gcloud`, `terraform`) -- prevents billable resource creation
-- **Destructive git** (`git reset`, `git rebase`) -- prevents history rewriting
-- **Process management** (`kill`, `pkill`) -- prevents accidental termination
-- **Permission changes** (`chmod`, `chown`) -- prevents security issues
+**Explicitly denied:** `rm -rf /` / `~` / `C:` / `.`, `git push --force`, `git reset --hard origin`, `git clean -fd`, `chmod -R 777`.
 
-### Explicit Deny List
-Claude will refuse to run these commands regardless of approval:
-- `rm -rf /`, `rm -rf ~`, `rm -rf C:` -- catastrophic deletion
-- `git push --force` -- prevents history loss on shared branches
+## Governance Hooks
 
-## Native Claude Code Features
+Four cross-platform hooks (Node.js) configured in `settings.json`:
 
-This template works alongside Claude Code's built-in features:
+| Hook | Event | Script |
+|------|-------|--------|
+| PROGRESS.md timestamp | Stop | `session-end-timestamp.js` |
+| Auto-commit checkpoint | Stop | `session-end-commit.js` |
+| Context re-injection | SessionStart | `session-start-context.js` |
+| Auto-format/lint | PostToolUse | `post-edit-lint.js` |
 
-- **MEMORY.md** -- Claude Code auto-summarizes context into this file. This template uses PROGRESS.md instead for explicit, versioned, auditable session state. CLAUDE.md tells Claude not to use MEMORY.md for project state.
-- **Plan mode** -- Native plan mode is good for scoping individual tasks. The `/plan` command handles full project planning (structured interview, strategy roadmap, quality tiers).
-- **Compact history** -- Claude Code automatically compresses old messages when context fills. `/checkpoint` saves state to files before this happens.
-- **Hooks** -- The template includes five governance hooks in `.claude/hooks/`, configured in `settings.json`. They handle: PROGRESS.md timestamp and auto-commit on session end (Stop), context re-injection after compaction (SessionStart), risky command guard (PreToolUse), and auto-format after file edits (PostToolUse). See `docs/customization-guide.md` for details.
-- **MCP servers** -- If `CLAUDE.md` lists MCP servers in the Project Identity section, Claude uses them for the appropriate tasks instead of shell commands.
+The auto-commit hook only runs on feature branches and stages only tracked files. It respects git hooks (no `--no-verify`).
