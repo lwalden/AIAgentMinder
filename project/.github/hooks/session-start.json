@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "bash": "node \".claude/hooks/session-start-context.js\"",
+        "timeoutSec": 10
+      }
+    ]
+  }
+}

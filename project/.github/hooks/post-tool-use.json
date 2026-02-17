@@ -1,0 +1,12 @@
+{
+  "version": 1,
+  "hooks": {
+    "PostToolUse": [
+      {
+        "type": "command",
+        "bash": "node \".claude/hooks/post-edit-lint.js\"",
+        "timeoutSec": 30
+      }
+    ]
+  }
+}
