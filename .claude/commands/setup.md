@@ -149,8 +149,9 @@ Created files:
 - PROGRESS.md (session tracking)
 - DECISIONS.md (architectural decisions)
 - docs/strategy-roadmap.md (project planning template)
-- .claude/settings.json (permissions -- stack tools added)
+- .claude/settings.json (permissions + hooks configuration)
 - .claude/commands/ (4 slash commands: /plan, /status, /checkpoint, /archive)
+- .claude/hooks/ (5 governance hooks: auto-commit, timestamp, context injection, command guard, auto-lint)
 - .gitignore (core + [stack] entries)
 
 CI/CD: Not included. When ready, open the project in Claude Code and say:

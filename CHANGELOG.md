@@ -6,6 +6,46 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [3.2.0] - 2026-02-16
+
+### Added
+- **Five governance hooks** shipping out of the box in `.claude/hooks/`:
+  - `session-end-timestamp.sh` (Stop) -- auto-updates PROGRESS.md "Last Updated" timestamp on session end
+  - `session-end-commit.sh` (Stop) -- auto git commit checkpoint on session end so no work is lost
+  - `session-start-context.sh` (SessionStart) -- re-injects PROGRESS.md and DECISIONS.md after context compaction or session resume
+  - `guard-risky-bash.sh` (PreToolUse/Bash) -- auto-approves safe read-only commands, blocks dangerous patterns (rm -rf, force push, etc.)
+  - `post-edit-lint.sh` (PostToolUse/Write|Edit) -- auto-runs project formatters (prettier, eslint, black, ruff, rustfmt, gofmt, dotnet format) after file edits
+- **Hook configuration** in `.claude/settings.json` under the `hooks` key -- all five hooks are pre-wired and ready to use
+- **Hook documentation** in `docs/customization-guide.md` -- table of included hooks, customization instructions, and optional Git pre-commit hook example
+
+### Changed
+- `CLAUDE.md` Native Claude Code Features section updated to list all five governance hooks with descriptions
+- `docs/how-it-works.md` hooks entry expanded to describe all shipped hooks
+- `docs/customization-guide.md` hooks section rewritten from "how to add hooks" to "what's included and how to customize"
+- README comparison table updated: hooks row now lists shipped hooks instead of "awareness"
+- README "What You Get" section now includes governance hooks
+- README "How It Works" section now describes hooks
+- README roadmap updated with v3.2
+
+---
+
+## [3.1.0] - 2026-02-14
+
+### Added
+- **ADR trigger criteria** in CLAUDE.md, `/checkpoint`, and DECISIONS.md -- explicit list of when to log decisions
+- **MVP Goals section** in CLAUDE.md -- populated by `/plan` with Phase 1 deliverables
+- **Format Reference** and example in DECISIONS.md template
+- **Risk-aware pre-commit hook example** in `docs/customization-guide.md`
+- **Roadmap section** in README
+- **"What AIAgentMinder is NOT" callout** in README
+
+### Changed
+- `/plan` updated to ask ADR format preference (lightweight vs. formal)
+- `/status` updated to surface MVP Goals and flag scope drift
+- Version badge bumped to 3.1
+
+---
+
 ## [3.0.0] - 2026-02-14
 
 ### Added

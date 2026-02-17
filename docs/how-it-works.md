@@ -94,5 +94,5 @@ This template works alongside Claude Code's built-in features:
 - **MEMORY.md** -- Claude Code auto-summarizes context into this file. This template uses PROGRESS.md instead for explicit, versioned, auditable session state. CLAUDE.md tells Claude not to use MEMORY.md for project state.
 - **Plan mode** -- Native plan mode is good for scoping individual tasks. The `/plan` command handles full project planning (structured interview, strategy roadmap, quality tiers).
 - **Compact history** -- Claude Code automatically compresses old messages when context fills. `/checkpoint` saves state to files before this happens.
-- **Hooks** -- If the project defines `.claude/hooks/` scripts, Claude respects them. Common uses: pre-commit validation, auto-checkpoint on session end.
+- **Hooks** -- The template includes five governance hooks in `.claude/hooks/`, configured in `settings.json`. They handle: PROGRESS.md timestamp and auto-commit on session end (Stop), context re-injection after compaction (SessionStart), risky command guard (PreToolUse), and auto-format after file edits (PostToolUse). See `docs/customization-guide.md` for details.
 - **MCP servers** -- If `CLAUDE.md` lists MCP servers in the Project Identity section, Claude uses them for the appropriate tasks instead of shell commands.

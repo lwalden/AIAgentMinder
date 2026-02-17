@@ -78,19 +78,31 @@ If your project uses MCP servers:
 
 ### Hooks
 
-Claude Code hooks run shell commands on events like file writes, tool calls, or session end. To add hooks to your project:
-1. Create `.claude/hooks/` directory
-2. Add hook scripts following [Claude Code hooks documentation](https://docs.anthropic.com/en/docs/claude-code/hooks)
-3. CLAUDE.md will automatically inform Claude to check for and respect hooks
+AIAgentMinder includes five governance hooks out of the box in `.claude/hooks/`. These are configured in `.claude/settings.json` under the `hooks` key and run automatically -- no user action needed.
 
-Useful hook ideas:
-- Run linting after file edits
-- Auto-update PROGRESS.md timestamp after file writes
-- Send a notification when a session ends
+#### Included Hooks
 
-#### Risk-Aware Pre-commit Hook
+| Hook | Event | Script | What It Does |
+|------|-------|--------|-------------|
+| PROGRESS.md timestamp | Stop | `session-end-timestamp.sh` | Updates the "Last Updated" date in PROGRESS.md when a session ends |
+| Auto-commit checkpoint | Stop | `session-end-commit.sh` | Runs `git add -A && git commit` with a timestamped message so no work is lost |
+| Context re-injection | SessionStart | `session-start-context.sh` | After context compaction or resume, re-injects PROGRESS.md and DECISIONS.md |
+| Risky command guard | PreToolUse (Bash) | `guard-risky-bash.sh` | Auto-approves safe commands (git status, ls, etc.), blocks dangerous patterns (rm -rf, force push) |
+| Auto-format/lint | PostToolUse (Write/Edit) | `post-edit-lint.sh` | Runs project formatters (prettier, black, rustfmt, gofmt, etc.) on edited files |
 
-This hook scans staged changes for common risk patterns before committing. Add it as `.claude/hooks/pre-commit.sh` (or wire it into `.git/hooks/pre-commit`):
+#### Customizing Hooks
+
+**Disable a hook:** Remove its entry from the `hooks` section in `.claude/settings.json`.
+
+**Add a custom hook:** Add a new entry to `settings.json` and create the script in `.claude/hooks/`. See the [Claude Code hooks documentation](https://docs.anthropic.com/en/docs/claude-code/hooks) for the full event list and JSON input format.
+
+**Modify guard rules:** Edit `guard-risky-bash.sh` to add patterns to the deny list (blocked commands) or allow list (auto-approved commands).
+
+**Disable auto-commit:** If you prefer manual commits, remove the `session-end-commit.sh` entry from the Stop hooks in `settings.json`. The PROGRESS.md timestamp hook can run independently.
+
+#### Risk-Aware Pre-commit Hook (Optional)
+
+For an additional layer of protection, you can wire a risk scanner into Git's pre-commit hook. Create `.git/hooks/pre-commit`:
 
 ```bash
 #!/usr/bin/env bash
@@ -120,7 +132,7 @@ fi
 
 if [ ${#WARNINGS[@]} -gt 0 ]; then
   echo ""
-  echo "⚠️  Pre-commit risk scan flagged the following:"
+  echo "Pre-commit risk scan flagged the following:"
   for W in "${WARNINGS[@]}"; do
     echo "   - $W"
   done
@@ -130,15 +142,11 @@ if [ ${#WARNINGS[@]} -gt 0 ]; then
   exit 1
 fi
 
-echo "✓ Pre-commit risk scan passed."
+echo "Pre-commit risk scan passed."
 exit 0
 ```
 
-Once the hook is in place, add a note to CLAUDE.md so Claude knows to respect it:
-
-```markdown
-**Hooks:** `.claude/hooks/pre-commit.sh` -- risk scan (credentials, large deletions). Claude should run this before committing and address any warnings rather than bypassing with --no-verify.
-```
+Note: This is a **Git hook** (`.git/hooks/`), not a Claude Code hook (`.claude/hooks/`). It runs on every `git commit`, whether from Claude or the user. The auto-commit Stop hook uses `--no-verify` to avoid blocking session-end checkpoints.
 
 ### Custom Slash Commands
 
