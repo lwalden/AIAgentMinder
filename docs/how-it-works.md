@@ -15,7 +15,7 @@ Claude reads `CLAUDE.md` automatically every session. PROGRESS.md and DECISIONS.
 
 ## Session Continuity
 
-**Starting:** The SessionStart hook injects PROGRESS.md (tasks, blockers, priorities) and DECISIONS.md automatically. Claude checks `git status` for uncommitted work, then resumes from priorities.
+**Starting:** The SessionStart hook injects PROGRESS.md (active tasks, current state, blockers, priorities) and DECISIONS.md automatically. Claude checks `git status` for uncommitted work, then resumes from priorities.
 
 **During:** Code written to files immediately. Commits at natural checkpoints. Feature branches only. Use Claude's native Tasks for complex multi-step work.
 
