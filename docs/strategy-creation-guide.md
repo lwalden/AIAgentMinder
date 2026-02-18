@@ -21,7 +21,9 @@ Claude: Round 1 -- Core Understanding:
 
 You:  [answers]
 
-Claude: Round 2 -- Scope & Technical: ...
+Claude: Round 2 -- Scope & Technical:
+        Must-haves, features that can wait, what's explicitly OUT of scope,
+        constraints, stack, launch date?
 
 Claude: Based on project scope (public-facing, user accounts), I recommend
         Rigorous testing tier. Does that sound right?

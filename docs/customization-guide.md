@@ -65,7 +65,7 @@ Tell Claude: "Set up GitHub Actions CI for this project."
 
 ### Hooks
 
-Five governance hooks (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`:
+Four hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`. Two run on the Stop event (timestamp + auto-commit), making five total hook executions per session end:
 
 | Hook | Event | Script | What It Does |
 |------|-------|--------|-------------|
