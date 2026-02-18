@@ -5,8 +5,6 @@
 >
 > **Reading order:** PROGRESS.md first → DECISIONS.md before architectural choices → other docs on-demand.
 
----
-
 ## Session Protocol
 
 ### Starting a Session
@@ -25,8 +23,6 @@
 ### Ending a Session
 Run `/handoff` to write a clear briefing for the next session. Hooks handle timestamp and auto-commit automatically.
 
----
-
 ## Project Identity
 
 **Project:** [Project Name]
@@ -38,13 +34,9 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 - [Experience level and tech expertise]
 - [Risk tolerance: conservative / medium / aggressive]
 
----
-
 ## MVP Goals
 
 <!-- Populated by /plan with Phase 1 deliverables -->
-
----
 
 ## Behavioral Rules
 
@@ -65,13 +57,11 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 - Write tests appropriate to the project's quality tier (see strategy-roadmap.md)
 - When Standard tier or above: write failing tests first, then implement
 
----
-
 ## Context Budget
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~90 lines | Don't add without removing something |
+| CLAUDE.md | ~75 lines | Don't add without removing something |
 | PROGRESS.md | ~20 lines active | Self-trimming: only 3 session notes kept |
 | DECISIONS.md | Grows over time | Delete superseded entries (git history preserves them) |
 
@@ -79,12 +69,3 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 - PROGRESS.md: Every session (auto-injected by hook)
 - DECISIONS.md: Auto-injected if decisions exist; always check before architectural choices
 - strategy-roadmap.md: On-demand
-
----
-
-## Governance Hooks
-
-Five hooks run automatically (configured in `.claude/settings.json`):
-- **Stop:** Updates PROGRESS.md timestamp + auto-commits on feature branches
-- **PreCompact:** Saves PROGRESS.md state before context compaction
-- **SessionStart:** Re-injects PROGRESS.md, DECISIONS.md, and task suggestions on every session start
