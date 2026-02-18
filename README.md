@@ -91,6 +91,27 @@ Claude already has your tasks, blockers, and priorities. For the first session o
 
 ---
 
+## What a Session Looks Like
+
+**Session 1 — Planning:**
+Run `/plan`. Claude asks about your project in grouped rounds. You describe a recipe sharing API.
+Claude generates `docs/strategy-roadmap.md` with MVP features, stack choices, and a quality tier.
+Run `/handoff`. PROGRESS.md now says "Phase 1 ready. Next: scaffold project structure."
+
+**Session 2 — Building:**
+Open Claude Code. It already knows the project state (hook injected PROGRESS.md).
+Say "Start on the next priority." Claude scaffolds the Express app, sets up routes, writes initial tests.
+Run `/handoff`. PROGRESS.md now says "GET /recipes working with tests. Next: POST endpoint + validation."
+
+**Session 3 — Continuing:**
+Open a fresh Claude Code tab. Say "Resume."
+Claude picks up from the handoff: implements POST /recipes with Zod validation, adds error handling.
+Decides to use Zod for validation — logs it in DECISIONS.md with alternatives considered and tradeoffs.
+
+See a [full demo walkthrough](examples/demo-transcript.md) with actual prompts and session state changes.
+
+---
+
 ## What Gets Copied to Your Project
 
 ```
@@ -138,6 +159,17 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 
 ---
 
+## Non-Goals
+
+AIAgentMinder deliberately does not try to be:
+
+- **A task management system.** Use GitHub Issues, Linear, or Jira for that. PROGRESS.md tracks session state, not project-wide task management.
+- **A multi-agent orchestrator.** Tools like CCPM and claude-flow handle parallel agent coordination. AIAgentMinder is for single-developer, single-agent workflows.
+- **A CLI tool.** There's nothing to install beyond copying files. The "tool" is markdown + hooks + slash commands that live in your repo.
+- **A replacement for Claude Code's built-in memory.** If Claude Code ships robust native memory persistence, AIAgentMinder's session continuity hooks become less critical. The planning and decision governance layers remain independently valuable.
+
+---
+
 ## Troubleshooting
 
 - **Commands not showing (VS Code)** — Close/reopen the Claude Code panel
@@ -152,6 +184,7 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 - [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
 - [Customization Guide](docs/customization-guide.md) — what to customize and how
 - [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/plan` or writing manually
+- [Examples](examples/) — filled-in state files from a realistic project (recipe API)
 
 ---
 

@@ -18,22 +18,25 @@ if (fs.existsSync(progressFile)) {
   console.log("--- PROGRESS.md (session context) ---");
   console.log(content);
 
-  // Extract tasks and priorities for Claude's native Task system
+  // Extract tasks, priorities, and current state for Claude's native Task system
   const lines = content.split("\n");
   const tasks = [];
   let inTasks = false;
   let inPriorities = false;
+  let inState = false;
 
   for (const line of lines) {
-    if (/^## Active Tasks/i.test(line)) { inTasks = true; inPriorities = false; continue; }
-    if (/^## Next Priorities/i.test(line)) { inPriorities = true; inTasks = false; continue; }
-    if (/^## /.test(line)) { inTasks = false; inPriorities = false; continue; }
+    if (/^## Active Tasks/i.test(line)) { inTasks = true; inPriorities = false; inState = false; continue; }
+    if (/^## Next Priorities/i.test(line)) { inPriorities = true; inTasks = false; inState = false; continue; }
+    if (/^## Current State/i.test(line)) { inState = true; inTasks = false; inPriorities = false; continue; }
+    if (/^## /.test(line)) { inTasks = false; inPriorities = false; inState = false; continue; }
 
     const trimmed = line.replace(/^[-*\d.)\s]+/, "").trim();
     if (!trimmed) continue;
 
     if (inTasks) tasks.push({ text: trimmed, type: "active" });
     if (inPriorities) tasks.push({ text: trimmed, type: "priority" });
+    if (inState) tasks.push({ text: trimmed, type: "state" });
   }
 
   if (tasks.length > 0) {

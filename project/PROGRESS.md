@@ -8,6 +8,9 @@
 ## Active Tasks
 - Project initialization (Run /setup then /plan)
 
+## Current State
+- [Brief description of what's working, what's partially done, what's broken]
+
 ## Blockers
 - None yet
 
@@ -17,4 +20,4 @@
 3. Begin Phase 1
 
 ---
-<!-- Session notes: keep last 3. Older ones are in git history. -->
+<!-- Session notes: keep last 3. Older ones are in git history. Format: - [DATE] Phase [N]: [what was accomplished]. Key files: [files touched]. → [what's next] -->
