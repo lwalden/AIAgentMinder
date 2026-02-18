@@ -14,6 +14,8 @@
 2. Check `git status` for uncommitted work
 3. Resume from "Next Priorities" in PROGRESS.md
 
+> If no session context was injected above (you don't see PROGRESS.md content), read PROGRESS.md and DECISIONS.md manually before proceeding.
+
 ### During a Session
 - Write code to files immediately -- don't accumulate changes in memory
 - Commit at natural checkpoints (compiles, tests pass, logical unit complete)
@@ -69,7 +71,7 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~70 lines | Don't add without removing something |
+| CLAUDE.md | ~90 lines | Don't add without removing something |
 | PROGRESS.md | ~20 lines active | Self-trimming: only 3 session notes kept |
 | DECISIONS.md | Grows over time | Delete superseded entries (git history preserves them) |
 

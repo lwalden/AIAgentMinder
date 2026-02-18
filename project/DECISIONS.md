@@ -12,9 +12,23 @@
 
 <!-- Set by /plan. Replace this comment with: "Format: Lightweight" or "Format: Formal" -->
 
-**Lightweight:** `### [Title]` | Date | Status: Active | Chose: [X] | Why: [rationale]
+**Lightweight:**
+```
+### [Title] | Date | Status: Active
+Chose: [X] over [alternatives considered]. Why: [rationale]. Tradeoff: [what you gave up].
+```
 
-**Formal:** `### [Title]` | Date | Status: Active | Context → Decision → Consequences
+**Formal:**
+```
+### [Title]
+- **Date:** [date]
+- **Status:** Active | Superseded | Revisit
+- **Context:** [what prompted this decision]
+- **Options considered:** [option A, option B, option C]
+- **Decision:** [what was chosen]
+- **Tradeoffs:** [what was given up or accepted as risk]
+- **Consequences:** [what this means going forward]
+```
 
 **Status values:** Active | Superseded | Revisit
 

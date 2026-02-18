@@ -49,6 +49,8 @@ If any of these happened this session, add an ADR entry:
 - Changed a data model
 - Made a build/deploy decision
 
+Use the format recorded in DECISIONS.md. Always include alternatives considered and the tradeoff accepted — a decision without alternatives is an assertion, not a record.
+
 ### 4. Commit
 
 ```bash

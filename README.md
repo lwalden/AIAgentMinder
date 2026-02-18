@@ -138,6 +138,17 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 
 ---
 
+## Non-Goals
+
+AIAgentMinder deliberately does not try to be:
+
+- **A task management system.** Use GitHub Issues, Linear, or Jira for that. PROGRESS.md tracks session state, not project-wide task management.
+- **A multi-agent orchestrator.** Tools like CCPM and claude-flow handle parallel agent coordination. AIAgentMinder is for single-developer, single-agent workflows.
+- **A CLI tool.** There's nothing to install beyond copying files. The "tool" is markdown + hooks + slash commands that live in your repo.
+- **A replacement for Claude Code's built-in memory.** If Claude Code ships robust native memory persistence, AIAgentMinder's session continuity hooks become less critical. The planning and decision governance layers remain independently valuable.
+
+---
+
 ## Troubleshooting
 
 - **Commands not showing (VS Code)** — Close/reopen the Claude Code panel
