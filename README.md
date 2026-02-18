@@ -75,7 +75,17 @@ Open Claude Code in your project and run `/plan`. Claude interviews you and gene
 Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
 ```
 
-End each session with `/handoff`. Start the next session and Claude already knows where you left off.
+End each session with `/handoff`. The next session — whether a fresh VS Code tab or a new CLI window — automatically picks up where you left off.
+
+### Resuming Work
+
+You don't need a special command to resume. The SessionStart hook injects PROGRESS.md and DECISIONS.md into Claude's context before you type anything. Just open Claude Code and say what you want:
+
+- "Resume" or "Continue where we left off"
+- "Start on the next priority"
+- "What's the current state?"
+
+Claude already has your tasks, blockers, and priorities. For the first session of a new phase, add: "Read docs/strategy-roadmap.md" for the bigger picture.
 
 **Manual setup:** Copy `project/*` and `project/.claude/` to your repo, fill in the Project Identity section of `CLAUDE.md`, then run `/plan`.
 
