@@ -34,6 +34,11 @@ Ask the user where they are:
 
 Ask questions in grouped rounds, not one at a time. Adapt based on project type.
 
+### Pre-Round (Starting Point A only): Explore the Idea
+- Are there existing tools or products that solve a similar problem? What's wrong with them?
+- What would make someone choose your tool over doing nothing?
+- Is this a "scratching your own itch" project or aimed at others?
+
 ### Round 1: Core Understanding
 - What does this project do? (elevator pitch)
 - Who will use it?
@@ -43,6 +48,7 @@ Ask questions in grouped rounds, not one at a time. Adapt based on project type.
 ### Round 2: Scope & Technical
 - 3-5 must-have features for v1?
 - Features that can wait?
+- What is explicitly OUT of scope? (things this project will never do)
 - Constraints? (budget, hosting, compliance, timeline)
 - External services or APIs needed?
 - MCP servers? (database tools, browser automation, etc. -- or "none")
@@ -82,6 +88,10 @@ Fill in `docs/strategy-roadmap.md` using the lean template. Keep it brief — a 
 ```markdown
 1. [Feature] -- Acceptance: [testable criterion]
 ```
+
+### For Non-Goals, Be Explicit
+The "Out of Scope" section in the roadmap should list concrete things the project will NOT do,
+not vague disclaimers. "Won't support offline mode" is good. "Won't do everything" is useless.
 
 ### For Unknowns, Use TODO Markers
 ```markdown
