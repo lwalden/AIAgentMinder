@@ -1,76 +1,60 @@
-# Strategy & Technical Roadmap
+# Product Brief & Roadmap
 
-> Project goals, architecture, and development plan. Claude references this for the "why" behind decisions.
-> Run `/plan` to fill this in interactively, or edit manually. Read on-demand, not every session.
-
----
-
-## Executive Summary
-
-**Vision:** [What this project aims to achieve]
-**Success Criteria:** [How you'll know it worked]
+> The "why" and "what" behind this project. Claude references this on-demand for decision context.
+> Run `/plan` to fill this in interactively, or edit manually.
 
 ---
 
-## Product Strategy
+## What & Why
 
 **Problem:** [What problem does this solve? Who has it?]
+**Vision:** [One sentence — what does success look like?]
 **Target Users:** [Who will use this?]
 
-### MVP Features (Phase 1)
+---
+
+## MVP Features (Phase 1)
+
 1. [Feature] -- Acceptance: [testable criterion]
 2. [Feature] -- Acceptance: [testable criterion]
 3. [Feature] -- Acceptance: [testable criterion]
 
-### Future Phases
-- Phase 2: [focus area]
-- Phase 3: [focus area]
-
-**Out of Scope:** [Explicitly excluded items]
+**Out of Scope:** [What this project is NOT doing]
 
 ---
 
-## Technical Architecture
+## Technical Stack
 
-| Component | Technology | Rationale |
-|-----------|------------|-----------|
-| [Backend/Frontend/DB/etc.] | [Choice] | [Why] |
-
-**Security:** [Auth method, data protection approach]
+| Component | Choice | Why |
+|-----------|--------|-----|
+| [e.g. Backend] | [e.g. Node/Express] | [rationale] |
 
 ---
 
-## Quality & Testing Strategy
+## Quality Tier
 
-**Quality Tier:** [Lightweight | Standard | Rigorous | Comprehensive]
-**Testing Approach:** [What gets tested and how]
-**Rationale:** [Why this tier fits]
-
----
-
-## Development Timeline
-
-### Phase 1: Foundation -- [X weeks]
-| Week | Focus | Deliverables |
-|------|-------|--------------|
-| 1 | Setup | Project structure, environment |
-| 2+ | Core | [Core functionality] |
+**Tier:** [Lightweight | Standard | Rigorous | Comprehensive]
+**Testing:** [What gets tested and how]
 
 ---
 
-## Risk Management
+## Phases
 
-| Risk | Impact | Mitigation |
-|------|--------|------------|
-| [Risk] | [H/M/L] | [Strategy] |
+**Phase 1 (MVP):** [X weeks] — [focus]
+**Phase 2:** [focus area]
+**Phase 3:** [focus area]
 
 ---
 
-## Human Actions Required
+## Open Questions
 
-| Action | When |
-|--------|------|
-| [Service signup / decision / API key] | [Before Phase X] |
+<!-- TODO: [What needs deciding] | WHEN: [deadline] | BLOCKS: [what] -->
+
+---
+
+## Human Actions Needed
+
+- [Service signup / decision / API key] — Before [when]
 
 ---
 
