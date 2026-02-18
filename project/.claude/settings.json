@@ -1,28 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Bash(git:*)",
-      "Bash(gh:*)",
-      "Bash(ls:*)",
-      "Bash(pwd:*)",
-      "Bash(cat:*)",
-      "Bash(echo:*)",
-      "Bash(grep:*)",
-      "Bash(find:*)",
-      "Bash(wc:*)",
-      "Bash(diff:*)",
-      "Bash(date:*)",
-      "Bash(which:*)",
-      "Bash(env:*)",
-      "Bash(mkdir:*)",
-      "Bash(cp:*)",
-      "Bash(mv:*)",
-      "Bash(touch:*)",
-      "Bash(jq:*)",
-      "Bash(sort:*)",
-      "Bash(head:*)",
-      "Bash(tail:*)"
-    ],
     "deny": [
       "Bash(rm -rf /:*)",
       "Bash(rm -rf ~:*)",
@@ -42,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-timestamp.js\"",
+            "command": "node .claude/hooks/session-end-timestamp.js",
             "timeout": 10
           }
         ]
@@ -51,32 +28,30 @@
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-end-commit.js\"",
+            "command": "node .claude/hooks/session-end-commit.js",
             "timeout": 30
+          }
+        ]
+      }
+    ],
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node .claude/hooks/pre-compact-save.js",
+            "timeout": 15
           }
         ]
       }
     ],
     "SessionStart": [
       {
-        "matcher": "compact|resume",
         "hooks": [
           {
             "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start-context.js\"",
+            "command": "node .claude/hooks/session-start-context.js",
             "timeout": 10
-          }
-        ]
-      }
-    ],
-    "PostToolUse": [
-      {
-        "matcher": "Write|Edit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/post-edit-lint.js\"",
-            "timeout": 30
           }
         ]
       }

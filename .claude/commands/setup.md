@@ -10,14 +10,12 @@ Follow these steps in order. Ask questions in grouped batches, not one at a time
 
 Ask the user which applies:
 
-**A) Create a new GitHub repository** -- You'll create the repo, initialize it, and set up all files.
-**B) Add to an existing repository** -- The user has a repo with code already. You'll add template files without overwriting their existing work.
-**C) Create a new local project** -- No GitHub yet. You'll create the directory, run `git init`, and set up files.
-**D) Initialize in current directory** -- The user already has a blank or near-blank local repo open. You'll set up files here.
+**A) Add to an existing repository** -- The user has a repo with code already. You'll add template files without overwriting their existing work.
+**B) Initialize in a directory** -- The user has a blank or near-blank directory (with or without `git init`). You'll set up files here.
 
-For scenarios A, B, and C: ask the user for the **full path** to the target directory (or where they want it created).
+For both: ask the user for the **full path** to the target directory.
 
-For scenario D: confirm with the user -- "This will set up AIAgentMinder files in this template repository's directory. Is that what you want, or did you mean to target a different project?"
+For scenario B in the current directory: confirm with the user -- "This will set up AIAgentMinder files in this template repository's directory. Is that what you want, or did you mean to target a different project?"
 
 ---
 
@@ -32,7 +30,6 @@ Ask all of these in one grouped prompt:
 5. **Developer profile:** Experience level, autonomy preference (conservative / medium / aggressive)
 6. **Project scale:** Personal tool, small team tool, or public-facing product?
 7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
-8. **GitHub username/org** (only for Scenario A)
 
 ---
 
@@ -40,29 +37,14 @@ Ask all of these in one grouped prompt:
 
 The template files are in the `project/` directory of this repository. Copy them to the target location based on the scenario.
 
-### Scenario A: New GitHub Repo
-```bash
-gh repo create [org/name] --public --clone
-cd [name]
-```
-Then copy all files from this repo's `project/` directory into the new repo.
-
-### Scenario B: Existing Repo
+### Scenario A: Existing Repo
 Copy template files into the user's repo. Before copying each file, check if it already exists:
 - If it exists, ask: "You already have [file]. Should I merge, replace, or skip it?"
 - Never overwrite without asking
 - Always copy `.claude/` directory (commands, settings, hooks)
 
-### Scenario C: New Local Project
-```bash
-mkdir -p [path]/[name]
-cd [path]/[name]
-git init
-```
-Then copy all files from this repo's `project/` directory.
-
-### Scenario D: Current Directory
-Copy all files from this repo's `project/` directory into the confirmed target directory.
+### Scenario B: New/Blank Directory
+If no git repo exists, run `git init`. Then copy all files from this repo's `project/` directory.
 
 ---
 
@@ -94,16 +76,6 @@ Replace the placeholder block with actual values:
 - [actual risk tolerance]
 ```
 
-### .claude/settings.json -- Add Stack-Specific Permissions
-Append to the `allow` array based on the chosen stack:
-- **Node.js**: `"Bash(npm:*)", "Bash(npx:*)", "Bash(node:*)"` (add pnpm/yarn/bun as applicable)
-- **Python**: `"Bash(pip:*)", "Bash(python:*)", "Bash(pytest:*)", "Bash(uv:*)"`
-- **.NET / C#**: `"Bash(dotnet:*)"`
-- **Rust**: `"Bash(cargo:*)", "Bash(rustup:*)"`
-- **Go**: `"Bash(go:*)"`
-- **Docker**: `"Bash(docker:*)", "Bash(docker-compose:*)"`
-Only add what the project actually uses.
-
 ### .gitignore -- Append Stack-Specific Entries
 The template `.gitignore` covers secrets, IDE files, OS artifacts. Append stack-specific entries:
 - **Node.js**: `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo`
@@ -122,12 +94,7 @@ Based on project scale: Personal → Lightweight, Small team → Standard, Publi
 In the **target project directory**:
 ```bash
 git add -A
-git commit -m "chore: initialize project with AIAgentMinder template"
-```
-
-For Scenario A, also push:
-```bash
-git push -u origin main
+git commit -m "chore: initialize project with AIAgentMinder"
 ```
 
 ---
@@ -139,17 +106,18 @@ Print:
 Project initialized successfully!
 
 Created files:
-- CLAUDE.md (project instructions -- ~80 lines)
+- CLAUDE.md (project instructions)
 - PROGRESS.md (session tracking)
 - DECISIONS.md (architectural decisions)
-- docs/strategy-roadmap.md (planning template)
-- .claude/settings.json (permissions + hooks)
-- .claude/commands/ (2 commands: /plan, /checkpoint)
-- .claude/hooks/ (4 Node.js hooks: timestamp, auto-commit, context re-injection, auto-lint)
+- docs/strategy-roadmap.md (product brief template)
+- .claude/settings.json (safety deny list + hooks)
+- .claude/commands/plan.md (/plan command)
+- .claude/commands/handoff.md (/handoff command)
+- .claude/hooks/ (5 Node.js hooks: timestamp, auto-commit, pre-compaction save, session context injection)
 - .gitignore (core + [stack] entries)
 
 Next steps:
-1. Open Claude Code in your new project directory
-2. Run /plan to create your strategy roadmap
+1. Open Claude Code in your project directory
+2. Run /plan to create your product brief & roadmap
 3. Or tell Claude "start Phase 1" if you already have a plan
 ```

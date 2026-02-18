@@ -1,4 +1,4 @@
-# Strategy Roadmap Creation Guide
+# Product Brief Creation Guide
 
 ## The Quick Way: Use `/plan`
 
@@ -36,11 +36,11 @@ Claude: Writing docs/strategy-roadmap.md...
 
 If you prefer to fill out `docs/strategy-roadmap.md` yourself:
 
-- **Executive Summary:** 2-3 sentences: what, who, why. Measurable success criteria.
-- **Product Strategy:** Problem, target users, MVP features with acceptance criteria, out of scope.
-- **Technical Architecture:** Technology choices with rationale, security approach.
-- **Quality & Testing:** Choose a tier (Lightweight / Standard / Rigorous / Comprehensive).
-- **Timeline:** Phases with deliverables. Phase 1 = MVP.
+- **What & Why:** Problem, vision, target users.
+- **MVP Features:** 3-5 features with testable acceptance criteria.
+- **Technical Stack:** Choices with rationale.
+- **Quality Tier:** Lightweight / Standard / Rigorous / Comprehensive.
+- **Phases:** Phase 1 = MVP. Future phases as focus areas.
 - **Human Actions:** Service signups, API keys, decisions with timing.
 
 ## Quality Tiers
@@ -60,6 +60,6 @@ Mark unknowns with TODO blocks:
 ```
 Claude will prompt you to resolve these during development.
 
-## After Creating Your Roadmap
+## After Creating Your Brief
 
 Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."

@@ -22,10 +22,9 @@ Replace the placeholder block with your actual project info:
 ### 2. `docs/strategy-roadmap.md` -- Your Project Plan
 
 Run `/plan` to fill it interactively, or edit manually. At minimum, fill in:
-- Executive Summary (vision and success criteria)
-- Product Strategy (problem, users, features)
-- Technical Architecture (stack choices)
-- Development Timeline (phases and deliverables)
+- What & Why (problem, vision, users)
+- MVP Features with acceptance criteria
+- Technical Stack choices
 
 ### 3. `PROGRESS.md` -- Initial Tasks
 
@@ -40,20 +39,16 @@ Update "Active Tasks" and "Next Priorities" to reflect your starting point. Or l
 - **Medium:** Claude makes routine decisions autonomously, asks for architectural choices
 - **Aggressive:** Claude makes most decisions autonomously, asks only for major pivots
 
-### Permissions (in `.claude/settings.json`)
+### Safety (in `.claude/settings.json`)
 
-Add stack-specific tools by appending to the `allow` array:
+The template ships a deny list that blocks dangerous commands. Claude Code's default permission system handles everything else — no allow list needed.
+
+To block additional commands, add to the `deny` array:
 ```json
-"Bash(your-custom-tool:*)"
+"Bash(dangerous-command:*)"
 ```
 
-Examples by stack:
-- **Node.js**: `"Bash(npm:*)"`, `"Bash(npx:*)"`, `"Bash(node:*)"`
-- **Python**: `"Bash(pip:*)"`, `"Bash(python:*)"`, `"Bash(pytest:*)"`
-- **.NET**: `"Bash(dotnet:*)"`
-- **Docker**: `"Bash(docker:*)"`, `"Bash(docker-compose:*)"`
-
-Do not add cloud CLIs (`az`, `aws`, `gcloud`, `terraform`) without careful consideration -- these can create billable resources.
+Do not pre-approve cloud CLIs (`az`, `aws`, `gcloud`, `terraform`) without careful consideration -- these can create billable resources.
 
 ### CI/CD
 
@@ -70,14 +65,14 @@ Tell Claude: "Set up GitHub Actions CI for this project."
 
 ### Hooks
 
-Four governance hooks (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`:
+Five governance hooks (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`:
 
 | Hook | Event | Script | What It Does |
 |------|-------|--------|-------------|
 | Timestamp | Stop | `session-end-timestamp.js` | Updates "Last Updated" in PROGRESS.md |
 | Auto-commit | Stop | `session-end-commit.js` | Git checkpoint on feature branches (tracked files only) |
-| Context re-injection | SessionStart | `session-start-context.js` | Re-injects PROGRESS.md and DECISIONS.md after compaction |
-| Auto-format | PostToolUse | `post-edit-lint.js` | Runs formatters (prettier, black, rustfmt, etc.) on edited files |
+| Pre-compaction save | PreCompact | `pre-compact-save.js` | Saves PROGRESS.md state before context compaction |
+| Context injection | SessionStart | `session-start-context.js` | Injects PROGRESS.md, DECISIONS.md, and task suggestions |
 
 **Prerequisite:** Node.js must be installed for hooks to work.
 
@@ -99,7 +94,7 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 ## Tips
 
 1. **Be specific in strategy-roadmap.md** -- More context = better decisions
-2. **Keep PROGRESS.md updated** -- This is Claude's memory between sessions
+2. **Run `/handoff` before ending sessions** -- This is how the next session picks up cleanly
 3. **Use DECISIONS.md for significant choices** -- Prevents re-debating
 4. **Prefer smaller PRs** -- Easier to review, less risk
 5. **Don't pre-approve cloud CLIs** -- Review those operations manually
