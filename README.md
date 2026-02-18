@@ -1,5 +1,5 @@
 # AIAgentMinder
-![AIAgentMinder_small](https://gist.github.com/user-attachments/assets/e134e8c4-e681-40cc-9339-bad9f22461b7)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-5.0-blue)
 
