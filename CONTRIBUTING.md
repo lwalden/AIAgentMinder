@@ -4,7 +4,7 @@ Thanks for your interest in improving AIAgentMinder!
 
 ## Reporting Issues
 
-Open an [issue](https://github.com/lwalden/claude-code-quick-start-template/issues) to suggest fixes or features for AIAgentMinder.
+Open an [issue](https://github.com/lwalden/aiagentminder/issues) to suggest fixes or features for AIAgentMinder.
 - What you expected to happen
 - What actually happened
 - Steps to reproduce (if applicable)
@@ -27,10 +27,9 @@ Ideas for new features, better defaults, or improved documentation are welcome. 
 ## What Makes a Good Contribution
 
 - Improvements that help beginners without adding complexity for experienced users
-- Bug fixes in slash commands or workflow files
-- Better defaults in `.claude/settings.json`
+- Bug fixes in slash commands or hook scripts
 - Documentation clarity improvements
-- Support for additional tech stacks in `/setup`
+- Better defaults for safety and governance
 
 ## Code of Conduct
 

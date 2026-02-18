@@ -10,19 +10,18 @@
 ## Session Protocol
 
 ### Starting a Session
-1. Read `PROGRESS.md` -- understand current state and priorities
-2. Run `git status` -- check for uncommitted work
-3. Run `gh pr list` -- check for open PRs awaiting review
-4. Check "Blockers" section -- ask user about pending items
-5. Resume from "Next Priorities" in PROGRESS.md
+1. Read `PROGRESS.md` -- understand current state, active tasks, and priorities
+2. Check `git status` for uncommitted work
+3. Resume from "Next Priorities" in PROGRESS.md
 
 ### During a Session
 - Write code to files immediately -- don't accumulate changes in memory
 - Commit at natural checkpoints (compiles, tests pass, logical unit complete)
 - Prefer smaller, frequent commits over one large commit
+- Use Claude's native Tasks for complex multi-step work; keep PROGRESS.md as the durable record
 
 ### Ending a Session
-Run `/checkpoint` or manually update PROGRESS.md and DECISIONS.md, then commit.
+Run `/handoff` to write a clear briefing for the next session. Hooks handle timestamp and auto-commit automatically.
 
 ---
 
@@ -70,21 +69,20 @@ Run `/checkpoint` or manually update PROGRESS.md and DECISIONS.md, then commit.
 
 | File | Target Size | Action if Exceeded |
 |------|------------|-------------------|
-| CLAUDE.md | ~80 lines | Don't add without removing something |
+| CLAUDE.md | ~70 lines | Don't add without removing something |
 | PROGRESS.md | ~20 lines active | Self-trimming: only 3 session notes kept |
 | DECISIONS.md | Grows over time | Delete superseded entries (git history preserves them) |
 
 **Reading Strategy:**
-- PROGRESS.md: Every session (first thing)
-- DECISIONS.md: Before architectural choices
+- PROGRESS.md: Every session (auto-injected by hook)
+- DECISIONS.md: Auto-injected if decisions exist; always check before architectural choices
 - strategy-roadmap.md: On-demand
-
 
 ---
 
 ## Governance Hooks
 
-Four hooks run automatically (configured in `.claude/settings.json`):
-- **Stop:** Updates PROGRESS.md timestamp and creates a git checkpoint commit (feature branches only)
-- **SessionStart:** Re-injects PROGRESS.md and DECISIONS.md after context compaction
-- **PostToolUse:** Auto-runs formatters after file edits (if available)
+Five hooks run automatically (configured in `.claude/settings.json`):
+- **Stop:** Updates PROGRESS.md timestamp + auto-commits on feature branches
+- **PreCompact:** Saves PROGRESS.md state before context compaction
+- **SessionStart:** Re-injects PROGRESS.md, DECISIONS.md, and task suggestions on every session start

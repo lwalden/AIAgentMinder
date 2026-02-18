@@ -1,4 +1,4 @@
-# /plan - Strategy Roadmap Creation
+# /plan - Product Brief & Roadmap Creation
 
 You are helping the user create or update `docs/strategy-roadmap.md` for this project.
 This document is the "north star" for development -- it tells Claude the "why" behind decisions.
@@ -76,7 +76,7 @@ After gathering answers, summarize and confirm: "Does this capture it? Anything 
 
 ## Document Generation
 
-Fill in `docs/strategy-roadmap.md` based on the user's answers. Expand sections as needed -- the template provides section headers; you generate the content.
+Fill in `docs/strategy-roadmap.md` using the lean template. Keep it brief — a product brief, not an enterprise strategy doc. The user can always expand sections later.
 
 ### For Each MVP Feature, Include Acceptance Criteria
 ```markdown
@@ -95,6 +95,6 @@ Fill in `docs/strategy-roadmap.md` based on the user's answers. Expand sections 
 1. Write the completed `docs/strategy-roadmap.md`
 2. Ask: "Do you prefer **lightweight one-liner ADRs** or **formal ADRs** (Context / Decision / Consequences)?" Record the answer in `DECISIONS.md` as `Format: Lightweight` or `Format: Formal`
 3. Populate `## MVP Goals` in `CLAUDE.md` with Phase 1 deliverables (3-5 testable bullet points)
-4. Update `PROGRESS.md` to note that strategy roadmap was created
+4. Update `PROGRESS.md` to note that roadmap was created
 5. If MCP servers were mentioned, add `**MCP Servers:**` line to Project Identity in `CLAUDE.md`
 6. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready."

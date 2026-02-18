@@ -1,126 +1,152 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-4.0-blue)
+![Version](https://img.shields.io/badge/version-5.0-blue)
 
-A governance and lifecycle framework for Claude Code. Adds persistent session memory, architectural decision tracking, and structured planning to help you take a project from idea to MVP and beyond.
+Session continuity and project governance for Claude Code. Takes you from "I have an idea" through planning to MVP — without losing context between sessions.
 
-> **What this is:** A set of markdown files, slash commands, and governance hooks that shape how Claude works with your code. Not a CLI tool, not an MCP server, not a code generator.
-
-## Why Use This
-
-Claude Code is powerful out of the box, but multi-session projects need structure:
-
-| Problem | AIAgentMinder Solution |
-|---|---|
-| Claude forgets what happened last session | **PROGRESS.md** -- git-tracked audit trail Claude reads first every session |
-| Claude re-debates past decisions | **DECISIONS.md** -- ADR log with trigger criteria prevents re-debating |
-| Projects start without clear goals | **/plan** -- structured interview that produces a strategy roadmap with quality tiers |
-| Sessions end with loose ends | **/checkpoint** -- end-of-session housekeeping |
-| Dangerous commands slip through | **settings.json** -- minimal permissions baseline with explicit deny list |
-| Context lost after compaction | **Governance hooks** -- auto re-inject project state after context compaction |
+> **What this is:** Markdown files, slash commands, and lifecycle hooks that give Claude Code persistent memory and structured planning. Not a CLI tool, not an MCP server, not a code generator.
 
 ---
 
-## Quick Start
+## The Problem
 
-### 1. Get the template
+Claude Code is excellent at writing code within a single session. But real projects span many sessions, and between them:
 
-```bash
-git clone https://github.com/lwalden/claude-code-quick-start-template.git
-cd claude-code-quick-start-template
-```
+- **Claude forgets everything.** Each session starts blank. You re-explain what you're building, where you left off, and what decisions were already made.
+- **Planning happens in your head.** Claude Code's `/init` analyzes existing code but doesn't help you plan a new project from scratch — defining what to build, for whom, with what architecture.
+- **Decisions get re-debated.** You chose Express over Fastify last week for good reasons. This session, Claude suggests switching.
+- **Compaction loses state.** When the context window fills up and compacts, work-in-progress details vanish.
 
-### 2. Run `/setup`
-
-Open Claude Code **in the cloned directory** and run `/setup`. It will ask about your project and copy the framework files to your target location:
-
-- **New GitHub repo** -- creates the repo and sets up all files
-- **Existing repo** -- copies files with confirmation prompts
-- **New local project** -- creates directory, `git init`, sets up files
-- **Current directory** -- fits template into existing structure
-
-### 3. Run `/plan`
-
-Open Claude Code in your target project and run `/plan`. Claude interviews you about your idea and generates `docs/strategy-roadmap.md`.
-
-### 4. Start building
-
-```
-Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
-```
-
-**Manual setup alternative:** Copy `project/*` and `project/.claude/` to your repo, customize `CLAUDE.md` and `.claude/settings.json`, then run `/plan`.
-
----
-
-## What You Get
-
-| File | Purpose | Read Frequency |
-|------|---------|---------------|
-| `CLAUDE.md` (~90 lines) | Session protocol, project identity, behavioral rules | Every session (auto) |
-| `PROGRESS.md` (~20 lines) | Current tasks, blockers, priorities | Every session (first thing) |
-| `DECISIONS.md` | Architectural decision log | Before architectural choices |
-| `docs/strategy-roadmap.md` | Goals, architecture, timeline, quality tier | On-demand |
-| `.claude/settings.json` | Permissions + hook configuration | N/A (config) |
-| `.claude/commands/` | `/plan`, `/checkpoint` | On use |
-| `.claude/hooks/` | 4 Node.js governance hooks | Automatic |
-
-### Governance Hooks
-
-Four cross-platform hooks (Node.js) run automatically:
-
-| Hook | Event | What It Does |
-|------|-------|-------------|
-| Timestamp | Stop | Updates "Last Updated" in PROGRESS.md |
-| Auto-commit | Stop | Git checkpoint on feature branches (tracked files only, respects git hooks) |
-| Context re-injection | SessionStart | Re-injects PROGRESS.md and DECISIONS.md after context compaction |
-| Auto-format | PostToolUse | Runs project formatters (prettier, black, rustfmt, etc.) after edits |
-
-### Permissions
-
-Starts with ~20 safe commands (git, gh, basic utilities). Stack-specific tools added during `/setup`. Dangerous operations are explicitly denied:
-- `rm -rf /`, `~`, `C:`, `.` -- catastrophic deletion
-- `git push --force` / `-f` -- history rewriting
-- `git reset --hard origin` -- destructive reset
-- `git clean -fd`, `chmod -R 777` -- unsafe operations
-
----
-
-## Commands
-
-| Command | Purpose |
-|---------|---------|
-| `/setup` | Initialize a project (run from this template repo) |
-| `/plan` | Create strategy roadmap via structured interview |
-| `/checkpoint` | End-of-session: update tracking files, commit |
+AIAgentMinder solves these with git-tracked project state files that survive across sessions, hooks that inject context automatically, and structured commands for planning and handoff.
 
 ---
 
 ## How It Works
 
-**Session continuity:** Claude reads PROGRESS.md at session start. At session end, `/checkpoint` (or the auto-commit hook) preserves state. Between sessions, progress lives in Git.
+**Three files** persist your project state in git:
 
-**Context budget:** Files are sized for minimal token consumption. CLAUDE.md (~90 lines) and PROGRESS.md (~20 lines) are read every session. Larger files are on-demand. PROGRESS.md self-trims: Claude keeps only the 3 most recent session notes when writing.
+| File | What It Does | When Claude Reads It |
+|------|-------------|---------------------|
+| `PROGRESS.md` | Current tasks, blockers, priorities, session notes | Every session (auto-injected by hook) |
+| `DECISIONS.md` | Architectural decisions with rationale | Every session if decisions exist (auto-injected) |
+| `docs/strategy-roadmap.md` | Product brief — what you're building and why | On-demand |
 
-**Decision tracking:** DECISIONS.md prevents re-debating. Claude checks it before architectural choices. Trigger criteria: library/framework choice, API design, auth approach, data model change, build/deploy decision.
+**Two commands** structure your workflow:
 
-For details: [docs/how-it-works.md](docs/how-it-works.md) | [docs/customization-guide.md](docs/customization-guide.md)
+| Command | When to Use |
+|---------|------------|
+| `/plan` | Start of a project — Claude interviews you about your idea and generates a product brief with MVP features, tech stack, and quality tier |
+| `/handoff` | End of a session — writes a clear briefing so the next session picks up exactly where you left off |
+
+**Five hooks** run automatically:
+
+| What | When |
+|------|------|
+| Inject PROGRESS.md + DECISIONS.md into context | Every session start |
+| Save state before compaction | Before context window compresses |
+| Update timestamp | Session end |
+| Auto-commit tracking files | Session end (feature branches only) |
+
+Claude's native Task system is supported too — the SessionStart hook outputs task suggestions extracted from PROGRESS.md that Claude can add to its native task list, giving you git-tracked durability *and* Claude's built-in task orchestration.
+
+---
+
+## Quick Start
+
+### 1. Clone the template
+
+```bash
+git clone https://github.com/lwalden/aiagentminder.git
+cd aiagentminder
+```
+
+### 2. Run `/setup`
+
+Open Claude Code in the cloned directory and run `/setup`. It asks about your project and copies framework files to your target location.
+
+### 3. Run `/plan`
+
+Open Claude Code in your project and run `/plan`. Claude interviews you and generates `docs/strategy-roadmap.md`.
+
+### 4. Build
+
+```
+Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
+```
+
+End each session with `/handoff`. Start the next session and Claude already knows where you left off.
+
+**Manual setup:** Copy `project/*` and `project/.claude/` to your repo, fill in the Project Identity section of `CLAUDE.md`, then run `/plan`.
+
+---
+
+## What Gets Copied to Your Project
+
+```
+your-project/
+├── CLAUDE.md              # ~70 lines — session protocol, project identity, rules
+├── PROGRESS.md            # ~20 lines — current state, self-trimming session notes
+├── DECISIONS.md           # Architectural decision log
+├── docs/
+│   └── strategy-roadmap.md  # Product brief (generated by /plan)
+├── .gitignore             # Core + stack-specific entries
+└── .claude/
+    ├── settings.json      # Safety deny list + hook configuration
+    ├── commands/
+    │   ├── plan.md        # /plan — structured planning interview
+    │   └── handoff.md     # /handoff — session-end briefing
+    └── hooks/
+        ├── session-start-context.js    # Injects state on every session start
+        ├── pre-compact-save.js         # Saves state before compaction
+        ├── session-end-timestamp.js    # Updates PROGRESS.md timestamp
+        └── session-end-commit.js       # Auto-commits on feature branches
+```
+
+---
+
+## Requirements
+
+- **Claude Code** (VS Code extension or CLI) — this is a Claude Code framework, not a standalone tool
+- **Node.js** — required for governance hooks (they're small cross-platform scripts)
+- **Git** — session state is tracked in git
+- **GitHub CLI (`gh`)** — optional, for PR workflows
+
+Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependency).
+
+---
+
+## When to Use This vs. Alternatives
+
+**Use AIAgentMinder if you're** a solo developer or small team starting a new project and you want structured planning plus session continuity without overhead. You want something lightweight that works at the CLI level.
+
+**Use Claude Code's built-in `/init` if** you already have a codebase and just need Claude to understand it. `/init` is great for existing projects; AIAgentMinder is for new ones.
+
+**Use CCPM or Simone if** you need full project management with GitHub Issues integration, parallel multi-agent execution, PRDs, and epic tracking. These are heavier systems for larger teams.
+
+**Use a custom CLAUDE.md if** you already have your own conventions and just want to write instructions by hand. AIAgentMinder adds structure on top — hooks, commands, and state management — but if you don't need that, a good CLAUDE.md is enough.
 
 ---
 
 ## Troubleshooting
 
-- **Commands not showing (VS Code)** -- Close/reopen the Claude Code panel
-- **Claude keeps asking permission** -- Add the command to `.claude/settings.json` allow list
-- **Claude lost track** -- `git status`, `git log --oneline -5`, update PROGRESS.md
-- **Claude re-debates decisions** -- Add to DECISIONS.md with rationale
+- **Commands not showing (VS Code)** — Close/reopen the Claude Code panel
+- **Hooks not running** — Verify Node.js is installed (`node --version`). Check `/hooks` in Claude Code to see loaded hooks.
+- **Claude lost track mid-session** — Run `/handoff` to write current state, then continue or start fresh
+- **Claude re-debates decisions** — Add the decision to DECISIONS.md with rationale
 
+---
+
+## Documentation
+
+- [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
+- [Customization Guide](docs/customization-guide.md) — what to customize and how
+- [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/plan` or writing manually
 
 ---
 
 ## License
 
-MIT -- see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE).
 
 *Works with Claude Code (VS Code extension and CLI). Independent open-source project, not affiliated with Anthropic.*
