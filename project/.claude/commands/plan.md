@@ -20,6 +20,7 @@ Ask the user where they are:
 **B) Clear idea, no details** -- "I know what I want but haven't worked out specifics"
 **C) Partial plan or spec** -- "I have some docs/notes -- help me fill in gaps"
 **D) Detailed plan or spec** -- "I have a writeup -- translate it into a roadmap"
+**E) Existing project** -- "The project already has code -- I'm adding AIAgentMinder for session continuity and governance"
 
 | Starting Point | Approach |
 |---------------|----------|
@@ -27,6 +28,51 @@ Ask the user where they are:
 | B) Clear idea | Full interview as written below |
 | C) Partial plan | Read shared docs, ask only about gaps |
 | D) Detailed plan | Generate roadmap directly, clarify ambiguities only |
+| E) Existing project | Codebase audit + current-state interview; skip product brief, generate filled state files |
+
+---
+
+## Starting Point E: Existing Project
+
+Skip the product planning interview. The goal is to capture current state, not design a product.
+
+### Step E1: Audit the Codebase
+
+Read key files to understand what exists:
+- `CLAUDE.md` (if present) -- existing project identity or instructions
+- `package.json`, `pyproject.toml`, `go.mod`, `Cargo.toml`, or equivalent -- stack and dependencies
+- `README.md` -- project description
+- Directory structure -- infer architecture
+
+Summarize what you found: language, framework, rough architecture, apparent project stage.
+
+### Step E2: Interview (one round)
+
+Ask in a single grouped message:
+- What phase is this project in? (early prototype / active development / maintenance)
+- What's working and stable?
+- What's currently in progress or incomplete?
+- What are the immediate next priorities?
+- What significant decisions have already been made? (stack choices, auth approach, DB, APIs, key libraries) -- these become DECISIONS.md entries
+- Any known blockers or open questions?
+
+### Step E3: Generate State Files
+
+Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
+
+1. **Write a filled-in `PROGRESS.md`** reflecting actual current state:
+   - Phase based on what you learned
+   - Active Tasks = what's in progress right now
+   - Current State = what's working / partial / broken
+   - Next Priorities = the immediate next steps the user described
+
+2. **Seed `DECISIONS.md`** with retroactive ADR entries for each significant decision identified in Step E2. Use the project's format (Lightweight or Formal -- ask if unknown). Each entry needs alternatives considered and tradeoffs, even if reconstructed from context.
+
+3. **Populate `CLAUDE.md` Project Identity** with actual values from the audit.
+
+4. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases, not needed just for session continuity."
+
+5. Tell the user: "AIAgentMinder is set up. Run `/handoff` at the end of each session to keep state current."
 
 ---
 
