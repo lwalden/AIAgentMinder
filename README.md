@@ -149,13 +149,11 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 
 ## When to Use This vs. Alternatives
 
-**Use AIAgentMinder if you're** a solo developer or small team starting a new project and you want structured planning plus session continuity without overhead. You want something lightweight that works at the CLI level.
-
-**Use Claude Code's built-in `/init` if** you already have a codebase and just need Claude to understand it. `/init` is great for existing projects; AIAgentMinder is for new ones.
+**Use AIAgentMinder if you're** a solo developer or small team — new project or existing — who wants structured session continuity, decision tracking, and optional planning without overhead.
 
 **Use CCPM or Simone if** you need full project management with GitHub Issues integration, parallel multi-agent execution, PRDs, and epic tracking. These are heavier systems for larger teams.
 
-**Use a custom CLAUDE.md if** you already have your own conventions and just want to write instructions by hand. AIAgentMinder adds structure on top — hooks, commands, and state management — but if you don't need that, a good CLAUDE.md is enough.
+**Use a custom CLAUDE.md if** you just want to write instructions by hand and your project fits comfortably in a single session without needing cross-session memory. AIAgentMinder adds structure on top — hooks, commands, and state management — but if you don't need that, a good CLAUDE.md is enough.
 
 ---
 
