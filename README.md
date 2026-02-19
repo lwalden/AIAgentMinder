@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-5.1-blue)
+![Version](https://img.shields.io/badge/version-0.5.1-blue)
 
 Session continuity and project governance for Claude Code. Takes you from "I have an idea" through planning to MVP — without losing context between sessions.
 
@@ -151,11 +151,9 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 
 **Use AIAgentMinder if you're** a solo developer or small team — new project or existing — who wants structured session continuity, decision tracking, and optional planning without overhead.
 
-**On an existing project:** Run `/init` first to generate a baseline CLAUDE.md from your codebase, then add AIAgentMinder's state files and hooks on top. Use `/plan` in existing-project mode (Starting Point E) to capture current state and retroactive decisions rather than doing a full planning interview.
-
 **Use CCPM or Simone if** you need full project management with GitHub Issues integration, parallel multi-agent execution, PRDs, and epic tracking. These are heavier systems for larger teams.
 
-**Use a custom CLAUDE.md if** you already have your own conventions and just want to write instructions by hand. AIAgentMinder adds structure on top — hooks, commands, and state management — but if you don't need that, a good CLAUDE.md is enough.
+**Use a custom CLAUDE.md if** you just want to write instructions by hand and your project fits comfortably in a single session without needing cross-session memory. AIAgentMinder adds structure on top — hooks, commands, and state management — but if you don't need that, a good CLAUDE.md is enough.
 
 ---
 
