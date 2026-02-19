@@ -67,7 +67,7 @@ Open Claude Code in the cloned directory and run `/setup`. It asks about your pr
 
 ### 3. Run `/plan`
 
-Open Claude Code in your project and run `/plan`. Claude interviews you and generates `docs/strategy-roadmap.md`.
+Open Claude Code in your project and run `/plan`. For new projects, Claude interviews you and generates `docs/strategy-roadmap.md`. For existing projects, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files instead.
 
 ### 4. Build
 
@@ -149,9 +149,9 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 
 ## When to Use This vs. Alternatives
 
-**Use AIAgentMinder if you're** a solo developer or small team starting a new project and you want structured planning plus session continuity without overhead. You want something lightweight that works at the CLI level.
+**Use AIAgentMinder if you're** a solo developer or small team — new project or existing — who wants structured session continuity, decision tracking, and optional planning without overhead.
 
-**Use Claude Code's built-in `/init` if** you already have a codebase and just need Claude to understand it. `/init` is great for existing projects; AIAgentMinder is for new ones.
+**On an existing project:** Run `/init` first to generate a baseline CLAUDE.md from your codebase, then add AIAgentMinder's state files and hooks on top. Use `/plan` in existing-project mode (Starting Point E) to capture current state and retroactive decisions rather than doing a full planning interview.
 
 **Use CCPM or Simone if** you need full project management with GitHub Issues integration, parallel multi-agent execution, PRDs, and epic tracking. These are heavier systems for larger teams.
 
