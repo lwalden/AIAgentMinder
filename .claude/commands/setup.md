@@ -89,9 +89,13 @@ Based on project scale: Personal → Lightweight, Small team → Standard, Publi
 
 ---
 
-## Step 6: Initial Commit
+## Step 6: Write Version Stamp and Initial Commit
 
-In the **target project directory**:
+Write the current AIAgentMinder version to the target project:
+- Read the version from `project/.claude/aiagentminder-version` in this repo
+- Write that version to `[target]/.claude/aiagentminder-version`
+
+Then in the **target project directory**:
 ```bash
 git add -A
 git commit -m "chore: initialize project with AIAgentMinder"
@@ -113,7 +117,8 @@ Created files:
 - .claude/settings.json (safety deny list + hooks)
 - .claude/commands/plan.md (/plan command)
 - .claude/commands/handoff.md (/handoff command)
-- .claude/hooks/ (5 Node.js hooks: timestamp, auto-commit, pre-compaction save, session context injection)
+- .claude/hooks/ (4 Node.js hooks: timestamp, auto-commit, pre-compaction save, session context injection)
+- .claude/aiagentminder-version (version stamp for /update)
 - .gitignore (core + [stack] entries)
 
 Next steps:
