@@ -32,12 +32,13 @@ AIAgentMinder solves these with git-tracked project state files that survive acr
 | `DECISIONS.md` | Architectural decisions with rationale | Every session if decisions exist (auto-injected) |
 | `docs/strategy-roadmap.md` | Product brief — what you're building and why | On-demand |
 
-**Two commands** structure your workflow:
+**Three commands** structure your workflow:
 
 | Command | When to Use |
 |---------|------------|
 | `/plan` | Start of a project — Claude interviews you about your idea and generates a product brief with MVP features, tech stack, and quality tier |
 | `/handoff` | End of a session — writes a clear briefing so the next session picks up exactly where you left off |
+| `/update` | Upgrade an existing AIAgentMinder installation — overwrites hook and command files, surgically merges CLAUDE.md structural sections while preserving your Project Identity and MVP Goals |
 
 **Five hooks** run automatically:
 
@@ -127,6 +128,8 @@ your-project/
     ├── commands/
     │   ├── plan.md        # /plan — structured planning interview
     │   └── handoff.md     # /handoff — session-end briefing
+    │   # Note: update.md (/update) stays in the AIAgentMinder repo — it's a
+    │   # maintenance tool run from there, not installed into target projects
     └── hooks/
         ├── session-start-context.js    # Injects state on every session start
         ├── pre-compact-save.js         # Saves state before compaction
@@ -174,6 +177,7 @@ AIAgentMinder deliberately does not try to be:
 - **Hooks not running** — Verify Node.js is installed (`node --version`). Check `/hooks` in Claude Code to see loaded hooks.
 - **Claude lost track mid-session** — Run `/handoff` to write current state, then continue or start fresh
 - **Claude re-debates decisions** — Add the decision to DECISIONS.md with rationale
+- **Upgrading an existing project** — Run `/update` from the AIAgentMinder repo. It overwrites hook and command files and surgically merges CLAUDE.md while preserving your Project Identity and MVP Goals
 
 ---
 
