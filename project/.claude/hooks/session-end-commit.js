@@ -37,6 +37,10 @@ run("git add -u");
 const staged = run("git diff --cached --name-only");
 if (!staged) process.exit(0);
 
+// Skip if only PROGRESS.md is staged — that's just a timestamp bump, not real work
+const stagedFiles = staged.split("\n").map(f => f.trim()).filter(Boolean);
+if (stagedFiles.length === 1 && stagedFiles[0] === "PROGRESS.md") process.exit(0);
+
 const now = new Date();
 const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")} ${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}:${String(now.getSeconds()).padStart(2, "0")}`;
 
