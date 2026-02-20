@@ -66,6 +66,8 @@ If any of these happened this session, add an ADR entry:
 
 Use the format recorded in DECISIONS.md. Always include alternatives considered and the tradeoff accepted — a decision without alternatives is an assertion, not a record.
 
+**Rule of thumb:** If a decision is important enough to survive the 3-note session-note rolling window, it belongs in DECISIONS.md — not just in session notes.
+
 ### 4. Commit
 
 ```bash

@@ -20,4 +20,4 @@
 3. Begin Phase 1
 
 ---
-<!-- Session notes: keep last 3. Older ones are in git history. Format: - [DATE] Phase [N]: [what was accomplished]. Key files: [files touched]. → [what's next] -->
+<!-- Session notes: keep last 3. Older ones are in git history. For decisions that matter beyond 3 sessions, use DECISIONS.md instead. Format: - [DATE] Phase [N]: [what was accomplished]. Key files: [files touched]. → [what's next] -->
