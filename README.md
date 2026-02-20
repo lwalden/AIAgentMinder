@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-0.5.2-blue)
+![Version](https://img.shields.io/badge/version-0.5.3-blue)
 
 Session continuity and project governance for Claude Code. Takes you from "I have an idea" through planning to MVP — without losing context between sessions.
 
