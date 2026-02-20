@@ -91,6 +91,25 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 
 ---
 
+## Upgrading AIAgentMinder
+
+When a new version of AIAgentMinder is released, run `/update` from the AIAgentMinder repo (not from your project). It performs a safe in-place upgrade:
+
+**Overwritten (AIAgentMinder-owned):**
+- `.claude/hooks/` — all 4 Node.js hook scripts
+- `.claude/settings.json`
+- `.claude/commands/handoff.md` and `plan.md`
+
+**Surgically merged:**
+- `CLAUDE.md` — structural sections (Session Protocol, Behavioral Rules, Context Budget) are updated; your Project Identity and MVP Goals blocks are preserved
+
+**Never touched (user-owned):**
+- `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore`
+
+After updating, `/update` writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
+
+---
+
 ## Tips
 
 1. **Be specific in strategy-roadmap.md** -- More context = better decisions
