@@ -39,6 +39,7 @@ PROGRESS.md self-trims: Claude keeps only 3 session notes, dropping older ones (
 | Command | Purpose | Modifies Files? |
 |---------|---------|----------------|
 | `/setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
+| `/update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md (run from AIAgentMinder repo) | Yes |
 | `/plan` | Create or update strategy-roadmap.md interactively | Yes |
 | `/handoff` | End-of-session: write briefing for next session, update tracking, commit | Yes |
 
