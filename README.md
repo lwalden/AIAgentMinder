@@ -40,7 +40,7 @@ AIAgentMinder solves these with git-tracked project state files that survive acr
 | `/handoff` | End of a session — writes a clear briefing so the next session picks up exactly where you left off |
 | `/update` | Upgrade an existing AIAgentMinder installation — overwrites hook and command files, surgically merges CLAUDE.md structural sections while preserving your Project Identity and MVP Goals |
 
-**Four hooks** run automatically:
+**Four hooks** run automatically (Stop fires two scripts — timestamp + auto-commit — for five total executions per session lifecycle):
 
 | What | When |
 |------|------|
@@ -130,8 +130,8 @@ your-project/
     ├── commands/
     │   ├── plan.md        # /plan — structured planning interview
     │   └── handoff.md     # /handoff — session-end briefing
-    │   # Note: update.md (/update) stays in the AIAgentMinder repo — it's a
-    │   # maintenance tool run from there, not installed into target projects
+    │   # Note: setup.md (/setup) and update.md (/update) stay in the AIAgentMinder
+    │   # repo — they are meta-commands run from there, not installed into target projects
     ├── guidance/          # optional, enabled during /plan or /setup
     │   ├── README.md      # Explains the guidance directory
     │   ├── code-quality.md   # TDD, review-before-commit, error handling (~18 lines)

@@ -70,7 +70,7 @@ When enabled, `project/.claude/guidance/sprint-workflow.md` is copied and `SPRIN
 
 ## Governance Hooks
 
-Four cross-platform hooks (Node.js) configured in `settings.json`:
+Four cross-platform hooks (Node.js) configured in `settings.json`. The Stop event runs two scripts (timestamp + auto-commit), making five total hook executions per session lifecycle:
 
 | Hook | Event | Script |
 |------|-------|--------|
