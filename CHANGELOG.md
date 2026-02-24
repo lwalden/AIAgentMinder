@@ -6,6 +6,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.6.0] - 2026-02-23
+
+### Added
+- **Code quality guidance** — optional `project/.claude/guidance/code-quality.md` (~18 lines): TDD cycle, build-before-commit, review-before-commit, explicit error handling, read-before-write, commit message discipline, CI-ready code, and context efficiency rules. Enabled during `/plan`, `/setup`, or `/update`.
+- **Sprint planning workflow** — optional `project/.claude/guidance/sprint-workflow.md` (~35 lines): full sprint lifecycle from issue decomposition through per-issue PRs, blocked issue handling, sprint review, and archive. Enabled during `/plan`, `/setup`, or `/update`.
+- **SPRINT.md template** — `project/SPRINT.md`: active sprint state file, injected at session start when a sprint is in progress. Archived to git history on sprint completion. Issue ID format: `S{sprint}-{seq}`.
+- **`.claude/guidance/` directory** — `project/.claude/guidance/` with `README.md`. Generic mechanism: any `.md` file here (except README.md) is injected at session start. Foundation for future guidance files.
+- **SessionStart hook: guidance injection** — `session-start-context.js` now reads all `.md` files in `.claude/guidance/` and injects them after PROGRESS.md/DECISIONS.md. No-op if directory doesn't exist.
+- **SessionStart hook: SPRINT.md injection** — When SPRINT.md contains `**Status:** in-progress`, injects full file content and extracts sprint issue task suggestions (with status: todo/in-progress/blocked). Skips placeholder and archived content.
+- **`/plan` optional features round** — After quality tier determination, `/plan` prompts for code quality guidance (recommended for Standard+) and sprint planning (recommended for Standard+). Handles Starting Point E in the interview round.
+- **`/setup` optional features questions** — Step 2 now includes questions 8 and 9 for code quality guidance and sprint planning. Step 3 conditionally copies guidance files and SPRINT.md. Step 7 summary reflects what was enabled.
+- **`/update` optional file handling** — New "AIAgentMinder-owned (optional)" taxonomy category. Guidance files overwritten if present, prompted if absent. SPRINT.md created if missing and sprint planning enabled; never overwritten if active sprint.
+- **`/update` updated file taxonomy table** — All six categories documented: AIAgentMinder-owned, AIAgentMinder-owned (optional), Hybrid, User-owned (AIAgentMinder creates initial), User-owned, Version stamp.
+- **`/handoff` sprint awareness** — Step 1 now checks for active sprint; Step 2 includes sprint progress in Current State and blocked issues in Blockers; Step 5 briefing includes sprint status. SPRINT.md not modified by handoff.
+- **CLAUDE.md sprint context budget** — `/plan` and `/setup` conditionally add SPRINT.md row to Context Budget table and Reading Strategy when sprint planning is enabled.
+
+### Changed
+- **README** — Updated "What Gets Copied" tree to show `.claude/guidance/` and `SPRINT.md` (both optional). "What a Session Looks Like" updated with sprint-based session flow. Hook count corrected to four.
+- **docs/how-it-works.md** — Context System table expanded with guidance and SPRINT.md rows. Session Continuity section updated for sprint workflow. Context Budget table updated. SessionStart hook description updated.
+- **docs/customization-guide.md** — New "Optional Features" section covering code quality guidance and sprint planning (enable/disable, full sprint lifecycle). Hooks table updated for new SessionStart capabilities. Upgrading section updated for optional file taxonomy.
+
+---
+
 ## [4.0.0] - 2026-02-16
 
 ### Added
