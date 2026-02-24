@@ -13,6 +13,9 @@ Review what happened this session:
 - What was the goal and how far did we get?
 - What's working? What's broken?
 - Any decisions made that should be in DECISIONS.md?
+- Is there an active sprint? If SPRINT.md contains `**Status:** in-progress`, note:
+  - Which sprint number and how many issues are done/in-progress/todo/blocked
+  - Which issue was being worked on when the session is ending
 
 ### 2. Update PROGRESS.md
 
@@ -27,9 +30,11 @@ Rewrite PROGRESS.md (don't append — replace the active content) with:
 
 ## Current State
 - [what's working, what's partially done, what's broken — e.g., "API compiles but auth isn't hooked up"]
+[if sprint active: include "Sprint [n] in progress: [done]/[total] issues complete. Currently on S[n]-[seq]."]
 
 ## Blockers
 - [anything blocking progress — missing API keys, design decisions, bugs]
+[if sprint issues are blocked: include them here]
 
 ## Next Priorities
 1. [most important next step — be specific, not vague]
@@ -75,6 +80,8 @@ git add PROGRESS.md DECISIONS.md
 git commit -m "handoff: session checkpoint [today's date]"
 ```
 
+Do NOT modify SPRINT.md during handoff — sprint state is updated during sprint execution, not during handoff.
+
 ### 5. Print the Briefing
 
 Print a summary the user can glance at:
@@ -87,6 +94,9 @@ This session:
 
 State of things:
 - [what's working, what's not]
+[if sprint active:]
+Sprint [n] in progress: [done]/[total] issues done[, [blocked] blocked]
+Currently working on: S[n]-[seq] ([issue title])
 
 Next session should:
 1. [specific first action]
