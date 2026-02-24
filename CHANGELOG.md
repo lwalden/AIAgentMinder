@@ -6,7 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [4.0.0] - 2026-02-16
+## [0.5.3] - 2026-02-16
+
+> **Note:** Versions prior to 0.5.0 used a different numbering scheme (1.x–4.x). The project re-versioned to semver 0.x starting with 0.5.0 to reflect pre-1.0 maturity. The entries below retain their original version numbers for historical accuracy.
 
 ### Added
 - **Cross-platform hooks (Node.js)** -- all hooks rewritten from bash to Node.js for Windows, macOS, and Linux support

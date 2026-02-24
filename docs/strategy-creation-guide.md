@@ -2,37 +2,7 @@
 
 ## The Quick Way: Use `/plan`
 
-Open Claude Code in your project and run `/plan`. Claude interviews you and generates `docs/strategy-roadmap.md`. This is the recommended approach.
-
-### What It Looks Like
-
-```
-You:  /plan
-Claude: Where are you with your project idea?
-        A) Rough concept  B) Clear idea  C) Partial plan  D) Detailed plan
-
-You:  B -- I want to build a recipe sharing app
-
-Claude: Round 1 -- Core Understanding:
-        1. What does this app do?
-        2. Who will use it?
-        3. What problem does it solve?
-        4. What makes it different?
-
-You:  [answers]
-
-Claude: Round 2 -- Scope & Technical:
-        Must-haves, features that can wait, what's explicitly OUT of scope,
-        constraints, stack, launch date?
-
-Claude: Based on project scope (public-facing, user accounts), I recommend
-        Rigorous testing tier. Does that sound right?
-
-You:  Yes
-
-Claude: Writing docs/strategy-roadmap.md...
-        Your roadmap is ready. Tell me to start Phase 1 when you're ready.
-```
+Open Claude Code in your project and run `/plan`. Claude interviews you and generates `docs/strategy-roadmap.md`. This is the recommended approach. See [examples/demo-transcript.md](../examples/demo-transcript.md) for a full walkthrough.
 
 ## The Manual Way
 
