@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Hook: SessionStart — Re-inject PROGRESS.md and DECISIONS.md on every session
 // start (startup, resume, compact, clear). Keeps Claude oriented automatically.
-// Also outputs task suggestions for Claude's native Task system.
+// Also injects SPRINT.md when an active sprint exists, injects any .md files
+// from .claude/guidance/, and outputs task suggestions for Claude's native Task system.
 // Cross-platform (Node.js). No dependencies.
 
 const fs = require("fs");
@@ -11,6 +12,8 @@ const projectDir = process.env.CLAUDE_PROJECT_DIR || process.cwd();
 
 const progressFile = path.join(projectDir, "PROGRESS.md");
 const decisionsFile = path.join(projectDir, "DECISIONS.md");
+const sprintFile = path.join(projectDir, "SPRINT.md");
+const guidanceDir = path.join(projectDir, ".claude", "guidance");
 
 // Always inject PROGRESS.md — this is Claude's session memory
 if (fs.existsSync(progressFile)) {
@@ -56,5 +59,85 @@ if (fs.existsSync(decisionsFile)) {
   if (hasDecisions) {
     console.log("\n--- DECISIONS.md (architectural decisions — do not re-debate) ---");
     console.log(content);
+  }
+}
+
+// Inject SPRINT.md when an active sprint exists
+if (fs.existsSync(sprintFile)) {
+  const content = fs.readFileSync(sprintFile, "utf8");
+  const hasActiveSprint = content.includes("**Status:** in-progress");
+  if (hasActiveSprint) {
+    console.log("\n--- SPRINT.md (active sprint) ---");
+    console.log(content);
+
+    // Extract sprint issues as task suggestions
+    const sprintMatch = content.match(/\*\*Sprint:\*\*\s*(\d+)/);
+    const sprintNum = sprintMatch ? sprintMatch[1] : "?";
+    const issueLines = [];
+    const issueRegex = /^### (S\d+-\d+): (.+)/;
+    const statusRegex = /\*\*Status:\*\*\s*(todo|in-progress|done|blocked)/;
+    const blockerRegex = /\*\*Blocker:\*\*\s*(.+)/;
+
+    const lines = content.split("\n");
+    let currentIssue = null;
+    let currentStatus = null;
+    let currentBlocker = null;
+
+    for (const line of lines) {
+      const issueMatch = line.match(issueRegex);
+      if (issueMatch) {
+        if (currentIssue && currentStatus !== "done") {
+          let entry = `[${currentStatus}] ${currentIssue}`;
+          if (currentStatus === "blocked" && currentBlocker) entry += ` — ${currentBlocker}`;
+          issueLines.push(entry);
+        }
+        currentIssue = `${issueMatch[1]}: ${issueMatch[2]}`;
+        currentStatus = null;
+        currentBlocker = null;
+        continue;
+      }
+      if (currentIssue) {
+        const statusMatch = line.match(statusRegex);
+        if (statusMatch) currentStatus = statusMatch[1];
+        const blockerMatch = line.match(blockerRegex);
+        if (blockerMatch) currentBlocker = blockerMatch[1];
+      }
+    }
+    // Flush last issue
+    if (currentIssue && currentStatus && currentStatus !== "done") {
+      let entry = `[${currentStatus}] ${currentIssue}`;
+      if (currentStatus === "blocked" && currentBlocker) entry += ` — ${currentBlocker}`;
+      issueLines.push(entry);
+    }
+
+    if (issueLines.length > 0) {
+      console.log(`\n--- Sprint issues (S${sprintNum}) ---`);
+      for (const line of issueLines) {
+        console.log(line);
+      }
+    }
+  }
+}
+
+// Inject .md files from .claude/guidance/ (excluding README.md)
+if (fs.existsSync(guidanceDir)) {
+  let guidanceFiles;
+  try {
+    guidanceFiles = fs.readdirSync(guidanceDir)
+      .filter((f) => f.endsWith(".md") && f.toLowerCase() !== "readme.md")
+      .sort();
+  } catch (e) {
+    guidanceFiles = [];
+  }
+
+  for (const file of guidanceFiles) {
+    const filePath = path.join(guidanceDir, file);
+    try {
+      const content = fs.readFileSync(filePath, "utf8");
+      console.log(`\n--- .claude/guidance/${file} (development guidance) ---`);
+      console.log(content);
+    } catch (e) {
+      // Skip unreadable files silently
+    }
   }
 }
