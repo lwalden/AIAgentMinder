@@ -32,6 +32,37 @@ Update "Active Tasks" and "Next Priorities" to reflect your starting point. Or l
 
 ---
 
+## Optional Features
+
+### Code Quality Guidance
+
+A small set of development discipline instructions (~18 lines) injected at every session start. Covers TDD cycle, build-before-commit, review-before-commit, error handling patterns, and context efficiency.
+
+**Enable during setup:** Answer yes to "Enable code quality guidance?" in `/setup` or `/plan`.
+**Enable later:** Run `/update` from the AIAgentMinder repo — it will prompt to add the file if absent.
+**Disable:** Delete `.claude/guidance/code-quality.md` from your project. The hook silently skips missing files.
+
+The file lives at `.claude/guidance/code-quality.md` and is overwritten by `/update` to stay current with new versions.
+
+### Sprint Planning
+
+A structured development workflow where Claude decomposes phase work into discrete issues, presents them for your review, then works them one-by-one with per-issue PRs. Sprint state is tracked in `SPRINT.md` and injected by the SessionStart hook when a sprint is active.
+
+**Full lifecycle:**
+1. Tell Claude "start a sprint" or "begin Phase 1"
+2. Claude reads the roadmap, proposes issues with acceptance criteria — waits for your approval
+3. Claude works issues in order: feature branch → implement → PR — waits for your PR review before merging
+4. Sprint ends when all issues are done or blocked
+5. Claude presents a sprint review; you accept → sprint is archived to git history
+6. Start the next sprint
+
+**Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/plan`.
+**Disable:** Delete `.claude/guidance/sprint-workflow.md`. SPRINT.md can be left or removed.
+
+Sprint workflow instructions live in `.claude/guidance/sprint-workflow.md` (overwritten by `/update`). Sprint state lives in `SPRINT.md` (user-owned; `/update` never overwrites an active sprint).
+
+---
+
 ## Optional Customizations
 
 ### Risk Tolerance (in CLAUDE.md)
@@ -72,7 +103,7 @@ Four hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `
 | Timestamp | Stop | `session-end-timestamp.js` | Updates "Last Updated" in PROGRESS.md |
 | Auto-commit | Stop | `session-end-commit.js` | Git checkpoint on feature branches (tracked files only) |
 | Pre-compaction save | PreCompact | `pre-compact-save.js` | Saves PROGRESS.md state before context compaction |
-| Context injection | SessionStart | `session-start-context.js` | Injects PROGRESS.md, DECISIONS.md, and task suggestions |
+| Context injection | SessionStart | `session-start-context.js` | Injects PROGRESS.md, DECISIONS.md, SPRINT.md (when active), guidance files, and task suggestions |
 
 **Prerequisite:** Node.js must be installed for hooks to work.
 
@@ -100,11 +131,16 @@ When a new version of AIAgentMinder is released, run `/update` from the AIAgentM
 - `.claude/settings.json`
 - `.claude/commands/handoff.md` and `plan.md`
 
+**Overwritten if present, prompted if absent (optional features):**
+- `.claude/guidance/code-quality.md`
+- `.claude/guidance/sprint-workflow.md`
+
 **Surgically merged:**
 - `CLAUDE.md` — structural sections (Session Protocol, Behavioral Rules, Context Budget) are updated; your Project Identity and MVP Goals blocks are preserved
 
-**Never touched (user-owned):**
+**Protected (user-owned):**
 - `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore`
+- `SPRINT.md` — never overwritten if an active sprint exists
 
 After updating, `/update` writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
 
@@ -118,3 +154,4 @@ After updating, `/update` writes a version stamp to `.claude/aiagentminder-versi
 4. **Prefer smaller PRs** -- Easier to review, less risk
 5. **Don't pre-approve cloud CLIs** -- Review those operations manually
 6. **Generate CI/CD from real code** -- Wait until the project has actual code
+7. **Sprint approval is mandatory** -- Claude always waits for your go-ahead before starting sprint work

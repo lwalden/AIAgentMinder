@@ -88,7 +88,7 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 
 ## Governance Hooks
 
-Five hooks run automatically (configured in `.claude/settings.json`):
+Four hooks run automatically (Stop fires two scripts — timestamp + auto-commit — for five total executions per session lifecycle; configured in `.claude/settings.json`):
 - **Stop:** Updates PROGRESS.md timestamp + auto-commits on feature branches
 - **PreCompact:** Saves PROGRESS.md state before context compaction
 - **SessionStart:** Re-injects PROGRESS.md, DECISIONS.md, and task suggestions on every session start
