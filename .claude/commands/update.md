@@ -11,7 +11,9 @@ Before touching anything, understand what each file is:
 | Category | Files | Action |
 |---|---|---|
 | **AIAgentMinder-owned** | `.claude/hooks/*.js` (4 files), `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/plan.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned (optional)** | `.claude/guidance/code-quality.md`, `.claude/guidance/sprint-workflow.md` | Overwrite if present; prompt to add if absent |
 | **Hybrid** | `CLAUDE.md` | Surgical merge — update structural sections, preserve user content |
+| **User-owned (AIAgentMinder creates initial)** | `SPRINT.md` | Never overwrite if active sprint; create from template if missing and sprint planning is enabled |
 | **User-owned** | `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore` | Never touch |
 | **Version stamp** | `.claude/aiagentminder-version` | Write current version at the end |
 
@@ -28,15 +30,16 @@ I'll update AIAgentMinder files in [path].
 This will overwrite:
   - .claude/hooks/ (4 Node.js hook files)
   - .claude/settings.json
-  - .claude/commands/handoff.md
-  - .claude/commands/plan.md
+  - .claude/commands/handoff.md and plan.md
+  - .claude/guidance/ (existing guidance files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
 
+You'll be prompted about:
+  - New optional features not yet enabled (code quality guidance, sprint planning)
+
 These will NOT be touched:
-  - PROGRESS.md
-  - DECISIONS.md
-  - docs/strategy-roadmap.md
-  - .gitignore
+  - PROGRESS.md, DECISIONS.md, docs/strategy-roadmap.md, .gitignore
+  - SPRINT.md (if active sprint exists)
 
 Proceed? (y/n)
 ```
@@ -74,6 +77,26 @@ project/.claude/commands/plan.md                →  [target]/.claude/commands/p
 
 Print each file as it's updated: "✓ Updated: .claude/hooks/session-end-commit.js"
 
+Then handle optional guidance files:
+
+### code-quality.md
+- If `[target]/.claude/guidance/code-quality.md` **exists**: overwrite from `project/.claude/guidance/code-quality.md`. Print "✓ Updated: .claude/guidance/code-quality.md"
+- If **absent**: prompt "Code quality guidance is available (new in this version). Enable? Adds TDD, review-before-commit, and build-before-commit instructions (~18 lines of context per session). (y/n)"
+  - If yes: create `[target]/.claude/guidance/` directory if needed, copy `project/.claude/guidance/README.md` and `project/.claude/guidance/code-quality.md`. Print "✓ Added: .claude/guidance/code-quality.md"
+  - If no: Print "⊘ Skipped: code quality guidance (not enabled)"
+
+### sprint-workflow.md
+- If `[target]/.claude/guidance/sprint-workflow.md` **exists**: overwrite from `project/.claude/guidance/sprint-workflow.md`. Print "✓ Updated: .claude/guidance/sprint-workflow.md"
+  - Then check SPRINT.md (see below).
+- If **absent**: prompt "Sprint planning is available (new in this version). Structured issue decomposition with per-issue PRs. Enable? (y/n)"
+  - If yes: create `[target]/.claude/guidance/` directory if needed, copy `project/.claude/guidance/README.md` (if not already copied) and `project/.claude/guidance/sprint-workflow.md`. Create `SPRINT.md` from template if missing. Print "✓ Added: .claude/guidance/sprint-workflow.md"
+  - If no: Print "⊘ Skipped: sprint planning (not enabled)"
+
+### SPRINT.md
+- If sprint-workflow.md was updated or added AND `[target]/SPRINT.md` does **not** exist: create from `project/SPRINT.md`. Print "✓ Created: SPRINT.md"
+- If `[target]/SPRINT.md` exists with an active sprint (`**Status:** in-progress`): do **not** overwrite. Print "⚠ SPRINT.md has an active sprint — not modified"
+- If `[target]/SPRINT.md` exists with placeholder or archived content: leave it alone (no action needed)
+
 ---
 
 ## Step 3: Surgical Merge of CLAUDE.md
@@ -103,6 +126,8 @@ For each structural section:
 After all sections: "CLAUDE.md: updated N section(s), preserved Project Identity and MVP Goals."
 
 If the installed `CLAUDE.md` is missing a structural section that exists in the template (e.g. a new section added in this version), append it after the last structural section, before any user sections.
+
+**Note on SPRINT.md in Context Budget:** If sprint planning was added during this update (sprint-workflow.md was absent and user said yes), also add the SPRINT.md row to the Context Budget table and the Reading Strategy line in CLAUDE.md.
 
 ---
 
@@ -147,6 +172,12 @@ Updated:
 - .claude/commands/plan.md
 - CLAUDE.md ([N] section(s) updated, Project Identity preserved)
 - .claude/aiagentminder-version
+
+Optional features:
+[list each of: ✓ Updated / ✓ Added / ⊘ Skipped / ⚠ Active sprint preserved]
+- .claude/guidance/code-quality.md
+- .claude/guidance/sprint-workflow.md
+- SPRINT.md
 
 Not touched (user-owned):
 - PROGRESS.md

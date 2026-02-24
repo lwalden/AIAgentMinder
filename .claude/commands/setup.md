@@ -30,6 +30,8 @@ Ask all of these in one grouped prompt:
 5. **Developer profile:** Experience level, autonomy preference (conservative / medium / aggressive)
 6. **Project scale:** Personal tool, small team tool, or public-facing product?
 7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
+8. **Code quality guidance:** Enable? (TDD, review-before-commit, build-before-commit — recommended for Standard+ projects, ~18 lines of context per session) (y/n)
+9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
 
 ---
 
@@ -45,6 +47,17 @@ Copy template files into the user's repo. Before copying each file, check if it 
 
 ### Scenario B: New/Blank Directory
 If no git repo exists, run `git init`. Then copy all files from this repo's `project/` directory.
+
+### Optional features (based on Step 2 answers)
+
+**Code quality guidance:** If enabled, copy `project/.claude/guidance/code-quality.md` to `[target]/.claude/guidance/code-quality.md` (create the directory if needed). Also copy `project/.claude/guidance/README.md`.
+
+**Sprint planning:** If enabled:
+- Copy `project/.claude/guidance/sprint-workflow.md` to `[target]/.claude/guidance/sprint-workflow.md`
+- Copy `project/SPRINT.md` to `[target]/SPRINT.md`
+- Also copy `project/.claude/guidance/README.md` if not already copied
+
+If neither optional feature is enabled, do **not** copy the `.claude/guidance/` directory.
 
 ---
 
@@ -76,6 +89,16 @@ Replace the placeholder block with actual values:
 - [actual risk tolerance]
 ```
 
+### CLAUDE.md -- Context Budget (if sprint planning enabled)
+Add to the Context Budget table:
+```
+| SPRINT.md | ~35 lines active | Archived to git history when sprint completes; only active sprint kept |
+```
+Add to Reading Strategy:
+```
+- SPRINT.md: Auto-injected when active sprint exists; contains current issue list and status
+```
+
 ### .gitignore -- Append Stack-Specific Entries
 The template `.gitignore` covers secrets, IDE files, OS artifacts. Append stack-specific entries:
 - **Node.js**: `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo`
@@ -105,7 +128,8 @@ git commit -m "chore: initialize project with AIAgentMinder"
 
 ## Step 7: Summary
 
-Print:
+Print based on what was enabled:
+
 ```
 Project initialized successfully!
 
@@ -120,9 +144,17 @@ Created files:
 - .claude/hooks/ (4 Node.js hooks: timestamp, auto-commit, pre-compaction save, session context injection)
 - .claude/aiagentminder-version (version stamp for /update)
 - .gitignore (core + [stack] entries)
+[if code quality enabled:]
+- .claude/guidance/code-quality.md (code quality guidance — TDD, review-before-commit)
+[if sprint planning enabled:]
+- .claude/guidance/sprint-workflow.md (sprint planning workflow)
+- SPRINT.md (sprint state tracking)
 
 Next steps:
 1. Open Claude Code in your project directory
 2. Run /plan to create your product brief & roadmap
+[if sprint planning enabled:]
+3. When ready to build, say "start a sprint" or "begin Phase 1" — I'll propose issues for your review
+[else:]
 3. Or tell Claude "start Phase 1" if you already have a plan
 ```
