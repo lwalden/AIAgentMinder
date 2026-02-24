@@ -51,7 +51,7 @@ PROGRESS.md self-trims: Claude keeps only 3 session notes, dropping older ones (
 
 ## Governance Hooks
 
-Five cross-platform hooks (Node.js) configured in `settings.json`:
+Four cross-platform hooks (Node.js) configured in `settings.json`. The Stop event runs two scripts (timestamp + auto-commit), making five total hook executions per session lifecycle:
 
 | Hook | Event | Script |
 |------|-------|--------|
