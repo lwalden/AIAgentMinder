@@ -40,7 +40,7 @@ AIAgentMinder solves these with git-tracked project state files that survive acr
 | `/handoff` | End of a session — writes a clear briefing so the next session picks up exactly where you left off |
 | `/update` | Upgrade an existing AIAgentMinder installation — overwrites hook and command files, surgically merges CLAUDE.md structural sections while preserving your Project Identity and MVP Goals |
 
-**Four hooks** run automatically (Stop fires two scripts — timestamp + auto-commit — for five total executions per session lifecycle):
+**Four hooks** run automatically:
 
 | What | When |
 |------|------|
