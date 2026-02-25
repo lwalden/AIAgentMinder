@@ -24,13 +24,14 @@ AIAgentMinder solves these with git-tracked project state files that survive acr
 
 ## How It Works
 
-**Three core files** persist your project state in git:
+**Core files** persist your project state in git:
 
 | File | What It Does | When Claude Reads It |
 |------|-------------|---------------------|
 | `PROGRESS.md` | Current tasks, blockers, priorities, session notes | Every session (auto-injected by hook) |
 | `DECISIONS.md` | Architectural decisions with rationale | Every session if decisions exist (auto-injected) |
 | `docs/strategy-roadmap.md` | Product brief — what you're building and why | On-demand |
+| `.claude/guidance/*.md` | Development discipline rules — TDD, error handling, sprint workflow | Every session (auto-injected when present) |
 
 **Three commands** structure your workflow:
 
@@ -69,6 +70,8 @@ Open Claude Code in the cloned directory and run `/setup`. It asks about your pr
 ### 3. Run `/plan`
 
 Open Claude Code in your project and run `/plan`. For new projects, Claude interviews you and generates `docs/strategy-roadmap.md`. For existing projects, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files instead.
+
+After determining your quality tier, `/plan` also asks whether to enable **code quality guidance** (TDD, review-before-commit, error handling rules) and **sprint planning** (issue decomposition, per-issue PRs, SPRINT.md tracking) — both recommended for Standard+ projects.
 
 ### 4. Build
 
@@ -118,7 +121,7 @@ See a [full demo walkthrough](examples/demo-transcript.md) with actual prompts a
 
 ```
 your-project/
-├── CLAUDE.md              # ~70 lines — session protocol, project identity, rules
+├── CLAUDE.md              # ~70 lines (baseline) — session protocol, project identity, rules
 ├── PROGRESS.md            # ~20 lines — current state, self-trimming session notes
 ├── DECISIONS.md           # Architectural decision log
 ├── SPRINT.md              # Sprint state tracking (optional, for sprint-driven development)

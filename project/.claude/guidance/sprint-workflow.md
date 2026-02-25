@@ -8,10 +8,10 @@ When the user asks to start a sprint or begin a phase:
 1. Read `docs/strategy-roadmap.md` for the phase's features and acceptance criteria.
 2. Read `PROGRESS.md` for current state, what's done, and any blockers.
 3. Read `DECISIONS.md` for architectural context that affects implementation choices.
-4. Decompose the next chunk of work into discrete issues. Each issue must be completable in a single focused effort — small enough that you don't need the entire codebase in context. One PR per issue.
-5. Each issue must have: a title, a type (feature/fix/chore/spike), acceptance criteria, and references to relevant strategy-roadmap items or files.
+4. Determine sprint scope. A sprint covers a coherent subset of the phase's work — typically 4–7 issues. If the phase has more work than fits comfortably in one sprint, group related features into this sprint and defer the rest to subsequent sprints. Prefer thematic coherence (e.g., "auth + session management") over arbitrary cutoffs. More than 8 issues is a signal to split; fewer than 3 is a signal to reconsider issue granularity or combine with adjacent work.
+5. Decompose the sprint scope into discrete issues. Each issue must be completable in a single focused effort — small enough that you don't need the entire codebase in context. One PR per issue. Each issue must have: a title, a type (feature/fix/chore/spike), acceptance criteria, and references to relevant strategy-roadmap items or files.
 6. Write the proposed sprint to `SPRINT.md` using the active sprint format.
-7. Present the sprint to the user as a numbered list. **Wait for the user to review, edit, discuss, and approve before starting any implementation.**
+7. Present the sprint to the user as a numbered list. If phase work was deferred to a future sprint, briefly note what was left out and why. **Wait for the user to review, edit, discuss, and approve before starting any implementation.**
 
 Issue ID format: `S{sprint_number}-{sequence}` (e.g., S1-001, S1-002, S2-001).
 

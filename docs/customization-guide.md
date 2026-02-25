@@ -48,6 +48,10 @@ The file lives at `.claude/guidance/code-quality.md` and is overwritten by `/upd
 
 A structured development workflow where Claude decomposes phase work into discrete issues, presents them for your review, then works them one-by-one with per-issue PRs. Sprint state is tracked in `SPRINT.md` and injected by the SessionStart hook when a sprint is active.
 
+**How sprints are scoped**
+
+A sprint in AIAgentMinder is not a time-boxed agile sprint — there's no two-week clock. A sprint is a coherent subset of a phase's work, typically 4–7 issues. Claude reads the phase's features and acceptance criteria from `docs/strategy-roadmap.md`, groups related work into a first sprint, and defers the rest to subsequent sprints. Multiple sprints per phase is normal for any non-trivial phase. Scope is bounded by thematic coherence and issue count, not by a calendar. When Claude presents the proposed sprint, it notes what phase work is deferred so you have the full picture before approving.
+
 **Full lifecycle:**
 1. Tell Claude "start a sprint" or "begin Phase 1"
 2. Claude reads the roadmap, proposes issues with acceptance criteria — waits for your approval
@@ -55,6 +59,16 @@ A structured development workflow where Claude decomposes phase work into discre
 4. Sprint ends when all issues are done or blocked
 5. Claude presents a sprint review; you accept → sprint is archived to git history
 6. Start the next sprint
+
+**Blocked issues and user interaction**
+
+When Claude cannot complete an issue — missing information, an unresolved dependency, or a decision that requires your input — it marks the issue `blocked` in `SPRINT.md`, adds the blocker to `PROGRESS.md`, and notifies you with a clear description of what's needed. Claude does not skip ahead to the next issue or make assumptions to work around the block. It stops and waits.
+
+You resolve the block (answer the question, provide the missing resource, make the decision), then tell Claude to continue. Claude updates the issue status and picks up where it left off. Blocked issues don't invalidate the sprint — the sprint resumes once the blocker is cleared.
+
+**End of sprint**
+
+A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. You review the summary and accept it. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, and the full detail is preserved in git history. `PROGRESS.md` is updated to reflect the sprint outcome. You can then ask to begin the next sprint, which increments the sprint number and starts fresh from the remaining roadmap work.
 
 **Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/plan`.
 **Disable:** Delete `.claude/guidance/sprint-workflow.md`. SPRINT.md can be left or removed.
