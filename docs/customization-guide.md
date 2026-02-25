@@ -68,7 +68,7 @@ You resolve the block (answer the question, provide the missing resource, make t
 
 **End of sprint**
 
-A sprint ends when every issue is either `done` or `blocked` with no remaining unblocked work. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. You review the summary and accept it. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, and the full detail is preserved in git history. `PROGRESS.md` is updated to reflect the sprint outcome. You can then ask to begin the next sprint, which increments the sprint number and starts fresh from the remaining roadmap work.
+A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. You review the summary and accept it. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, and the full detail is preserved in git history. `PROGRESS.md` is updated to reflect the sprint outcome. You can then ask to begin the next sprint, which increments the sprint number and starts fresh from the remaining roadmap work.
 
 **Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/plan`.
 **Disable:** Delete `.claude/guidance/sprint-workflow.md`. SPRINT.md can be left or removed.
