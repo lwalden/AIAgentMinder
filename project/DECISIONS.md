@@ -1,7 +1,8 @@
 # DECISIONS.md - Architectural Decision Log
 
 > Record significant decisions to prevent re-debating them later.
-> Claude reads this before making architectural choices.
+> Not auto-loaded. Claude writes here when making architectural choices.
+> To load automatically every session, add `@DECISIONS.md` to CLAUDE.md.
 >
 
 > **When to log:** choosing a library/framework, designing an API, selecting an auth approach, changing a data model, making a build/deploy decision.

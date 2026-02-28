@@ -1,27 +1,8 @@
 # CLAUDE.md - Project Instructions
 
 > Claude reads this file automatically at the start of every session.
-> Keep it concise -- every line costs context tokens.
->
-> **Reading order:** PROGRESS.md first → DECISIONS.md before architectural choices → other docs on-demand.
-
-## Session Protocol
-
-### Starting a Session
-1. Read `PROGRESS.md` -- understand current state, active tasks, and priorities
-2. Check `git status` for uncommitted work
-3. Resume from "Next Priorities" in PROGRESS.md
-
-> If no session context was injected above (you don't see PROGRESS.md content), read PROGRESS.md and DECISIONS.md manually before proceeding.
-
-### During a Session
-- Write code to files immediately -- don't accumulate changes in memory
-- Commit at natural checkpoints (compiles, tests pass, logical unit complete)
-- Prefer smaller, frequent commits over one large commit
-- Use Claude's native Tasks for complex multi-step work; keep PROGRESS.md as the durable record
-
-### Ending a Session
-Run `/handoff` to write a clear briefing for the next session. Hooks handle timestamp and auto-commit automatically.
+> Keep it concise — every line costs context tokens.
+> Use `claude --continue` to restore the previous session's full message history.
 
 ## Project Identity
 
@@ -41,7 +22,7 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 ## Behavioral Rules
 
 ### Git Workflow
-- **Never commit directly to main** -- always use feature branches
+- **Never commit directly to main** — always use feature branches
 - Branch naming: `feature/short-description`, `fix/short-description`, `chore/short-description`
 - All changes via PR. Claude creates PRs; human reviews and merges
 
@@ -57,15 +38,14 @@ Run `/handoff` to write a clear briefing for the next session. Hooks handle time
 - Write tests appropriate to the project's quality tier (see strategy-roadmap.md)
 - When Standard tier or above: write failing tests first, then implement
 
+### Decision Recording
+- Record significant architectural decisions in DECISIONS.md (library choices, API contracts, auth approach, data model changes, deploy decisions)
+- Include alternatives considered — a decision without alternatives is an assertion, not a record
+- To auto-load DECISIONS.md every session, add `@DECISIONS.md` to this file
+
 ## Context Budget
 
-| File | Target Size | Action if Exceeded |
-|------|------------|-------------------|
-| CLAUDE.md | ~75 lines | Don't add without removing something |
-| PROGRESS.md | ~20 lines active | Self-trimming: only 3 session notes kept |
+| File | Target Size | Notes |
+|------|------------|-------|
+| CLAUDE.md | ~50 lines | Don't add without removing something |
 | DECISIONS.md | Grows over time | Delete superseded entries (git history preserves them) |
-
-**Reading Strategy:**
-- PROGRESS.md: Every session (auto-injected by hook)
-- DECISIONS.md: Auto-injected if decisions exist; always check before architectural choices
-- strategy-roadmap.md: On-demand
