@@ -26,27 +26,23 @@ Run `/plan` to fill it interactively, or edit manually. At minimum, fill in:
 - MVP Features with acceptance criteria
 - Technical Stack choices
 
-### 3. `PROGRESS.md` -- Initial Tasks
-
-Update "Active Tasks" and "Next Priorities" to reflect your starting point. Or leave defaults and let `/setup` handle it.
-
 ---
 
 ## Optional Features
 
 ### Code Quality Guidance
 
-A small set of development discipline instructions (~18 lines) injected at every session start. Covers TDD cycle, build-before-commit, review-before-commit, error handling patterns, and context efficiency.
+A small set of development discipline instructions (~18 lines) loaded natively at every session start. Covers TDD cycle, build-before-commit, review-before-commit, and error handling patterns.
 
 **Enable during setup:** Answer yes to "Enable code quality guidance?" in `/setup` or `/plan`.
 **Enable later:** Run `/update` from the AIAgentMinder repo — it will prompt to add the file if absent.
-**Disable:** Delete `.claude/guidance/code-quality.md` from your project. The hook silently skips missing files.
+**Disable:** Delete `.claude/rules/code-quality.md` from your project.
 
-The file lives at `.claude/guidance/code-quality.md` and is overwritten by `/update` to stay current with new versions.
+The file lives at `.claude/rules/code-quality.md` and is overwritten by `/update` to stay current. Claude Code loads all `.md` files in `.claude/rules/` natively — no hooks needed.
 
 ### Sprint Planning
 
-A structured development workflow where Claude decomposes phase work into discrete issues, presents them for your review, then works them one-by-one with per-issue PRs. Sprint state is tracked in `SPRINT.md` and injected by the SessionStart hook when a sprint is active.
+A structured development workflow where Claude decomposes phase work into discrete issues, presents them for your review, then works them one-by-one with per-issue PRs. Sprint state is tracked in `SPRINT.md`, which is loaded via `@import` in CLAUDE.md when a sprint is active.
 
 **How sprints are scoped**
 
@@ -62,18 +58,18 @@ A sprint in AIAgentMinder is not a time-boxed agile sprint — there's no two-we
 
 **Blocked issues and user interaction**
 
-When Claude cannot complete an issue — missing information, an unresolved dependency, or a decision that requires your input — it marks the issue `blocked` in `SPRINT.md`, adds the blocker to `PROGRESS.md`, and notifies you with a clear description of what's needed. Claude does not skip ahead to the next issue or make assumptions to work around the block. It stops and waits.
+When Claude cannot complete an issue — missing information, an unresolved dependency, or a decision that requires your input — it marks the issue `blocked` in `SPRINT.md` and notifies you with a clear description of what's needed. Claude does not skip ahead to the next issue or make assumptions to work around the block. It stops and waits.
 
-You resolve the block (answer the question, provide the missing resource, make the decision), then tell Claude to continue. Claude updates the issue status and picks up where it left off. Blocked issues don't invalidate the sprint — the sprint resumes once the blocker is cleared.
+You resolve the block (answer the question, provide the missing resource, make the decision), then tell Claude to continue. Blocked issues don't invalidate the sprint — the sprint resumes once the blocker is cleared.
 
 **End of sprint**
 
-A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. You review the summary and accept it. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, and the full detail is preserved in git history. `PROGRESS.md` is updated to reflect the sprint outcome. You can then ask to begin the next sprint, which increments the sprint number and starts fresh from the remaining roadmap work.
+A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, preserved in full in git history. You can then ask to begin the next sprint.
 
 **Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/plan`.
-**Disable:** Delete `.claude/guidance/sprint-workflow.md`. SPRINT.md can be left or removed.
+**Disable:** Delete `.claude/rules/sprint-workflow.md`. SPRINT.md can be left or removed.
 
-Sprint workflow instructions live in `.claude/guidance/sprint-workflow.md` (overwritten by `/update`). Sprint state lives in `SPRINT.md` (user-owned; `/update` never overwrites an active sprint).
+Sprint workflow instructions live in `.claude/rules/sprint-workflow.md` (overwritten by `/update`). Sprint state lives in `SPRINT.md` (user-owned; `/update` never overwrites an active sprint).
 
 ---
 
@@ -83,17 +79,6 @@ Sprint workflow instructions live in `.claude/guidance/sprint-workflow.md` (over
 - **Conservative:** Claude asks before most decisions, smaller PRs
 - **Medium:** Claude makes routine decisions autonomously, asks for architectural choices
 - **Aggressive:** Claude makes most decisions autonomously, asks only for major pivots
-
-### Safety (in `.claude/settings.json`)
-
-The template ships a deny list that blocks dangerous commands. Claude Code's default permission system handles everything else — no allow list needed.
-
-To block additional commands, add to the `deny` array:
-```json
-"Bash(dangerous-command:*)"
-```
-
-Do not pre-approve cloud CLIs (`az`, `aws`, `gcloud`, `terraform`) without careful consideration -- these can create billable resources.
 
 ### CI/CD
 
@@ -110,14 +95,12 @@ Tell Claude: "Set up GitHub Actions CI for this project."
 
 ### Hooks
 
-Four hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`. Two run on the Stop event (timestamp + auto-commit), making five total hook executions per session end:
+Two hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`. Hooks require Node.js to run.
 
 | Hook | Event | Script | What It Does |
 |------|-------|--------|-------------|
-| Timestamp | Stop | `session-end-timestamp.js` | Updates "Last Updated" in PROGRESS.md |
 | Auto-commit | Stop | `session-end-commit.js` | Git checkpoint on feature branches (tracked files only) |
-| Pre-compaction save | PreCompact | `pre-compact-save.js` | Saves PROGRESS.md state before context compaction |
-| Context injection | SessionStart | `session-start-context.js` | Injects PROGRESS.md, DECISIONS.md, SPRINT.md (when active), guidance files, and task suggestions |
+| Sprint reorientation | SessionStart (compact) | `compact-reorient.js` | Outputs sprint summary after context compaction |
 
 **Prerequisite:** Node.js must be installed for hooks to work.
 
@@ -125,7 +108,7 @@ Four hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `
 
 **Add a custom hook:** Add a new entry to `settings.json` and create the script in `.claude/hooks/`. See the [Claude Code hooks documentation](https://docs.anthropic.com/en/docs/claude-code/hooks) for the full event list and JSON input format.
 
-**Disable auto-commit:** Remove the `session-end-commit.js` entry from Stop hooks. The timestamp hook runs independently.
+**Disable auto-commit:** Remove the `session-end-commit.js` entry from Stop hooks.
 
 ### Custom Slash Commands
 
@@ -141,20 +124,26 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 When a new version of AIAgentMinder is released, run `/update` from the AIAgentMinder repo (not from your project). It performs a safe in-place upgrade:
 
 **Overwritten (AIAgentMinder-owned):**
-- `.claude/hooks/` — all 4 Node.js hook scripts
-- `.claude/settings.json`
+- `.claude/hooks/session-end-commit.js` and `compact-reorient.js`
+- `.claude/settings.json` (hook configuration)
 - `.claude/commands/handoff.md` and `plan.md`
 
 **Overwritten if present, prompted if absent (optional features):**
-- `.claude/guidance/code-quality.md`
-- `.claude/guidance/sprint-workflow.md`
+- `.claude/rules/code-quality.md`
+- `.claude/rules/sprint-workflow.md`
 
 **Surgically merged:**
-- `CLAUDE.md` — structural sections (Session Protocol, Behavioral Rules, Context Budget) are updated; your Project Identity and MVP Goals blocks are preserved
+- `CLAUDE.md` — Behavioral Rules and Context Budget sections are updated; your Project Identity and MVP Goals blocks are preserved
 
 **Protected (user-owned):**
 - `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore`
 - `SPRINT.md` — never overwritten if an active sprint exists
+
+**v0.6.0 → v0.7.0 migration (handled automatically by `/update`):**
+- Deletes obsolete hooks: `session-start-context.js`, `session-end-timestamp.js`, `pre-compact-save.js`
+- Migrates `.claude/guidance/` files to `.claude/rules/` and removes the old directory
+- Removes `## Session Protocol` section from CLAUDE.md (replaced by native Session Memory)
+- Adds `@SPRINT.md` import to CLAUDE.md if sprint planning was previously enabled
 
 After updating, `/update` writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
 
@@ -163,9 +152,8 @@ After updating, `/update` writes a version stamp to `.claude/aiagentminder-versi
 ## Tips
 
 1. **Be specific in strategy-roadmap.md** -- More context = better decisions
-2. **Run `/handoff` before ending sessions** -- This is how the next session picks up cleanly
-3. **Use DECISIONS.md for significant choices** -- Prevents re-debating
+2. **Run `/handoff` before ending sessions** -- Writes priorities to auto-memory so the next session resumes cleanly
+3. **Use DECISIONS.md for significant choices** -- Prevents re-debating; add `@DECISIONS.md` to CLAUDE.md to auto-load
 4. **Prefer smaller PRs** -- Easier to review, less risk
-5. **Don't pre-approve cloud CLIs** -- Review those operations manually
-6. **Generate CI/CD from real code** -- Wait until the project has actual code
-7. **Sprint approval is mandatory** -- Claude always waits for your go-ahead before starting sprint work
+5. **Generate CI/CD from real code** -- Wait until the project has actual code
+6. **Sprint approval is mandatory** -- Claude always waits for your go-ahead before starting sprint work

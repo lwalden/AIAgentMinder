@@ -1,3 +1,7 @@
+---
+description: Code quality and development discipline rules
+---
+
 # Code Quality Guidance
 # AIAgentMinder-managed. Delete this file to opt out of code quality guidance.
 
@@ -18,5 +22,3 @@
 **Commit messages describe why, not what:** Format: `type(scope): description` — e.g., `feat(auth): add JWT refresh token rotation`. The diff shows what changed; the message explains why it was the right change.
 
 **CI-ready code:** Produce code that passes the project's full CI pipeline. Run linters and formatters if configured before committing — don't leave that to CI to catch.
-
-**Context efficiency:** Read only the files needed for the current task. When resuming, summarize previous work from PROGRESS.md rather than re-reading entire file histories.

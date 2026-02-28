@@ -1,6 +1,6 @@
-# /handoff - Session Handoff Brief
+# /handoff - Session Checkpoint
 
-Generate a concise handoff briefing so the next Claude session can pick up exactly where this one left off. This is the most important thing you do before ending a session.
+Capture current state so work can be resumed cleanly. Run this before ending a session.
 
 ---
 
@@ -11,56 +11,11 @@ Generate a concise handoff briefing so the next Claude session can pick up exact
 Review what happened this session:
 - What files were created or modified?
 - What was the goal and how far did we get?
-- What's working? What's broken?
+- What's working? What's broken or incomplete?
 - Any decisions made that should be in DECISIONS.md?
-- Is there an active sprint? If SPRINT.md contains `**Status:** in-progress`, note:
-  - Which sprint number and how many issues are done/in-progress/todo/blocked
-  - Which issue was being worked on when the session is ending
+- Is there an active sprint? Check if SPRINT.md contains `**Status:** in-progress`. If so, note which issue was active and the done/in-progress/todo/blocked counts.
 
-### 2. Update PROGRESS.md
-
-Rewrite PROGRESS.md (don't append — replace the active content) with:
-
-```markdown
-**Phase:** [current phase]
-**Last Updated:** [now]
-
-## Active Tasks
-- [what's currently in progress, with enough detail that a fresh session understands]
-
-## Current State
-- [what's working, what's partially done, what's broken — e.g., "API compiles but auth isn't hooked up"]
-[if sprint active: include "Sprint [n] in progress: [done]/[total] issues complete. Currently on S[n]-[seq]."]
-
-## Blockers
-- [anything blocking progress — missing API keys, design decisions, bugs]
-[if sprint issues are blocked: include them here]
-
-## Next Priorities
-1. [most important next step — be specific, not vague]
-2. [second priority]
-3. [third priority]
-
----
-<!-- Session notes: keep last 3. Older ones are in git history. -->
-- [DATE] Phase [N]: [what was accomplished]. Key files: [files touched]. → [what's next]
-```
-
-**Be specific.** "Continue API work" is useless. "Implement the /users/:id endpoint — GET handler is done, need POST and validation" is useful.
-
-### 2b. Self-Check: Is This Handoff Useful?
-
-Re-read the PROGRESS.md you just wrote. For each item in Active Tasks and Next Priorities, ask:
-- Could a fresh Claude session understand this without any other context?
-- Is there a specific file, function, or endpoint named?
-- Is the current state of that work described (what's done, what's not)?
-
-If any item is vague (e.g., "continue API work", "fix bugs", "finish frontend"), rewrite it with specifics before proceeding.
-
-**Bad:** "Continue work on authentication"
-**Good:** "Implement JWT refresh token rotation in src/auth/tokens.ts — access token generation works, refresh endpoint returns 401, need to add token rotation logic and update the middleware in src/middleware/auth.ts"
-
-### 3. Update DECISIONS.md (if applicable)
+### 2. Update DECISIONS.md (if applicable)
 
 If any of these happened this session, add an ADR entry:
 - Chose a library, framework, or tool
@@ -69,39 +24,57 @@ If any of these happened this session, add an ADR entry:
 - Changed a data model
 - Made a build/deploy decision
 
-Use the format recorded in DECISIONS.md. Always include alternatives considered and the tradeoff accepted — a decision without alternatives is an assertion, not a record.
+Use the format already established in DECISIONS.md. Always include alternatives considered and the tradeoff accepted — a decision without alternatives is an assertion, not a record.
 
-**Rule of thumb:** If a decision is important enough to survive the 3-note session-note rolling window, it belongs in DECISIONS.md — not just in session notes.
+### 3. Write 2-3 Priority Items to MEMORY.md
 
-### 4. Commit
+Locate the project's auto-memory file at:
+`~/.claude/projects/[project-path-hash]/memory/MEMORY.md`
+
+Append or update a "Next Session" section:
+
+```
+## Next Session
+- [Most important thing to know picking up next — be specific, not vague]
+- [Second priority or open question]
+- [Third item only if genuinely needed]
+```
+
+Keep each bullet to one sentence. Do not exceed 3 items. Specificity matters: "Continue API work" is not useful; "Implement POST /users/:id — GET is done, need POST with request validation" is.
+
+### 4. Update PROGRESS.md (optional)
+
+If the project uses PROGRESS.md as a human-readable artifact, rewrite the active section (Active Tasks, Current State, Blockers, Next Priorities) with current state. Keep the last 3 session notes; drop older ones.
+
+Skip this step if the project doesn't actively use PROGRESS.md.
+
+### 5. Commit
 
 ```bash
-git add PROGRESS.md DECISIONS.md
+git add DECISIONS.md PROGRESS.md
 git commit -m "handoff: session checkpoint [today's date]"
 ```
 
-Do NOT modify SPRINT.md during handoff — sprint state is updated during sprint execution, not during handoff.
+Only stage files that were modified. The auto-commit Stop hook may have already committed other tracked files. Do NOT modify SPRINT.md during handoff — sprint state is updated during sprint execution.
 
-### 5. Print the Briefing
-
-Print a summary the user can glance at:
+### 6. Print the Briefing
 
 ```
 Session handoff complete.
 
 This session:
-- [what was accomplished]
+- [what was accomplished — specific files/features/fixes]
 
 State of things:
-- [what's working, what's not]
+- [what's working, what's not, what's in progress]
 [if sprint active:]
-Sprint [n] in progress: [done]/[total] issues done[, [blocked] blocked]
-Currently working on: S[n]-[seq] ([issue title])
+Sprint [n]: [done]/[total] issues done[, [blocked] blocked]
+Currently on: S[n]-[seq] — [issue title]
 
 Next session should:
 1. [specific first action]
 2. [specific second action]
 
 Blockers for human:
-- [anything the human needs to do before next session, or "None"]
+- [anything requiring human action, or "None"]
 ```

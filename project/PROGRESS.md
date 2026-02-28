@@ -1,9 +1,9 @@
 # PROGRESS.md - Session Continuity
 
-> Claude reads this FIRST every session. When adding a session note, keep only the 3 most recent -- drop older ones (git history is the archive).
+> Optional human-readable artifact. Not auto-loaded — use `claude --continue` or Session Memory for session continuity.
+> When adding a session note, keep only the 3 most recent — drop older ones (git history is the archive).
 
 **Phase:** 1 - Foundation
-**Last Updated:** [DATE]
 
 ## Active Tasks
 - Project initialization (Run /setup then /plan)

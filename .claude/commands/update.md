@@ -10,8 +10,9 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/*.js` (4 files), `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/plan.md` | Overwrite unconditionally |
-| **AIAgentMinder-owned (optional)** | `.claude/guidance/code-quality.md`, `.claude/guidance/sprint-workflow.md` | Overwrite if present; prompt to add if absent |
+| **AIAgentMinder-owned** | `.claude/hooks/session-end-commit.js`, `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/plan.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md` | Overwrite if present; prompt to add if absent |
+| **Obsolete (v0.6.0 → v0.7.0)** | `.claude/hooks/session-start-context.js`, `.claude/hooks/session-end-timestamp.js`, `.claude/hooks/pre-compact-save.js`, `.claude/guidance/` directory | Delete during migration |
 | **Hybrid** | `CLAUDE.md` | Surgical merge — update structural sections, preserve user content |
 | **User-owned (AIAgentMinder creates initial)** | `SPRINT.md` | Never overwrite if active sprint; create from template if missing and sprint planning is enabled |
 | **User-owned** | `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore` | Never touch |
@@ -28,11 +29,17 @@ Then confirm before proceeding:
 I'll update AIAgentMinder files in [path].
 
 This will overwrite:
-  - .claude/hooks/ (4 Node.js hook files)
+  - .claude/hooks/ (2 Node.js hook files: session-end-commit.js, compact-reorient.js)
   - .claude/settings.json
   - .claude/commands/handoff.md and plan.md
-  - .claude/guidance/ (existing guidance files only — not adding new ones without asking)
+  - .claude/rules/ (existing rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
+
+[If upgrading from v0.6.0, these will also be removed:]
+  - .claude/hooks/session-start-context.js (replaced by native .claude/rules/ loading)
+  - .claude/hooks/session-end-timestamp.js (PROGRESS.md timestamp no longer needed)
+  - .claude/hooks/pre-compact-save.js (replaced by compact-matcher hook)
+  - .claude/guidance/ directory (migrated to .claude/rules/)
 
 You'll be prompted about:
   - New optional features not yet enabled (code quality guidance, sprint planning)
@@ -63,38 +70,69 @@ Read the current version from `project/.claude/aiagentminder-version` in this re
 
 ## Step 2: Overwrite AIAgentMinder-Owned Files
 
+### v0.6.0 Migration: Remove Obsolete Files
+
+Check if any of these exist in the target. If so, delete them:
+
+```
+[target]/.claude/hooks/session-start-context.js   → DELETE (replaced by native .claude/rules/ loading)
+[target]/.claude/hooks/session-end-timestamp.js   → DELETE (PROGRESS.md timestamp no longer maintained)
+[target]/.claude/hooks/pre-compact-save.js         → DELETE (replaced by compact-matcher hook)
+```
+
+For each deleted file, print: `✓ Removed (obsolete): .claude/hooks/session-start-context.js`
+
+### v0.6.0 Migration: Migrate guidance/ → rules/
+
+If `[target]/.claude/guidance/code-quality.md` exists:
+- Copy `project/.claude/rules/code-quality.md` to `[target]/.claude/rules/code-quality.md` (create `.claude/rules/` if needed)
+- Delete `[target]/.claude/guidance/code-quality.md`
+- Print: `✓ Migrated: .claude/guidance/code-quality.md → .claude/rules/code-quality.md`
+
+If `[target]/.claude/guidance/sprint-workflow.md` exists:
+- Copy `project/.claude/rules/sprint-workflow.md` to `[target]/.claude/rules/sprint-workflow.md`
+- Delete `[target]/.claude/guidance/sprint-workflow.md`
+- Print: `✓ Migrated: .claude/guidance/sprint-workflow.md → .claude/rules/sprint-workflow.md`
+
+If `[target]/.claude/guidance/README.md` exists: delete it silently.
+
+If `[target]/.claude/guidance/` directory is now empty (or only had the above files): remove the directory.
+Print: `✓ Removed (obsolete): .claude/guidance/ directory`
+
+### Copy Current Hook and Command Files
+
 Copy each file from `project/` in this repo to the target, overwriting whatever is there:
 
 ```
-project/.claude/hooks/session-end-timestamp.js  →  [target]/.claude/hooks/session-end-timestamp.js
 project/.claude/hooks/session-end-commit.js     →  [target]/.claude/hooks/session-end-commit.js
-project/.claude/hooks/session-start-context.js  →  [target]/.claude/hooks/session-start-context.js
-project/.claude/hooks/pre-compact-save.js       →  [target]/.claude/hooks/pre-compact-save.js
+project/.claude/hooks/compact-reorient.js       →  [target]/.claude/hooks/compact-reorient.js
 project/.claude/settings.json                   →  [target]/.claude/settings.json
 project/.claude/commands/handoff.md             →  [target]/.claude/commands/handoff.md
 project/.claude/commands/plan.md                →  [target]/.claude/commands/plan.md
 ```
 
-Print each file as it's updated: "✓ Updated: .claude/hooks/session-end-commit.js"
+Print each file as it's updated: `✓ Updated: .claude/hooks/session-end-commit.js`
 
-Then handle optional guidance files:
+Also copy `project/.claude/rules/README.md` to `[target]/.claude/rules/README.md` if `.claude/rules/` exists in the target.
+
+Then handle optional rules files:
 
 ### code-quality.md
-- If `[target]/.claude/guidance/code-quality.md` **exists**: overwrite from `project/.claude/guidance/code-quality.md`. Print "✓ Updated: .claude/guidance/code-quality.md"
-- If **absent**: prompt "Code quality guidance is available (new in this version). Enable? Adds TDD, review-before-commit, and build-before-commit instructions (~18 lines of context per session). (y/n)"
-  - If yes: create `[target]/.claude/guidance/` directory if needed, copy `project/.claude/guidance/README.md` and `project/.claude/guidance/code-quality.md`. Print "✓ Added: .claude/guidance/code-quality.md"
-  - If no: Print "⊘ Skipped: code quality guidance (not enabled)"
+- If `[target]/.claude/rules/code-quality.md` **exists** (including just-migrated): overwrite from `project/.claude/rules/code-quality.md`. Print `✓ Updated: .claude/rules/code-quality.md`
+- If **absent**: prompt "Code quality guidance is available. Enable? Adds TDD, review-before-commit, and build-before-commit instructions (~18 lines, loaded natively via .claude/rules/). (y/n)"
+  - If yes: create `[target]/.claude/rules/` directory if needed, copy `project/.claude/rules/README.md` and `project/.claude/rules/code-quality.md`. Print `✓ Added: .claude/rules/code-quality.md`
+  - If no: Print `⊘ Skipped: code quality guidance (not enabled)`
 
 ### sprint-workflow.md
-- If `[target]/.claude/guidance/sprint-workflow.md` **exists**: overwrite from `project/.claude/guidance/sprint-workflow.md`. Print "✓ Updated: .claude/guidance/sprint-workflow.md"
+- If `[target]/.claude/rules/sprint-workflow.md` **exists** (including just-migrated): overwrite from `project/.claude/rules/sprint-workflow.md`. Print `✓ Updated: .claude/rules/sprint-workflow.md`
   - Then check SPRINT.md (see below).
-- If **absent**: prompt "Sprint planning is available (new in this version). Structured issue decomposition with per-issue PRs. Enable? (y/n)"
-  - If yes: create `[target]/.claude/guidance/` directory if needed, copy `project/.claude/guidance/README.md` (if not already copied) and `project/.claude/guidance/sprint-workflow.md`. Create `SPRINT.md` from template if missing. Print "✓ Added: .claude/guidance/sprint-workflow.md"
-  - If no: Print "⊘ Skipped: sprint planning (not enabled)"
+- If **absent**: prompt "Sprint planning is available. Structured issue decomposition with per-issue PRs. Enable? (y/n)"
+  - If yes: create `[target]/.claude/rules/` directory if needed, copy `project/.claude/rules/README.md` (if not already copied) and `project/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template if missing. Print `✓ Added: .claude/rules/sprint-workflow.md`
+  - If no: Print `⊘ Skipped: sprint planning (not enabled)`
 
 ### SPRINT.md
-- If sprint-workflow.md was updated or added AND `[target]/SPRINT.md` does **not** exist: create from `project/SPRINT.md`. Print "✓ Created: SPRINT.md"
-- If `[target]/SPRINT.md` exists with an active sprint (`**Status:** in-progress`): do **not** overwrite. Print "⚠ SPRINT.md has an active sprint — not modified"
+- If sprint-workflow.md was updated or added AND `[target]/SPRINT.md` does **not** exist: create from `project/SPRINT.md`. Print `✓ Created: SPRINT.md`
+- If `[target]/SPRINT.md` exists with an active sprint (`**Status:** in-progress`): do **not** overwrite. Print `⚠ SPRINT.md has an active sprint — not modified`
 - If `[target]/SPRINT.md` exists with placeholder or archived content: leave it alone (no action needed)
 
 ---
@@ -106,18 +144,45 @@ Read both files:
 - **Installed:** `[target]/CLAUDE.md`
 
 The structural sections **owned by AIAgentMinder** (safe to update):
-- `## Session Protocol` and all its subsections
 - `## Behavioral Rules` and all its subsections
-- `## Context Budget` (table + Reading Strategy)
+- `## Context Budget` (table only)
 
 The user-owned sections **never to touch**:
 - `## Project Identity` block
 - `## MVP Goals` block
 - Any `##` section in the installed file that doesn't exist in the template (user additions)
 
-### Merge procedure
+### v0.6.0 → v0.7.0 CLAUDE.md Migration
 
-For each structural section:
+In addition to the standard section merge, perform these one-time migration steps:
+
+1. **Remove `## Session Protocol` section entirely** — look for the section starting with `## Session Protocol` and delete it and all its subsections through the next `##` heading. Print: `✓ Removed: ## Session Protocol (replaced by native Session Memory + claude --continue)`
+
+2. **Remove the `> **Reading order:**` blockquote** from the header block if present.
+
+3. **Add `claude --continue` hint to header** — add this line to the header blockquote block:
+   `> Use \`claude --continue\` to restore the previous session's full message history.`
+
+4. **Remove PROGRESS.md and DECISIONS.md rows from Context Budget table** — these are no longer auto-injected. (The CLAUDE.md template no longer includes them.)
+
+5. **Remove `Reading Strategy:` subsection** from Context Budget if present — this was the bullet list describing injection frequency.
+
+6. **Add `### Decision Recording` to `## Behavioral Rules`** if not already present — add it as the last subsection of Behavioral Rules with this content:
+   ```
+   ### Decision Recording
+   - Record significant architectural decisions in DECISIONS.md (library choices, API contracts, auth approach, data model changes, deploy decisions)
+   - Include alternatives considered — a decision without alternatives is an assertion, not a record
+   - To auto-load DECISIONS.md every session, add `@DECISIONS.md` to this file
+   ```
+
+7. **Sprint planning @import** — Detect whether sprint planning is enabled:
+   - Check if `[target]/.claude/rules/sprint-workflow.md` exists (after migration above)
+   - OR check if the old installed CLAUDE.md had a SPRINT.md row in the Context Budget table
+   - If sprint planning was enabled: add `@SPRINT.md` to CLAUDE.md after the Context Budget table (if not already present). This replaces the old hook injection mechanism.
+
+### Standard Merge Procedure
+
+For each structural section (`## Behavioral Rules`, `## Context Budget`):
 1. Extract the section content from both template and installed file
 2. If identical: skip, note "unchanged"
 3. If different: show a brief plain-English summary of what changed (not a raw diff), then confirm: "Apply this update to `## [Section Name]`? (y/n)"
@@ -126,8 +191,6 @@ For each structural section:
 After all sections: "CLAUDE.md: updated N section(s), preserved Project Identity and MVP Goals."
 
 If the installed `CLAUDE.md` is missing a structural section that exists in the template (e.g. a new section added in this version), append it after the last structural section, before any user sections.
-
-**Note on SPRINT.md in Context Budget:** If sprint planning was added during this update (sprint-workflow.md was absent and user said yes), also add the SPRINT.md row to the Context Budget table and the Reading Strategy line in CLAUDE.md.
 
 ---
 
@@ -166,7 +229,7 @@ If the target project has uncommitted changes beyond what we just updated, warn 
 AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
 
 Updated:
-- .claude/hooks/ (4 files)
+- .claude/hooks/ (2 files: session-end-commit.js, compact-reorient.js)
 - .claude/settings.json
 - .claude/commands/handoff.md
 - .claude/commands/plan.md
@@ -175,9 +238,17 @@ Updated:
 
 Optional features:
 [list each of: ✓ Updated / ✓ Added / ⊘ Skipped / ⚠ Active sprint preserved]
-- .claude/guidance/code-quality.md
-- .claude/guidance/sprint-workflow.md
+- .claude/rules/code-quality.md
+- .claude/rules/sprint-workflow.md
 - SPRINT.md
+
+[If migrating from v0.6.0:]
+Migration actions:
+[list each of: ✓ Removed / ✓ Migrated for each obsolete file that was found]
+- .claude/hooks/session-start-context.js
+- .claude/hooks/session-end-timestamp.js
+- .claude/hooks/pre-compact-save.js
+- .claude/guidance/ directory
 
 Not touched (user-owned):
 - PROGRESS.md
@@ -185,5 +256,6 @@ Not touched (user-owned):
 - docs/strategy-roadmap.md
 - .gitignore
 
-Next: open Claude Code in [target] — your session continuity and governance are now current.
+Next: open Claude Code in [target] — your project governance is now current.
+Use `claude --continue` to restore your previous session, or start a new one.
 ```
