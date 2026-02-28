@@ -6,6 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.7.0] - 2026-02-28
+
+### Added
+- **`compact-reorient.js` hook** — SessionStart hook with `"matcher": "compact"` that fires exclusively after context compaction. Outputs the first 15 lines of SPRINT.md (if an active sprint exists) or "No active sprint." Provides targeted sprint reorientation without bloating every session start.
+- **`.claude/rules/` directory** — Claude Code native rules loading replaces `.claude/guidance/`. All `.md` files in `.claude/rules/` are auto-discovered and loaded every session by Claude Code natively — no hooks required.
+- **YAML frontmatter** on `code-quality.md` and `sprint-workflow.md` — `description:` field for Claude Code rules system compatibility.
+- **`@SPRINT.md` native import** — When sprint planning is enabled, `@SPRINT.md` is added to CLAUDE.md after the Context Budget table. Claude Code loads it natively every session when the file exists, replacing hook injection.
+- **`### Decision Recording` behavioral rule** in CLAUDE.md — Instructs Claude to write to DECISIONS.md when making architectural choices. Includes note that `@DECISIONS.md` can be added to CLAUDE.md for auto-loading.
+- **MEMORY.md step in `/handoff`** — Step 3 writes 2-3 priority items to the project's auto-memory file (`~/.claude/projects/.../memory/MEMORY.md`), bridging `/handoff` to Claude Code's native persistent memory.
+
+### Changed
+- **CLAUDE.md template** slimmed to ~50 lines (from ~72). Removed `## Session Protocol` section (Session Memory + `claude --continue` replaces manual PROGRESS.md reading). Removed PROGRESS.md and DECISIONS.md from Context Budget. Added `> Use \`claude --continue\`` hint to header.
+- **Hook count reduced** from 4 scripts / 5 executions to 2 scripts / 2 executions per session.
+- **`session-end-commit.js`** — Removed special case that skipped commits when only PROGRESS.md was staged (no longer relevant since PROGRESS.md is not auto-maintained by hooks).
+- **PROGRESS.md template** — Demoted to optional human artifact. Header updated to reflect it is not auto-loaded. Removed `**Last Updated:**` field (timestamp hook is gone).
+- **DECISIONS.md template** — Header updated to note it is not auto-loaded. Instructions added to add `@DECISIONS.md` to CLAUDE.md if auto-loading is desired.
+- **`/handoff` command** — Slimmed to ~60 lines (from ~108). DECISIONS.md promoted to step 2. New step 3 writes priorities to MEMORY.md. PROGRESS.md update demoted to optional step 4.
+- **`/update` command** — Full v0.6.0 → v0.7.0 migration logic: deletes obsolete hooks, migrates `.claude/guidance/` to `.claude/rules/`, removes Session Protocol from CLAUDE.md, adds `@SPRINT.md` import if sprint planning was previously enabled.
+- **`/setup` command** — All `.claude/guidance/` references updated to `.claude/rules/`. Sprint planning uses `@SPRINT.md` import instead of Context Budget Reading Strategy line. Hook count updated to 2.
+- **`/plan` command** — All `.claude/guidance/` references updated to `.claude/rules/`. Sprint planning adds `@SPRINT.md` import to CLAUDE.md.
+- **README** — Repositioned from "session continuity" to "project governance and planning". Problem statement updated to reflect that native memory solved continuity. Architecture section updated for 2-hook model. "What Gets Copied" tree updated.
+- **docs/how-it-works.md** — All sections updated for v0.7.0 architecture: 2-hook model, native rules loading, @import, Session Memory.
+- **docs/customization-guide.md** — guidance/ → rules/ throughout. Hooks table updated to 2 entries. Upgrading section adds v0.6.0 migration notes.
+
+### Removed
+- **`session-start-context.js` hook** — Full context injection on every session start. Replaced by native Claude Code features: `.claude/rules/` loading, Session Memory, `@import` syntax. Deleted.
+- **`session-end-timestamp.js` hook** — PROGRESS.md timestamp maintenance. No longer needed since PROGRESS.md is no longer auto-maintained. Deleted.
+- **`pre-compact-save.js` hook** — PreCompact hook for PROGRESS.md state save. Replaced by compact-matcher SessionStart hook pattern. Deleted.
+- **`## Session Protocol` section** from CLAUDE.md template — Native Session Memory and `claude --continue` replace manual session-start/end protocol. Removed.
+- **`.claude/guidance/` directory** — Renamed to `.claude/rules/` to align with Claude Code's native mechanism. Old directory and its README deleted.
+- **PROGRESS.md auto-injection** — PROGRESS.md is no longer injected by hooks or referenced in CLAUDE.md session protocol.
+- **DECISIONS.md auto-injection** — DECISIONS.md is no longer injected by hooks (still referenced in Behavioral Rules as a write target).
+
+---
+
 ## [0.6.0] - 2026-02-23
 
 ### Added

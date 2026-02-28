@@ -73,8 +73,8 @@ Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
 3. **Populate `CLAUDE.md` Project Identity** with actual values from the audit.
 
 4. **Handle optional features** based on Step E2 answers:
-   - If code quality guidance enabled: create `.claude/guidance/` directory and copy `code-quality.md` from the AIAgentMinder template. Add SPRINT.md context budget line to CLAUDE.md.
-   - If sprint planning enabled: copy `sprint-workflow.md` from template and create `SPRINT.md` from template. Add SPRINT.md to CLAUDE.md Context Budget table and Reading Strategy. Add reminder to Human Actions: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval."
+   - If code quality guidance enabled: copy `code-quality.md` from the AIAgentMinder template to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
+   - If sprint planning enabled: copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template. Add `@SPRINT.md` to CLAUDE.md (after the Context Budget table — this is Claude Code's native import syntax, loads SPRINT.md every session). Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`. Add reminder to Human Actions: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval."
 
 5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases, not needed just for session continuity."
 
@@ -134,13 +134,13 @@ After determining the quality tier, ask about optional features:
 - For **Standard, Rigorous, Comprehensive** tiers: "I recommend enabling sprint planning. When you start a phase, I'll decompose work into reviewable issues and work them one-by-one with per-issue PRs. Enable? (y/n)" — default yes
 - For **Lightweight** tier: "Sprint planning is available — structured issue decomposition with per-issue PRs. It's optional for simple projects. Enable? (y/n)" — default no
 
-If code quality guidance enabled: create `.claude/guidance/` directory and copy `code-quality.md` from the AIAgentMinder template (`project/.claude/guidance/code-quality.md`).
+If code quality guidance enabled: copy `code-quality.md` from the AIAgentMinder template (`project/.claude/rules/code-quality.md`) to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
 
 If sprint planning enabled:
-- Copy `sprint-workflow.md` from template (`project/.claude/guidance/sprint-workflow.md`)
+- Copy `sprint-workflow.md` from template (`project/.claude/rules/sprint-workflow.md`) to `[target]/.claude/rules/sprint-workflow.md`
 - Create `SPRINT.md` from template (`project/SPRINT.md`) if it doesn't exist
-- Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived to git history when sprint completes; only active sprint kept |`
-- Add to CLAUDE.md Reading Strategy: `- SPRINT.md: Auto-injected when active sprint exists; contains current issue list and status`
+- Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists)
+- Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`
 - Add to `docs/strategy-roadmap.md` Human Actions Needed: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval"
 
 ### Round 4: Unknowns (only if gaps exist)
@@ -178,6 +178,6 @@ not vague disclaimers. "Won't support offline mode" is good. "Won't do everythin
 3. Populate `## MVP Goals` in `CLAUDE.md` with Phase 1 deliverables (3-5 testable bullet points)
 4. Update `PROGRESS.md` to note that roadmap was created
 5. If MCP servers were mentioned, add `**MCP Servers:**` line to Project Identity in `CLAUDE.md`
-6. Summarize what was enabled: mention code quality guidance and/or sprint planning if enabled, with a note on how to use them
+6. Summarize what was enabled: mention code quality guidance and/or sprint planning if enabled. If code quality guidance enabled, note it lives in `.claude/rules/` and is loaded natively by Claude Code each session. If sprint planning enabled, note SPRINT.md is loaded via `@import` in CLAUDE.md.
 7. If sprint planning was enabled: "Sprint planning enabled. When you're ready, say 'start a sprint' or 'begin Phase 1' and I'll propose issues for your review."
 8. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready."
