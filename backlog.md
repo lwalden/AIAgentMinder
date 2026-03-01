@@ -76,21 +76,23 @@ This positions AIAgentMinder to integrate with the broader Claude Code ecosystem
 
 ## D) High-Value New Feature
 
-### Story: Add `/doctor` Diagnostic Command for Installation Health Checks
+### Story: Add `/checkup` Diagnostic Command for Installation Health Checks
 
-**Title:** New `/doctor` command that validates AIAgentMinder installation health and identifies common misconfiguration issues
+**Title:** New `/checkup` command that validates AIAgentMinder installation health and identifies common misconfiguration issues
+
+> **Note:** Renamed from `/checkup` to avoid shadowing Claude Code's built-in `/checkup` command (which checks Node.js, API connectivity, and auth). `/checkup` covers AIAgentMinder-specific health: files present, hooks configured, placeholders resolved.
 
 **Description:**
-As a developer who has installed AIAgentMinder in my project, I want to run `/doctor` to verify that my installation is correctly configured and all prerequisites are met, so that I can quickly diagnose why hooks aren't firing, commands aren't loading, or session continuity isn't working.
+As a developer who has installed AIAgentMinder in my project, I want to run `/checkup` to verify that my installation is correctly configured and all prerequisites are met, so that I can quickly diagnose why hooks aren't firing, commands aren't loading, or the framework isn't working as expected.
 
 **Rationale:**
 - The #1 troubleshooting section in the README addresses "Hooks not running" and "Commands not showing." A diagnostic command eliminates guesswork.
 - Competing tools (CCPM has `/pm:validate`, claude-mem has a dashboard) provide self-diagnosis. AIAgentMinder has nothing.
-- This is especially valuable for the `/update` flow — after upgrading, run `/doctor` to confirm everything is healthy.
+- This is especially valuable for the `/update` flow — after upgrading, run `/checkup` to confirm everything is healthy.
 - Low implementation complexity (reads files and checks conditions) with high user-facing value.
 
 **Acceptance Criteria:**
-1. Create `.claude/commands/doctor.md` in the `project/` directory (gets copied to target projects by `/setup` and `/update`)
+1. Create `.claude/commands/checkup.md` in the `project/` directory (gets copied to target projects by `/setup` and `/update`)
 2. The command checks and reports on:
    - **Node.js availability**: `node --version` — PASS/FAIL with version shown
    - **Required files exist**: CLAUDE.md, PROGRESS.md, DECISIONS.md, docs/strategy-roadmap.md, .claude/settings.json — PASS/WARN for each
@@ -102,15 +104,14 @@ As a developer who has installed AIAgentMinder in my project, I want to run `/do
    - **Git status**: Is this a git repo? Is there a remote? What branch? — INFO
 3. Output format:
    ```
-   AIAgentMinder Health Check — v0.5.3
+   AIAgentMinder Health Check — v0.8.0
 
    ✓ Node.js: v20.11.0
    ✓ CLAUDE.md: found (Project Identity populated)
-   ✓ PROGRESS.md: found
    ✓ DECISIONS.md: found
-   ⚠ docs/strategy-roadmap.md: found but has placeholder values — run /plan
-   ✓ .claude/settings.json: valid JSON, 10 deny rules, 4 hook entries
-   ✓ .claude/hooks/: 4/4 scripts present
+   ⚠ docs/strategy-roadmap.md: found but has placeholder values — run /brief
+   ✓ .claude/settings.json: valid JSON, 1 hook entry (compact-reorient)
+   ✓ .claude/hooks/: compact-reorient.js present
    ✓ Git: on branch feature/add-search, remote origin configured
 
    Status: Healthy (1 warning)
@@ -119,31 +120,31 @@ As a developer who has installed AIAgentMinder in my project, I want to run `/do
 5. Failures (Node.js missing, settings.json invalid) are clearly flagged with remediation steps
 
 **Test Plan:**
-1. Run `/doctor` in a correctly configured project → all checks pass
-2. Remove `node` from PATH, run `/doctor` → Node.js check fails with clear message
-3. Delete one hook file, run `/doctor` → hook check warns about missing file
-4. Corrupt `.claude/settings.json` (invalid JSON), run `/doctor` → settings check fails
-5. Run `/doctor` on a freshly `/setup`-initialized project before `/plan` → warns about placeholder values in strategy-roadmap.md
-6. Add `/doctor` to the file list in `/setup` Step 7 summary and `/update` Step 2 overwrite list
-7. Update README troubleshooting section to recommend `/doctor` as first step
+1. Run `/checkup` in a correctly configured project → all checks pass
+2. Remove `node` from PATH, run `/checkup` → Node.js check fails with clear message
+3. Delete one hook file, run `/checkup` → hook check warns about missing file
+4. Corrupt `.claude/settings.json` (invalid JSON), run `/checkup` → settings check fails
+5. Run `/checkup` on a freshly `/setup`-initialized project before `/brief` → warns about placeholder values in strategy-roadmap.md
+6. Add `/checkup` to the file list in `/setup` Step 7 summary and `/update` Step 2 overwrite list
+7. Update README troubleshooting section to recommend `/checkup` as first step
 
-### Supporting Story: Update `/setup` and `/update` to Include `/doctor`
+### Supporting Story: Update `/setup` and `/update` to Include `/checkup`
 
-**Title:** `/setup` and `/update` commands copy `doctor.md` and reference it in their output
+**Title:** `/setup` and `/update` commands copy `checkup.md` and reference it in their output
 
 **Description:**
-As a maintainer of AIAgentMinder, I need `/setup` and `/update` to include the new `doctor.md` command file so that users get it automatically on install and upgrade.
+As a maintainer of AIAgentMinder, I need `/setup` and `/update` to include the new `checkup.md` command file so that users get it automatically on install and upgrade.
 
 **Acceptance Criteria:**
-1. `/setup` Step 3 copies `project/.claude/commands/doctor.md` to the target project
-2. `/setup` Step 7 summary lists `doctor.md` in the "Created files" output
-3. `/update` Step 2 overwrites `doctor.md` as an AIAgentMinder-owned file
-4. `/update` file taxonomy table includes `doctor.md` in the "AIAgentMinder-owned" row
-5. README "What Gets Copied" tree includes `doctor.md`
-6. README troubleshooting section says: "Run `/doctor` first to check your installation"
+1. `/setup` Step 3 copies `project/.claude/commands/checkup.md` to the target project
+2. `/setup` Step 7 summary lists `checkup.md` in the "Created files" output
+3. `/update` Step 2 overwrites `checkup.md` as an AIAgentMinder-owned file
+4. `/update` file taxonomy table includes `checkup.md` in the "AIAgentMinder-owned" row
+5. README "What Gets Copied" tree includes `checkup.md`
+6. README troubleshooting section says: "Run `/checkup` first to check your installation"
 
 **Test Plan:**
-1. Run `/setup` on a new project → verify `.claude/commands/doctor.md` exists in target
-2. Run `/update` on an existing project that doesn't have `doctor.md` → verify it's added
-3. Run `/update` on a project that has an older `doctor.md` → verify it's overwritten
+1. Run `/setup` on a new project → verify `.claude/commands/checkup.md` exists in target
+2. Run `/update` on an existing project that doesn't have `checkup.md` → verify it's added
+3. Run `/update` on a project that has an older `checkup.md` → verify it's overwritten
 4. Verify README file tree includes the new command
