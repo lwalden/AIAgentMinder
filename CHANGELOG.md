@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.8.0] - 2026-03-01
+
+### Added
+- **`.claude/rules/git-workflow.md`** — New always-active rule covering commit discipline, branch naming, PR workflow, and explicit guidance against auto-committing on session end. Loaded natively by Claude Code; replaces the `session-end-commit.js` Stop hook.
+- **Native Tasks integration in sprint workflow** — `sprint-workflow.md` restructured to use Claude Code's native TaskCreate/TaskUpdate/TaskList tools as the issue execution layer. After sprint approval, each issue becomes a native Task (persistent across sessions, supports dependency DAGs). SPRINT.md becomes a lightweight sprint header (goal, scope, status) rather than a full issue tracker.
+
+### Changed
+- **`/plan` renamed to `/brief`** — Avoids collision with Claude Code's built-in `/plan` command (which toggles Plan Mode). The command behavior is unchanged; only the name changed. A disambiguation note is included in the command header. `/setup` and `/update` updated throughout.
+- **`/doctor` renamed to `/checkup`** (backlog item) — Avoids shadowing Claude Code's built-in `/doctor` command. Renamed in backlog and acceptance criteria.
+- **`sprint-workflow.md`** — Dual-layer architecture: sprint governance wrapper (SPRINT.md header + approval gate + review/archive) over native Tasks (per-issue tracking, persistence, cross-session state). SPRINT.md format updated to sprint header only.
+- **`SPRINT.md` template** — Updated header to reflect new role as sprint header, not issue tracker.
+- **`CLAUDE.md` template** — Git Workflow behavioral rule slimmed to a pointer to `git-workflow.md` (rules file loaded natively; avoids duplication).
+- **`/setup`** — Copies `git-workflow.md` as a core (non-optional) rule. Rules directory always created. Hook count updated from 2 to 1.
+- **`/update`** — Adds `git-workflow.md` to AIAgentMinder-owned files. Adds v0.7.0 → v0.8.0 migration steps: delete `session-end-commit.js`, delete `plan.md` (replaced by `brief.md`).
+- **`.claude/rules/README.md`** — Table updated to include `git-workflow.md`.
+
+### Removed
+- **`session-end-commit.js` Stop hook** — Auto-commit on session end replaced by `git-workflow.md` rule. Commits should be intentional, not automatic. Deleted.
+- **Stop hook entry** removed from `project/.claude/settings.json`.
+
+---
+
 ## [0.7.0] - 2026-02-28
 
 ### Added

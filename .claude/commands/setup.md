@@ -48,16 +48,17 @@ Copy template files into the user's repo. Before copying each file, check if it 
 ### Scenario B: New/Blank Directory
 If no git repo exists, run `git init`. Then copy all files from this repo's `project/` directory.
 
+### Core rules (always copy)
+
+Copy `project/.claude/rules/git-workflow.md` to `[target]/.claude/rules/git-workflow.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
+
 ### Optional features (based on Step 2 answers)
 
-**Code quality guidance:** If enabled, copy `project/.claude/rules/code-quality.md` to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
+**Code quality guidance:** If enabled, copy `project/.claude/rules/code-quality.md` to `[target]/.claude/rules/code-quality.md`.
 
 **Sprint planning:** If enabled:
 - Copy `project/.claude/rules/sprint-workflow.md` to `[target]/.claude/rules/sprint-workflow.md`
 - Copy `project/SPRINT.md` to `[target]/SPRINT.md`
-- Also copy `project/.claude/rules/README.md` if not already copied
-
-If neither optional feature is enabled, do **not** copy the `.claude/rules/` directory.
 
 ---
 
@@ -137,9 +138,10 @@ Created files:
 - DECISIONS.md (architectural decisions)
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
-- .claude/commands/plan.md (/plan command)
+- .claude/commands/brief.md (/brief command — product brief & roadmap creation)
 - .claude/commands/handoff.md (/handoff command)
-- .claude/hooks/ (2 Node.js hooks: auto-commit on session end, sprint reorientation post-compaction)
+- .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
+- .claude/rules/git-workflow.md (git discipline rules — commit discipline, PR workflow)
 - .claude/aiagentminder-version (version stamp for /update)
 - .gitignore (core + [stack] entries)
 [if code quality enabled:]
@@ -150,7 +152,7 @@ Created files:
 
 Next steps:
 1. Open Claude Code in your project directory
-2. Run /plan to create your product brief & roadmap
+2. Run /brief to create your product brief & roadmap
 [if sprint planning enabled:]
 3. When ready to build, say "start a sprint" or "begin Phase 1" — I'll propose issues for your review
 [else:]

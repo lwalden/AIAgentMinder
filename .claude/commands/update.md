@@ -10,7 +10,7 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/session-end-commit.js`, `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/plan.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/brief.md`, `.claude/rules/git-workflow.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v0.6.0 → v0.7.0)** | `.claude/hooks/session-start-context.js`, `.claude/hooks/session-end-timestamp.js`, `.claude/hooks/pre-compact-save.js`, `.claude/guidance/` directory | Delete during migration |
 | **Hybrid** | `CLAUDE.md` | Surgical merge — update structural sections, preserve user content |
@@ -29,9 +29,9 @@ Then confirm before proceeding:
 I'll update AIAgentMinder files in [path].
 
 This will overwrite:
-  - .claude/hooks/ (2 Node.js hook files: session-end-commit.js, compact-reorient.js)
+  - .claude/hooks/ (1 Node.js hook file: compact-reorient.js)
   - .claude/settings.json
-  - .claude/commands/handoff.md and plan.md
+  - .claude/commands/handoff.md and brief.md
   - .claude/rules/ (existing rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
 
@@ -70,6 +70,21 @@ Read the current version from `project/.claude/aiagentminder-version` in this re
 
 ## Step 2: Overwrite AIAgentMinder-Owned Files
 
+### v0.7.0 Migration: Remove Stop Hook and Rename /plan to /brief
+
+Check if any of these exist in the target. If so, handle them:
+
+```
+[target]/.claude/hooks/session-end-commit.js   → DELETE (replaced by .claude/rules/git-workflow.md)
+[target]/.claude/commands/plan.md              → DELETE (renamed to brief.md)
+```
+
+For each deleted file, print: `✓ Removed (obsolete): .claude/hooks/session-end-commit.js`
+
+If `[target]/.claude/commands/plan.md` is deleted: print `✓ Renamed: .claude/commands/plan.md → brief.md (new file will be written in next step)`
+
+Also update the Stop hook entry in `[target]/.claude/settings.json` if it references `session-end-commit.js` — the settings.json file will be overwritten in the copy step below, so this is handled automatically.
+
 ### v0.6.0 Migration: Remove Obsolete Files
 
 Check if any of these exist in the target. If so, delete them:
@@ -104,11 +119,11 @@ Print: `✓ Removed (obsolete): .claude/guidance/ directory`
 Copy each file from `project/` in this repo to the target, overwriting whatever is there:
 
 ```
-project/.claude/hooks/session-end-commit.js     →  [target]/.claude/hooks/session-end-commit.js
 project/.claude/hooks/compact-reorient.js       →  [target]/.claude/hooks/compact-reorient.js
 project/.claude/settings.json                   →  [target]/.claude/settings.json
 project/.claude/commands/handoff.md             →  [target]/.claude/commands/handoff.md
-project/.claude/commands/plan.md                →  [target]/.claude/commands/plan.md
+project/.claude/commands/brief.md               →  [target]/.claude/commands/brief.md
+project/.claude/rules/git-workflow.md           →  [target]/.claude/rules/git-workflow.md
 ```
 
 Print each file as it's updated: `✓ Updated: .claude/hooks/session-end-commit.js`
@@ -229,10 +244,11 @@ If the target project has uncommitted changes beyond what we just updated, warn 
 AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
 
 Updated:
-- .claude/hooks/ (2 files: session-end-commit.js, compact-reorient.js)
+- .claude/hooks/ (1 file: compact-reorient.js)
 - .claude/settings.json
 - .claude/commands/handoff.md
-- .claude/commands/plan.md
+- .claude/commands/brief.md
+- .claude/rules/git-workflow.md
 - CLAUDE.md ([N] section(s) updated, Project Identity preserved)
 - .claude/aiagentminder-version
 
@@ -241,6 +257,12 @@ Optional features:
 - .claude/rules/code-quality.md
 - .claude/rules/sprint-workflow.md
 - SPRINT.md
+
+[If migrating from v0.7.0:]
+Migration actions:
+[list each of: ✓ Removed / ✓ Renamed for each obsolete file that was found]
+- .claude/hooks/session-end-commit.js (auto-commit removed — use git-workflow.md rule instead)
+- .claude/commands/plan.md (renamed to brief.md — avoids collision with native Plan Mode)
 
 [If migrating from v0.6.0:]
 Migration actions:
