@@ -1,4 +1,4 @@
-# /plan - Product Brief & Roadmap Creation
+# /brief - Product Brief & Roadmap Creation
 
 You are helping the user create or update `docs/strategy-roadmap.md` for this project.
 This document is the "north star" for development -- it tells Claude the "why" behind decisions.
@@ -10,6 +10,8 @@ This document is the "north star" for development -- it tells Claude the "why" b
 Read `CLAUDE.md` to understand the project identity (name, type, stack).
 If Project Identity is still placeholder brackets, run `/setup` first.
 
+> **Note:** Claude Code has a built-in `/plan` command that toggles Plan Mode (read-only exploration). This command (`/brief`) is different — it produces a product brief and strategy roadmap.
+
 ---
 
 ## Step 0: Assess Starting Point
@@ -20,7 +22,7 @@ Ask the user where they are:
 **B) Clear idea, no details** -- "I know what I want but haven't worked out specifics"
 **C) Partial plan or spec** -- "I have some docs/notes -- help me fill in gaps"
 **D) Detailed plan or spec** -- "I have a writeup -- translate it into a roadmap"
-**E) Existing project** -- "The project already has code -- I'm adding AIAgentMinder for session continuity and governance"
+**E) Existing project** -- "The project already has code -- I'm adding AIAgentMinder for governance"
 
 | Starting Point | Approach |
 |---------------|----------|
@@ -76,9 +78,9 @@ Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
    - If code quality guidance enabled: copy `code-quality.md` from the AIAgentMinder template to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
    - If sprint planning enabled: copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template. Add `@SPRINT.md` to CLAUDE.md (after the Context Budget table — this is Claude Code's native import syntax, loads SPRINT.md every session). Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`. Add reminder to Human Actions: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval."
 
-5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases, not needed just for session continuity."
+5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases."
 
-6. Tell the user: "AIAgentMinder is set up. Run `/handoff` at the end of each session to keep state current."
+6. Tell the user: "AIAgentMinder is set up. Run `/handoff` at the end of each session to checkpoint decisions and key context."
 
 ---
 
