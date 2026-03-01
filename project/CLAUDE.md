@@ -22,9 +22,7 @@
 ## Behavioral Rules
 
 ### Git Workflow
-- **Never commit directly to main** — always use feature branches
-- Branch naming: `feature/short-description`, `fix/short-description`, `chore/short-description`
-- All changes via PR. Claude creates PRs; human reviews and merges
+- See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each session.
 
 ### Credentials
 - Never store credentials in code. Use `.env` files (gitignored).

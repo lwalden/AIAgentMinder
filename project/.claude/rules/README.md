@@ -6,7 +6,8 @@ All `.md` files in this directory are auto-discovered and loaded automatically. 
 
 | File | Purpose |
 |------|---------|
-| `code-quality.md` | TDD cycle, build-before-commit, review-before-commit, error handling |
-| `sprint-workflow.md` | Sprint planning and execution workflow (requires sprint planning to be enabled) |
+| `git-workflow.md` | Git discipline — branch naming, commit discipline, PR workflow (always active) |
+| `code-quality.md` | TDD cycle, build-before-commit, review-before-commit, error handling (optional) |
+| `sprint-workflow.md` | Sprint governance over native Tasks — planning, approval gates, review/archive (optional) |
 
 Add your own `.md` files here for project-specific rules. Files support YAML frontmatter with `globs:` patterns to scope rules to specific file paths.
