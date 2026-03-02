@@ -32,6 +32,7 @@ Ask all of these in one grouped prompt:
 7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
 8. **Code quality guidance:** Enable? (TDD, review-before-commit, build-before-commit — loaded via `.claude/rules/` natively, ~18 lines per session) (y/n)
 9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
+10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc. You fill in the rules for your architecture.) (y/n — recommended for Rigorous/Comprehensive quality tiers)
 
 ---
 
@@ -48,9 +49,13 @@ Copy template files into the user's repo. Before copying each file, check if it 
 ### Scenario B: New/Blank Directory
 If no git repo exists, run `git init`. Then copy all files from this repo's `project/` directory.
 
-### Core rules (always copy)
+### Core files (always copy)
 
-Copy `project/.claude/rules/git-workflow.md` to `[target]/.claude/rules/git-workflow.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
+Copy these to the target unconditionally (create the `.claude/rules/` directory if needed):
+- `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
+- `project/.claude/rules/scope-guardian.md` → `[target]/.claude/rules/scope-guardian.md`
+- `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
+- `project/.claude/commands/quality-gate.md` → `[target]/.claude/commands/quality-gate.md`
 
 ### Optional features (based on Step 2 answers)
 
@@ -59,6 +64,10 @@ Copy `project/.claude/rules/git-workflow.md` to `[target]/.claude/rules/git-work
 **Sprint planning:** If enabled:
 - Copy `project/.claude/rules/sprint-workflow.md` to `[target]/.claude/rules/sprint-workflow.md`
 - Copy `project/SPRINT.md` to `[target]/SPRINT.md`
+
+**Architecture fitness rules:** If enabled:
+- Copy `project/.claude/rules/architecture-fitness.md` to `[target]/.claude/rules/architecture-fitness.md`
+- Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder examples with constraints that match your project's architecture."
 
 ---
 
@@ -140,8 +149,10 @@ Created files:
 - .claude/settings.json (hook configuration)
 - .claude/commands/brief.md (/brief command — product brief & roadmap creation)
 - .claude/commands/handoff.md (/handoff command)
+- .claude/commands/quality-gate.md (/quality-gate command — tiered pre-PR checks)
 - .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
-- .claude/rules/git-workflow.md (git discipline rules — commit discipline, PR workflow)
+- .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
+- .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
 - .claude/aiagentminder-version (version stamp for /update)
 - .gitignore (core + [stack] entries)
 [if code quality enabled:]
@@ -149,6 +160,8 @@ Created files:
 [if sprint planning enabled:]
 - .claude/rules/sprint-workflow.md (sprint planning workflow)
 - SPRINT.md (sprint state tracking)
+[if architecture fitness enabled:]
+- .claude/rules/architecture-fitness.md (structural constraints — customize for your architecture)
 
 Next steps:
 1. Open Claude Code in your project directory

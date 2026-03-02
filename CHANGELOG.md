@@ -6,6 +6,25 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.8.1] - 2026-03-01
+
+### Added
+- **`.claude/rules/scope-guardian.md`** — Always-active scope governance rule. Before implementing any new feature, Claude checks `docs/strategy-roadmap.md`: if the feature is in scope, proceed; if out of scope, pause and confirm; if absent from both lists, ask before proceeding. Also flags mid-sprint scope additions.
+- **`.claude/commands/quality-gate.md`** — New `/quality-gate` command for tiered pre-PR checks. Four tiers matching the project's declared quality tier: Lightweight (build passes), Standard (tests exist + pass, no debug statements), Rigorous (Standard + coverage delta + linter + no `any` types), Comprehensive (Rigorous + secret scan + error handling audit + security scan). Always copied; integrated into sprint workflow before PR creation.
+- **`.claude/rules/architecture-fitness.md`** — Optional, project-customizable structural constraint template. Covers layer boundaries, external API centralization, test isolation, and file size limits. Ships with placeholder examples that the user replaces with their architecture's rules. Glob-scoped rules supported via YAML frontmatter.
+- **Decision Forcing Function in `/brief`** — During the planning interview, after gathering tech stack choices, `/brief` now proactively surfaces hard-to-reverse decisions with downstream consequences (e.g., JWT → no revocation, PostgreSQL → search strategy needed, NoSQL → join strategy). Includes a reference table of common choice→consequence patterns. Resolved decisions are logged to `DECISIONS.md` with alternatives and reversal cost; deferred decisions become `<!-- TODO: -->` markers in the roadmap.
+
+### Changed
+- **`/brief`** — Round 3 now offers architecture fitness rules as an optional feature (default yes for Rigorous/Comprehensive, offered for Standard, skipped for Lightweight). After Generation step 3 updated to log Decision Forcing decisions to DECISIONS.md with structured format.
+- **`/brief` Step E3** — Existing project flow updated to offer architecture fitness rules alongside code quality guidance and sprint planning.
+- **`sprint-workflow.md`** — Sprint Execution now calls `/quality-gate` before each PR creation. Fix any quality gate failures before the PR is created.
+- **`/setup`** — Copies `scope-guardian.md` and `quality-gate.md` as core (non-optional) files. Adds architecture fitness rules as optional feature (question 10). Rules directory always created.
+- **`/update`** — Adds `scope-guardian.md` and `quality-gate.md` to AIAgentMinder-owned (always-overwrite) list. Adds `architecture-fitness.md` to optional file handling with prompt-to-add-if-absent behavior.
+- **`docs/strategy-roadmap.md` template** — `/plan` reference updated to `/brief`. "Out of Scope" placeholder text made more explicit.
+- **`.claude/rules/README.md`** — Table updated with `scope-guardian.md` and `architecture-fitness.md`.
+
+---
+
 ## [0.8.0] - 2026-03-01
 
 ### Added
