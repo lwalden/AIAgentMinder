@@ -10,8 +10,8 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/brief.md`, `.claude/rules/git-workflow.md` | Overwrite unconditionally |
-| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md` | Overwrite if present; prompt to add if absent |
+| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/brief.md`, `.claude/commands/quality-gate.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v0.6.0 → v0.7.0)** | `.claude/hooks/session-start-context.js`, `.claude/hooks/session-end-timestamp.js`, `.claude/hooks/pre-compact-save.js`, `.claude/guidance/` directory | Delete during migration |
 | **Hybrid** | `CLAUDE.md` | Surgical merge — update structural sections, preserve user content |
 | **User-owned (AIAgentMinder creates initial)** | `SPRINT.md` | Never overwrite if active sprint; create from template if missing and sprint planning is enabled |
@@ -31,8 +31,9 @@ I'll update AIAgentMinder files in [path].
 This will overwrite:
   - .claude/hooks/ (1 Node.js hook file: compact-reorient.js)
   - .claude/settings.json
-  - .claude/commands/handoff.md and brief.md
-  - .claude/rules/ (existing rules files only — not adding new ones without asking)
+  - .claude/commands/handoff.md, brief.md, quality-gate.md
+  - .claude/rules/git-workflow.md, scope-guardian.md (always-active governance rules)
+  - .claude/rules/ (existing optional rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
 
 [If upgrading from v0.6.0, these will also be removed:]
@@ -42,7 +43,7 @@ This will overwrite:
   - .claude/guidance/ directory (migrated to .claude/rules/)
 
 You'll be prompted about:
-  - New optional features not yet enabled (code quality guidance, sprint planning)
+  - New optional features not yet enabled (code quality guidance, sprint planning, architecture fitness rules)
 
 These will NOT be touched:
   - PROGRESS.md, DECISIONS.md, docs/strategy-roadmap.md, .gitignore
@@ -119,11 +120,13 @@ Print: `✓ Removed (obsolete): .claude/guidance/ directory`
 Copy each file from `project/` in this repo to the target, overwriting whatever is there:
 
 ```
-project/.claude/hooks/compact-reorient.js       →  [target]/.claude/hooks/compact-reorient.js
-project/.claude/settings.json                   →  [target]/.claude/settings.json
-project/.claude/commands/handoff.md             →  [target]/.claude/commands/handoff.md
-project/.claude/commands/brief.md               →  [target]/.claude/commands/brief.md
-project/.claude/rules/git-workflow.md           →  [target]/.claude/rules/git-workflow.md
+project/.claude/hooks/compact-reorient.js              →  [target]/.claude/hooks/compact-reorient.js
+project/.claude/settings.json                          →  [target]/.claude/settings.json
+project/.claude/commands/handoff.md                    →  [target]/.claude/commands/handoff.md
+project/.claude/commands/brief.md                      →  [target]/.claude/commands/brief.md
+project/.claude/commands/quality-gate.md               →  [target]/.claude/commands/quality-gate.md
+project/.claude/rules/git-workflow.md                  →  [target]/.claude/rules/git-workflow.md
+project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
 ```
 
 Print each file as it's updated: `✓ Updated: .claude/hooks/session-end-commit.js`
@@ -149,6 +152,12 @@ Then handle optional rules files:
 - If sprint-workflow.md was updated or added AND `[target]/SPRINT.md` does **not** exist: create from `project/SPRINT.md`. Print `✓ Created: SPRINT.md`
 - If `[target]/SPRINT.md` exists with an active sprint (`**Status:** in-progress`): do **not** overwrite. Print `⚠ SPRINT.md has an active sprint — not modified`
 - If `[target]/SPRINT.md` exists with placeholder or archived content: leave it alone (no action needed)
+
+### architecture-fitness.md
+- If `[target]/.claude/rules/architecture-fitness.md` **exists**: overwrite from `project/.claude/rules/architecture-fitness.md`. Print `✓ Updated: .claude/rules/architecture-fitness.md`
+- If **absent**: prompt "Architecture fitness rules are available. These are structural constraints (layer boundaries, external API rules, etc.) that you customize for your project. Enable? (y/n)"
+  - If yes: copy `project/.claude/rules/architecture-fitness.md`. Print `✓ Added: .claude/rules/architecture-fitness.md`. Tell the user: "Open `.claude/rules/architecture-fitness.md` and replace the placeholder examples with your project's architectural constraints."
+  - If no: Print `⊘ Skipped: architecture fitness rules (not enabled)`
 
 ---
 
@@ -248,7 +257,9 @@ Updated:
 - .claude/settings.json
 - .claude/commands/handoff.md
 - .claude/commands/brief.md
+- .claude/commands/quality-gate.md
 - .claude/rules/git-workflow.md
+- .claude/rules/scope-guardian.md
 - CLAUDE.md ([N] section(s) updated, Project Identity preserved)
 - .claude/aiagentminder-version
 
@@ -257,6 +268,7 @@ Optional features:
 - .claude/rules/code-quality.md
 - .claude/rules/sprint-workflow.md
 - SPRINT.md
+- .claude/rules/architecture-fitness.md
 
 [If migrating from v0.7.0:]
 Migration actions:
