@@ -136,6 +136,11 @@ After determining the quality tier, ask about optional features:
 - For **Standard, Rigorous, Comprehensive** tiers: "I recommend enabling sprint planning. When you start a phase, I'll decompose work into reviewable issues and work them one-by-one with per-issue PRs. Enable? (y/n)" — default yes
 - For **Lightweight** tier: "Sprint planning is available — structured issue decomposition with per-issue PRs. It's optional for simple projects. Enable? (y/n)" — default no
 
+**Architecture fitness rules:**
+- For **Rigorous, Comprehensive** tiers: "I recommend enabling architecture fitness rules. These are structural constraints (layer boundaries, external API rules, etc.) that you customize for your project. Claude enforces them during code review and PR creation. Enable? (y/n)" — default yes
+- For **Standard** tier: "Architecture fitness rules are available — structural constraints for your project architecture. They're most valuable when you have a clear layered architecture. Enable? (y/n)" — default no
+- For **Lightweight** tier: skip entirely
+
 If code quality guidance enabled: copy `code-quality.md` from the AIAgentMinder template (`project/.claude/rules/code-quality.md`) to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
 
 If sprint planning enabled:
@@ -144,6 +149,38 @@ If sprint planning enabled:
 - Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists)
 - Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`
 - Add to `docs/strategy-roadmap.md` Human Actions Needed: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval"
+
+If architecture fitness rules enabled:
+- Copy `architecture-fitness.md` from template (`project/.claude/rules/architecture-fitness.md`) to `[target]/.claude/rules/architecture-fitness.md`
+- Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder constraints with rules for your project's architecture."
+
+### Decision Forcing: Surface Hard-to-Reverse Choices
+
+After Round 2 (or after gathering technical stack information in any starting point), identify decisions that are **hard to reverse** and surface them proactively. Do not wait for the user to raise them — the value is catching them before they're locked in.
+
+For each significant technical choice, check whether it carries downstream consequences the user may not have considered. Raise it in a single grouped message:
+
+**Patterns that trigger a decision point:**
+
+| Choice | Consequence to surface |
+|--------|----------------------|
+| Relational DB (Postgres, MySQL) | Search strategy — full-text search needs GIN index or external search service |
+| JWT / stateless auth | No server-side revocation — stolen tokens valid until expiry |
+| NoSQL (MongoDB, DynamoDB) | Joins are expensive — how will you handle relational data? |
+| Monorepo | CI complexity, shared dependency management overhead |
+| Microservices | Network latency, distributed tracing, eventual consistency |
+| External auth provider (Auth0, Clerk) | Vendor lock-in and per-user pricing at scale |
+| ORM vs raw SQL | ORM hides query cost; raw SQL is harder to maintain |
+| Server-side rendering | SEO benefit, but state management becomes more complex |
+| Third-party API as core dependency | Outage = your outage; rate limits = your limits |
+
+For each decision point identified, say:
+
+> "You've chosen [X]. This means [consequence]. [Optional: alternative and its tradeoff.] Do you want to decide [downstream question] now, or defer it?"
+
+If the user decides now: log it. If they defer: add a `<!-- TODO: -->` marker to the roadmap.
+
+**Reversal cost language:** When a decision is hard to reverse, say so explicitly. "This choice is hard to change after you have data in it" or "Swapping this later would require a database migration" makes the stakes concrete.
 
 ### Round 4: Unknowns (only if gaps exist)
 - What decisions are you unsure about?
@@ -177,8 +214,14 @@ not vague disclaimers. "Won't support offline mode" is good. "Won't do everythin
 
 1. Write the completed `docs/strategy-roadmap.md`
 2. Ask: "Do you prefer **lightweight one-liner ADRs** or **formal ADRs** (Context / Decision / Consequences)?" Record the answer in `DECISIONS.md` as `Format: Lightweight` or `Format: Formal`
-3. Populate `## MVP Goals` in `CLAUDE.md` with Phase 1 deliverables (3-5 testable bullet points)
-4. Update `PROGRESS.md` to note that roadmap was created
+3. **Log decision points to `DECISIONS.md`** — For each decision surfaced during the Decision Forcing step that the user resolved:
+   - Record the decision with: what was chosen, alternatives considered, reversal cost, and why this choice was made.
+   - Use this format (lightweight):
+     ```
+     [TOPIC]: [Choice made]. Alternatives: [what else was considered]. Reversal cost: [high/medium/low — and why]. Rationale: [reason].
+     ```
+   - For deferred decisions: add a `<!-- TODO: [decision question] | WHEN: [trigger] | BLOCKS: [what] -->` marker in the roadmap's Open Questions section.
+4. Populate `## MVP Goals` in `CLAUDE.md` with Phase 1 deliverables (3-5 testable bullet points)
 5. If MCP servers were mentioned, add `**MCP Servers:**` line to Project Identity in `CLAUDE.md`
 6. Summarize what was enabled: mention code quality guidance and/or sprint planning if enabled. If code quality guidance enabled, note it lives in `.claude/rules/` and is loaded natively by Claude Code each session. If sprint planning enabled, note SPRINT.md is loaded via `@import` in CLAUDE.md.
 7. If sprint planning was enabled: "Sprint planning enabled. When you're ready, say 'start a sprint' or 'begin Phase 1' and I'll propose issues for your review."
