@@ -237,12 +237,27 @@ During sprint planning, flag issues that carry architectural risk — things lik
 3. **Architecture Fitness rules** — glob-scoped structural constraints
 4. **Decision Forcing Function** — enhanced `/brief` that surfaces decision points proactively
 
-### Medium-term (v0.9.0) — Ambitious Project Support
+### Medium-term (v0.9.0) — Ambitious Project Support ✓ Done
 
-1. **Self-Review workflow** — subagent-based code review before PR
-2. **Milestone Health Checks** — periodic project health assessment
-3. **Sprint Retrospective** — automated metrics and feedback after sprint completion
-4. **Plugin packaging** — distribute via Claude Code Plugin Marketplace
+1. **Self-Review workflow** — subagent-based code review before PR ✓
+2. **Milestone Health Checks** — periodic project health assessment ✓
+3. **Sprint Retrospective** — automated metrics and feedback after sprint completion ✓
+4. **Plugin packaging** — moved to v0.9.1 (marketplace confirmed live; proper skill structure requires per-skill directories, not a top-level SKILL.md)
+
+### v0.9.1 — Plugin Marketplace Packaging
+
+The Claude Code Plugin Marketplace is live (claudemarketplaces.com). This is additive to v1.0.0 — plugin packaging is distribution, not a feature.
+
+Required structure:
+
+1. **Per-skill directories** — `.claude/skills/<name>/SKILL.md` with frontmatter (`name`, `description`, `argument-hint`, `allowed-tools`, `user-invocable`)
+2. **Plugin manifest** — `.claude-plugin/plugin.json` with plugin metadata and skill list
+3. **Marketplace index** — `marketplace.json` at repo root
+4. **Submission** — via the Claude plugin submission page
+
+Install command after packaging: `/plugin marketplace add lwalden/aiagentminder`
+
+The `/setup` manual install path continues to work. Marketplace is an additive distribution channel.
 
 ### Longer-term (v1.0.0) — Intelligence Layer
 
