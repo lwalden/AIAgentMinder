@@ -1,11 +1,11 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-0.7.0-blue)
+![Version](https://img.shields.io/badge/version-0.9.1-blue)
 
-Project governance and planning for Claude Code. Structured `/plan` interviews, sprint workflows, and decision tracking — designed to complement Claude Code's native memory system, not replace it.
+Project governance and planning for Claude Code. Structured `/brief` planning interviews, sprint workflows, and decision tracking — designed to complement Claude Code's native memory system, not replace it.
 
-> **What this is:** Markdown files, slash commands, and lifecycle hooks that add structured planning and governance on top of Claude Code. Not a CLI tool, not an MCP server, not a code generator.
+> **What this is:** Markdown files, slash commands, and a lifecycle hook that add structured planning and governance on top of Claude Code. Not a CLI tool, not an MCP server, not a code generator.
 
 ---
 
@@ -34,19 +34,22 @@ AIAgentMinder fills these gaps while leaving native memory to do what it does be
 | `.claude/rules/*.md` | Development discipline rules — TDD, error handling, sprint workflow | Every session (Claude Code native rules loading) |
 | `SPRINT.md` | Active sprint issues and status | Every session when sprint enabled (via `@import` in CLAUDE.md) |
 
-**Three commands** structure your workflow:
+**Commands** structure your workflow:
 
 | Command | When to Use |
 |---------|------------|
-| `/plan` | Start of a project — Claude interviews you and generates a product brief with MVP features, tech stack, and quality tier |
+| `/brief` | Start of a project — Claude interviews you and generates a product brief with MVP features, tech stack, and quality tier |
 | `/handoff` | End of a session — records key priorities to auto-memory, updates DECISIONS.md, commits |
+| `/quality-gate` | Pre-PR — tiered quality checks matching your project quality tier |
+| `/self-review` | Pre-PR (Rigorous/Comprehensive) — specialist review subagents for security, performance, API design |
+| `/milestone` | Sprint boundaries — project health assessment across four dimensions |
+| `/retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
 | `/update` | Upgrade an existing installation — handles migration from previous versions |
 
-**Two hooks** run automatically:
+**One hook** runs automatically:
 
 | What | When |
 |------|------|
-| Auto-commit checkpoint | Session end (feature branches only) |
 | Sprint reorientation | After context compaction (outputs active sprint summary) |
 
 **Native Claude Code features do the rest:** Session Memory preserves context within a session, auto-memory (MEMORY.md) persists decisions and priorities across sessions, and `claude --continue` restores full message history. AIAgentMinder complements these rather than duplicating them.
@@ -55,8 +58,14 @@ AIAgentMinder fills these gaps while leaving native memory to do what it does be
 
 ## Quick Start
 
-### 1. Clone the template
+### 1. Clone or install
 
+**Via plugin marketplace (Claude Code):**
+```
+/plugin marketplace add lwalden/AIAgentMinder
+```
+
+**Manual:**
 ```bash
 git clone https://github.com/lwalden/aiagentminder.git
 cd aiagentminder
@@ -66,11 +75,11 @@ cd aiagentminder
 
 Open Claude Code in the cloned directory and run `/setup`. It asks about your project and copies framework files to your target location.
 
-### 3. Run `/plan`
+### 3. Run `/brief`
 
-Open Claude Code in your project and run `/plan`. For new projects, Claude interviews you and generates `docs/strategy-roadmap.md`. For existing projects, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files instead.
+Open Claude Code in your project and run `/brief`. For new projects, Claude interviews you and generates `docs/strategy-roadmap.md`. For existing projects, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files instead.
 
-After determining your quality tier, `/plan` also asks whether to enable **code quality guidance** (TDD, review-before-commit, error handling rules) and **sprint planning** (issue decomposition, per-issue PRs, SPRINT.md tracking) — both recommended for Standard+ projects.
+After determining your quality tier, `/brief` also asks whether to enable **code quality guidance** (TDD, review-before-commit, error handling rules) and **sprint planning** (issue decomposition, per-issue PRs, SPRINT.md tracking) — both recommended for Standard+ projects.
 
 ### 4. Build
 
@@ -88,14 +97,14 @@ Use `claude --continue` to restore the previous session's full message history. 
 - "Start on the next priority"
 - "What's the current sprint status?"
 
-**Manual setup:** Copy `project/*` and `project/.claude/` to your repo, fill in the Project Identity section of `CLAUDE.md`, then run `/plan`.
+**Manual setup:** Copy `project/*` and `project/.claude/` to your repo, fill in the Project Identity section of `CLAUDE.md`, then run `/brief`.
 
 ---
 
 ## What a Session Looks Like
 
 **Session 1 — Planning:**
-Run `/plan`. Claude asks about your project in grouped rounds. You describe a recipe sharing API.
+Run `/brief`. Claude asks about your project in grouped rounds. You describe a recipe sharing API.
 Claude generates `docs/strategy-roadmap.md` with MVP features, stack choices, and a quality tier.
 With sprint planning enabled, Claude notes: "Ready to start Phase 1 — say 'start a sprint' when you are."
 Run `/handoff`. Key priorities are written to auto-memory.
@@ -123,22 +132,28 @@ your-project/
 ├── DECISIONS.md           # Architectural decision log
 ├── SPRINT.md              # Sprint state tracking (optional, for sprint-driven development)
 ├── docs/
-│   └── strategy-roadmap.md  # Product brief (generated by /plan)
+│   └── strategy-roadmap.md  # Product brief (generated by /brief)
 ├── .gitignore             # Core + stack-specific entries
 └── .claude/
     ├── settings.json      # Hook configuration
     ├── commands/
-    │   ├── plan.md        # /plan — structured planning interview
-    │   └── handoff.md     # /handoff — session-end checkpoint
+    │   ├── brief.md           # /brief — structured planning interview
+    │   ├── handoff.md         # /handoff — session-end checkpoint
+    │   ├── quality-gate.md    # /quality-gate — tiered pre-PR checks
+    │   ├── self-review.md     # /self-review — specialist review subagents
+    │   ├── milestone.md       # /milestone — project health assessment
+    │   └── retrospective.md   # /retrospective — sprint retrospective with metrics
     │   # Note: setup.md (/setup) and update.md (/update) stay in the AIAgentMinder
     │   # repo — they are meta-commands run from there, not installed into target projects
-    ├── rules/             # optional, enabled during /plan or /setup
-    │   ├── README.md      # Explains the rules directory
-    │   ├── code-quality.md   # TDD, review-before-commit, error handling (~18 lines)
-    │   └── sprint-workflow.md  # Sprint planning and execution workflow (~35 lines)
+    ├── rules/             # optional rules enabled during /brief or /setup
+    │   ├── README.md          # Explains the rules directory
+    │   ├── git-workflow.md    # Branch naming, commit discipline, PR workflow (always active)
+    │   ├── scope-guardian.md  # Scope governance — checks work against roadmap (always active)
+    │   ├── code-quality.md    # TDD, review-before-commit, error handling (~18 lines)
+    │   ├── sprint-workflow.md # Sprint planning and execution workflow (~35 lines)
+    │   └── architecture-fitness.md  # Structural constraints (optional, customize per project)
     └── hooks/
-        ├── compact-reorient.js   # Sprint summary after context compaction
-        └── session-end-commit.js # Auto-commits on feature branches
+        └── compact-reorient.js   # Sprint summary after context compaction
 ```
 
 ---
@@ -146,7 +161,7 @@ your-project/
 ## Requirements
 
 - **Claude Code** (VS Code extension or CLI) — this is a Claude Code framework, not a standalone tool
-- **Node.js** — required for governance hooks (they're small cross-platform scripts)
+- **Node.js** — required for the governance hook (cross-platform Node.js script)
 - **Git** — session state is tracked in git
 - **GitHub CLI (`gh`)** — optional, for PR workflows
 
@@ -168,7 +183,7 @@ Works on **Windows, macOS, and Linux**. All hooks are Node.js (no bash dependenc
 
 AIAgentMinder deliberately does not try to be:
 
-- **A full backlog or issue tracker.** AIAgentMinder guides a project from idea through phased delivery — `/plan` defines the phases, DECISIONS.md tracks architectural choices, `/handoff` keeps priorities current. Sprint planning adds lightweight issue decomposition within a phase, but it's not a persistent backlog of 50 issues. If you need that, layer GitHub Issues or Linear on top.
+- **A full backlog or issue tracker.** AIAgentMinder guides a project from idea through phased delivery — `/brief` defines the phases, DECISIONS.md tracks architectural choices, `/handoff` keeps priorities current. Sprint planning adds lightweight issue decomposition within a phase, but it's not a persistent backlog of 50 issues. If you need that, layer GitHub Issues or Linear on top.
 - **A multi-session orchestrator.** Claude Code can still spawn subagents and parallelize work within a session on its own — AIAgentMinder doesn't prevent that. What it doesn't do is coordinate multiple independent Claude Code sessions working on separate branches simultaneously. Tools like CCPM and claude-flow handle that.
 - **A CLI tool.** There's nothing to install beyond copying files. The "tool" is markdown + hooks + slash commands that live in your repo.
 - **A replacement for Claude Code's native memory.** Claude Code's Session Memory, auto-memory (MEMORY.md), and `claude --continue` handle session continuity natively. AIAgentMinder complements these with planning structure, governance, and sprint workflows — not with a parallel memory system.
@@ -189,7 +204,8 @@ AIAgentMinder deliberately does not try to be:
 
 - [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
 - [Customization Guide](docs/customization-guide.md) — what to customize and how, including optional features
-- [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/plan` or writing manually
+- [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/brief` or writing manually
+- [Roadmap](ROADMAP.md) — planned features and future direction
 - [Examples](examples/) — filled-in state files from a realistic project (recipe API)
 
 ---

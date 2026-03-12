@@ -21,7 +21,7 @@ Replace the placeholder block with your actual project info:
 
 ### 2. `docs/strategy-roadmap.md` -- Your Project Plan
 
-Run `/plan` to fill it interactively, or edit manually. At minimum, fill in:
+Run `/brief` to fill it interactively, or edit manually. At minimum, fill in:
 - What & Why (problem, vision, users)
 - MVP Features with acceptance criteria
 - Technical Stack choices
@@ -34,7 +34,7 @@ Run `/plan` to fill it interactively, or edit manually. At minimum, fill in:
 
 A small set of development discipline instructions (~18 lines) loaded natively at every session start. Covers TDD cycle, build-before-commit, review-before-commit, and error handling patterns.
 
-**Enable during setup:** Answer yes to "Enable code quality guidance?" in `/setup` or `/plan`.
+**Enable during setup:** Answer yes to "Enable code quality guidance?" in `/setup` or `/brief`.
 **Enable later:** Run `/update` from the AIAgentMinder repo — it will prompt to add the file if absent.
 **Disable:** Delete `.claude/rules/code-quality.md` from your project.
 
@@ -66,7 +66,7 @@ You resolve the block (answer the question, provide the missing resource, make t
 
 A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, preserved in full in git history. You can then ask to begin the next sprint.
 
-**Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/plan`.
+**Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/brief`.
 **Disable:** Delete `.claude/rules/sprint-workflow.md`. SPRINT.md can be left or removed.
 
 Sprint workflow instructions live in `.claude/rules/sprint-workflow.md` (overwritten by `/update`). Sprint state lives in `SPRINT.md` (user-owned; `/update` never overwrites an active sprint).
@@ -95,11 +95,10 @@ Tell Claude: "Set up GitHub Actions CI for this project."
 
 ### Hooks
 
-Two hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`. Hooks require Node.js to run.
+One hook script (Node.js, cross-platform) in `.claude/hooks/`, configured in `.claude/settings.json`. Requires Node.js to run.
 
 | Hook | Event | Script | What It Does |
 |------|-------|--------|-------------|
-| Auto-commit | Stop | `session-end-commit.js` | Git checkpoint on feature branches (tracked files only) |
 | Sprint reorientation | SessionStart (compact) | `compact-reorient.js` | Outputs sprint summary after context compaction |
 
 **Prerequisite:** Node.js must be installed for hooks to work.
@@ -108,7 +107,6 @@ Two hook scripts (Node.js, cross-platform) in `.claude/hooks/`, configured in `.
 
 **Add a custom hook:** Add a new entry to `settings.json` and create the script in `.claude/hooks/`. See the [Claude Code hooks documentation](https://docs.anthropic.com/en/docs/claude-code/hooks) for the full event list and JSON input format.
 
-**Disable auto-commit:** Remove the `session-end-commit.js` entry from Stop hooks.
 
 ### Custom Slash Commands
 
@@ -124,13 +122,15 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 When a new version of AIAgentMinder is released, run `/update` from the AIAgentMinder repo (not from your project). It performs a safe in-place upgrade:
 
 **Overwritten (AIAgentMinder-owned):**
-- `.claude/hooks/session-end-commit.js` and `compact-reorient.js`
+- `.claude/hooks/compact-reorient.js`
 - `.claude/settings.json` (hook configuration)
-- `.claude/commands/handoff.md` and `plan.md`
+- `.claude/commands/brief.md`, `handoff.md`, `quality-gate.md`, `self-review.md`, `milestone.md`, `retrospective.md`
+- `.claude/rules/git-workflow.md`, `scope-guardian.md`
 
 **Overwritten if present, prompted if absent (optional features):**
 - `.claude/rules/code-quality.md`
 - `.claude/rules/sprint-workflow.md`
+- `.claude/rules/architecture-fitness.md`
 
 **Surgically merged:**
 - `CLAUDE.md` — Behavioral Rules and Context Budget sections are updated; your Project Identity and MVP Goals blocks are preserved

@@ -41,15 +41,19 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 | Command | Purpose | Modifies Files? |
 |---------|---------|----------------|
 | `/setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
-| `/update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md, handles v0.6.0 migration (run from AIAgentMinder repo) | Yes |
-| `/plan` | Create or update strategy-roadmap.md interactively; optionally enable code quality guidance and sprint planning | Yes |
+| `/update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md (run from AIAgentMinder repo) | Yes |
+| `/brief` | Create or update strategy-roadmap.md interactively; optionally enable code quality guidance and sprint planning | Yes |
 | `/handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
+| `/quality-gate` | Pre-PR quality checks — four tiers matching the project quality tier | No |
+| `/self-review` | Specialist review subagents (security, performance, API design) — Rigorous/Comprehensive tiers | No |
+| `/milestone` | Project health assessment: phase progress, timeline, complexity, scope drift | No |
+| `/retrospective` | Sprint retrospective with metrics and adaptive sizing guidance | No |
 
 ## Optional Features
 
 ### Code Quality Guidance
 
-When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (~18 lines of actionable instructions: TDD cycle, build-before-commit, review-before-commit, error handling, and more). Enabled during `/plan`, `/setup`, or `/update`. Delete the file to opt out.
+When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (~18 lines of actionable instructions: TDD cycle, build-before-commit, review-before-commit, error handling, and more). Enabled during `/brief`, `/setup`, or `/update`. Delete the file to opt out.
 
 ### Sprint Planning
 
@@ -62,11 +66,12 @@ When enabled, `project/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` 
 
 ## Governance Hooks
 
-Two cross-platform hooks (Node.js) configured in `settings.json`:
+One cross-platform hook (Node.js) configured in `settings.json`:
 
 | Hook | Event | Script |
 |------|-------|--------|
-| Auto-commit checkpoint | Stop | `session-end-commit.js` |
 | Sprint reorientation post-compaction | SessionStart (compact matcher) | `compact-reorient.js` |
 
-The auto-commit hook only runs on feature branches and stages only tracked files. It respects git hooks (no `--no-verify`). The compact-reorient hook fires exclusively after context compaction, not on every session start.
+The hook fires exclusively after context compaction, not on every session start. It outputs the first 15 lines of SPRINT.md (if an active sprint exists) to reorient Claude after context was compacted.
+
+Git commit discipline is enforced by `.claude/rules/git-workflow.md` (always-active rule). Commits are intentional, not automatic.
