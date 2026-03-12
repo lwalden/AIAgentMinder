@@ -51,11 +51,14 @@ If no git repo exists, run `git init`. Then copy all files from this repo's `pro
 
 ### Core files (always copy)
 
-Copy these to the target unconditionally (create the `.claude/rules/` directory if needed):
+Copy these to the target unconditionally (create the `.claude/rules/` and `.claude/commands/` directories if needed):
 - `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
 - `project/.claude/rules/scope-guardian.md` → `[target]/.claude/rules/scope-guardian.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
 - `project/.claude/commands/quality-gate.md` → `[target]/.claude/commands/quality-gate.md`
+- `project/.claude/commands/self-review.md` → `[target]/.claude/commands/self-review.md`
+- `project/.claude/commands/milestone.md` → `[target]/.claude/commands/milestone.md`
+- `project/.claude/commands/retrospective.md` → `[target]/.claude/commands/retrospective.md`
 
 ### Optional features (based on Step 2 answers)
 
@@ -149,7 +152,10 @@ Created files:
 - .claude/settings.json (hook configuration)
 - .claude/commands/brief.md (/brief command — product brief & roadmap creation)
 - .claude/commands/handoff.md (/handoff command)
-- .claude/commands/quality-gate.md (/quality-gate command — tiered pre-PR checks)
+- .claude/commands/quality-gate.md (/quality-gate — tiered pre-PR checks)
+- .claude/commands/self-review.md (/self-review — subagent code review before PR)
+- .claude/commands/milestone.md (/milestone — project health assessment)
+- .claude/commands/retrospective.md (/retrospective — sprint metrics and feedback)
 - .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)

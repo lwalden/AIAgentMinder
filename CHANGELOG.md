@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.0] - 2026-03-12
+
+### Added
+- **`.claude/commands/self-review.md`** — New `/self-review` command. Spawns specialist review subagents (security, performance, API design) that read the diff and relevant rules — not the entire codebase. Each lens produces a focused finding list with severity ratings. High severity blocks PR creation; Medium/Low let the user choose to fix or proceed with issues noted in the PR description. Integrated into `sprint-workflow.md` for Rigorous and Comprehensive quality tiers.
+- **`.claude/commands/milestone.md`** — New `/milestone` command for project health assessment. Reviews four dimensions: phase progress (MVP features complete vs planned), timeline health (on-track vs at-risk), complexity vs phase (file count, largest files, dependency growth), and scope drift (non-MVP work done while MVP items remain). Produces a structured health report with actionable recommendations. Run at sprint boundaries or phase transitions.
+- **`.claude/commands/retrospective.md`** — New `/retrospective` command for sprint retrospective with metrics. Computes planned vs completed issues, scope changes mid-sprint, blocked issues with reasons, decisions logged, and an honest "what went well / what was harder" observation. After Sprint 3+, provides adaptive sprint sizing guidance based on historical completion rates. Called automatically by `sprint-workflow.md` at sprint completion.
+- **`SKILL.md`** (repo root) — Plugin metadata placeholder. Documents intended plugin identity, command and rule inventory, and v0.9.1 packaging plan. Proper skill directories and plugin manifest are planned for v0.9.1.
+
+### Changed
+- **`sprint-workflow.md`** — Sprint Execution now calls `/self-review` (Rigorous/Comprehensive tiers) after `/quality-gate`, before PR creation. Sprint Completion now calls `/retrospective` before the user reviews and archives the sprint.
+- **`/setup`** — Copies `self-review.md`, `milestone.md`, `retrospective.md` as core (non-optional) files alongside `quality-gate.md`.
+- **`/update`** — Adds `self-review.md`, `milestone.md`, `retrospective.md` to the AIAgentMinder-owned (always-overwrite) file list.
+
+---
+
 ## [0.8.1] - 2026-03-01
 
 ### Added

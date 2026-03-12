@@ -10,7 +10,7 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/brief.md`, `.claude/commands/quality-gate.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/brief.md`, `.claude/commands/quality-gate.md`, `.claude/commands/self-review.md`, `.claude/commands/milestone.md`, `.claude/commands/retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v0.6.0 → v0.7.0)** | `.claude/hooks/session-start-context.js`, `.claude/hooks/session-end-timestamp.js`, `.claude/hooks/pre-compact-save.js`, `.claude/guidance/` directory | Delete during migration |
 | **Hybrid** | `CLAUDE.md` | Surgical merge — update structural sections, preserve user content |
@@ -125,6 +125,9 @@ project/.claude/settings.json                          →  [target]/.claude/set
 project/.claude/commands/handoff.md                    →  [target]/.claude/commands/handoff.md
 project/.claude/commands/brief.md                      →  [target]/.claude/commands/brief.md
 project/.claude/commands/quality-gate.md               →  [target]/.claude/commands/quality-gate.md
+project/.claude/commands/self-review.md                →  [target]/.claude/commands/self-review.md
+project/.claude/commands/milestone.md                  →  [target]/.claude/commands/milestone.md
+project/.claude/commands/retrospective.md              →  [target]/.claude/commands/retrospective.md
 project/.claude/rules/git-workflow.md                  →  [target]/.claude/rules/git-workflow.md
 project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
 ```
@@ -258,6 +261,9 @@ Updated:
 - .claude/commands/handoff.md
 - .claude/commands/brief.md
 - .claude/commands/quality-gate.md
+- .claude/commands/self-review.md
+- .claude/commands/milestone.md
+- .claude/commands/retrospective.md
 - .claude/rules/git-workflow.md
 - .claude/rules/scope-guardian.md
 - CLAUDE.md ([N] section(s) updated, Project Identity preserved)
