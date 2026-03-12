@@ -1,7 +1,8 @@
 # AIAgentMinder Plugin
 
-> **Status:** Plugin packaging scaffold — awaiting Claude Code Plugin Marketplace availability.
-> The commands below work today via `/setup`. This file prepares for marketplace distribution.
+> **Status:** Placeholder — proper plugin packaging planned for v0.9.1.
+> This file documents intended plugin metadata. Actual skill directories and plugin manifest will be built in v0.9.1.
+> The commands listed here work today via `/setup`.
 
 ---
 
@@ -18,7 +19,7 @@ license: MIT
 
 ## What This Plugin Provides
 
-Once installed, the following commands become available in any project:
+Once packaged and installed, the following commands become available in any project:
 
 | Command | Purpose |
 |---------|---------|
@@ -58,21 +59,19 @@ Then in Claude Code:
 
 Follow the setup interview to initialize AIAgentMinder in your target project.
 
-## Installation (Future — Plugin Marketplace)
+## Installation (Planned — Plugin Marketplace, v0.9.1)
 
 ```
-/plugin install airagentminder
+/plugin marketplace add lwalden/aiagentminder
 ```
 
-This will copy the governance files and run the setup interview automatically.
+## v0.9.1 Plugin Packaging Plan
 
-## Notes for Marketplace Distribution
+The marketplace requires a specific structure that differs from the current `/setup` install path:
 
-When the Claude Code Plugin Marketplace is available, the following steps are needed to complete packaging:
+1. **Per-skill directories**: Each command gets its own `.claude/skills/<name>/SKILL.md` with frontmatter (`name`, `description`, `argument-hint`, `allowed-tools`, `user-invocable`, etc.)
+2. **Plugin manifest**: `.claude-plugin/plugin.json` declaring plugin metadata and skill list
+3. **Marketplace index**: `marketplace.json` at repo root for discovery
+4. **Submission**: via https://claude.ai/settings/plugins/submit
 
-1. Add `skills:` frontmatter to each command file in `project/.claude/commands/` per marketplace spec
-2. Register the plugin at the marketplace submission endpoint
-3. Test `/plugin install airagentminder` end-to-end
-4. Verify rule files are activated post-install without manual setup
-
-The existing file structure is already compatible with the skills system — commands in `.claude/commands/` and rules in `.claude/rules/` are the correct locations.
+The `/setup` install path continues to work after v0.9.1. Marketplace is an additional distribution channel.
