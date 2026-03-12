@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.9.1] - 2026-03-12
+
+### Added
+
+- **`skills/` directory** — Per-skill plugin packaging for the Claude Code Plugin Marketplace. Each command is packaged as a proper skill with a `SKILL.md` containing YAML frontmatter (`name`, `description`, `argument-hint`, `allowed-tools`, `user-invocable`) and the full command content. Skills: `brief`, `handoff`, `quality-gate`, `self-review`, `milestone`, `retrospective`.
+- **`.claude-plugin/plugin.json`** — Plugin manifest declaring plugin identity, version, author, and skills directory location.
+
+### Changed
+
+- **`SKILL.md`** (repo root) — Updated from placeholder to reflect completed packaging. Documents the marketplace install command and links to the skill files.
+- **`project/.claude/aiagentminder-version`** — Bumped to `0.9.1`.
+
+### Notes
+
+- Install via plugin marketplace: `/plugin marketplace add lwalden/AIAgentMinder`
+- Manual install via `/setup` continues to work unchanged. Marketplace is an additive distribution channel.
+- v1.0.0 Intelligence Layer (Complexity Budget, Adaptive Sprint Sizing, Technical Debt Tracker, Risk-Flagged Issues) is unaffected — plugin packaging is distribution, not a feature.
+
+---
+
 ## [0.9.0] - 2026-03-12
 
 ### Added
