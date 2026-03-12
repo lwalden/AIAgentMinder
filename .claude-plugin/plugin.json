@@ -1,0 +1,14 @@
+{
+  "name": "aiagentminder",
+  "version": "0.9.1",
+  "description": "Project governance and methodology layer for AI-assisted development. Structured planning, sprint governance, scope control, quality gates, and architectural fitness checks.",
+  "author": {
+    "name": "lwalden",
+    "url": "https://github.com/lwalden"
+  },
+  "homepage": "https://github.com/lwalden/AIAgentMinder",
+  "repository": "https://github.com/lwalden/AIAgentMinder",
+  "license": "MIT",
+  "keywords": ["governance", "planning", "sprint", "quality", "methodology"],
+  "skills": "./skills/"
+}
