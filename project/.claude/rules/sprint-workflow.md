@@ -53,7 +53,8 @@ Once the user approves:
 - Work issues in the proposed order unless the user directs otherwise.
 - For each issue: create a feature branch (`{type}/S{n}-{seq}-{short-desc}`), implement, commit referencing the issue ID (`feat(auth): implement login endpoint [S1-003]`).
 - Before creating a PR: run `/quality-gate` to confirm the issue meets the project's quality tier. Fix any failures before proceeding.
-- After quality gate passes, create the PR. Notify the user it's ready for review. **Wait for user input before merging — the user always approves PRs.**
+- For **Rigorous** and **Comprehensive** quality tiers: also run `/self-review` after the quality gate passes. Address any High severity findings before proceeding.
+- After checks pass, create the PR. Notify the user it's ready for review. **Wait for user input before merging — the user always approves PRs.**
 - Update the native Task status as you work: pending → in_progress → completed (or leave pending if blocked).
 - Update SPRINT.md issue status to match: `todo` → `in-progress` → `done` or `blocked`.
 - If an issue cannot be completed: mark both the Task and SPRINT.md entry as `blocked` and notify the user with a clear description of what's needed.
@@ -64,6 +65,7 @@ A sprint ends when all issues are `done` or `blocked`.
 
 - If blocked issues exist: notify the user and wait for resolution. Once blocks are resolved, complete remaining issues, then proceed to review.
 - Present a sprint review: completed issues with PR links, decisions logged to DECISIONS.md, summary of what was accomplished, and what remains for the next sprint.
+- Run `/retrospective` to generate metrics for the sprint. Present it alongside the review.
 - If the user accepts the review: archive the sprint — replace SPRINT.md contents with a single summary line:
   ```
   S{n} archived ({date}): {count} issues completed. {brief summary}.
