@@ -8,6 +8,8 @@ All `.md` files in this directory are auto-discovered and loaded automatically. 
 |------|---------|
 | `git-workflow.md` | Git discipline — branch naming, commit discipline, PR workflow (always active) |
 | `scope-guardian.md` | Scope governance — checks new work against roadmap before implementing (always active) |
+| `approach-first.md` | Approach-first protocol — state intent before executing architecture/multi-file changes (always active) |
+| `debug-checkpoint.md` | Debug checkpoint — stops spirals after 3 failed attempts at the same fix (always active) |
 | `code-quality.md` | TDD cycle, build-before-commit, review-before-commit, error handling (optional) |
 | `sprint-workflow.md` | Sprint governance over native Tasks — planning, approval gates, review/archive (optional) |
 | `architecture-fitness.md` | Structural constraints — layer boundaries, external API rules, etc. (optional, customize for your project) |
