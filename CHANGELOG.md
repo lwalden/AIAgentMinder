@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.2.0] - 2026-03-14
+
+### Added
+- **`/aam-revise` command** — Mid-stream plan revision. Add, change, drop, or reprioritize features directly in `docs/strategy-roadmap.md` with decision logging in `DECISIONS.md` and active sprint impact checks. Handles research findings, new/changed/dropped requirements, and reprioritization. Closes the gap between `/aam-brief` (initial planning) and sprint execution — the plan is now a living document that stays current as direction changes.
+- **`skills/aam-revise/SKILL.md`** — Plugin marketplace packaging for the new command.
+
+### Changed
+- **README.md** — Non-Goals reframed: "Not a backlog tool" → "Not a ticket tracker" with description of AIAgentMinder's living plan approach. Session flow section adds "Between sprints — revising the plan" example. Commands table and "What Gets Copied" tree updated.
+- **All docs** updated to include `/aam-revise`: `docs/how-it-works.md`, `docs/customization-guide.md`, `SKILL.md`, `/aam-setup`, `/aam-update`.
+
+---
+
 ## [1.1.0] - 2026-03-14
 
 ### Added
