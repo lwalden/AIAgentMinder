@@ -1,4 +1,4 @@
-# /self-review - Pre-PR Code Review
+# /aam-self-review - Pre-PR Code Review
 
 Run a focused code review before creating a pull request. Spawns a review subagent with a specific lens so the review is context-efficient — it reads the diff and relevant rules, not the entire codebase.
 
@@ -109,7 +109,7 @@ After all subagents complete:
    [List all findings by severity: High → Medium → Low]
    ```
 
-2. **If High severity issues found:** Do not proceed to PR. Fix the issues and re-run `/self-review` or `/quality-gate`.
+2. **If High severity issues found:** Do not proceed to PR. Fix the issues and re-run `/aam-self-review` or `/aam-quality-gate`.
 
 3. **If Medium/Low issues only:** Ask the user: "Medium/Low issues found. Fix before PR, or proceed with issues noted in PR description? (fix / proceed)"
    - If fix: address issues, then proceed to PR creation.
@@ -121,6 +121,6 @@ After all subagents complete:
 
 ## Integration with Sprint Workflow
 
-`/self-review` is called by the sprint workflow before PR creation for **Rigorous** and **Comprehensive** quality tiers. For **Standard** tier it's optional. For **Lightweight** tier it's skipped.
+`/aam-self-review` is called by the sprint workflow before PR creation for **Rigorous** and **Comprehensive** quality tiers. For **Standard** tier it's optional. For **Lightweight** tier it's skipped.
 
-You can also invoke it manually at any time with `/self-review`.
+You can also invoke it manually at any time with `/aam-self-review`.

@@ -1,4 +1,4 @@
-# /scope-check - Active Scope Governance
+# /aam-scope-check - Active Scope Governance
 
 Evaluate a proposed feature, task, or change against the project roadmap before you commit to building it.
 
@@ -10,9 +10,9 @@ Use this when you're about to start something and want a clear answer on whether
 
 Describe what you want to build — a sentence or a draft issue title is enough:
 
-> `/scope-check` — Add dark mode toggle to the settings page
+> `/aam-scope-check` — Add dark mode toggle to the settings page
 
-> `/scope-check` — Refactor the auth middleware to support OAuth providers
+> `/aam-scope-check` — Refactor the auth middleware to support OAuth providers
 
 ---
 

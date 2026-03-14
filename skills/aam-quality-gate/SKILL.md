@@ -1,11 +1,11 @@
 ---
-name: quality-gate
+name: aam-quality-gate
 description: Run pre-PR quality checks matching the project's declared quality tier (Lightweight/Standard/Rigorous/Comprehensive). Called automatically before PR creation in the sprint workflow; also invocable manually before any pull request.
 user-invocable: true
 allowed-tools: Read, Bash, Grep, Glob
 ---
 
-# /quality-gate - Pre-PR Quality Checks
+# /aam-quality-gate - Pre-PR Quality Checks
 
 Run this before creating any pull request. It enforces the quality tier declared in `docs/strategy-roadmap.md`.
 
@@ -66,4 +66,4 @@ If the user overrides: create the PR and add a note to the PR description: "⚠ 
 
 ## Integration with Sprint Workflow
 
-This command is called automatically by the sprint workflow before each PR creation. You can also invoke it manually at any time with `/quality-gate`.
+This command is called automatically by the sprint workflow before each PR creation. You can also invoke it manually at any time with `/aam-quality-gate`.

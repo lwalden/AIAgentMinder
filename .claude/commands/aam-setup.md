@@ -1,4 +1,4 @@
-# /setup - Project Initialization
+# /aam-setup - Project Initialization
 
 You are running this command from the **AIAgentMinder template repository**. Your job is to help the user set up AIAgentMinder in a target project by copying and customizing the template files from the `project/` directory in this repo.
 
@@ -58,14 +58,14 @@ Copy these to the target unconditionally (create directories as needed):
 - `project/.claude/rules/approach-first.md` → `[target]/.claude/rules/approach-first.md`
 - `project/.claude/rules/debug-checkpoint.md` → `[target]/.claude/rules/debug-checkpoint.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
-- `project/.claude/commands/brief.md` → `[target]/.claude/commands/brief.md`
-- `project/.claude/commands/checkup.md` → `[target]/.claude/commands/checkup.md`
-- `project/.claude/commands/handoff.md` → `[target]/.claude/commands/handoff.md`
-- `project/.claude/commands/quality-gate.md` → `[target]/.claude/commands/quality-gate.md`
-- `project/.claude/commands/scope-check.md` → `[target]/.claude/commands/scope-check.md`
-- `project/.claude/commands/self-review.md` → `[target]/.claude/commands/self-review.md`
-- `project/.claude/commands/milestone.md` → `[target]/.claude/commands/milestone.md`
-- `project/.claude/commands/retrospective.md` → `[target]/.claude/commands/retrospective.md`
+- `project/.claude/commands/aam-brief.md` → `[target]/.claude/commands/aam-brief.md`
+- `project/.claude/commands/aam-checkup.md` → `[target]/.claude/commands/aam-checkup.md`
+- `project/.claude/commands/aam-handoff.md` → `[target]/.claude/commands/aam-handoff.md`
+- `project/.claude/commands/aam-quality-gate.md` → `[target]/.claude/commands/aam-quality-gate.md`
+- `project/.claude/commands/aam-scope-check.md` → `[target]/.claude/commands/aam-scope-check.md`
+- `project/.claude/commands/aam-self-review.md` → `[target]/.claude/commands/aam-self-review.md`
+- `project/.claude/commands/aam-milestone.md` → `[target]/.claude/commands/aam-milestone.md`
+- `project/.claude/commands/aam-retrospective.md` → `[target]/.claude/commands/aam-retrospective.md`
 
 ### Optional features (based on Step 2 answers)
 
@@ -156,20 +156,20 @@ Created files:
 - DECISIONS.md (architectural decisions and known debt log)
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
-- .claude/commands/brief.md (/brief — product brief & roadmap creation)
-- .claude/commands/checkup.md (/checkup — installation health check)
-- .claude/commands/handoff.md (/handoff — session checkpoint)
-- .claude/commands/quality-gate.md (/quality-gate — tiered pre-PR checks)
-- .claude/commands/scope-check.md (/scope-check — active scope governance)
-- .claude/commands/self-review.md (/self-review — subagent code review before PR)
-- .claude/commands/milestone.md (/milestone — project health assessment)
-- .claude/commands/retrospective.md (/retrospective — sprint metrics and feedback)
+- .claude/commands/aam-brief.md (/aam-brief — product brief & roadmap creation)
+- .claude/commands/aam-checkup.md (/aam-checkup — installation health check)
+- .claude/commands/aam-handoff.md (/aam-handoff — session checkpoint)
+- .claude/commands/aam-quality-gate.md (/aam-quality-gate — tiered pre-PR checks)
+- .claude/commands/aam-scope-check.md (/aam-scope-check — active scope governance)
+- .claude/commands/aam-self-review.md (/aam-self-review — subagent code review before PR)
+- .claude/commands/aam-milestone.md (/aam-milestone — project health assessment)
+- .claude/commands/aam-retrospective.md (/aam-retrospective — sprint metrics and feedback)
 - .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
 - .claude/rules/approach-first.md (approach-first protocol — state intent before executing)
 - .claude/rules/debug-checkpoint.md (debug checkpoint — prevents debugging spirals)
-- .claude/aiagentminder-version (version stamp for /update)
+- .claude/aiagentminder-version (version stamp for /aam-update)
 - .gitignore (core + [stack] entries)
 [if code quality enabled:]
 - .claude/rules/code-quality.md (code quality guidance — TDD, review-before-commit)
@@ -181,8 +181,8 @@ Created files:
 
 Next steps:
 1. Open Claude Code in your project directory
-2. Run /brief to create your product brief & roadmap
-3. Run /checkup to verify the installation is healthy
+2. Run /aam-brief to create your product brief & roadmap
+3. Run /aam-checkup to verify the installation is healthy
 [if sprint planning enabled:]
 4. When ready to build, say "start a sprint" or "begin Phase 1" — I'll propose issues for your review
 [else:]
