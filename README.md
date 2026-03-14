@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.1.0-blue)
+![Version](https://img.shields.io/badge/version-1.2.0-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
@@ -62,6 +62,7 @@ Spec-Driven Development tools (Spec-Kit, cc-sdd, GSD) have emerged as strong opt
 | `/aam-brief` | Start of a project — Claude interviews you and generates a product brief with MVP features, tech stack, and quality tier |
 | `/aam-checkup` | After `/aam-update` or when something seems broken — validates installation health (files, hooks, version, Node.js) |
 | `/aam-scope-check` | Before building something — Claude compares the proposed work against your roadmap and returns a clear verdict |
+| `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features directly in the roadmap with decision logging and sprint impact checks |
 | `/aam-handoff` | End of a session — writes priorities to auto-memory, updates DECISIONS.md, commits |
 | `/aam-quality-gate` | Pre-PR — tiered checks matching your project's quality tier (Lightweight / Standard / Rigorous / Comprehensive) |
 | `/aam-self-review` | Pre-PR (Rigorous/Comprehensive, and any risk-flagged issue) — specialist subagents review the diff for security, performance, and API design |
@@ -144,6 +145,9 @@ Say "Start a sprint for Phase 1." Claude proposes 5 issues with acceptance crite
 Claude creates a branch, implements S1-001 (scaffold Express app), passes `/aam-quality-gate`, opens a PR. Waits for your review.
 After you merge, Claude moves to S1-002 (user registration endpoint).
 
+**Between sprints — revising the plan:**
+You research a competing API and realize you need WebSocket support but can drop RSS feeds. Run `/aam-revise` — describe the changes, and Claude updates the roadmap directly: adds WebSocket to Phase 2, moves RSS to Out of Scope, logs both decisions. The next sprint proposal reflects the updated plan.
+
 **Session 3 — Continuing:**
 Open a fresh Claude Code tab. SPRINT.md is loaded automatically.
 Say "Resume." Claude picks up where it left off — runs `/aam-self-review` on the risk-flagged auth issue before creating the PR.
@@ -172,6 +176,7 @@ your-project/
     ├── commands/
     │   ├── aam-brief.md           # /aam-brief — planning interview
     │   ├── aam-checkup.md         # /aam-checkup — installation health check
+    │   ├── aam-revise.md          # /aam-revise — mid-stream plan revision
     │   ├── aam-handoff.md         # /aam-handoff — session-end checkpoint
     │   ├── aam-quality-gate.md    # /aam-quality-gate — tiered pre-PR checks
     │   ├── aam-scope-check.md     # /aam-scope-check — active scope governance
@@ -219,7 +224,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 ## Non-Goals
 
-- **Not a backlog tool.** Sprint planning handles 4–7 issues per sprint within a phase. If you need 50 open issues, persistent epics, or a kanban board, layer GitHub Issues or Linear on top.
+- **Not a ticket tracker.** AIAgentMinder keeps a living plan (`docs/strategy-roadmap.md`) and decomposes it into sprints on demand. Use `/aam-revise` to update the plan mid-stream. If you need 50 open issues, persistent epics, or a kanban board, layer GitHub Issues or Linear on top.
 - **Not a multi-agent orchestrator.** AIAgentMinder governs a single-agent session. It doesn't coordinate parallel Claude Code instances. Tools like CCPM and claude-flow handle that.
 - **Not a CLI tool.** There's nothing to install or run. Everything is markdown files and slash commands in your repo.
 - **Not a memory system.** Claude Code's native Session Memory, auto-memory, and `--continue` handle session continuity. AIAgentMinder adds governance structure on top, not a parallel memory layer.
