@@ -1,11 +1,13 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Version](https://img.shields.io/badge/version-1.1.0-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
 > **What this is:** Slash commands, rules files, and a lifecycle hook that add governance structure to Claude Code. No CLI, no MCP server, no database. Everything lives in your repo as markdown.
+>
+> **Command prefix:** All AIAgentMinder commands use the `aam-` prefix (e.g., `/aam-brief`, `/aam-handoff`) to avoid collision with Claude Code built-in commands and other plugins.
 
 ---
 
@@ -31,7 +33,7 @@ Spec-Driven Development tools (Spec-Kit, cc-sdd, GSD) have emerged as strong opt
 | File | Purpose | When Claude reads it |
 | ------ | --------- | --------------------- |
 | `CLAUDE.md` | Project identity, behavioral rules, quality tier | Every session (auto) |
-| `DECISIONS.md` | Architectural decisions with rationale and known debt log | On-demand; add `@DECISIONS.md` to CLAUDE.md to auto-load |
+| `DECISIONS.md` | Architectural decisions, rationale, and known debt log | On-demand; add `@DECISIONS.md` to CLAUDE.md to auto-load |
 | `docs/strategy-roadmap.md` | Product brief — what you're building, phases, out-of-scope items | On-demand |
 | `.claude/rules/*.md` | Development discipline rules — loaded natively by Claude Code | Every session (auto) |
 | `SPRINT.md` | Active sprint header, issues, and velocity archive | Every session when sprint enabled (via `@SPRINT.md` import) |
@@ -57,15 +59,15 @@ Spec-Driven Development tools (Spec-Kit, cc-sdd, GSD) have emerged as strong opt
 
 | Command | When to use |
 |---------|------------|
-| `/brief` | Start of a project — Claude interviews you and generates a product brief with MVP features, tech stack, and quality tier |
-| `/checkup` | After `/update` or when something seems broken — validates installation health (files, hooks, version, Node.js) |
-| `/scope-check` | Before building something — Claude compares the proposed work against your roadmap and returns a clear verdict |
-| `/handoff` | End of a session — writes priorities to auto-memory, updates DECISIONS.md, commits |
-| `/quality-gate` | Pre-PR — tiered checks matching your project's quality tier (Lightweight / Standard / Rigorous / Comprehensive) |
-| `/self-review` | Pre-PR (Rigorous/Comprehensive, and any risk-flagged issue) — specialist subagents review the diff for security, performance, and API design |
-| `/milestone` | Sprint boundaries — health assessment across phase progress, timeline, scope drift, dependency health, complexity budget, and known debt |
-| `/retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
-| `/update` | Upgrade an existing installation — handles migration from previous versions |
+| `/aam-brief` | Start of a project — Claude interviews you and generates a product brief with MVP features, tech stack, and quality tier |
+| `/aam-checkup` | After `/aam-update` or when something seems broken — validates installation health (files, hooks, version, Node.js) |
+| `/aam-scope-check` | Before building something — Claude compares the proposed work against your roadmap and returns a clear verdict |
+| `/aam-handoff` | End of a session — writes priorities to auto-memory, updates DECISIONS.md, commits |
+| `/aam-quality-gate` | Pre-PR — tiered checks matching your project's quality tier (Lightweight / Standard / Rigorous / Comprehensive) |
+| `/aam-self-review` | Pre-PR (Rigorous/Comprehensive, and any risk-flagged issue) — specialist subagents review the diff for security, performance, and API design |
+| `/aam-milestone` | Sprint boundaries — health assessment across phase progress, timeline, scope drift, dependency health, complexity budget, and known debt |
+| `/aam-retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
+| `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
 
 **One hook** runs automatically:
 
@@ -94,21 +96,21 @@ git clone https://github.com/lwalden/AIAgentMinder.git
 cd AIAgentMinder
 ```
 
-### 2. Run `/setup`
+### 2. Run `/aam-setup`
 
-Open Claude Code in the cloned directory and run `/setup`. It asks about your project in grouped rounds, then copies the right files to your target location.
+Open Claude Code in the cloned directory and run `/aam-setup`. It asks about your project in grouped rounds, then copies the right files to your target location.
 
-### 3. Run `/checkup`
+### 3. Run `/aam-checkup`
 
-After setup, run `/checkup` in your project directory to verify the installation is healthy before you start.
+After setup, run `/aam-checkup` in your project directory to verify the installation is healthy before you start.
 
-### 4. Run `/brief`
+### 4. Run `/aam-brief`
 
-Run `/brief` to create your product brief and strategy roadmap. Claude interviews you about your project and generates `docs/strategy-roadmap.md` with MVP features, phase plan, and quality tier.
+Run `/aam-brief` to create your product brief and strategy roadmap. Claude interviews you about your project and generates `docs/strategy-roadmap.md` with MVP features, phase plan, and quality tier.
 
 For an **existing project**, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files from what it finds.
 
-After the roadmap, `/brief` asks whether to enable optional features: code quality guidance, sprint planning, and architecture fitness rules. Recommended for Standard+ projects.
+After the roadmap, `/aam-brief` asks whether to enable optional features: code quality guidance, sprint planning, and architecture fitness rules. Recommended for Standard+ projects.
 
 ### 5. Build
 
@@ -118,7 +120,7 @@ Tell Claude: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
 
 Or, with sprint planning enabled: "Start a sprint for Phase 1."
 
-End each session with `/handoff` to record priorities and decisions.
+End each session with `/aam-handoff` to record priorities and decisions.
 
 ### Resuming work
 
@@ -133,25 +135,25 @@ Use `claude --continue` to restore the previous session's full message history, 
 ## What a Session Looks Like
 
 **Session 1 — Planning:**
-Run `/brief`. Claude asks about your project in grouped rounds. You describe a recipe sharing API, select Standard quality tier, enable sprint planning.
-Claude generates `docs/strategy-roadmap.md`. Run `/handoff`. Priorities are written to auto-memory.
+Run `/aam-brief`. Claude asks about your project in grouped rounds. You describe a recipe sharing API, select Standard quality tier, enable sprint planning.
+Claude generates `docs/strategy-roadmap.md`. Run `/aam-handoff`. Priorities are written to auto-memory.
 
 **Session 2 — Sprint planning + building:**
 Open Claude Code. Session Memory knows the project state.
 Say "Start a sprint for Phase 1." Claude proposes 5 issues with acceptance criteria — one flagged `[risk]` because it touches auth. You review and approve.
-Claude creates a branch, implements S1-001 (scaffold Express app), passes `/quality-gate`, opens a PR. Waits for your review.
+Claude creates a branch, implements S1-001 (scaffold Express app), passes `/aam-quality-gate`, opens a PR. Waits for your review.
 After you merge, Claude moves to S1-002 (user registration endpoint).
 
 **Session 3 — Continuing:**
 Open a fresh Claude Code tab. SPRINT.md is loaded automatically.
-Say "Resume." Claude picks up where it left off — runs `/self-review` on the risk-flagged auth issue before creating the PR.
+Say "Resume." Claude picks up where it left off — runs `/aam-self-review` on the risk-flagged auth issue before creating the PR.
 
 **Sprint completion:**
-All issues done. Claude runs `/retrospective` — 5 planned, 5 completed, 1 decision logged. Adaptive sizing: "Your first sprint was 100% — consider planning 6–7 issues next time."
+All issues done. Claude runs `/aam-retrospective` — 5 planned, 5 completed, 1 decision logged. Adaptive sizing: "Your first sprint was 100% — consider planning 6–7 issues next time."
 Sprint is archived with velocity metadata. Start Sprint 2.
 
 **Phase boundary:**
-Run `/milestone`. Health report: 6/6 MVP features complete, timeline on track, 3 known debt items (oldest 1 sprint), largest file 180 lines (healthy for Phase 1). Recommendations: none — clean bill of health.
+Run `/aam-milestone`. Health report: 6/6 MVP features complete, timeline on track, 3 known debt items (oldest 1 sprint), largest file 180 lines (healthy for Phase 1). Recommendations: none — clean bill of health.
 
 ---
 
@@ -163,19 +165,19 @@ your-project/
 ├── DECISIONS.md               # Architectural decisions + Known Debt table
 ├── SPRINT.md                  # Sprint header (optional, sprint planning only)
 ├── docs/
-│   └── strategy-roadmap.md    # Product brief (generated by /brief)
+│   └── strategy-roadmap.md    # Product brief (generated by /aam-brief)
 ├── .gitignore                 # Core + stack-specific entries
 └── .claude/
     ├── settings.json          # Hook configuration
     ├── commands/
-    │   ├── brief.md           # /brief — planning interview
-    │   ├── checkup.md         # /checkup — installation health check
-    │   ├── handoff.md         # /handoff — session-end checkpoint
-    │   ├── quality-gate.md    # /quality-gate — tiered pre-PR checks
-    │   ├── scope-check.md     # /scope-check — active scope governance
-    │   ├── self-review.md     # /self-review — specialist review subagents
-    │   ├── milestone.md       # /milestone — project health assessment
-    │   └── retrospective.md   # /retrospective — sprint retrospective
+    │   ├── aam-brief.md           # /aam-brief — planning interview
+    │   ├── aam-checkup.md         # /aam-checkup — installation health check
+    │   ├── aam-handoff.md         # /aam-handoff — session-end checkpoint
+    │   ├── aam-quality-gate.md    # /aam-quality-gate — tiered pre-PR checks
+    │   ├── aam-scope-check.md     # /aam-scope-check — active scope governance
+    │   ├── aam-self-review.md     # /aam-self-review — specialist review subagents
+    │   ├── aam-milestone.md       # /aam-milestone — project health assessment
+    │   └── aam-retrospective.md   # /aam-retrospective — sprint retrospective
     ├── rules/
     │   ├── git-workflow.md        # Always active
     │   ├── scope-guardian.md      # Always active
@@ -188,7 +190,7 @@ your-project/
         └── compact-reorient.js    # Sprint summary after context compaction
 ```
 
-`/setup` and `/update` are **meta-commands** — they run from the AIAgentMinder repo to install or upgrade a target project. They are not copied into your project.
+`/aam-setup` and `/aam-update` are **meta-commands** — they run from the AIAgentMinder repo to install or upgrade a target project. They are not copied into your project.
 
 ---
 
@@ -226,16 +228,16 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 ## Troubleshooting
 
-**Start with `/checkup`.** Run it in your project directory — it validates that all required files are present, hooks are configured, Node.js is available, and CLAUDE.md placeholders are filled in.
+**Start with `/aam-checkup`.** Run it in your project directory — it validates that all required files are present, hooks are configured, Node.js is available, and CLAUDE.md placeholders are filled in.
 
 | Symptom | Fix |
 | --------- | ----- |
 | Commands not showing (VS Code) | Close and reopen the Claude Code panel |
-| Hooks not firing | Run `/checkup` — it will tell you exactly what's wrong |
+| Hooks not firing | Run `/aam-checkup` — it will tell you exactly what's wrong |
 | Claude re-debates a past decision | Add it to DECISIONS.md with rationale; add `@DECISIONS.md` to CLAUDE.md to auto-load |
-| Claude starts building something out of scope | Run `/scope-check` before starting work; the passive `scope-guardian.md` rule also catches this during execution |
+| Claude starts building something out of scope | Run `/aam-scope-check` before starting work; the passive `scope-guardian.md` rule also catches this during execution |
 | Sprint context lost after compaction | The `compact-reorient.js` hook fires automatically and outputs the active sprint summary — verify Node.js is installed |
-| Upgrading an existing project | Run `/update` from the AIAgentMinder repo — it handles all migrations, overwrites framework files, surgically merges CLAUDE.md, and runs `/checkup` at the end |
+| Upgrading an existing project | Run `/aam-update` from the AIAgentMinder repo — it handles all migrations, overwrites framework files, surgically merges CLAUDE.md, and runs `/aam-checkup` at the end |
 
 ---
 
@@ -243,8 +245,8 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 - [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
 - [Customization Guide](docs/customization-guide.md) — optional features, architecture fitness rules, quality tiers
-- [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/brief` or writing `strategy-roadmap.md` manually
-- [Roadmap](ROADMAP.md) — v1.0 feature set and post-v1.0 backlog
+- [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/aam-brief` or writing `strategy-roadmap.md` manually
+- [Roadmap](ROADMAP.md) — post-v1.0 direction and backlog
 
 ---
 

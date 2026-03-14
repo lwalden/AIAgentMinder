@@ -30,7 +30,7 @@ When the user asks to start a sprint or begin a phase:
    - Public API changes (breaking or additive)
    - Security-sensitive config or secrets handling
 
-   If yes, add `[risk]` to the issue title. Risk-tagged issues trigger automatic `/self-review` before PR creation regardless of quality tier.
+   If yes, add `[risk]` to the issue title. Risk-tagged issues trigger automatic `/aam-self-review` before PR creation regardless of quality tier.
 
 7. Write the sprint header to `SPRINT.md`:
 
@@ -65,9 +65,9 @@ Once the user approves:
 
 - Work issues in the proposed order unless the user directs otherwise.
 - For each issue: create a feature branch (`{type}/S{n}-{seq}-{short-desc}`), implement, commit referencing the issue ID (`feat(auth): implement login endpoint [S1-003]`).
-- Before creating a PR: run `/quality-gate` to confirm the issue meets the project's quality tier. Fix any failures before proceeding.
-- For **Rigorous** and **Comprehensive** quality tiers: also run `/self-review` after the quality gate passes. Address any High severity findings before proceeding.
-- For **risk-tagged issues** (`[risk]`): run `/self-review` regardless of quality tier (even Lightweight/Standard). Address any High severity findings before creating the PR.
+- Before creating a PR: run `/aam-quality-gate` to confirm the issue meets the project's quality tier. Fix any failures before proceeding.
+- For **Rigorous** and **Comprehensive** quality tiers: also run `/aam-self-review` after the quality gate passes. Address any High severity findings before proceeding.
+- For **risk-tagged issues** (`[risk]`): run `/aam-self-review` regardless of quality tier (even Lightweight/Standard). Address any High severity findings before creating the PR.
 - After all checks pass, create the PR. Notify the user it's ready for review. **Wait for user input before merging — the user always approves PRs.**
 - Update the native Task status as you work: pending → in_progress → completed (or leave pending if blocked).
 - Update SPRINT.md issue status to match: `todo` → `in-progress` → `done` or `blocked`.
@@ -79,7 +79,7 @@ A sprint ends when all issues are `done` or `blocked`.
 
 - If blocked issues exist: notify the user and wait for resolution. Once blocks are resolved, complete remaining issues, then proceed to review.
 - Present a sprint review: completed issues with PR links, decisions logged to DECISIONS.md, any risk-tagged issues and their self-review outcomes, summary of what was accomplished, and what remains for the next sprint.
-- Run `/retrospective` to generate metrics for the sprint. Present it alongside the review.
+- Run `/aam-retrospective` to generate metrics for the sprint. Present it alongside the review.
 - If the user accepts the review: archive the sprint — replace SPRINT.md contents with:
 
   ```
@@ -87,7 +87,7 @@ A sprint ends when all issues are `done` or `blocked`.
   <!-- sizing: {recommended_min}-{recommended_max} -->
   ```
 
-  The velocity percentage is `completed/planned * 100`. The `sizing` comment is the recommended issue range for the next sprint, derived from `/retrospective` Step 4. Full sprint detail is preserved in git history and in native task history.
+  The velocity percentage is `completed/planned * 100`. The `sizing` comment is the recommended issue range for the next sprint, derived from `/aam-retrospective` Step 4. Full sprint detail is preserved in git history and in native task history.
 
 - The user can then ask to begin a new sprint. Increment the sprint number.
 
@@ -96,4 +96,4 @@ A sprint ends when all issues are `done` or `blocked`.
 - `SPRINT.md` persists across sessions via git — it's the sprint header and authoritative scope record.
 - Native Tasks persist across sessions automatically (stored at `~/.claude/tasks/`).
 - When resuming a session with an active sprint: read `SPRINT.md` to get context, then use TaskList to see current task states. Resume from where you left off.
-- `/handoff` works independently — it checkpoints decisions and key context. Do not modify SPRINT.md or tasks during handoff; sprint state is updated during sprint execution.
+- `/aam-handoff` works independently — it checkpoints decisions and key context. Do not modify SPRINT.md or tasks during handoff; sprint state is updated during sprint execution.

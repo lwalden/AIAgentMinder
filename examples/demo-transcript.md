@@ -1,12 +1,12 @@
 # Demo: Planning and Building a Recipe API
 
-A walkthrough of three sessions using AIAgentMinder. Shows `/plan`, `/handoff`, and the resume cycle.
+A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-handoff`, and the resume cycle.
 
 ---
 
 ## Session 1: Planning
 
-> **User:** /plan
+> **User:** /aam-brief
 
 > **Claude:** Where are you with your project idea? A) Rough concept B) Clear idea C) Partial plan D) Detailed plan
 
@@ -24,95 +24,66 @@ A walkthrough of three sessions using AIAgentMinder. Shows `/plan`, `/handoff`, 
 
 [Claude records format preference in DECISIONS.md, populates MVP Goals in CLAUDE.md]
 
-> **User:** /handoff
+> **User:** /aam-handoff
 
-[Claude rewrites PROGRESS.md: Active Tasks = "None — planning complete", Current State = "strategy-roadmap.md generated, no code yet", Next Priorities = scaffold → auth → test setup. Adds session note.]
+[Claude writes priorities to auto-memory, updates DECISIONS.md with ADR format choice, commits]
 
 > Session handoff complete. Next session: scaffold the Express app. Blockers for human: create GitHub repo, provision PostgreSQL.
 
 ---
 
-## Session 2: Building
+## Session 2: Building with Sprint Planning
 
-*(New session. SessionStart hook fires — PROGRESS.md injected automatically.)*
+*(New session. Session Memory provides automatic context from Session 1.)*
 
-> **Claude (hook output):**
-> ```
-> --- PROGRESS.md (session context) ---
-> [PROGRESS.md contents injected]
+> **User:** Start a sprint for Phase 1.
+
+> **Claude:** Reading roadmap... I'll propose a first sprint covering the foundational work:
 >
-> --- Tasks from PROGRESS.md ---
-> [priority] Scaffold Express app — src/app.ts, src/db/pool.ts...
-> [priority] Implement auth endpoints...
-> [priority] Set up Jest + Supertest...
-> ```
+> Sprint S1 — "Auth + Scaffold"
+> 1. S1-001: Scaffold Express app (feature)
+> 2. S1-002: Set up Jest + Supertest (chore)
+> 3. S1-003: User registration + JWT auth [risk] (feature)
+> 4. S1-004: Auth middleware (feature)
+> 5. S1-005: Recipe CRUD endpoints (feature)
+>
+> S1-003 is risk-tagged because it touches auth. Deferred to Sprint 2: ingredient search, favorites, rate limiting.
+> Approve this sprint?
 
-> **User:** Start on the next priority.
+> **User:** Approved.
 
-> **Claude:** Planning is done, no code yet. Starting with the Express scaffold.
-
-[Claude scaffolds src/app.ts, src/db/pool.ts, src/routes/, .env.example, installs dependencies]
+[Claude creates feature branch, scaffolds src/app.ts, src/db/pool.ts, src/routes/, .env.example, installs dependencies]
 
 [Claude writes failing tests for auth, implements POST /auth/register and POST /auth/login — tests pass]
 
-> **User:** Looks good. Now the recipe routes.
+[Runs `/aam-quality-gate` — Standard tier checks pass. Creates PR for S1-003.]
 
-[Claude implements GET /recipes and GET /recipes/:id with integration tests — tests pass]
+[For the risk-tagged auth issue, Claude also runs `/aam-self-review` — security lens finds no issues.]
 
-> **User:** /handoff
+> **User:** PR looks good. Continue.
 
-[Claude rewrites PROGRESS.md:]
-- Active Tasks: "Recipe mutation routes (POST, PUT, DELETE) — not yet started"
-- Current State: "App running. Auth complete. GET /recipes working with tests. Auth middleware exists but not applied to mutation routes."
-- Next Priorities: POST /recipes with Zod validation → apply auth middleware → PUT/DELETE with ownership check
-- Adds session note for 2026-02-15
+[Claude implements recipe CRUD routes with tests — all pass]
 
-> **Claude:** Also logging the Zod decision.
+> **User:** /aam-handoff
 
-```
-### Input Validation | 2026-02-15 | Status: Active
-Chose: Zod over Joi and express-validator. Why: TypeScript-first — schemas double as type
-definitions, eliminating runtime/compile mismatches. Tradeoff: new to Zod (learning curve).
-```
-
-> Next session: POST /recipes with validation, then PUT/DELETE with auth. Blockers: provision staging DB.
+[Claude writes priorities to auto-memory: "Next: ingredient search, favorites, rate limiting (Sprint 2)". Updates DECISIONS.md with Zod validation decision. Commits.]
 
 ---
 
 ## Session 3: Continuing
 
-*(Fresh session. Hook injects PROGRESS.md and DECISIONS.md.)*
-
-> **Claude (hook output):**
-> ```
-> [active] Recipe mutation routes — not yet started
-> [state] App running. Auth complete. GET /recipes working with tests.
-> [state] Auth middleware exists but not applied to mutation routes.
-> [priority] POST /recipes with Zod validation...
-> [priority] Apply auth middleware to mutation routes...
-> --- DECISIONS.md injected (4 decisions) ---
-> ```
+*(Fresh session. SPRINT.md is loaded automatically via @import.)*
 
 > **User:** Resume.
 
-> **Claude:** GET routes done, auth middleware not yet applied to mutations, POST /recipes schema stub exists. Writing failing test first.
+> **Claude:** Sprint S1: 5/5 issues complete. All PRs merged. Ready for sprint review.
 
-[Claude writes failing tests: no auth → 401, valid body + auth → 201]
+[Claude runs `/aam-retrospective` — 5 planned, 5 completed, 1 decision logged. "Your first sprint was 100% — consider 6–7 issues next time."]
 
-[Claude wires auth middleware, connects Zod schema — validation errors return 400 with field errors]
+> **User:** Archive the sprint and start Sprint 2.
 
-[Tests pass, commits on feature branch]
+[Sprint S1 archived with velocity metadata. Claude proposes Sprint S2: ingredient search, favorites, rate limiting, plus a Zod schema refinement issue.]
 
-> **User:** Wire the same into PUT and DELETE.
+> **User:** Approved.
 
-[Claude implements PUT/DELETE /recipes/:id with ownership check — 403 if not owner. Tests pass.]
-
-> **User:** /handoff
-
-[Claude rewrites PROGRESS.md:]
-- Active Tasks: "Ingredient search — not yet started"
-- Current State: "Full recipe CRUD complete. Zod validation on POST/PUT. Auth on all mutation routes. All tests passing."
-- Next Priorities: ingredient search → favorites → rate limiting
-- Adds session note for 2026-02-17, drops oldest note (now 3 kept)
-
-> Next session: ingredient search (the core feature), then favorites, then rate limiting. Blockers: provision Railway PostgreSQL.
+[Claude continues building...]

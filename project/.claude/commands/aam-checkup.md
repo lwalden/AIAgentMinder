@@ -1,8 +1,8 @@
-# /checkup - Installation Health Check
+# /aam-checkup - Installation Health Check
 
 Validate that AIAgentMinder is correctly installed and configured in this project.
 
-Run this after `/update`, when hooks aren't firing, or when commands aren't loading.
+Run this after `/aam-update`, when hooks aren't firing, or when commands aren't loading.
 
 ---
 
@@ -27,7 +27,7 @@ Check that each of these exists in the project root or expected path:
 | --- | --- |
 | `CLAUDE.md` | FAIL |
 | `DECISIONS.md` | WARN |
-| `docs/strategy-roadmap.md` | WARN — "Run /brief to create" |
+| `docs/strategy-roadmap.md` | WARN — "Run /aam-brief to create" |
 | `.claude/settings.json` | FAIL |
 
 ### 3. Hook Script
@@ -35,13 +35,13 @@ Check that each of these exists in the project root or expected path:
 Check that `.claude/hooks/compact-reorient.js` exists.
 
 - **PASS:** Found
-- **FAIL:** Missing — "Hook script not found. Run /update to restore it."
+- **FAIL:** Missing — "Hook script not found. Run /aam-update to restore it."
 
 ### 4. Hook Configuration
 
 Read `.claude/settings.json` and verify:
 
-- Parses as valid JSON — if not: **FAIL** — "settings.json is not valid JSON. Re-run /update to restore it."
+- Parses as valid JSON — if not: **FAIL** — "settings.json is not valid JSON. Re-run /aam-update to restore it."
 - Contains a `hooks` entry referencing `compact-reorient.js` — if missing: **WARN** — "Hook entry not found in settings.json. The compact-reorient hook may not fire."
 
 ### 5. Project Identity
@@ -49,14 +49,14 @@ Read `.claude/settings.json` and verify:
 Read `CLAUDE.md` and check for unfilled placeholder brackets (`[Project Name]`, `[Brief description]`, `[Language`, etc.).
 
 - **PASS:** No placeholders found
-- **WARN:** Placeholders present — "CLAUDE.md still has placeholder values. Run /brief to fill them in."
+- **WARN:** Placeholders present — "CLAUDE.md still has placeholder values. Run /aam-brief to fill them in."
 
 ### 6. Version Stamp
 
 Read `.claude/aiagentminder-version`.
 
 - **INFO:** Show installed version (e.g., "v1.0.0")
-- **WARN if missing:** "No version stamp found. Run /update to write one."
+- **WARN if missing:** "No version stamp found. Run /aam-update to write one."
 
 ### 7. Git Status
 
@@ -81,7 +81,7 @@ AIAgentMinder Health Check — v{version}
 ✓ Node.js: v20.11.0
 ✓ CLAUDE.md: found (Project Identity populated)
 ✓ DECISIONS.md: found
-⚠ docs/strategy-roadmap.md: found but has placeholder values — run /brief
+⚠ docs/strategy-roadmap.md: found but has placeholder values — run /aam-brief
 ✓ .claude/settings.json: valid JSON, hook entry present (compact-reorient)
 ✓ .claude/hooks/compact-reorient.js: found
 ✓ Git: branch main, remote origin configured

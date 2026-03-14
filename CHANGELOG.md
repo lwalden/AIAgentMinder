@@ -6,6 +6,50 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.1.0] - 2026-03-14
+
+### Added
+- **`aam-` command prefix** — All AIAgentMinder commands renamed with `aam-` prefix to avoid collision with Claude Code built-in commands (`/plan`, `/doctor`) and other plugins. Commands are now: `/aam-brief`, `/aam-checkup`, `/aam-handoff`, `/aam-quality-gate`, `/aam-scope-check`, `/aam-self-review`, `/aam-milestone`, `/aam-retrospective`, `/aam-setup`, `/aam-update`.
+- **`## Known Debt` section** in `project/DECISIONS.md` template — structured table for recording shortcuts, workarounds, and deferred quality work. `/aam-milestone` surfaces the debt list alongside scope drift.
+- **`docs/archive/`** directory — analysis documents moved here to keep root clean.
+
+### Changed
+- **All documentation** reviewed and updated for accuracy: stale `/plan` references fixed, Stop hook references removed, PROGRESS.md references removed, missing commands (`/aam-checkup`, `/aam-scope-check`) added to all docs.
+- **`ROADMAP.md`** — reframed: v1.0 marked as shipped, post-v1.1 direction outlined, `/onboard` dropped (covered by `/aam-brief` Starting Point E).
+- **`backlog.md`** — cleaned: completed v1.0 items removed, only unscheduled backlog remains.
+- **`SKILL.md`** — version bumped to 1.1.0, missing skills added (`/aam-checkup`, `/aam-scope-check`), missing rules added (`approach-first.md`, `debug-checkpoint.md`).
+- **Plugin skills** — all skill directories and SKILL.md frontmatter names updated with `aam-` prefix.
+- **`.claude-plugin/plugin.json`** — version bumped to 1.1.0.
+- **`examples/CLAUDE.md`** — modernized from legacy v0.6.0 format to v1.1 format (removed Session Protocol, PROGRESS.md, 4-hook references).
+- **`examples/demo-transcript.md`** — modernized to reflect current Session Memory workflow instead of hook injection.
+
+### Removed
+- **`examples/PROGRESS.md`** — deleted (PROGRESS.md was pruned from scaffolding in v1.0).
+- **Root-level analysis docs** — moved to `docs/archive/` (not user-facing).
+
+---
+
+## [1.0.0] - 2026-03-13
+
+### Added
+- **`.claude/rules/approach-first.md`** — Always-active rule. Claude states its intended approach before executing architecture changes, multi-file refactors, new dependencies, or data model changes. Prevents "wrong approach" wasted cycles.
+- **`.claude/rules/debug-checkpoint.md`** — Always-active rule. After 3 consecutive failed attempts at the same error, Claude stops, summarizes what's been tried, and asks for human input. Prevents debugging spirals.
+- **`.claude/commands/checkup.md`** — New `/checkup` command for installation health checks. Validates: Node.js availability, required files present, hook scripts and settings.json, CLAUDE.md placeholders filled, version stamp, git status. Outputs PASS/WARN/FAIL report with remediation.
+- **`.claude/commands/scope-check.md`** — New `/scope-check` command for active scope governance. Developer describes proposed work; Claude compares against roadmap and sprint scope, returns verdict: in-scope, out-of-scope, deferred, or not-in-roadmap.
+- **Complexity Budget** in `/milestone` — fifth health dimension tracking file count, largest files, dependency count, and phase-appropriate thresholds.
+- **`## Known Debt` section** in DECISIONS.md template — structured table for recording shortcuts and workarounds. `/milestone` surfaces the debt list with oldest and highest-risk items.
+- **Risk-flagged issues** in sprint planning — issues touching auth, payments, data migration, or public APIs get `[risk]` tag; auto-triggers `/self-review` before PR creation regardless of quality tier.
+- **Adaptive sprint sizing formalized** — `/retrospective` writes velocity metadata to SPRINT.md on archive; next sprint planning reads it for recommended issue count.
+
+### Changed
+- **PROGRESS.md pruned from scaffolding** — no longer copied by `/setup` or managed by hooks. Session continuity handled by native Session Memory and `--continue`.
+- **`/handoff` refactored** — stripped PROGRESS.md update step; focused on its two unique contributions: priority note to auto-memory and DECISIONS.md updates.
+- **CLAUDE.md context budget simplified** — replaced detailed table with two plain-text lines plus `/context` tip. Native `/context` command provides real-time optimization.
+- **`/setup`** — copies `approach-first.md`, `debug-checkpoint.md`, `checkup.md`, `scope-check.md` as core files.
+- **`/update`** — adds new files to AIAgentMinder-owned list; handles v0.9.1→v1.0 PROGRESS.md migration.
+
+---
+
 ## [0.9.1] - 2026-03-12
 
 ### Added
