@@ -1,11 +1,11 @@
 ---
-name: milestone
+name: aam-milestone
 description: Run a project health assessment across four dimensions — phase progress, timeline health, complexity vs phase, and scope drift. Produces a structured health report with actionable recommendations. Run at sprint boundaries, phase transitions, or any time you want a clear picture of project health.
 user-invocable: true
 allowed-tools: Read, Bash, Glob, Grep
 ---
 
-# /milestone - Project Health Assessment
+# /aam-milestone - Project Health Assessment
 
 Run a milestone health check to assess whether the project is on track. This is the "project standup" that solo developers don't have — a periodic review of scope, progress, and complexity.
 

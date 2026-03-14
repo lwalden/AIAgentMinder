@@ -2,7 +2,7 @@
 
 ## Essential Customizations
 
-Before starting development, customize these files (or let `/setup` do it):
+Before starting development, customize these files (or let `/aam-setup` do it):
 
 ### 1. `CLAUDE.md` -- Project Identity Section
 
@@ -21,7 +21,7 @@ Replace the placeholder block with your actual project info:
 
 ### 2. `docs/strategy-roadmap.md` -- Your Project Plan
 
-Run `/brief` to fill it interactively, or edit manually. At minimum, fill in:
+Run `/aam-brief` to fill it interactively, or edit manually. At minimum, fill in:
 - What & Why (problem, vision, users)
 - MVP Features with acceptance criteria
 - Technical Stack choices
@@ -34,11 +34,11 @@ Run `/brief` to fill it interactively, or edit manually. At minimum, fill in:
 
 A small set of development discipline instructions (~18 lines) loaded natively at every session start. Covers TDD cycle, build-before-commit, review-before-commit, and error handling patterns.
 
-**Enable during setup:** Answer yes to "Enable code quality guidance?" in `/setup` or `/brief`.
-**Enable later:** Run `/update` from the AIAgentMinder repo — it will prompt to add the file if absent.
+**Enable during setup:** Answer yes to "Enable code quality guidance?" in `/aam-setup` or `/aam-brief`.
+**Enable later:** Run `/aam-update` from the AIAgentMinder repo — it will prompt to add the file if absent.
 **Disable:** Delete `.claude/rules/code-quality.md` from your project.
 
-The file lives at `.claude/rules/code-quality.md` and is overwritten by `/update` to stay current. Claude Code loads all `.md` files in `.claude/rules/` natively — no hooks needed.
+The file lives at `.claude/rules/code-quality.md` and is overwritten by `/aam-update` to stay current. Claude Code loads all `.md` files in `.claude/rules/` natively — no hooks needed.
 
 ### Sprint Planning
 
@@ -66,10 +66,10 @@ You resolve the block (answer the question, provide the missing resource, make t
 
 A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, preserved in full in git history. You can then ask to begin the next sprint.
 
-**Enable during setup:** Answer yes to "Enable sprint planning?" in `/setup` or `/brief`.
+**Enable during setup:** Answer yes to "Enable sprint planning?" in `/aam-setup` or `/aam-brief`.
 **Disable:** Delete `.claude/rules/sprint-workflow.md`. SPRINT.md can be left or removed.
 
-Sprint workflow instructions live in `.claude/rules/sprint-workflow.md` (overwritten by `/update`). Sprint state lives in `SPRINT.md` (user-owned; `/update` never overwrites an active sprint).
+Sprint workflow instructions live in `.claude/rules/sprint-workflow.md` (overwritten by `/aam-update`). Sprint state lives in `SPRINT.md` (user-owned; `/aam-update` never overwrites an active sprint).
 
 ---
 
@@ -119,13 +119,13 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 
 ## Upgrading AIAgentMinder
 
-When a new version of AIAgentMinder is released, run `/update` from the AIAgentMinder repo (not from your project). It performs a safe in-place upgrade:
+When a new version of AIAgentMinder is released, run `/aam-update` from the AIAgentMinder repo (not from your project). It performs a safe in-place upgrade:
 
 **Overwritten (AIAgentMinder-owned):**
 - `.claude/hooks/compact-reorient.js`
 - `.claude/settings.json` (hook configuration)
-- `.claude/commands/brief.md`, `handoff.md`, `quality-gate.md`, `self-review.md`, `milestone.md`, `retrospective.md`
-- `.claude/rules/git-workflow.md`, `scope-guardian.md`
+- `.claude/commands/aam-brief.md`, `aam-handoff.md`, `aam-checkup.md`, `aam-quality-gate.md`, `aam-scope-check.md`, `aam-self-review.md`, `aam-milestone.md`, `aam-retrospective.md`
+- `.claude/rules/git-workflow.md`, `scope-guardian.md`, `approach-first.md`, `debug-checkpoint.md`
 
 **Overwritten if present, prompted if absent (optional features):**
 - `.claude/rules/code-quality.md`
@@ -136,23 +136,35 @@ When a new version of AIAgentMinder is released, run `/update` from the AIAgentM
 - `CLAUDE.md` — Behavioral Rules and Context Budget sections are updated; your Project Identity and MVP Goals blocks are preserved
 
 **Protected (user-owned):**
-- `PROGRESS.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore`
+- `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore`
 - `SPRINT.md` — never overwritten if an active sprint exists
 
-**v0.6.0 → v0.7.0 migration (handled automatically by `/update`):**
+**v1.0 → v1.1 migration (handled automatically by `/aam-update`):**
+- Command files renamed with `aam-` prefix — old unprefixed command files are deleted
+- Skill names updated to match
+
+**v0.9.1 → v1.0 migration:**
+- PROGRESS.md offered for deletion (no longer AIAgentMinder-managed)
+- CLAUDE.md Context Budget simplified
+
+**v0.7.0 → v0.8.0 migration:**
+- Deletes obsolete hooks: `session-end-commit.js`
+- Deletes old `plan.md` command (replaced by `aam-brief.md`)
+
+**v0.6.0 → v0.7.0 migration:**
 - Deletes obsolete hooks: `session-start-context.js`, `session-end-timestamp.js`, `pre-compact-save.js`
 - Migrates `.claude/guidance/` files to `.claude/rules/` and removes the old directory
-- Removes `## Session Protocol` section from CLAUDE.md (replaced by native Session Memory)
+- Removes `## Session Protocol` section from CLAUDE.md
 - Adds `@SPRINT.md` import to CLAUDE.md if sprint planning was previously enabled
 
-After updating, `/update` writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
+After updating, `/aam-update` writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
 
 ---
 
 ## Tips
 
 1. **Be specific in strategy-roadmap.md** -- More context = better decisions
-2. **Run `/handoff` before ending sessions** -- Writes priorities to auto-memory so the next session resumes cleanly
+2. **Run `/aam-handoff` before ending sessions** -- Writes priorities to auto-memory so the next session resumes cleanly
 3. **Use DECISIONS.md for significant choices** -- Prevents re-debating; add `@DECISIONS.md` to CLAUDE.md to auto-load
 4. **Prefer smaller PRs** -- Easier to review, less risk
 5. **Generate CI/CD from real code** -- Wait until the project has actual code

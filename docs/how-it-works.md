@@ -7,7 +7,7 @@ Core files work together with native Claude Code features:
 | File | Role | Analogy |
 |------|------|---------|
 | `CLAUDE.md` | Behavioral rules and project identity | Employee handbook |
-| `DECISIONS.md` | Architectural decision log | Meeting minutes |
+| `DECISIONS.md` | Architectural decision log + known debt | Meeting minutes |
 | `docs/strategy-roadmap.md` | Project goals and architecture | Product brief |
 | `.claude/rules/*.md` | Development discipline & workflow | Standing operating procedures |
 | `SPRINT.md` | Active sprint issues & status | Sprint board |
@@ -20,7 +20,7 @@ Claude reads `CLAUDE.md` automatically every session. `.claude/rules/*.md` files
 
 **During:** Code written to files immediately. Commits at natural checkpoints. Feature branches only. When sprint planning is enabled, Claude decomposes phase work into reviewable issues, works them one-by-one, and creates per-issue PRs — each sprint starts with user approval.
 
-**Ending:** Run `/handoff` to write a 2-3 item priority note to auto-memory, update DECISIONS.md with session ADRs, and commit. The Stop hook auto-commits any other tracked changes on feature branches.
+**Ending:** Run `/aam-handoff` to write a 2-3 item priority note to auto-memory, update DECISIONS.md with session ADRs, and commit. Git commit discipline is enforced by `.claude/rules/git-workflow.md` — commits are intentional, not automatic.
 
 **After context compaction:** The `compact-reorient.js` hook fires via the SessionStart `compact` matcher and outputs the first 15 lines of SPRINT.md (if active) to reorient Claude to the current sprint. Session Memory handles the broader context restoration.
 
@@ -40,20 +40,22 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 
 | Command | Purpose | Modifies Files? |
 |---------|---------|----------------|
-| `/setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
-| `/update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md (run from AIAgentMinder repo) | Yes |
-| `/brief` | Create or update strategy-roadmap.md interactively; optionally enable code quality guidance and sprint planning | Yes |
-| `/handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
-| `/quality-gate` | Pre-PR quality checks — four tiers matching the project quality tier | No |
-| `/self-review` | Specialist review subagents (security, performance, API design) — Rigorous/Comprehensive tiers | No |
-| `/milestone` | Project health assessment: phase progress, timeline, complexity, scope drift | No |
-| `/retrospective` | Sprint retrospective with metrics and adaptive sizing guidance | No |
+| `/aam-setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
+| `/aam-update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md (run from AIAgentMinder repo) | Yes |
+| `/aam-brief` | Create or update strategy-roadmap.md interactively; optionally enable code quality guidance and sprint planning | Yes |
+| `/aam-checkup` | Validate installation health — files, hooks, Node.js, version stamp, CLAUDE.md placeholders | No |
+| `/aam-scope-check` | Compare proposed work against roadmap — returns in-scope / out-of-scope / deferred verdict | No |
+| `/aam-handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
+| `/aam-quality-gate` | Pre-PR quality checks — four tiers matching the project quality tier | No |
+| `/aam-self-review` | Specialist review subagents (security, performance, API design) — Rigorous/Comprehensive tiers | No |
+| `/aam-milestone` | Project health assessment: phase progress, timeline, complexity budget, scope drift, known debt | No |
+| `/aam-retrospective` | Sprint retrospective with metrics and adaptive sizing guidance | No |
 
 ## Optional Features
 
 ### Code Quality Guidance
 
-When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (~18 lines of actionable instructions: TDD cycle, build-before-commit, review-before-commit, error handling, and more). Enabled during `/brief`, `/setup`, or `/update`. Delete the file to opt out.
+When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (~18 lines of actionable instructions: TDD cycle, build-before-commit, review-before-commit, error handling, and more). Enabled during `/aam-brief`, `/aam-setup`, or `/aam-update`. Delete the file to opt out.
 
 ### Sprint Planning
 
