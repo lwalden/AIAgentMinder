@@ -1,150 +1,277 @@
 # AIAgentMinder Backlog
 
-## Competitive Landscape Analysis 2/23/2026
-
-### Direct Competitors (Session Continuity for Claude Code)
-
-| Tool | Approach | Strengths vs AIAgentMinder | Weaknesses vs AIAgentMinder |
-|------|----------|---------------------------|----------------------------|
-| **claude-mem** (thedotmack) | Plugin marketplace install; 5 lifecycle hooks; SQLite + Chroma vector DB; 3-layer progressive disclosure | Zero-config automatic capture; 10x token efficiency via compression; semantic search; 1,739 GitHub stars in 24 hours (Feb 2026) | Requires Bun + external dependencies; API cost (~$0.10/day for Haiku calls); no planning/governance layer |
-| **memory-mcp** (yuvalsuede) | MCP server; Haiku-powered extraction; two-tier memory (CLAUDE.md + deep store) | Fully automatic; LLM-powered consolidation; visual dashboard; npm install | External LLM dependency (cost); no project planning; no decision tracking |
-| **ContextStream** (contextstream) | Hooks-based auto-capture; per-message context injection | Smart per-message relevance filtering; learns from errors | No planning layer; no governance; less mature |
-| **claude-sessions** (iannuttall) | Slash commands only; session files in `sessions/` directory | Simple; pure markdown | Manual-only; no hooks; no auto-inject; no planning |
-| **Claude Code Native Session Memory** | Built-in (v2.1.30+, Feb 2026); background recall/write of memories | Zero setup; native integration; no token cost | Compressed summaries lose detail; no decision tracking; no structured planning; no governance; gradual rollout |
-
-### Broader Ecosystem (Project Management / Governance)
-
-| Tool | Approach | Overlap with AIAgentMinder |
-|------|----------|---------------------------|
-| **CCPM** (automazeio) | GitHub Issues as source of truth; PRDs → Epics → Issues; parallel agent execution via git worktrees | Planning layer overlaps with `/plan`; much heavier; targets teams, not solo devs |
-| **claude-simone** | Framework for AI-assisted development with Claude Code | Project management focus; less session continuity |
-| **Compound Engineering Plugin** (EveryInc) | Agents, skills, commands; turns mistakes into lessons | Learning-from-errors overlaps with DECISIONS.md; different philosophy |
-| **Context Engineering Kit** (Vlad Goncharov) | Minimal-token context patterns | Complements rather than competes; could inform AIAgentMinder's context budget approach |
-
-### Key Takeaway
-
-AIAgentMinder occupies a **unique niche**: lightweight session continuity + structured planning + decision governance, all in plain markdown with no external dependencies beyond Node.js. The biggest emerging threat is **Claude Code's native Session Memory** (Feb 2026 rollout), which automates the session continuity piece. However, native memory doesn't provide planning (`/plan`), decision tracking (DECISIONS.md), or structured handoffs — AIAgentMinder's governance and planning layers remain independently valuable, as the README correctly notes.
-
-The **automated memory tools** (claude-mem, memory-mcp) are more sophisticated at context capture but add dependencies and cost. AIAgentMinder's manual-but-structured approach (git-tracked, human-readable) is a feature for developers who want transparency and control.
+Full acceptance criteria for planned features. Items here are assessed and ready to implement; items in ROADMAP.md backlog section are unscheduled without full AC.
 
 ---
 
-## C) High-Value Enhancement to Existing Feature
+## v1.0 Must-Have Features
 
-### Story: Enhance `/handoff` to Generate a Machine-Readable Session Digest
+### `/checkup` Diagnostic Command
 
-**Title:** `/handoff` writes a structured JSON digest alongside PROGRESS.md for automated tooling integration
-
-**Description:**
-As a developer using AIAgentMinder, I want `/handoff` to produce a small structured JSON file (`.claude/session-digest.json`) in addition to updating PROGRESS.md, so that external tools (CI/CD, dashboards, Linear/GitHub integrations) can programmatically read session state without parsing markdown.
-
-This positions AIAgentMinder to integrate with the broader Claude Code ecosystem (CCPM, Linear, GitHub Actions) without adding heavy dependencies. The digest is a lightweight bridge file — write-only from AIAgentMinder's perspective.
-
-**Rationale:**
-- Multiple competing tools (CCPM, claude-mem) offer programmatic access to session state. AIAgentMinder's pure-markdown approach is a strength for human readability but a weakness for tooling integration.
-- A JSON digest is the minimum viable step toward integration without abandoning the markdown-first philosophy.
-- Users who want to build custom dashboards, Slack notifications, or CI checks can consume this file.
-
-**Acceptance Criteria:**
-1. When `/handoff` runs, it writes `.claude/session-digest.json` with the following schema:
-   ```json
-   {
-     "version": "0.5.3",
-     "timestamp": "2026-02-23T10:30:00Z",
-     "phase": "1 - MVP",
-     "activeTasks": ["Implement POST /recipes endpoint with Zod validation"],
-     "blockers": ["Need DATABASE_URL for staging"],
-     "nextPriorities": ["Wire Zod validation", "Apply auth middleware", "Implement PUT/DELETE"],
-     "decisions": ["Input Validation: Zod over Joi"],
-     "filesModified": ["src/routes/recipes.ts", "src/schemas/recipe.ts"],
-     "sessionSummary": "Implemented GET /recipes with tests. POST stub exists."
-   }
-   ```
-2. The JSON file is added to `.gitignore` in the template (it's ephemeral — git history of PROGRESS.md is the durable record)
-3. `/handoff` command markdown instructions are updated to include the digest generation step
-4. The `session-start-context.js` hook does NOT read this file (it's for external consumers, not Claude)
-5. If the file already exists, it is overwritten (not appended)
-
-**Test Plan:**
-1. Run `/handoff` in a test project → verify `.claude/session-digest.json` is created with valid JSON
-2. Verify the schema matches the AC above
-3. Verify the file is listed in `.gitignore`
-4. Verify `session-start-context.js` does not reference the digest file
-5. Run `/handoff` twice → verify second run overwrites the first (no duplicate data)
-
----
-
-## D) High-Value New Feature
-
-### Story: Add `/checkup` Diagnostic Command for Installation Health Checks
-
-**Title:** New `/checkup` command that validates AIAgentMinder installation health and identifies common misconfiguration issues
-
-> **Note:** Renamed from `/checkup` to avoid shadowing Claude Code's built-in `/checkup` command (which checks Node.js, API connectivity, and auth). `/checkup` covers AIAgentMinder-specific health: files present, hooks configured, placeholders resolved.
+**Title:** New `/checkup` command that validates AIAgentMinder installation health
 
 **Description:**
 As a developer who has installed AIAgentMinder in my project, I want to run `/checkup` to verify that my installation is correctly configured and all prerequisites are met, so that I can quickly diagnose why hooks aren't firing, commands aren't loading, or the framework isn't working as expected.
 
-**Rationale:**
-- The #1 troubleshooting section in the README addresses "Hooks not running" and "Commands not showing." A diagnostic command eliminates guesswork.
-- Competing tools (CCPM has `/pm:validate`, claude-mem has a dashboard) provide self-diagnosis. AIAgentMinder has nothing.
-- This is especially valuable for the `/update` flow — after upgrading, run `/checkup` to confirm everything is healthy.
-- Low implementation complexity (reads files and checks conditions) with high user-facing value.
-
 **Acceptance Criteria:**
-1. Create `.claude/commands/checkup.md` in the `project/` directory (gets copied to target projects by `/setup` and `/update`)
+
+1. Create `project/.claude/commands/checkup.md`
 2. The command checks and reports on:
    - **Node.js availability**: `node --version` — PASS/FAIL with version shown
-   - **Required files exist**: CLAUDE.md, PROGRESS.md, DECISIONS.md, docs/strategy-roadmap.md, .claude/settings.json — PASS/WARN for each
-   - **Hook scripts exist**: All 4 files in `.claude/hooks/` — PASS/FAIL for each
-   - **Hook configuration valid**: `.claude/settings.json` parses as valid JSON and contains expected hook entries — PASS/FAIL
-   - **settings.json deny list**: Verify deny list is present and non-empty — PASS/WARN
-   - **CLAUDE.md Project Identity**: Check if placeholder brackets still present (`[Project Name]`, `[Brief description]`) — PASS/WARN ("still has placeholder values — run /setup")
+   - **Required files exist**: CLAUDE.md, DECISIONS.md, docs/strategy-roadmap.md, .claude/settings.json — PASS/WARN for each
+   - **Hook script exists**: `.claude/hooks/compact-reorient.js` — PASS/FAIL
+   - **Hook configuration valid**: `.claude/settings.json` parses as valid JSON and contains expected hook entry — PASS/FAIL
+   - **CLAUDE.md Project Identity**: Check if placeholder brackets still present (`[Project Name]`, `[Brief description]`) — PASS/WARN
    - **Version stamp**: Read `.claude/aiagentminder-version` and display current version — INFO
    - **Git status**: Is this a git repo? Is there a remote? What branch? — INFO
+
 3. Output format:
-   ```
-   AIAgentMinder Health Check — v0.8.0
+
+   ```text
+   AIAgentMinder Health Check — v1.0.0
 
    ✓ Node.js: v20.11.0
    ✓ CLAUDE.md: found (Project Identity populated)
    ✓ DECISIONS.md: found
    ⚠ docs/strategy-roadmap.md: found but has placeholder values — run /brief
    ✓ .claude/settings.json: valid JSON, 1 hook entry (compact-reorient)
-   ✓ .claude/hooks/: compact-reorient.js present
+   ✓ .claude/hooks/compact-reorient.js: found
    ✓ Git: on branch feature/add-search, remote origin configured
 
    Status: Healthy (1 warning)
    ```
-4. Warnings are non-blocking (the tool still reports overall health)
-5. Failures (Node.js missing, settings.json invalid) are clearly flagged with remediation steps
 
-**Test Plan:**
-1. Run `/checkup` in a correctly configured project → all checks pass
-2. Remove `node` from PATH, run `/checkup` → Node.js check fails with clear message
-3. Delete one hook file, run `/checkup` → hook check warns about missing file
-4. Corrupt `.claude/settings.json` (invalid JSON), run `/checkup` → settings check fails
-5. Run `/checkup` on a freshly `/setup`-initialized project before `/brief` → warns about placeholder values in strategy-roadmap.md
-6. Add `/checkup` to the file list in `/setup` Step 7 summary and `/update` Step 2 overwrite list
-7. Update README troubleshooting section to recommend `/checkup` as first step
+4. Warnings are non-blocking; failures are flagged with remediation steps
+5. `/setup` and `/update` copy this command and reference it in their output
 
-### Supporting Story: Update `/setup` and `/update` to Include `/checkup`
+**Supporting Story: Update `/setup` and `/update`**
 
-**Title:** `/setup` and `/update` commands copy `checkup.md` and reference it in their output
+1. `/setup` Step 3 copies `project/.claude/commands/checkup.md` to the target project
+2. `/setup` Step 7 summary lists `checkup.md` in "Created files"
+3. `/update` Step 2 overwrites `checkup.md` as an AIAgentMinder-owned file
+4. README troubleshooting section says: "Run `/checkup` first to check your installation"
+
+---
+
+### `approach-first.md` Rule
+
+**Title:** Rule instructing Claude to state approach before executing architecture-affecting tasks
 
 **Description:**
-As a maintainer of AIAgentMinder, I need `/setup` and `/update` to include the new `checkup.md` command file so that users get it automatically on install and upgrade.
+A `.claude/rules/approach-first.md` rule that prevents "wrong approach" errors — the top friction pattern from the March 2026 session analysis. Claude must state its intended approach before executing when the task involves architecture changes, adding new dependencies, multi-file refactors, new data models, or any change affecting more than 3 files.
 
 **Acceptance Criteria:**
-1. `/setup` Step 3 copies `project/.claude/commands/checkup.md` to the target project
-2. `/setup` Step 7 summary lists `checkup.md` in the "Created files" output
-3. `/update` Step 2 overwrites `checkup.md` as an AIAgentMinder-owned file
-4. `/update` file taxonomy table includes `checkup.md` in the "AIAgentMinder-owned" row
-5. README "What Gets Copied" tree includes `checkup.md`
-6. README troubleshooting section says: "Run `/checkup` first to check your installation"
 
-**Test Plan:**
-1. Run `/setup` on a new project → verify `.claude/commands/checkup.md` exists in target
-2. Run `/update` on an existing project that doesn't have `checkup.md` → verify it's added
-3. Run `/update` on a project that has an older `checkup.md` → verify it's overwritten
-4. Verify README file tree includes the new command
+1. Create `project/.claude/rules/approach-first.md`
+2. Rule applies to: architecture changes, new dependencies, multi-file refactors, data model changes, changes affecting more than 3 files
+3. Claude states what it's going to do, which files will change, and any assumptions — before writing code
+4. If the user replies with corrections, Claude adjusts approach before executing
+5. Rule does NOT apply to: single-file edits, bug fixes with obvious fixes, test additions, documentation edits
+6. `/setup` copies this file (always-active, not optional)
+7. `/update` overwrites this file as AIAgentMinder-owned
+
+---
+
+### `debug-checkpoint.md` Rule
+
+**Title:** Rule triggering a checkpoint after repeated failed debug attempts
+
+**Description:**
+A `.claude/rules/debug-checkpoint.md` rule that prevents debugging spirals. After 3 consecutive failed attempts at the same fix (same error, different code changes), Claude stops, summarizes what's been tried, and asks the human for input before continuing.
+
+**Acceptance Criteria:**
+
+1. Create `project/.claude/rules/debug-checkpoint.md`
+2. Trigger condition: 3 consecutive attempts targeting the same error that did not resolve it
+3. Checkpoint output: what the error is, what was tried (list of approaches), what Claude's current hypothesis is, and a clear ask for human input
+4. After human responds, Claude may continue — the checkpoint resets
+5. Rule does NOT block: first attempt at a fix, different errors, making progress on the same error
+6. `/setup` copies this file (always-active)
+7. `/update` overwrites this file as AIAgentMinder-owned
+
+---
+
+### Complexity Budget (in `/milestone`)
+
+**Title:** Add Complexity Budget as a fifth health dimension to `/milestone`
+
+**Description:**
+Track cumulative complexity signals at sprint boundaries. No SDD tool or native Claude Code feature provides ongoing complexity trend tracking. Integrate into `/milestone` rather than a separate command.
+
+**Acceptance Criteria:**
+
+1. `/milestone` Step 1 gathers: file count, top-5 largest source files by line count, direct dependency count
+2. `/milestone` Step 2 adds **Section E: Complexity Budget**:
+   - File count vs phase expectations (Phase 1 <50, Phase 2 <150, Phase 3+ uncapped)
+   - Largest 3 source files with line counts
+   - Dependency count vs last sprint (trend)
+   - Flag: any file >300 lines in Phase 1, >500 lines in Phase 2+
+3. `/milestone` Step 3 health report includes Complexity Budget row:
+
+   ```text
+   Complexity Budget: [Healthy / Watch / Concern]
+     File count: {n} ({delta from last sprint if available})
+     Largest:    {file}: {lines}, {file}: {lines}, {file}: {lines}
+     Deps:       {n} direct ({delta})
+   ```
+
+4. Step 4 hard issues: flag files exceeding thresholds before proceeding
+
+---
+
+### Technical Debt Tracker (in `/milestone`)
+
+**Title:** Surface Technical Debt in `/milestone`; establish logging convention
+
+**Description:**
+A structured `## Known Debt` section in DECISIONS.md for recording known shortcuts. Claude logs debt when implementing workarounds. `/milestone` surfaces the debt list.
+
+**Acceptance Criteria:**
+
+1. `project/DECISIONS.md` template includes a `## Known Debt` section with format:
+
+   ```markdown
+   ## Known Debt
+   | ID | Description | Impact | Logged | Sprint |
+   |---|---|---|---|---|
+   | D-001 | [shortcut taken] | [what breaks if ignored] | [date] | S{n} |
+   ```
+
+2. When Claude implements a workaround or intentional shortcut, it appends a row to Known Debt
+3. `/milestone` Step 1 reads the Known Debt section
+4. `/milestone` Step 3 health report includes:
+
+   ```text
+   Known Debt: {n} items logged
+     Oldest:       {date} — {description}
+     Highest risk: {description}
+   ```
+
+5. `/milestone` Step 4 flags debt items that are more than 2 sprints old
+
+---
+
+### Risk-Flagged Issues in Sprint Planning
+
+**Title:** Auto-trigger `/self-review` for risk-flagged sprint issues
+
+**Description:**
+During sprint planning, issues touching high-risk areas get a `[risk]` tag. At PR creation for that issue, `/self-review` runs automatically regardless of quality tier.
+
+**Acceptance Criteria:**
+
+1. `sprint-workflow.md` Step 4 (decompose issues): instruct Claude to add `[risk]` tag to issues touching auth/session handling, payments/billing, data migration, public API changes, or security-sensitive config
+2. Risk tag appears in SPRINT.md issue table and native Task description
+3. During sprint execution, before creating a PR for a risk-tagged issue: run `/self-review` automatically (even for Lightweight/Standard quality tiers)
+4. If `/self-review` finds High severity issues, they must be addressed before the PR is created
+5. Sprint review output notes which issues were risk-flagged
+
+---
+
+### Adaptive Sprint Sizing — Formalize Metadata
+
+**Title:** Write sprint velocity metadata to SPRINT.md on archive for cross-session trend tracking
+
+**Description:**
+`/retrospective` already provides adaptive sizing guidance after Sprint 3+. Formalize it so the data persists without parsing git history.
+
+**Acceptance Criteria:**
+
+1. When a sprint is archived, the archive line includes velocity metadata:
+
+   ```text
+   S{n} archived ({date}): {planned} planned, {completed} completed ({velocity}%). Recommended next sprint: {min}–{max} issues.
+   ```
+
+2. A `<!-- sizing: {min}-{max} -->` comment is appended after the archive line for the next sprint planning step to read
+3. `/retrospective` Step 4 reads prior archived sprint lines to compute trend (not just git log)
+4. After Sprint 3+, the recommendation is based on median velocity across available archived sprints
+
+---
+
+## v1.0 Should-Have Features
+
+### `/scope-check` Command
+
+**Title:** Active scope governance command for evaluating proposed work against the roadmap
+
+**Description:**
+The passive `scope-guardian.md` rule catches scope drift during execution. `/scope-check` provides an on-demand consultation before the developer commits to building something.
+
+**Acceptance Criteria:**
+
+1. Create `project/.claude/commands/scope-check.md`
+2. The developer describes a proposed feature or task — can be a brief sentence or a draft issue
+3. Claude reads `docs/strategy-roadmap.md`, current phase, and approved sprint scope (if active)
+4. Returns one of:
+   - **In-scope:** "This aligns with Phase {n} — [MVP feature it maps to]. Proceed."
+   - **Out-of-scope:** "This is explicitly out of scope: [quote from roadmap]. Add to a future phase or override?"
+   - **Deferred:** "This isn't in Phase {n} but is in Phase {m}. Build it then, or move it up?"
+   - **Not in roadmap:** "This isn't in the roadmap. Options: add it to the current phase, defer to a future phase, or mark out of scope."
+5. Response always includes a one-sentence recommendation and a clear path to proceed
+6. `/setup` and `/update` copy this command
+
+---
+
+## Backlog (Unscheduled)
+
+### SDD Integration Layer
+
+**Title:** Generate a `constitution.md` from `/brief` output for SDD tool compatibility
+
+**Description:**
+SDD tools (Spec-Kit, cc-sdd, GSD) handle feature-level planning. AIAgentMinder handles project-level governance. Instead of competing, generate a governance document that SDD tools can consume — positioning AIAgentMinder as the layer above SDD.
+
+**Acceptance Criteria (draft):**
+
+1. `/brief` final step optionally generates `docs/constitution.md` with: project identity, quality tier, architectural constraints, out-of-scope list, tech stack decisions
+2. The file follows emerging SDD conventions (compatible with Spec-Kit `constitution.md` format)
+3. `/setup` asks: "Generate SDD constitution.md for use with Spec-Kit/cc-sdd? (y/n)"
+
+---
+
+### `/onboard` Command
+
+**Title:** Analyze an existing codebase and generate AIAgentMinder governance files from it
+
+**Description:**
+Targets developers who discover AIAgentMinder mid-project. Reads the existing codebase and git history to generate a filled-in CLAUDE.md, initial DECISIONS.md entries, quality tier recommendation, and draft strategy-roadmap.md.
+
+**Acceptance Criteria (draft):**
+
+1. Read: existing CLAUDE.md (from `claude /init`), recent git log (last 50 commits), package/dependency files, top-level README
+2. Generate: project identity block, DECISIONS.md entries from notable git commits, quality tier recommendation based on project size/history, draft strategy-roadmap.md with inferred phases
+3. Always prompts for human review before writing — never overwrites without confirmation
+4. Leverages subagents for parallel codebase analysis
+
+---
+
+### `/handoff` JSON Digest
+
+**Recommendation: Keep in backlog. Do not implement for v1.0.**
+
+The JSON digest was designed for external tooling integration. For the target audience (solo devs, small teams), this is speculative value — nobody has requested it. If someone needs programmatic session state, they can request it. The markdown output of `/handoff` is sufficient.
+
+---
+
+### `/update` Dry-Run Mode
+
+Show what would change before committing to the migration. Useful but not v1.0 critical.
+
+---
+
+### GitHub Issues Bridge
+
+Optional sync of native Tasks to GitHub Issues for teams that want visibility outside Claude Code. Team feature, not solo dev priority.
+
+---
+
+### MCP Server Detection in `/checkup`
+
+Verify MCP servers listed in CLAUDE.md are actually configured in the project's MCP config. Post-v1.0 because MCP config format is still stabilizing.
+
+---
+
+### Strategy-Roadmap.md Versioning
+
+Lightweight change log when the roadmap is revised mid-project. Low urgency; git history serves as the archive.
