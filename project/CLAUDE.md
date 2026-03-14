@@ -18,7 +18,7 @@
 
 ## MVP Goals
 
-<!-- Populated by /brief with Phase 1 deliverables -->
+<!-- Populated by /aam-brief with Phase 1 deliverables -->
 
 ## Behavioral Rules
 
@@ -45,6 +45,7 @@ Never store credentials in code. Use `.env` files (gitignored).
 ### Decision Recording
 
 - Record significant architectural decisions in DECISIONS.md (library choices, API contracts, auth approach, data model changes, deploy decisions)
+- Record known shortcuts and workarounds in the Known Debt section of DECISIONS.md
 - Include alternatives considered — a decision without alternatives is an assertion, not a record
 - To auto-load DECISIONS.md every session, add `@DECISIONS.md` to this file
 

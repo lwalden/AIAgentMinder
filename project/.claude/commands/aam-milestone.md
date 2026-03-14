@@ -1,4 +1,4 @@
-# /milestone - Project Health Assessment
+# /aam-milestone - Project Health Assessment
 
 Run a milestone health check to assess whether the project is on track. This is the "project standup" that solo developers don't have — a periodic review of scope, progress, complexity, and known debt.
 

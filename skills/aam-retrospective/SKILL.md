@@ -1,13 +1,13 @@
 ---
-name: retrospective
+name: aam-retrospective
 description: Generate a sprint retrospective with metrics — planned vs completed issues, scope changes, blocked issues, decisions logged, and adaptive sprint sizing guidance. Called automatically at sprint completion; also invocable manually.
 user-invocable: true
 allowed-tools: Read, Bash, Glob
 ---
 
-# /retrospective - Sprint Retrospective
+# /aam-retrospective - Sprint Retrospective
 
-Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/retrospective`.
+Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/aam-retrospective`.
 
 ---
 

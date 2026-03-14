@@ -1,6 +1,6 @@
-# /retrospective - Sprint Retrospective
+# /aam-retrospective - Sprint Retrospective
 
-Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/retrospective`.
+Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/aam-retrospective`.
 
 ---
 
@@ -28,7 +28,7 @@ From the data gathered, calculate:
 | **Planned issues** | How many issues were in the approved sprint |
 | **Completed issues** | How many reached `done` |
 | **Blocked issues** | How many are still `blocked` at sprint end |
-| **Risk-tagged issues** | How many had `[risk]` tag; how many triggered `/self-review` |
+| **Risk-tagged issues** | How many had `[risk]` tag; how many triggered `/aam-self-review` |
 | **Scope additions** | Issues added after sprint approval |
 | **Scope removals** | Issues removed after sprint approval |
 | **Decisions logged** | DECISIONS.md entries added this sprint |

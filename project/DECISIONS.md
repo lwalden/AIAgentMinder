@@ -11,7 +11,7 @@
 
 ## ADR Format
 
-<!-- Set by /plan. Replace this comment with: "Format: Lightweight" or "Format: Formal" -->
+<!-- Set by /aam-brief. Replace this comment with: "Format: Lightweight" or "Format: Formal" -->
 
 **Lightweight:**
 ```
@@ -36,3 +36,13 @@ Chose: [X] over [alternatives considered]. Why: [rationale]. Tradeoff: [what you
 ---
 
 <!-- Decisions go here -->
+
+---
+
+## Known Debt
+
+> Record shortcuts, workarounds, and deferred quality work here. Claude logs debt when implementing workarounds. `/aam-milestone` surfaces the debt list alongside scope drift.
+
+| ID | Description | Impact | Logged | Sprint |
+|---|---|---|---|---|
+<!-- Debt entries go here -->

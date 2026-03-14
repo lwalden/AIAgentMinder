@@ -1,4 +1,4 @@
-# /update - Upgrade AIAgentMinder in a Target Project
+# /aam-update - Upgrade AIAgentMinder in a Target Project
 
 You are running this command from the **AIAgentMinder template repository**. Your job is to upgrade an existing AIAgentMinder installation in a target project to match the current version of the template files in `project/`.
 
@@ -10,7 +10,7 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/handoff.md`, `.claude/commands/brief.md`, `.claude/commands/checkup.md`, `.claude/commands/quality-gate.md`, `.claude/commands/scope-check.md`, `.claude/commands/self-review.md`, `.claude/commands/milestone.md`, `.claude/commands/retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
 | **Obsolete (v0.7.0 → v0.8.0)** | `.claude/hooks/session-end-commit.js`, `.claude/commands/plan.md` | Delete during migration |
@@ -34,7 +34,7 @@ I'll update AIAgentMinder files in [path].
 This will overwrite:
   - .claude/hooks/ (1 Node.js hook file: compact-reorient.js)
   - .claude/settings.json
-  - .claude/commands/handoff.md, brief.md, checkup.md, quality-gate.md, scope-check.md
+  - .claude/commands/aam-handoff.md, aam-brief.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
   - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md
   - .claude/rules/ (existing optional rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
@@ -44,7 +44,7 @@ This will overwrite:
 
 [If upgrading from v0.7.0, these will also be removed:]
   - .claude/hooks/session-end-commit.js (replaced by .claude/rules/git-workflow.md)
-  - .claude/commands/plan.md (renamed to brief.md)
+  - .claude/commands/plan.md (renamed to aam-brief.md)
 
 [If upgrading from v0.6.0, these will also be removed:]
   - .claude/hooks/session-start-context.js
@@ -103,13 +103,13 @@ During the CLAUDE.md merge (Step 3), simplify the Context Budget section if it c
 
 Add the tip line above the budget: `> Use \`/context\` for real-time context usage and optimization tips.`
 
-### v0.7.0 → v0.8.0 Migration: Remove Stop Hook and Rename /plan to /brief
+### v0.7.0 → v0.8.0 Migration: Remove Stop Hook and Rename /plan to /aam-brief
 
 Check if any of these exist in the target. If so, handle them:
 
 ```
 [target]/.claude/hooks/session-end-commit.js   → DELETE (replaced by .claude/rules/git-workflow.md)
-[target]/.claude/commands/plan.md              → DELETE (renamed to brief.md)
+[target]/.claude/commands/plan.md              → DELETE (renamed to aam-brief.md)
 ```
 
 For each deleted file, print: `✓ Removed (obsolete): .claude/hooks/session-end-commit.js`
@@ -145,21 +145,21 @@ Copy each file from `project/` in this repo to the target, overwriting whatever 
 ```
 project/.claude/hooks/compact-reorient.js              →  [target]/.claude/hooks/compact-reorient.js
 project/.claude/settings.json                          →  [target]/.claude/settings.json
-project/.claude/commands/handoff.md                    →  [target]/.claude/commands/handoff.md
-project/.claude/commands/brief.md                      →  [target]/.claude/commands/brief.md
-project/.claude/commands/checkup.md                    →  [target]/.claude/commands/checkup.md
-project/.claude/commands/quality-gate.md               →  [target]/.claude/commands/quality-gate.md
-project/.claude/commands/scope-check.md                →  [target]/.claude/commands/scope-check.md
-project/.claude/commands/self-review.md                →  [target]/.claude/commands/self-review.md
-project/.claude/commands/milestone.md                  →  [target]/.claude/commands/milestone.md
-project/.claude/commands/retrospective.md              →  [target]/.claude/commands/retrospective.md
+project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
+project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
+project/.claude/commands/aam-checkup.md                    →  [target]/.claude/commands/aam-checkup.md
+project/.claude/commands/aam-quality-gate.md               →  [target]/.claude/commands/aam-quality-gate.md
+project/.claude/commands/aam-scope-check.md                →  [target]/.claude/commands/aam-scope-check.md
+project/.claude/commands/aam-self-review.md                →  [target]/.claude/commands/aam-self-review.md
+project/.claude/commands/aam-milestone.md                  →  [target]/.claude/commands/aam-milestone.md
+project/.claude/commands/aam-retrospective.md              →  [target]/.claude/commands/aam-retrospective.md
 project/.claude/rules/git-workflow.md                  →  [target]/.claude/rules/git-workflow.md
 project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
 project/.claude/rules/approach-first.md                →  [target]/.claude/rules/approach-first.md
 project/.claude/rules/debug-checkpoint.md              →  [target]/.claude/rules/debug-checkpoint.md
 ```
 
-Print each file as it's updated: `✓ Updated: .claude/commands/checkup.md`
+Print each file as it's updated: `✓ Updated: .claude/commands/aam-checkup.md`
 
 Also copy `project/.claude/rules/README.md` to `[target]/.claude/rules/README.md` if `.claude/rules/` exists in the target.
 
@@ -258,14 +258,14 @@ AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
 Updated:
 - .claude/hooks/ (1 file: compact-reorient.js)
 - .claude/settings.json
-- .claude/commands/handoff.md
-- .claude/commands/brief.md
-- .claude/commands/checkup.md
-- .claude/commands/quality-gate.md
-- .claude/commands/scope-check.md
-- .claude/commands/self-review.md
-- .claude/commands/milestone.md
-- .claude/commands/retrospective.md
+- .claude/commands/aam-handoff.md
+- .claude/commands/aam-brief.md
+- .claude/commands/aam-checkup.md
+- .claude/commands/aam-quality-gate.md
+- .claude/commands/aam-scope-check.md
+- .claude/commands/aam-self-review.md
+- .claude/commands/aam-milestone.md
+- .claude/commands/aam-retrospective.md
 - .claude/rules/git-workflow.md
 - .claude/rules/scope-guardian.md
 - .claude/rules/approach-first.md
@@ -289,7 +289,7 @@ Migration actions:
 Migration actions:
 [list each: ✓ Removed / ✓ Renamed]
 - .claude/hooks/session-end-commit.js
-- .claude/commands/plan.md → brief.md
+- .claude/commands/plan.md → aam-brief.md
 
 [If migrating from v0.6.0:]
 Migration actions:
@@ -306,5 +306,5 @@ Not touched (user-owned):
 
 Next: open Claude Code in [target] — your project governance is now current.
 Use `claude --continue` to restore your previous session, or start a new one.
-Run /checkup to verify the installation is healthy.
+Run /aam-checkup to verify the installation is healthy.
 ```
