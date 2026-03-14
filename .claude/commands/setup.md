@@ -32,7 +32,7 @@ Ask all of these in one grouped prompt:
 7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
 8. **Code quality guidance:** Enable? (TDD, review-before-commit, build-before-commit — loaded via `.claude/rules/` natively, ~18 lines per session) (y/n)
 9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
-10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc. You fill in the rules for your architecture.) (y/n — recommended for Rigorous/Comprehensive quality tiers)
+10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc.) (y/n — recommended for Rigorous/Comprehensive quality tiers)
 
 ---
 
@@ -51,11 +51,18 @@ If no git repo exists, run `git init`. Then copy all files from this repo's `pro
 
 ### Core files (always copy)
 
-Copy these to the target unconditionally (create the `.claude/rules/` and `.claude/commands/` directories if needed):
+Copy these to the target unconditionally (create directories as needed):
+
 - `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
 - `project/.claude/rules/scope-guardian.md` → `[target]/.claude/rules/scope-guardian.md`
+- `project/.claude/rules/approach-first.md` → `[target]/.claude/rules/approach-first.md`
+- `project/.claude/rules/debug-checkpoint.md` → `[target]/.claude/rules/debug-checkpoint.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
+- `project/.claude/commands/brief.md` → `[target]/.claude/commands/brief.md`
+- `project/.claude/commands/checkup.md` → `[target]/.claude/commands/checkup.md`
+- `project/.claude/commands/handoff.md` → `[target]/.claude/commands/handoff.md`
 - `project/.claude/commands/quality-gate.md` → `[target]/.claude/commands/quality-gate.md`
+- `project/.claude/commands/scope-check.md` → `[target]/.claude/commands/scope-check.md`
 - `project/.claude/commands/self-review.md` → `[target]/.claude/commands/self-review.md`
 - `project/.claude/commands/milestone.md` → `[target]/.claude/commands/milestone.md`
 - `project/.claude/commands/retrospective.md` → `[target]/.claude/commands/retrospective.md`
@@ -103,11 +110,11 @@ Replace the placeholder block with actual values:
 ```
 
 ### CLAUDE.md -- Sprint import (if sprint planning enabled)
-Add `@SPRINT.md` after the Context Budget table in CLAUDE.md. This is Claude Code's native `@import` syntax — it loads SPRINT.md into every session automatically when the file exists.
+Add `@SPRINT.md` after the Context Budget section in CLAUDE.md. This uses Claude Code's native `@import` syntax — it loads SPRINT.md into every session automatically when the file exists.
 
-Also add to the Context Budget table:
+Also add to the Context Budget:
 ```
-| SPRINT.md | ~35 lines active | Archived when sprint completes |
+**Sprint tracking:** SPRINT.md — auto-loaded via @import; archived when sprint completes
 ```
 
 ### .gitignore -- Append Stack-Specific Entries
@@ -146,19 +153,22 @@ Project initialized successfully!
 
 Created files:
 - CLAUDE.md (project instructions — ~50 lines)
-- PROGRESS.md (optional human-readable session artifact)
-- DECISIONS.md (architectural decisions)
+- DECISIONS.md (architectural decisions and known debt log)
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
-- .claude/commands/brief.md (/brief command — product brief & roadmap creation)
-- .claude/commands/handoff.md (/handoff command)
+- .claude/commands/brief.md (/brief — product brief & roadmap creation)
+- .claude/commands/checkup.md (/checkup — installation health check)
+- .claude/commands/handoff.md (/handoff — session checkpoint)
 - .claude/commands/quality-gate.md (/quality-gate — tiered pre-PR checks)
+- .claude/commands/scope-check.md (/scope-check — active scope governance)
 - .claude/commands/self-review.md (/self-review — subagent code review before PR)
 - .claude/commands/milestone.md (/milestone — project health assessment)
 - .claude/commands/retrospective.md (/retrospective — sprint metrics and feedback)
 - .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
+- .claude/rules/approach-first.md (approach-first protocol — state intent before executing)
+- .claude/rules/debug-checkpoint.md (debug checkpoint — prevents debugging spirals)
 - .claude/aiagentminder-version (version stamp for /update)
 - .gitignore (core + [stack] entries)
 [if code quality enabled:]
@@ -172,8 +182,9 @@ Created files:
 Next steps:
 1. Open Claude Code in your project directory
 2. Run /brief to create your product brief & roadmap
+3. Run /checkup to verify the installation is healthy
 [if sprint planning enabled:]
-3. When ready to build, say "start a sprint" or "begin Phase 1" — I'll propose issues for your review
+4. When ready to build, say "start a sprint" or "begin Phase 1" — I'll propose issues for your review
 [else:]
-3. Or tell Claude "start Phase 1" if you already have a plan
+4. Or tell Claude "start Phase 1" if you already have a plan
 ```
