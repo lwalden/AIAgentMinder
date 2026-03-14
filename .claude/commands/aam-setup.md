@@ -59,6 +59,7 @@ Copy these to the target unconditionally (create directories as needed):
 - `project/.claude/rules/debug-checkpoint.md` → `[target]/.claude/rules/debug-checkpoint.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
 - `project/.claude/commands/aam-brief.md` → `[target]/.claude/commands/aam-brief.md`
+- `project/.claude/commands/aam-revise.md` → `[target]/.claude/commands/aam-revise.md`
 - `project/.claude/commands/aam-checkup.md` → `[target]/.claude/commands/aam-checkup.md`
 - `project/.claude/commands/aam-handoff.md` → `[target]/.claude/commands/aam-handoff.md`
 - `project/.claude/commands/aam-quality-gate.md` → `[target]/.claude/commands/aam-quality-gate.md`
@@ -157,6 +158,7 @@ Created files:
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
 - .claude/commands/aam-brief.md (/aam-brief — product brief & roadmap creation)
+- .claude/commands/aam-revise.md (/aam-revise — mid-stream plan revision)
 - .claude/commands/aam-checkup.md (/aam-checkup — installation health check)
 - .claude/commands/aam-handoff.md (/aam-handoff — session checkpoint)
 - .claude/commands/aam-quality-gate.md (/aam-quality-gate — tiered pre-PR checks)

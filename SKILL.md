@@ -1,6 +1,6 @@
 # AIAgentMinder Plugin
 
-> **Status:** v1.1.0 — All commands prefixed with `aam-` to avoid collision with Claude Code built-ins and other plugins.
+> **Status:** v1.2.0 — All commands prefixed with `aam-` to avoid collision with Claude Code built-ins and other plugins.
 
 ---
 
@@ -33,7 +33,7 @@ The `/aam-setup` interview copies governance files to your project and customize
 ```json
 {
   "name": "aiagentminder",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Project governance and methodology layer for AI-assisted development.",
   "repository": "https://github.com/lwalden/AIAgentMinder",
   "license": "MIT"
@@ -49,6 +49,7 @@ See `.claude-plugin/plugin.json` for the full manifest.
 | Skill | Purpose |
 |-------|---------|
 | `/aam-brief` | Structured product brief and roadmap creation interview |
+| `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features in the roadmap |
 | `/aam-handoff` | Session checkpoint — log decisions, write priorities to memory |
 | `/aam-checkup` | Installation health check — files, hooks, Node.js, version stamp |
 | `/aam-scope-check` | Active scope governance — compare proposed work against roadmap |

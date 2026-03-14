@@ -10,7 +10,7 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
 | **Obsolete (v0.7.0 → v0.8.0)** | `.claude/hooks/session-end-commit.js`, `.claude/commands/plan.md` | Delete during migration |
@@ -34,7 +34,7 @@ I'll update AIAgentMinder files in [path].
 This will overwrite:
   - .claude/hooks/ (1 Node.js hook file: compact-reorient.js)
   - .claude/settings.json
-  - .claude/commands/aam-handoff.md, aam-brief.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
+  - .claude/commands/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
   - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md
   - .claude/rules/ (existing optional rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
@@ -147,6 +147,7 @@ project/.claude/hooks/compact-reorient.js              →  [target]/.claude/hoo
 project/.claude/settings.json                          →  [target]/.claude/settings.json
 project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
 project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
+project/.claude/commands/aam-revise.md                     →  [target]/.claude/commands/aam-revise.md
 project/.claude/commands/aam-checkup.md                    →  [target]/.claude/commands/aam-checkup.md
 project/.claude/commands/aam-quality-gate.md               →  [target]/.claude/commands/aam-quality-gate.md
 project/.claude/commands/aam-scope-check.md                →  [target]/.claude/commands/aam-scope-check.md
@@ -260,6 +261,7 @@ Updated:
 - .claude/settings.json
 - .claude/commands/aam-handoff.md
 - .claude/commands/aam-brief.md
+- .claude/commands/aam-revise.md
 - .claude/commands/aam-checkup.md
 - .claude/commands/aam-quality-gate.md
 - .claude/commands/aam-scope-check.md

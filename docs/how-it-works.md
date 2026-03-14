@@ -45,6 +45,7 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 | `/aam-brief` | Create or update strategy-roadmap.md interactively; optionally enable code quality guidance and sprint planning | Yes |
 | `/aam-checkup` | Validate installation health — files, hooks, Node.js, version stamp, CLAUDE.md placeholders | No |
 | `/aam-scope-check` | Compare proposed work against roadmap — returns in-scope / out-of-scope / deferred verdict | No |
+| `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features in the roadmap | Yes |
 | `/aam-handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
 | `/aam-quality-gate` | Pre-PR quality checks — four tiers matching the project quality tier | No |
 | `/aam-self-review` | Specialist review subagents (security, performance, API design) — Rigorous/Comprehensive tiers | No |
