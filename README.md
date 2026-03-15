@@ -162,6 +162,38 @@ Run `/aam-milestone`. Health report: 6/6 MVP features complete, timeline on trac
 
 ---
 
+## Development Lifecycle
+
+AIAgentMinder provides a complete governance flow from initial planning through sprint execution. Each step builds on the previous one — no external feature-spec tools required.
+
+### Why structured governance matters
+
+AI-assisted development moves fast. Without governance structure, projects accumulate scope drift, undocumented decisions, and growing complexity that erodes quality over time. The lifecycle below creates natural checkpoints where you review, approve, and course-correct — so speed doesn't come at the cost of control.
+
+### The flow
+
+| Step | Command / Mechanism | What happens |
+| ---- | ------------------- | ------------ |
+| **1. Plan** | `/aam-brief` | Interview-driven product brief. Defines MVP features, phases, quality tier, and surfaces hard-to-reverse decisions early. |
+| **2. Revise** | `/aam-revise` | Update the plan when requirements change — add, drop, or reprioritize features with decision logging and roadmap history. |
+| **3. Decompose** | Sprint planning (`sprint-workflow.md`) | Break phase features into 4–7 sprint issues with acceptance criteria, risk tags, and dependencies. Human approves before work starts. |
+| **4. Execute** | Native Tasks + feature branches | One issue at a time. Each issue tracked as a persistent Task, implemented on its own branch, committed with issue ID reference. |
+| **5. Gate** | `/aam-quality-gate` + `/aam-self-review` | Pre-PR checks matching your quality tier. Specialist subagent review for Rigorous/Comprehensive tiers and risk-flagged issues. |
+| **6. Checkpoint** | `/aam-handoff` | Session-end discipline. Captures decisions, writes next-session priorities to auto-memory, commits checkpoint. |
+| **7. Reflect** | `/aam-retrospective` + `/aam-milestone` | Sprint metrics, adaptive sizing guidance, and phase-level health assessment at boundaries. |
+
+### Sprint completion = full completion
+
+AAM sprints don't carry over incomplete work. Every issue in a sprint is accepted as done before the sprint closes. Feature decomposition happens naturally during sprint planning — you size issues to fit, and the sprint isn't done until they all pass quality gates and human review.
+
+This eliminates the need for separate feature-level design documents that persist across sprints. The combination of sprint issue acceptance criteria, `DECISIONS.md` for architectural choices, and `/aam-revise` for plan changes gives you full traceability without an extra artifact layer.
+
+### When to add feature-level spec tools
+
+For most projects, the lifecycle above is sufficient. Consider adding a spec-driven development tool alongside AIAgentMinder only if you're designing complex API surfaces where getting the contract wrong before implementation starts would mean significant rework. Even then, it's an optional complement — not a prerequisite.
+
+---
+
 ## What Gets Copied to Your Project
 
 ```
@@ -216,7 +248,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 **Use AIAgentMinder if** you're a solo developer or small team who wants structured planning, scope enforcement, decision logging, and optional sprint governance without heavy infrastructure.
 
-**Use spec-driven development tools for feature-level planning.** These tools handle requirements → design → tasks → implementation for individual features. They're complementary, not competitive — AIAgentMinder governs the project; SDD tools govern the feature.
+**Spec-driven development tools are optional complements.** AIAgentMinder's lifecycle — brief → revise → sprint decompose → execute → gate — handles most projects without additional feature-level planning. If you're designing complex API surfaces where the contract must be right before implementation starts, tools like cc-ssd can layer on top. They're complementary, not required.
 
 **Use Conductor or CCPM if** you need full project management with GitHub Issues integration, Linear sync, and parallel multi-agent execution across branches. These target teams, not solo devs.
 
