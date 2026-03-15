@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.3.1] - 2026-03-15
+
+### Fixed
+
+- **Agent-aware sprint sizing** — Replaced velocity-based adaptive sizing with stress-indicator-based sizing. The old logic recommended +1 to +2 issues when completion rate was ≥90%, causing unbounded sprint growth for AI agents that routinely complete 100%. New logic: hold steady when no problems, reduce for stress indicators (scope churn, blocked issues, context pressure ≥7 issues), hard cap at 7 issues, floor at 3. Prioritizes complete feature delivery and manageable context over issue count targets.
+
+### Changed
+
+- Sprint archive format now records scope changes and blocked counts instead of velocity percentage.
+- Terminology updated across README, CHANGELOG, demo transcript, and milestone command: "velocity" → "sizing" where it referred to the sprint metric.
+
+---
+
 ## [1.3.0] - 2026-03-14
 
 ### Added
@@ -67,7 +80,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 - **Complexity Budget** in `/milestone` — fifth health dimension tracking file count, largest files, dependency count, and phase-appropriate thresholds.
 - **`## Known Debt` section** in DECISIONS.md template — structured table for recording shortcuts and workarounds. `/milestone` surfaces the debt list with oldest and highest-risk items.
 - **Risk-flagged issues** in sprint planning — issues touching auth, payments, data migration, or public APIs get `[risk]` tag; auto-triggers `/self-review` before PR creation regardless of quality tier.
-- **Adaptive sprint sizing formalized** — `/retrospective` writes velocity metadata to SPRINT.md on archive; next sprint planning reads it for recommended issue count.
+- **Adaptive sprint sizing formalized** — `/retrospective` writes sizing metadata to SPRINT.md on archive; next sprint planning reads it for recommended issue count.
 
 ### Changed
 - **PROGRESS.md pruned from scaffolding** — no longer copied by `/setup` or managed by hooks. Session continuity handled by native Session Memory and `--continue`.
