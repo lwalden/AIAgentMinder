@@ -1,6 +1,6 @@
 # AIAgentMinder Plugin
 
-> **Status:** v1.3.0 — SDD constitution.md integration, roadmap versioning, GitHub Issues sync, missing skill packages added.
+> **Status:** v1.3.1 — Agent-aware sprint sizing, stress-indicator-based adaptive sizing.
 
 ---
 

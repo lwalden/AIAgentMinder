@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.3.0-blue)
+![Version](https://img.shields.io/badge/version-1.3.1-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
@@ -36,7 +36,7 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 | `DECISIONS.md` | Architectural decisions, rationale, and known debt log | On-demand; add `@DECISIONS.md` to CLAUDE.md to auto-load |
 | `docs/strategy-roadmap.md` | Product brief — what you're building, phases, out-of-scope items | On-demand |
 | `.claude/rules/*.md` | Development discipline rules — loaded natively by Claude Code | Every session (auto) |
-| `SPRINT.md` | Active sprint header, issues, and velocity archive | Every session when sprint enabled (via `@SPRINT.md` import) |
+| `SPRINT.md` | Active sprint header, issues, and sprint sizing archive | Every session when sprint enabled (via `@SPRINT.md` import) |
 
 **Always-active rules** (copied to every project):
 
@@ -154,8 +154,8 @@ Open a fresh Claude Code tab. SPRINT.md is loaded automatically.
 Say "Resume." Claude picks up where it left off — runs `/aam-self-review` on the risk-flagged auth issue before creating the PR.
 
 **Sprint completion:**
-All issues done. Claude runs `/aam-retrospective` — 5 planned, 5 completed, 1 decision logged. Adaptive sizing: "Your first sprint was 100% — consider planning 6–7 issues next time."
-Sprint is archived with velocity metadata. Start Sprint 2.
+All issues done. Claude runs `/aam-retrospective` — 5 planned, 5 completed, 0 scope changes, 0 blocked, 1 decision logged. Adaptive sizing: "First sprint — recommend 4–5 issues next sprint. No stress indicators."
+Sprint is archived with sizing metadata. Start Sprint 2.
 
 **Phase boundary:**
 Run `/aam-milestone`. Health report: 6/6 MVP features complete, timeline on track, 3 known debt items (oldest 1 sprint), largest file 180 lines (healthy for Phase 1). Recommendations: none — clean bill of health.
