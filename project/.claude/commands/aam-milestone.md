@@ -12,7 +12,7 @@ Read the following:
 
 1. `docs/strategy-roadmap.md` — current phase, MVP features, out-of-scope items, phase timeline
 2. `DECISIONS.md` — original stack and architecture decisions; also read the `## Known Debt` section if present
-3. `SPRINT.md` — current sprint status (if active); archived sprint lines for velocity data
+3. `SPRINT.md` — current sprint status (if active); archived sprint lines for sprint sizing data
 4. Use TaskList to get current task states
 5. Recent git log: `git log --oneline -20` — what has been merged recently
 6. File count and largest files:

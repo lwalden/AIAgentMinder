@@ -78,11 +78,11 @@ A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-h
 
 > **Claude:** Sprint S1: 5/5 issues complete. All PRs merged. Ready for sprint review.
 
-[Claude runs `/aam-retrospective` — 5 planned, 5 completed, 1 decision logged. "Your first sprint was 100% — consider 6–7 issues next time."]
+[Claude runs `/aam-retrospective` — 5 planned, 5 completed, 0 scope changes, 0 blocked, 1 decision logged. "First sprint — recommend 4–5 issues next sprint. No stress indicators."]
 
 > **User:** Archive the sprint and start Sprint 2.
 
-[Sprint S1 archived with velocity metadata. Claude proposes Sprint S2: ingredient search, favorites, rate limiting, plus a Zod schema refinement issue.]
+[Sprint S1 archived with sizing metadata. Claude proposes Sprint S2: ingredient search, favorites, rate limiting, plus a Zod schema refinement issue.]
 
 > **User:** Approved.
 

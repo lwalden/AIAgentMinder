@@ -66,20 +66,25 @@ Patterns:
 
 Read prior archived sprint lines from `SPRINT.md` (lines starting with `S{n} archived`).
 
-From each archived line, extract the velocity percentage (the `{velocity}%` value in the archive format).
+From each archived line and from the current sprint's metrics (Step 2), identify **stress indicators**:
+- **Scope churn**: any scope additions or removals occurred during the sprint
+- **Blocked issues**: any issues ended the sprint in `blocked` status
+- **Context pressure**: the sprint had 7+ planned issues
 
 **Recommendation logic:**
 
-- **Sprint 1 or 2 (insufficient data):** "Not enough sprint history for sizing recommendations yet."
-- **Sprint 3+:** Compute the median completion rate across available archived sprints.
-  - Median ≥ 90%: "You're completing nearly everything planned. Consider planning {planned + 1} to {planned + 2} issues next sprint."
-  - Median 70–89%: "Completion rate is healthy. Current sprint size of ~{planned} issues looks right."
-  - Median 50–69%: "Consistently completing about {median%} of planned work. Consider planning {recommended range} issues rather than {planned}."
-  - Median < 50%: "Sprint scope is regularly exceeding capacity. Recommend planning {recommended_max} issues or fewer next sprint."
+- **Sprint 1 (no history):** "First sprint — recommend 4–5 issues next sprint to establish a baseline. Fit whole features; avoid splitting a feature across sprints when it can fit in one."
+- **Sprint 2+:** Start from the previous sprint's planned issue count (or 5 if unavailable). Apply adjustments:
+  - No stress indicators in the most recent sprint: hold steady. Do not increase.
+  - 1 stress indicator in the most recent sprint: reduce max by 1.
+  - 2+ stress indicators in the most recent sprint: reduce both min and max by 1.
+  - Stress indicators present in 2+ of the last 3 sprints: reduce both min and max by 1 (cumulative with above).
+
+**Hard boundaries:** The recommendation must fall within 3–7 issues. Clamp to this range after all adjustments. Never recommend more than 7 regardless of history.
+
+**Feature coherence:** Always append: "Prefer fitting whole features over hitting an issue count. If a feature needs more issues than the range, plan the feature — but confirm with the user that context will stay manageable."
 
 Write the recommendation as the `<!-- sizing: {min}-{max} -->` comment in the SPRINT.md archive line (see sprint-workflow.md Sprint Completion). This comment persists for the next sprint planning step to read.
-
-Only surface this when there is a pattern (2+ sprints in the same completion band). Do not speculate on a single data point.
 
 ---
 
