@@ -20,8 +20,8 @@ When the user asks to start a sprint or begin a phase:
 
 1. Read `docs/strategy-roadmap.md` for the phase's features and acceptance criteria.
 2. Read `DECISIONS.md` for architectural context that affects implementation choices.
-3. Check `SPRINT.md` for archived sprint lines. If present, read the `<!-- sizing: {min}-{max} -->` comment from the most recent archive — use that range as the recommended issue count for this sprint.
-4. Determine sprint scope. A sprint covers a coherent subset of the phase's work — typically 4–7 issues. Prefer thematic coherence (e.g., "auth + session management") over arbitrary cutoffs. More than 8 issues is a signal to split; fewer than 3 is a signal to reconsider granularity.
+3. Check `SPRINT.md` for archived sprint lines. If present, read the `<!-- sizing: {min}-{max} -->` comment from the most recent archive — use that range as the recommended issue count. If no archive exists, default to 4–5 issues. Never plan more than 7 issues regardless of sizing comment.
+4. Determine sprint scope. A sprint covers a coherent subset of the phase's work — typically 4–7 issues. Prefer fitting whole features over hitting an exact count: if a feature needs 6 issues and the sizing range says 4–5, plan 6 but confirm with the user. More than 7 issues signals context overload; fewer than 3 signals insufficient granularity.
 5. Decompose into discrete issues. Each issue must be completable in a single focused effort. One PR per issue. Each issue must have: a title, a type (feature/fix/chore/spike), acceptance criteria, and references to relevant roadmap items.
 6. **Risk tagging:** For each issue, check if it touches a high-risk area:
    - Auth or session handling
@@ -83,11 +83,11 @@ A sprint ends when all issues are `done` or `blocked`.
 - If the user accepts the review: archive the sprint — replace SPRINT.md contents with:
 
   ```
-  S{n} archived ({date}): {planned} planned, {completed} completed ({velocity}%). {brief summary}.
+  S{n} archived ({date}): {planned} planned, {completed} completed. {scope_changes} scope changes, {blocked} blocked. {brief summary}.
   <!-- sizing: {recommended_min}-{recommended_max} -->
   ```
 
-  The velocity percentage is `completed/planned * 100`. The `sizing` comment is the recommended issue range for the next sprint, derived from `/aam-retrospective` Step 4. Full sprint detail is preserved in git history and in native task history.
+  The `sizing` comment is the recommended issue range for the next sprint, derived from `/aam-retrospective` Step 4. Scope changes and blocked counts are recorded as stress indicators for future sizing adjustments. Full sprint detail is preserved in git history and in native task history.
 
 - The user can then ask to begin a new sprint. Increment the sprint number.
 

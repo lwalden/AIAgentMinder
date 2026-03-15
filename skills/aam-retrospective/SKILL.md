@@ -67,15 +67,22 @@ Patterns:
 
 ---
 
-## Step 4: Adaptive Sprint Sizing (after 2+ sprints)
+## Step 4: Adaptive Sprint Sizing
 
-If this is Sprint 3 or later, check prior sprint completion rates from git history or SPRINT.md archives.
+Check prior archived sprint lines from `SPRINT.md` and the current sprint's metrics (Step 2).
 
-If there's a pattern (e.g., consistently completing 4–5 of 7 planned issues), note it:
+Identify **stress indicators** from each sprint: scope churn (additions or removals), blocked issues, or context pressure (7+ planned issues).
 
-> "Your last {N} sprints completed {avg} issues on average. For the next sprint, consider planning {recommended range} issues rather than the current {planned count}."
+**Sizing logic:**
+- **Sprint 1:** Recommend 4–5 issues to establish a baseline.
+- **Sprint 2+:** Start from the previous sprint's planned count (or 5). Hold steady if no stress indicators. Reduce by 1 for each: stress in the most recent sprint, and repeated stress across 2+ of the last 3 sprints.
+- **Hard boundaries:** Always 3–7. Never recommend more than 7. Never fewer than 3.
 
-Only offer this observation if there is a clear pattern (2+ consecutive sprints with the same completion band). Do not speculate on a single data point.
+If stress indicators are present, explain which ones drove the recommendation:
+
+> "Last sprint had scope changes mid-sprint and 1 blocked issue. Recommend {min}–{max} issues next sprint (reduced from {previous planned count})."
+
+Always note: prefer fitting whole features over hitting an exact count. If a feature needs more issues than the range suggests, plan the feature — but confirm context will stay manageable.
 
 ---
 
