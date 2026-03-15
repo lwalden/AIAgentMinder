@@ -6,6 +6,22 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.3.0] - 2026-03-14
+
+### Added
+
+- **Roadmap versioning** — `docs/strategy-roadmap.md` template now includes a `## Roadmap History` table. `/aam-revise` appends an entry for each significant scope, phase, or acceptance criteria change. Handles pre-v1.3 roadmaps gracefully (adds the section if absent).
+- **`/aam-sync-issues` command** — Optional command that pushes current sprint issues to GitHub Issues using `gh` CLI. Creates issues for new sprint tasks (labeled `aiagentminder`, `sprint-S{n}`, type, and `risk`), closes issues for completed tasks, and comments on blocked tasks. Added to `/aam-setup` (question 11) and `/aam-update` optional file handling.
+- **`skills/aam-checkup/SKILL.md`** and **`skills/aam-scope-check/SKILL.md`** — Plugin marketplace skill packages for these two commands were missing. Both are now present in `skills/`, resolving broken references for marketplace installs.
+
+### Changed
+
+- **`/aam-update`** — `aam-sync-issues.md` added to the optional file taxonomy (overwrite if present, prompt to add if absent).
+- **`skills/aam-revise/SKILL.md`** — Synced with command file: includes the Roadmap History update step.
+- **`skills/aam-brief/SKILL.md`** — Synced with command file: includes the constitution.md generation step.
+
+---
+
 ## [1.2.0] - 2026-03-14
 
 ### Added
