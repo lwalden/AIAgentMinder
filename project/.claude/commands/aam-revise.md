@@ -85,6 +85,18 @@ Do not modify `SPRINT.md` without explicit user confirmation.
 
 ---
 
+## Update the Roadmap History
+
+Append an entry to the `## Roadmap History` table in `docs/strategy-roadmap.md` for each significant change made this revision:
+
+```
+| [DATE] | [Added / Changed / Dropped / Moved]: [feature or requirement] | [brief reason] |
+```
+
+Only log changes that affect scope, phase placement, or acceptance criteria. Wording tweaks do not need an entry.
+
+If the `## Roadmap History` section doesn't exist in the file (pre-v1.3 roadmap), add it before the footer line.
+
 ## Update the Roadmap Footer
 
 Update the footer of `docs/strategy-roadmap.md`:

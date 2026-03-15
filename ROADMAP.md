@@ -10,31 +10,39 @@ All v1.0 features have been implemented and merged. See [CHANGELOG.md](CHANGELOG
 
 **Shipped:** `/aam-checkup` command, `/aam-scope-check` command, `approach-first.md` rule, `debug-checkpoint.md` rule, complexity budget in `/aam-milestone`, technical debt tracker (Known Debt in DECISIONS.md), risk-flagged issues in sprint planning, adaptive sprint sizing formalization, PROGRESS.md pruned, `/aam-handoff` refactored, CLAUDE.md context budget simplified.
 
-## v1.1 — Command Prefix + Housekeeping (current)
+## v1.1 — Command Prefix + Housekeeping (shipped)
 
 **Shipped:** All commands renamed with `aam-` prefix to avoid collision with Claude Code built-in commands and other plugins. Docs reviewed and updated for accuracy. Analysis docs archived. Examples modernized.
 
 ---
 
-## Post-v1.1 Direction
+## v1.2 — `/aam-revise` (shipped)
 
-AIAgentMinder is stable as a project governance layer for single-agent Claude Code sessions. Future work focuses on:
+**Shipped:** Mid-stream plan revision command. Add, change, drop, or reprioritize features directly in `docs/strategy-roadmap.md` with decision logging and active sprint impact checks.
 
-1. **SDD integration** — bridging AIAgentMinder governance with feature-level SDD tools (Spec-Kit, cc-sdd)
-2. **Reducing overhead** — evaluating whether the compact-reorient.js hook is still needed as Claude Code's native context handling improves
-3. **Distribution improvements** — plugin marketplace polish, `/aam-update` dry-run mode
+---
+
+## v1.3 — Backlog Clearance (current)
+
+**Shipped:** Roadmap versioning (`## Roadmap History` table + `/aam-revise` logging), GitHub Issues bridge (`/aam-sync-issues` optional command), missing skill packages for `aam-checkup` and `aam-scope-check`.
+
+---
+
+## Post-v1.3 Direction
+
+AIAgentMinder is stable as a project governance layer for single-agent Claude Code sessions. Remaining future work:
+
+1. **Reducing overhead** — evaluating whether the compact-reorient.js hook is still needed as Claude Code's native context handling improves
+2. **Distribution improvements** — `/aam-update` dry-run mode
+3. **HTTP hook support** — replacing Node.js dependency with Claude Code's HTTP hooks
 
 ---
 
 ## Backlog (unscheduled)
 
-- **SDD integration layer** — Generate a `constitution.md` from `/aam-brief` output that SDD tools (Spec-Kit, cc-sdd) can consume. Positions AIAgentMinder as the governance layer above feature-level planning tools. See backlog for draft AC.
 - **Evaluate compact-reorient.js necessity** — As Claude Code's native Session Memory and context handling improve, the post-compaction sprint reorientation hook may become redundant. Test whether removing it degrades sprint continuity; if not, drop the Node.js dependency.
 - **`/aam-update` dry-run mode** — Show what would change before committing to the migration.
 - **HTTP hook support** — Leverage Claude Code's HTTP hooks for integrations without requiring Node.js.
-- **Strategy-roadmap.md versioning** — Lightweight change log when the roadmap is revised mid-project.
-- **MCP server detection in `/aam-checkup`** — Verify MCP servers listed in CLAUDE.md are actually configured.
-- **GitHub Issues bridge** — Optional sync of native Tasks to GitHub Issues for teams that want visibility outside Claude Code.
 
 ### Dropped
 

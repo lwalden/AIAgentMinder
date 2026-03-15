@@ -1,6 +1,6 @@
 # AIAgentMinder Plugin
 
-> **Status:** v1.2.0 — All commands prefixed with `aam-` to avoid collision with Claude Code built-ins and other plugins.
+> **Status:** v1.3.0 — SDD constitution.md integration, roadmap versioning, GitHub Issues sync, missing skill packages added.
 
 ---
 
@@ -57,6 +57,7 @@ See `.claude-plugin/plugin.json` for the full manifest.
 | `/aam-self-review` | Subagent-based code review (security, performance, API design) |
 | `/aam-milestone` | Project health assessment — scope drift, complexity, timeline, known debt |
 | `/aam-retrospective` | Sprint retrospective with metrics and adaptive sizing |
+| `/aam-sync-issues` | Sync current sprint issues to GitHub Issues (optional — team projects) |
 
 Skill definitions live in `skills/<name>/SKILL.md`.
 
