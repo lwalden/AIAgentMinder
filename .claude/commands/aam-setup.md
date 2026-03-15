@@ -33,6 +33,7 @@ Ask all of these in one grouped prompt:
 8. **Code quality guidance:** Enable? (TDD, review-before-commit, build-before-commit — loaded via `.claude/rules/` natively, ~18 lines per session) (y/n)
 9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
 10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc.) (y/n — recommended for Rigorous/Comprehensive quality tiers)
+11. **GitHub Issues sync:** Enable `/aam-sync-issues` command? Syncs current sprint issues to GitHub Issues for visibility outside Claude Code. (y/n — recommended for team projects with a GitHub remote)
 
 ---
 
@@ -79,6 +80,10 @@ Copy these to the target unconditionally (create directories as needed):
 **Architecture fitness rules:** If enabled:
 - Copy `project/.claude/rules/architecture-fitness.md` to `[target]/.claude/rules/architecture-fitness.md`
 - Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder examples with constraints that match your project's architecture."
+
+**GitHub Issues sync:** If enabled:
+
+- Copy `project/.claude/commands/aam-sync-issues.md` to `[target]/.claude/commands/aam-sync-issues.md`
 
 ---
 
