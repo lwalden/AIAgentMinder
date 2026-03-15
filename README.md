@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.2.0-blue)
+![Version](https://img.shields.io/badge/version-1.3.0-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
@@ -22,7 +22,7 @@ Claude Code's native memory system (Session Memory, auto-memory, `claude --conti
 - **Ongoing complexity tracking.** Nothing that monitors file count, coupling, and dependency growth over weeks of development.
 - **Session-end discipline.** No structured checkpoint to capture priorities and decisions before closing.
 
-Spec-Driven Development tools (Spec-Kit, cc-sdd, GSD) have emerged as strong options for *feature-level* planning — requirements to design to tasks to implementation. AIAgentMinder doesn't compete with those. It answers a different question: how do you govern a multi-phase project across weeks of AI-assisted development, with scope drift, complexity growth, and architectural decisions accumulating the whole time?
+Spec-driven development tools have emerged as strong options for *feature-level* planning — requirements to design to tasks to implementation. AIAgentMinder doesn't compete with those. It answers a different question: how do you govern a multi-phase project across weeks of AI-assisted development, with scope drift, complexity growth, and architectural decisions accumulating the whole time?
 
 ---
 
@@ -68,6 +68,7 @@ Spec-Driven Development tools (Spec-Kit, cc-sdd, GSD) have emerged as strong opt
 | `/aam-self-review` | Pre-PR (Rigorous/Comprehensive, and any risk-flagged issue) — specialist subagents review the diff for security, performance, and API design |
 | `/aam-milestone` | Sprint boundaries — health assessment across phase progress, timeline, scope drift, dependency health, complexity budget, and known debt |
 | `/aam-retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
+| `/aam-sync-issues` | Optional — push current sprint issues to GitHub Issues using `gh` CLI (team projects) |
 | `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
 
 **One hook** runs automatically:
@@ -182,7 +183,8 @@ your-project/
     │   ├── aam-scope-check.md     # /aam-scope-check — active scope governance
     │   ├── aam-self-review.md     # /aam-self-review — specialist review subagents
     │   ├── aam-milestone.md       # /aam-milestone — project health assessment
-    │   └── aam-retrospective.md   # /aam-retrospective — sprint retrospective
+    │   ├── aam-retrospective.md   # /aam-retrospective — sprint retrospective
+    │   └── aam-sync-issues.md     # /aam-sync-issues — GitHub Issues sync (optional)
     ├── rules/
     │   ├── git-workflow.md        # Always active
     │   ├── scope-guardian.md      # Always active
@@ -214,7 +216,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 **Use AIAgentMinder if** you're a solo developer or small team who wants structured planning, scope enforcement, decision logging, and optional sprint governance without heavy infrastructure.
 
-**Use SDD tools (Spec-Kit, cc-sdd, GSD) for feature-level planning.** These tools handle requirements → design → tasks → implementation for individual features. They're complementary, not competitive — AIAgentMinder governs the project; SDD tools govern the feature. The two can coexist.
+**Use spec-driven development tools for feature-level planning.** These tools handle requirements → design → tasks → implementation for individual features. They're complementary, not competitive — AIAgentMinder governs the project; SDD tools govern the feature.
 
 **Use Conductor or CCPM if** you need full project management with GitHub Issues integration, Linear sync, and parallel multi-agent execution across branches. These target teams, not solo devs.
 
