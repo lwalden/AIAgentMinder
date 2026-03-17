@@ -26,10 +26,6 @@
 
 See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each session.
 
-### Credentials
-
-Never store credentials in code. Use `.env` files (gitignored).
-
 ### Autonomy Boundaries
 
 **You CAN autonomously:** Create files, install packages, run builds/tests, create branches and PRs, scaffold code
@@ -38,7 +34,6 @@ Never store credentials in code. Use `.env` files (gitignored).
 
 ### Verification-First Development
 
-- Confirm requirements before implementing
 - Write tests appropriate to the project's quality tier (see strategy-roadmap.md)
 - When Standard tier or above: write failing tests first, then implement
 

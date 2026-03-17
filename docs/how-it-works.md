@@ -56,7 +56,7 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 
 ### Code Quality Guidance
 
-When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (~18 lines of actionable instructions: TDD cycle, build-before-commit, review-before-commit, error handling, and more). Enabled during `/aam-brief`, `/aam-setup`, or `/aam-update`. Delete the file to opt out.
+When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (TDD cycle, build-before-commit, small focused functions, and read-before-write). Enabled during `/aam-brief`, `/aam-setup`, or `/aam-update`. Delete the file to opt out.
 
 ### Sprint Planning
 
