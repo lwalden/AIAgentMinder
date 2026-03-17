@@ -32,7 +32,7 @@ Run `/aam-brief` to fill it interactively, or edit manually. At minimum, fill in
 
 ### Code Quality Guidance
 
-A small set of development discipline instructions (~18 lines) loaded natively at every session start. Covers TDD cycle, build-before-commit, review-before-commit, and error handling patterns.
+A small set of development discipline instructions loaded natively at every session start. Covers TDD cycle, build-before-commit, small focused functions, and read-before-write.
 
 **Enable during setup:** Answer yes to "Enable code quality guidance?" in `/aam-setup` or `/aam-brief`.
 **Enable later:** Run `/aam-update` from the AIAgentMinder repo — it will prompt to add the file if absent.

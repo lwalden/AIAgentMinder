@@ -37,10 +37,6 @@ ROADMAP.md is the authoritative scope document for this repo. The `docs/strategy
 
 See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each session.
 
-### Credentials
-
-Never store credentials in code. Use `.env` files (gitignored).
-
 ### Decision Recording
 
 Log significant decisions in DECISIONS.md. Key architectural decisions are already recorded there.
