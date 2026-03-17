@@ -24,20 +24,4 @@ Keep it short. This is a check-in, not a design doc.
 **Example:**
 > Approach: Add a refresh token endpoint by creating `src/routes/auth/refresh.ts`, updating `src/middleware/auth.ts` to validate refresh tokens, and adding a `refresh_tokens` table migration. Assuming the existing JWT secret is reused for refresh tokens — let me know if that should be separate.
 
-## After Stating the Approach
-
 Wait for the user to respond before writing code.
-
-- If the user confirms or says nothing that implies a change: proceed.
-- If the user corrects the approach: adjust and restate before executing.
-- If the user says "just do it" or similar: proceed without further confirmation.
-
-## When This Does NOT Apply
-
-Skip the approach statement for:
-
-- Single-file edits with an obvious fix
-- Bug fixes where the root cause is clearly identified
-- Adding or updating tests
-- Documentation edits
-- Trivial changes (renaming a variable, fixing a typo)

@@ -51,7 +51,7 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 
 | Rule | What it does |
 |------|-------------|
-| `code-quality.md` | TDD cycle, build-before-commit, review-before-commit, error handling |
+| `code-quality.md` | TDD cycle, build-before-commit, small focused functions, read-before-write |
 | `sprint-workflow.md` | Sprint planning, approval gates, risk tagging, review/archive cycle |
 | `architecture-fitness.md` | Project-specific structural constraints — customize layer boundaries, external API rules, etc. |
 

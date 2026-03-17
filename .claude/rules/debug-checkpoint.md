@@ -36,13 +36,8 @@ Then wait for the user to respond before continuing.
 
 ## After the Checkpoint
 
-Once the user provides input:
-
-- Apply the new direction and continue debugging.
-- The attempt counter resets — you have 3 more attempts before the next checkpoint.
+Apply the new direction and continue debugging.
 
 ## When This Does NOT Apply
 
-- First or second attempt at a fix
-- Different errors on each attempt (you're making progress)
 - The user has explicitly said "keep trying" or "figure it out"
