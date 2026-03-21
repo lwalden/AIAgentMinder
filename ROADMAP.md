@@ -22,13 +22,23 @@ All v1.0 features have been implemented and merged. See [CHANGELOG.md](CHANGELOG
 
 ---
 
-## v1.3 — Backlog Clearance (current)
+## v1.3 — Backlog Clearance (shipped)
 
 **Shipped:** Roadmap versioning (`## Roadmap History` table + `/aam-revise` logging), GitHub Issues bridge (`/aam-sync-issues` optional command), missing skill packages for `aam-checkup` and `aam-scope-check`.
 
 ---
 
-## Post-v1.3 Direction
+## v1.4 — Development Methodology Skills (current)
+
+Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), reshaped for AIAgentMinder conventions:
+
+- **`/aam-tdd`** — Guided TDD workflow (plan, tracer bullet, incremental RED-GREEN loop, refactor). Complements `code-quality.md`'s one-liner with the full methodology.
+- **`/aam-triage`** — Structured bug triage: reproduce, diagnose root cause, design durable fix plan, create GitHub issue. Complements `debug-checkpoint.md` (triage = structured start, checkpoint = structured pause).
+- **`/aam-grill`** — Plan interrogation: walk every branch of the decision tree before implementation. Intensive counterpart to `approach-first.md`.
+
+---
+
+## Post-v1.4 Direction
 
 AIAgentMinder is stable as a project governance layer for single-agent Claude Code sessions. Remaining future work:
 
