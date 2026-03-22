@@ -79,3 +79,7 @@ If yes, append each decision to DECISIONS.md in the project's existing format, i
 - **Use `/aam-grill`** when a design is non-obvious, high-stakes, or has multiple interdependent decisions.
 - **Use `approach-first.md`** for routine check-ins — state intent, confirm, proceed.
 - For Rigorous+ quality tiers, consider running `/aam-grill` before architecture changes touching more than 5 files.
+
+---
+
+*Adapted from [mattpocock/skills/grill-me](https://github.com/mattpocock/skills) (MIT license).*

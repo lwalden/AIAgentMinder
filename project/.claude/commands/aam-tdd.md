@@ -94,3 +94,7 @@ Run tests after each refactor step. Never refactor while RED — get to GREEN fi
 - **Use `/aam-tdd`** when starting a new feature or when the test plan is non-obvious.
 - **Use `code-quality.md`** (loaded automatically at Standard+ tiers) for day-to-day TDD discipline without the full structured workflow.
 - Pairs well with `/aam-triage` — triage produces a fix plan as RED-GREEN cycles that this skill can execute.
+
+---
+
+*Adapted from [mattpocock/skills/tdd](https://github.com/mattpocock/skills) (MIT license).*
