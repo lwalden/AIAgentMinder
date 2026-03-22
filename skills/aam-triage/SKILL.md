@@ -107,3 +107,7 @@ If yes, append to DECISIONS.md in the project's existing format.
 - **Use `debug-checkpoint.md`** (triggers automatically) when you're mid-fix and stuck after 3 attempts on the same error.
 - Created issues can be pulled into the next sprint via `/aam-sync-issues`.
 - Fix plans produce RED-GREEN cycles that `/aam-tdd` can execute.
+
+---
+
+*Adapted from [mattpocock/skills/triage-issue](https://github.com/mattpocock/skills) (MIT license).*

@@ -30,7 +30,9 @@ See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each sess
 
 **You CAN autonomously:** Create files, install packages, run builds/tests, create branches and PRs, scaffold code
 
-**Ask the human first:** Create GitHub repos, merge PRs, sign up for services, provide API keys, approve major architectural changes
+**Only when explicitly asked:** Merge PRs
+
+**Ask the human first:** Create GitHub repos, sign up for services, provide API keys, approve major architectural changes
 
 ### Verification-First Development
 

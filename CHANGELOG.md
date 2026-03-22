@@ -6,6 +6,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.4.0] - 2026-03-21
+
+### Added
+
+- **`/aam-tdd` skill** — Guided TDD workflow: planning, tracer bullet, incremental RED-GREEN loop, and post-green refactoring. Language-agnostic. Complements `code-quality.md`'s one-liner with the full structured methodology. Adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT).
+- **`/aam-triage` skill** — Structured bug triage: capture problem, explore and diagnose root cause, design durable fix plan as RED-GREEN cycles, create GitHub issue. Complements `debug-checkpoint.md` (triage = structured start, checkpoint = structured pause). Adapted from mattpocock/skills (MIT).
+- **`/aam-grill` skill** — Plan interrogation: map decision branches, walk each one (exploring codebase where possible), produce decision summary for DECISIONS.md. Intensive counterpart to `approach-first.md`. Adapted from mattpocock/skills (MIT).
+
+### Changed
+
+- **PR merge policy relaxed** — `git-workflow.md` and `sprint-workflow.md` no longer instruct Claude to "never merge" or "wait for human review." Claude's job ends at PR creation during sprint execution; merging is handled externally (by the user, CI, or automation). Claude will still merge if explicitly asked.
+- Removed "merge PRs" from CLAUDE.md template's "Ask the human first" list.
+
+---
+
 ## [1.3.1] - 2026-03-15
 
 ### Fixed
