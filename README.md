@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.3.1-blue)
+![Version](https://img.shields.io/badge/version-1.4.0-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
@@ -68,6 +68,9 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 | `/aam-self-review` | Pre-PR (Rigorous/Comprehensive, and any risk-flagged issue) — specialist subagents review the diff for security, performance, and API design |
 | `/aam-milestone` | Sprint boundaries — health assessment across phase progress, timeline, scope drift, dependency health, complexity budget, and known debt |
 | `/aam-retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
+| `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor. Full methodology behind `code-quality.md`'s one-liner |
+| `/aam-triage` | Structured bug triage — reproduce, diagnose root cause, design durable fix plan, create GitHub issue |
+| `/aam-grill` | Plan interrogation — walk every branch of the decision tree before implementation. Intensive counterpart to `approach-first.md` |
 | `/aam-sync-issues` | Optional — push current sprint issues to GitHub Issues using `gh` CLI (team projects) |
 | `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
 
@@ -143,8 +146,8 @@ Claude generates `docs/strategy-roadmap.md`. Run `/aam-handoff`. Priorities are 
 **Session 2 — Sprint planning + building:**
 Open Claude Code. Session Memory knows the project state.
 Say "Start a sprint for Phase 1." Claude proposes 5 issues with acceptance criteria — one flagged `[risk]` because it touches auth. You review and approve.
-Claude creates a branch, implements S1-001 (scaffold Express app), passes `/aam-quality-gate`, opens a PR. Waits for your review.
-After you merge, Claude moves to S1-002 (user registration endpoint).
+Claude creates a branch, implements S1-001 (scaffold Express app), passes `/aam-quality-gate`, opens a PR.
+Once the PR is merged (by you, CI, or automation), Claude moves to S1-002 (user registration endpoint).
 
 **Between sprints — revising the plan:**
 You research a competing API and realize you need WebSocket support but can drop RSS feeds. Run `/aam-revise` — describe the changes, and Claude updates the roadmap directly: adds WebSocket to Phase 2, moves RSS to Out of Scope, logs both decisions. The next sprint proposal reflects the updated plan.
@@ -184,7 +187,7 @@ AI-assisted development moves fast. Without governance structure, projects accum
 
 ### Sprint completion = full completion
 
-AAM sprints don't carry over incomplete work. Every issue in a sprint is accepted as done before the sprint closes. Feature decomposition happens naturally during sprint planning — you size issues to fit, and the sprint isn't done until they all pass quality gates and human review.
+AAM sprints don't carry over incomplete work. Every issue in a sprint is accepted as done before the sprint closes. Feature decomposition happens naturally during sprint planning — you size issues to fit, and the sprint isn't done until they all pass quality gates and review.
 
 This eliminates the need for separate feature-level design documents that persist across sprints. The combination of sprint issue acceptance criteria, `DECISIONS.md` for architectural choices, and `/aam-revise` for plan changes gives you full traceability without an extra artifact layer.
 
@@ -214,6 +217,9 @@ your-project/
     │   ├── aam-quality-gate.md    # /aam-quality-gate — tiered pre-PR checks
     │   ├── aam-scope-check.md     # /aam-scope-check — active scope governance
     │   ├── aam-self-review.md     # /aam-self-review — specialist review subagents
+    │   ├── aam-tdd.md             # /aam-tdd — guided TDD workflow
+    │   ├── aam-triage.md          # /aam-triage — structured bug triage
+    │   ├── aam-grill.md           # /aam-grill — plan interrogation
     │   ├── aam-milestone.md       # /aam-milestone — project health assessment
     │   ├── aam-retrospective.md   # /aam-retrospective — sprint retrospective
     │   └── aam-sync-issues.md     # /aam-sync-issues — GitHub Issues sync (optional)

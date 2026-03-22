@@ -15,5 +15,5 @@ description: Git workflow discipline rules
 
 ## PR Workflow
 
-- All changes go through PRs. Claude creates PRs; the human reviews and merges.
-- Never merge without human review. After creating a PR, notify the user and wait.
+- All changes go through PRs. Claude creates PRs but does not merge them as part of normal workflow — merging is handled externally (by the user, CI, or automation).
+- If the user explicitly asks Claude to merge a PR, do it.
