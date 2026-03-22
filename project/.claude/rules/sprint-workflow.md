@@ -68,7 +68,7 @@ Once the user approves:
 - Before creating a PR: run `/aam-quality-gate` to confirm the issue meets the project's quality tier. Fix any failures before proceeding.
 - For **Rigorous** and **Comprehensive** quality tiers: also run `/aam-self-review` after the quality gate passes. Address any High severity findings before proceeding.
 - For **risk-tagged issues** (`[risk]`): run `/aam-self-review` regardless of quality tier (even Lightweight/Standard). Address any High severity findings before creating the PR.
-- After all checks pass, create the PR. Claude's work on the issue ends at PR creation — merging is handled externally.
+- After all checks pass, create the PR. Claude's work on the issue ends at PR creation — merging is handled externally. Wait for the user to signal readiness before beginning the next issue.
 - Update the native Task status as you work: pending → in_progress → completed (or leave pending if blocked).
 - Update SPRINT.md issue status to match: `todo` → `in-progress` → `done` or `blocked`.
 - If an issue cannot be completed: mark both the Task and SPRINT.md entry as `blocked` and notify the user with a clear description of what's needed.
