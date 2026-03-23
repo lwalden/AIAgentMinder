@@ -35,7 +35,7 @@ This will overwrite:
   - .claude/hooks/ (1 Node.js hook file: compact-reorient.js)
   - .claude/settings.json
   - .claude/commands/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
-  - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md
+  - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md, tool-first.md
   - .claude/rules/ (existing optional rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
 
@@ -54,7 +54,7 @@ This will overwrite:
 
 You'll be prompted about:
   - New optional features not yet enabled (code quality, sprint planning, architecture fitness)
-  - New always-active rules not yet present (approach-first, debug-checkpoint)
+  - New always-active rules not yet present (approach-first, debug-checkpoint, tool-first)
 
 These will NOT be touched:
   - DECISIONS.md, docs/strategy-roadmap.md, .gitignore
@@ -158,6 +158,7 @@ project/.claude/rules/git-workflow.md                  →  [target]/.claude/rul
 project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
 project/.claude/rules/approach-first.md                →  [target]/.claude/rules/approach-first.md
 project/.claude/rules/debug-checkpoint.md              →  [target]/.claude/rules/debug-checkpoint.md
+project/.claude/rules/tool-first.md                   →  [target]/.claude/rules/tool-first.md
 ```
 
 Print each file as it's updated: `✓ Updated: .claude/commands/aam-checkup.md`
@@ -277,6 +278,7 @@ Updated:
 - .claude/rules/scope-guardian.md
 - .claude/rules/approach-first.md
 - .claude/rules/debug-checkpoint.md
+- .claude/rules/tool-first.md
 - CLAUDE.md ([N] section(s) updated, Project Identity preserved)
 - .claude/aiagentminder-version
 
