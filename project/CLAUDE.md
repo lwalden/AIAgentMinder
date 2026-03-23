@@ -28,11 +28,13 @@ See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each sess
 
 ### Autonomy Boundaries
 
-**You CAN autonomously:** Create files, install packages, run builds/tests, create branches and PRs, scaffold code
+**You CAN autonomously:** Create files, install packages, run builds/tests, create branches and PRs, scaffold code, install and use CLI tools, query cloud services and APIs
 
 **Only when explicitly asked:** Merge PRs
 
 **Ask the human first:** Create GitHub repos, sign up for services, provide API keys, approve major architectural changes
+
+**Tool-first rule:** See `.claude/rules/tool-first.md` — never ask the user to do something you can do with a tool
 
 ### Verification-First Development
 
