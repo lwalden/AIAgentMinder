@@ -28,7 +28,13 @@ All v1.0 features have been implemented and merged. See [CHANGELOG.md](CHANGELOG
 
 ---
 
-## v1.4 — Development Methodology Skills (current)
+## v1.4.1 — Tool-First Autonomy (current)
+
+- **`tool-first.md` rule** (always active) — Directs Claude to use CLI tools, APIs, and package managers instead of asking the user to perform actions manually. CLAUDE.md Autonomy Boundaries updated to reference it.
+
+---
+
+## v1.4 — Development Methodology Skills (shipped)
 
 Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), reshaped for AIAgentMinder conventions:
 

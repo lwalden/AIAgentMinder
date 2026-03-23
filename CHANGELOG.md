@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [1.4.1] - 2026-03-22
+
+### Added
+
+- **`tool-first.md` rule** (always active) — Directs Claude to use CLI tools, APIs, and package managers instead of asking the user to perform actions manually. Covers cloud service queries (Azure, AWS, GCP), environment value lookups, package installation, and config file reading. Auth-gated logins are the sole exception.
+- CLAUDE.md template Autonomy Boundaries now references the tool-first rule and lists CLI tool usage as an autonomous capability.
+
+---
+
 ## [1.4.0] - 2026-03-21
 
 ### Added
