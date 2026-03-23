@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.4.0-blue)
+![Version](https://img.shields.io/badge/version-1.4.1-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
@@ -46,6 +46,7 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 | `scope-guardian.md` | Checks new work against the roadmap before implementing |
 | `approach-first.md` | Claude states its intended approach before executing multi-file or architecture changes |
 | `debug-checkpoint.md` | Stops debugging spirals after 3 failed attempts at the same error |
+| `tool-first.md` | Use CLI/API tools instead of asking the user to perform actions manually |
 
 **Optional rules** (enabled at setup or on request):
 
@@ -228,6 +229,7 @@ your-project/
     │   ├── scope-guardian.md      # Always active
     │   ├── approach-first.md      # Always active
     │   ├── debug-checkpoint.md    # Always active
+    │   ├── tool-first.md          # Always active
     │   ├── code-quality.md        # Optional
     │   ├── sprint-workflow.md     # Optional
     │   └── architecture-fitness.md  # Optional, project-customized
@@ -281,6 +283,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 | Hooks not firing | Run `/aam-checkup` — it will tell you exactly what's wrong |
 | Claude re-debates a past decision | Add it to DECISIONS.md with rationale; add `@DECISIONS.md` to CLAUDE.md to auto-load |
 | Claude starts building something out of scope | Run `/aam-scope-check` before starting work; the passive `scope-guardian.md` rule also catches this during execution |
+| Claude asks you to look up values or do things in a UI | The `tool-first.md` rule should prevent this — verify it's installed with `/aam-checkup`. If Claude still asks, remind it: "Use the CLI" |
 | Sprint context lost after compaction | The `compact-reorient.js` hook fires automatically and outputs the active sprint summary — verify Node.js is installed |
 | Upgrading an existing project | Run `/aam-update` from the AIAgentMinder repo — it handles all migrations, overwrites framework files, surgically merges CLAUDE.md, and runs `/aam-checkup` at the end |
 
