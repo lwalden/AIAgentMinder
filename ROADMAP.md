@@ -51,6 +51,15 @@ Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/
 
 ---
 
+## v2.0 — Autonomous PR Pipeline
+
+- **`/aam-pr-pipeline` skill** — Autonomous review-fix-test-merge pipeline for PRs. Reviews with full repo context (not just the diff), evaluates each issue with a developer perspective, applies fixes, runs the test suite, waits for external CI checks, and auto-merges when everything is green. Escalates to the user via email or PR label for high-risk files, cycle limit, blocked tests, or unresolvable merge blockers.
+- **`pr-pipeline-trigger.js` hook** — PostToolUse hook that detects `gh pr create` output and spawns a background `claude -p` in an isolated git worktree. The pipeline runs autonomously without blocking the active Claude Code session.
+- **`.pr-pipeline.json` config template** — Per-repo configuration for high-risk file patterns, cycle limit, auto-merge preference, merge method, notification email, and external check timeout.
+- **Sprint workflow integration** — `sprint-workflow.md` updated so the post-PR flow proceeds to the next issue without waiting for manual merge confirmation when the pipeline is installed.
+
+---
+
 ## Post-v1.4 Direction
 
 AIAgentMinder is stable as a project governance layer for single-agent Claude Code sessions. Remaining future work:
