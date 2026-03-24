@@ -226,8 +226,7 @@ Then handle default-on and optional rules files:
 - **Never overwrite.** This is user-configured per-project.
 - If absent and `aam-pr-pipeline.md` is being added: copy from `project/.pr-pipeline.json`
 - If present: print `⊘ Kept: .pr-pipeline.json (user-owned — edit manually to update settings)`
-
-  When upgrading to v2.1 or later, check whether the following fields are present. If absent, tell the user to add them manually and explain what each does:
+- **v2.1+ upgrade note:** Check whether `autoContinueSprint` and `continueMaxIssues` are present. If absent, tell the user to add them manually:
   - `"autoContinueSprint": false` — set `true` to spawn a continuation agent after each merge and drive the full sprint autonomously
   - `"continueMaxIssues": null` — integer cap on autonomous continuations per sprint; `null` = unlimited
 

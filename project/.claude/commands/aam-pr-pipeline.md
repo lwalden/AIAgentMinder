@@ -556,8 +556,8 @@ Run this block only after a successful merge. It is a no-op in all other exit pa
    Moving to next sprint issue autonomously.
 
    - Next issue: {next issue title from SPRINT.md}
-   - Log: ${LOG_FILE}
-   - Auto-continue count: $((N + 1))${continueMaxIssues != null ? ' / ' + continueMaxIssues : ''}"
+   - Log: {LOG_FILE}
+   - Auto-continue count: {N+1}{if continueMaxIssues is set: / {continueMaxIssues}}"
    ```
 
 **If merge fails — attempt self-resolution first:**
