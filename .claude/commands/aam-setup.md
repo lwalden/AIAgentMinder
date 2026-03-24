@@ -53,7 +53,9 @@ If no git repo exists, run `git init`. Then copy all files from this repo's `pro
 
 ### Core files (always copy)
 
-Copy these to the target unconditionally (create directories as needed):
+Copy these to the target unconditionally (create directories as needed).
+
+**Note:** Copy `project/.claude/settings.json` as part of the `.claude/` directory. After copying, if PR pipeline was **not** enabled in Step 2, remove the `PostToolUse` hook entry from the copied `settings.json` — without `pr-pipeline-trigger.js` present, that entry would fire on every Bash call and fail silently.
 
 - `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
 - `project/.claude/rules/scope-guardian.md` → `[target]/.claude/rules/scope-guardian.md`
@@ -71,6 +73,9 @@ Copy these to the target unconditionally (create directories as needed):
 - `project/.claude/commands/aam-self-review.md` → `[target]/.claude/commands/aam-self-review.md`
 - `project/.claude/commands/aam-milestone.md` → `[target]/.claude/commands/aam-milestone.md`
 - `project/.claude/commands/aam-retrospective.md` → `[target]/.claude/commands/aam-retrospective.md`
+- `project/.claude/commands/aam-tdd.md` → `[target]/.claude/commands/aam-tdd.md`
+- `project/.claude/commands/aam-triage.md` → `[target]/.claude/commands/aam-triage.md`
+- `project/.claude/commands/aam-grill.md` → `[target]/.claude/commands/aam-grill.md`
 
 ### Optional features (based on Step 2 answers)
 
@@ -182,6 +187,9 @@ Created files:
 - .claude/commands/aam-self-review.md (/aam-self-review — subagent code review before PR)
 - .claude/commands/aam-milestone.md (/aam-milestone — project health assessment)
 - .claude/commands/aam-retrospective.md (/aam-retrospective — sprint metrics and feedback)
+- .claude/commands/aam-tdd.md (/aam-tdd — guided TDD workflow)
+- .claude/commands/aam-triage.md (/aam-triage — structured bug triage)
+- .claude/commands/aam-grill.md (/aam-grill — plan interrogation)
 - .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
