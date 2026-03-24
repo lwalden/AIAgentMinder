@@ -12,7 +12,8 @@ Before touching anything, understand what each file is:
 |---|---|---|
 | **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
-| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md` | Overwrite if present; prompt to add if absent |
+| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md`, `.claude/hooks/pr-pipeline-trigger.js`, `.claude/commands/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
+| **User-owned (AIAgentMinder creates initial)** | `.pr-pipeline.json` | Never overwrite — user configures high-risk patterns and notification email |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
 | **Obsolete (v0.7.0 → v0.8.0)** | `.claude/hooks/session-end-commit.js`, `.claude/commands/plan.md` | Delete during migration |
 | **Obsolete (v0.6.0 → v0.7.0)** | `.claude/hooks/session-start-context.js`, `.claude/hooks/session-end-timestamp.js`, `.claude/hooks/pre-compact-save.js`, `.claude/guidance/` directory | Delete during migration |
@@ -196,6 +197,18 @@ Then handle default-on and optional rules files:
 - If present: overwrite. Print `✓ Updated: .claude/commands/aam-sync-issues.md`
 - If absent: prompt "GitHub Issues sync is available (/aam-sync-issues — pushes sprint issues to GitHub Issues). Enable? (y/n)"
 
+### aam-pr-pipeline.md and pr-pipeline-trigger.js
+
+- If both present: overwrite both. Print `✓ Updated: .claude/commands/aam-pr-pipeline.md` and `✓ Updated: .claude/hooks/pr-pipeline-trigger.js`
+- If absent: prompt "PR pipeline automation is available (/aam-pr-pipeline — autonomous review, fix, test, and merge after PR creation). Enable? (y/n)"
+  - If yes: copy both files and copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json` (unless it already exists — never overwrite user config)
+
+### .pr-pipeline.json
+
+- **Never overwrite.** This is user-configured per-project.
+- If absent and `aam-pr-pipeline.md` is being added: copy from `project/.pr-pipeline.json`
+- If present: print `⊘ Kept: .pr-pipeline.json (user-owned — edit manually to update settings)`
+
 ---
 
 ## Step 3: Surgical Merge of CLAUDE.md
@@ -298,6 +311,9 @@ Optional features:
 - .claude/rules/sprint-workflow.md
 - SPRINT.md
 - .claude/rules/architecture-fitness.md
+- .claude/commands/aam-pr-pipeline.md
+- .claude/hooks/pr-pipeline-trigger.js
+- .pr-pipeline.json (⊘ user-owned if present)
 
 [If migrating from v0.9.1:]
 Migration actions:

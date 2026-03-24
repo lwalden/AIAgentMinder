@@ -34,6 +34,7 @@ Ask all of these in one grouped prompt:
 9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
 10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc.) (y/n — recommended for Rigorous/Comprehensive quality tiers)
 11. **GitHub Issues sync:** Enable `/aam-sync-issues` command? Syncs current sprint issues to GitHub Issues for visibility outside Claude Code. (y/n — recommended for team projects with a GitHub remote)
+12. **PR pipeline automation:** Enable `/aam-pr-pipeline`? Automatically reviews, fixes, tests, and merges PRs after creation. Requires Node.js and `gh` CLI. (y/n — recommended for any project where you create PRs from Claude Code)
 
 ---
 
@@ -86,6 +87,14 @@ Copy these to the target unconditionally (create directories as needed):
 **GitHub Issues sync:** If enabled:
 
 - Copy `project/.claude/commands/aam-sync-issues.md` to `[target]/.claude/commands/aam-sync-issues.md`
+
+**PR pipeline automation:** If enabled:
+- Copy `project/.claude/hooks/pr-pipeline-trigger.js` to `[target]/.claude/hooks/pr-pipeline-trigger.js`
+- Copy `project/.claude/commands/aam-pr-pipeline.md` to `[target]/.claude/commands/aam-pr-pipeline.md`
+- Copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json`
+- Ask: "Email address for escalation notifications? (leave blank to use PR comments only)"
+  - If provided, update `notification.email` in the copied `.pr-pipeline.json`
+- Tell the user: "PR pipeline installed. After `gh pr create`, a background agent will review, fix, test, and merge the PR automatically. Check `.pr-pipeline.json` to configure high-risk patterns, cycle limit, and auto-merge behavior."
 
 ---
 
