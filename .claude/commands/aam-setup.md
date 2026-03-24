@@ -59,6 +59,7 @@ Copy these to the target unconditionally (create directories as needed):
 - `project/.claude/rules/approach-first.md` → `[target]/.claude/rules/approach-first.md`
 - `project/.claude/rules/debug-checkpoint.md` → `[target]/.claude/rules/debug-checkpoint.md`
 - `project/.claude/rules/tool-first.md` → `[target]/.claude/rules/tool-first.md`
+- `project/.claude/rules/correction-capture.md` → `[target]/.claude/rules/correction-capture.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
 - `project/.claude/commands/aam-brief.md` → `[target]/.claude/commands/aam-brief.md`
 - `project/.claude/commands/aam-revise.md` → `[target]/.claude/commands/aam-revise.md`
@@ -178,6 +179,7 @@ Created files:
 - .claude/rules/approach-first.md (approach-first protocol — state intent before executing)
 - .claude/rules/debug-checkpoint.md (debug checkpoint — prevents debugging spirals)
 - .claude/rules/tool-first.md (tool-first autonomy — use CLI/API tools instead of asking the user)
+- .claude/rules/correction-capture.md (correction capture — flags repeated wrong-first-approach patterns)
 - .claude/aiagentminder-version (version stamp for /aam-update)
 - .gitignore (core + [stack] entries)
 [if code quality enabled:]

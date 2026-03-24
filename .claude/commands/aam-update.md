@@ -11,6 +11,7 @@ Before touching anything, understand what each file is:
 | Category | Files | Action |
 |---|---|---|
 | **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
 | **Obsolete (v0.7.0 → v0.8.0)** | `.claude/hooks/session-end-commit.js`, `.claude/commands/plan.md` | Delete during migration |
@@ -53,6 +54,7 @@ This will overwrite:
   - .claude/guidance/ directory
 
 You'll be prompted about:
+  - Default-on rules not yet present (correction-capture)
   - New optional features not yet enabled (code quality, sprint planning, architecture fitness)
   - New always-active rules not yet present (approach-first, debug-checkpoint, tool-first)
 
@@ -165,7 +167,11 @@ Print each file as it's updated: `✓ Updated: .claude/commands/aam-checkup.md`
 
 Also copy `project/.claude/rules/README.md` to `[target]/.claude/rules/README.md` if `.claude/rules/` exists in the target.
 
-Then handle optional rules files:
+Then handle default-on and optional rules files:
+
+### correction-capture.md
+- If present: overwrite. Print `✓ Updated: .claude/rules/correction-capture.md`
+- If absent: prompt "Correction capture is available (flags repeated wrong-first-approach patterns and proposes permanent instructions). Enable? (y/n)"
 
 ### code-quality.md
 - If present: overwrite. Print `✓ Updated: .claude/rules/code-quality.md`
@@ -281,6 +287,10 @@ Updated:
 - .claude/rules/tool-first.md
 - CLAUDE.md ([N] section(s) updated, Project Identity preserved)
 - .claude/aiagentminder-version
+
+Default-on features:
+[list each of: ✓ Updated / ✓ Added / ⊘ Skipped]
+- .claude/rules/correction-capture.md
 
 Optional features:
 [list each of: ✓ Updated / ✓ Added / ⊘ Skipped / ⚠ Active sprint preserved]
