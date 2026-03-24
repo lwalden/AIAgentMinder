@@ -44,6 +44,13 @@ Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/
 
 ---
 
+## v1.5 — Correction Capture
+
+- **`correction-capture.md` rule** (default-on) — Instructs Claude to self-monitor for repeated wrong-first-approach patterns within a session. When the same correction recurs, flags it and proposes a permanent `.claude/rules/` instruction for user approval. Complement to `debug-checkpoint.md` (which catches error spirals).
+- **`default-on` update category** — New file taxonomy category in `/aam-update`: installed by default during `/aam-setup`, but treated as optional during `/aam-update` (overwrite if present; prompt if absent). Respects user deletion.
+
+---
+
 ## Post-v1.4 Direction
 
 AIAgentMinder is stable as a project governance layer for single-agent Claude Code sessions. Remaining future work:
