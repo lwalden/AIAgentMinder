@@ -16,6 +16,18 @@ Chose: [X] over [alternatives considered]. Why: [rationale]. Tradeoff: [what you
 
 ---
 
+### Sprint continuation counter via HTML comment in SPRINT.md | 2026-03 | Status: Active
+
+Chose: `<!-- ai-continues: N -->` HTML comment written directly into SPRINT.md at runtime over tracking via PR labels or a separate state file. Why: self-contained with no external dependencies, survives worktree removal, is invisible in rendered markdown, and resets naturally when the sprint is archived. Counter is NOT committed — it is ephemeral state that controls runaway protection within a single sprint execution. Tradeoff: if SPRINT.md is reset by hand mid-sprint, the counter resets too (acceptable — manual sprint intervention implies human oversight).
+
+---
+
+### nohup + disown spawn pattern for continuation agent | 2026-03 | Status: Active
+
+Chose: `nohup claude -p ... >> log 2>&1 & disown $!` over Node.js `spawn({detached: true})` or a separate trigger script for spawning the continuation agent. Why: the continuation is spawned from inside a `claude -p` bash invocation (not a Node.js hook), so `nohup`/`disown` is the natural detach mechanism. Running in the main repo root (`cd $REPO_ROOT`) ensures the continuation agent has the correct working directory for git operations. Tradeoff: `nohup` is not available on Windows natively, but the pipeline already runs in bash (git bash or WSL) and uses other bash-only patterns throughout.
+
+---
+
 ### PostToolUse hook over webhook-only for PR pipeline trigger | 2026-03 | Status: Active
 
 Chose: PostToolUse hook on `Bash` detecting `gh pr create` output to spawn background `claude -p` in a worktree over relying solely on GitHub webhook → n8n → spawn. Why: the hook path eliminates n8n as a dependency for the primary use case (PRs created from Claude Code sessions), removes the cloudflare tunnel dependency, reduces latency, and keeps pipeline logic in AIAgentMinder where it's version-controlled alongside governance rules. The n8n webhook path is retained as a fallback for PRs created outside Claude Code. Tradeoff: two trigger paths to maintain; hook depends on `claude -p` being available with the user's active Claude subscription.
