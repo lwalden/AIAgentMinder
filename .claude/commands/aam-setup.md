@@ -99,7 +99,11 @@ Copy these to the target unconditionally (create directories as needed).
 - Copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json`
 - Ask: "Email address for escalation notifications? (leave blank to use PR comments only)"
   - If provided, update `notification.email` in the copied `.pr-pipeline.json`
-- Tell the user: "PR pipeline installed. After `gh pr create`, a background agent will review, fix, test, and merge the PR automatically. Check `.pr-pipeline.json` to configure high-risk patterns, cycle limit, and auto-merge behavior."
+- Ask: "Enable autonomous sprint loop? After each merge, automatically start the next sprint issue without waiting for human confirmation. (y/n — default: n)"
+  - If yes: set `autoContinueSprint: true` in the copied `.pr-pipeline.json`
+  - If yes: Ask: "Maximum issues to auto-continue per sprint? (enter a number, or leave blank for unlimited)"
+    - If a number provided: set `continueMaxIssues: {value}` in `.pr-pipeline.json`
+- Tell the user: "PR pipeline installed. After `gh pr create`, a background agent will review, fix, test, and merge the PR automatically. Check `.pr-pipeline.json` to configure high-risk patterns, cycle limit, auto-merge, and sprint loop behavior."
 
 ---
 

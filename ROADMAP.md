@@ -60,7 +60,7 @@ Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/
 
 ---
 
-## v2.1 — Autonomous Sprint Loop
+## v2.1 — Autonomous Sprint Loop (shipped)
 
 Close the automation gap between pipeline merges and the next sprint issue. Currently the sprint proceeds automatically only when the Claude Code session is still open. This milestone makes sprint execution fully self-driving.
 
