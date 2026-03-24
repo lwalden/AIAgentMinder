@@ -10,7 +10,8 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/settings.json`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md`, `.claude/hooks/pr-pipeline-trigger.js`, `.claude/commands/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
 | **User-owned (AIAgentMinder creates initial)** | `.pr-pipeline.json` | Never overwrite — user configures high-risk patterns and notification email |
@@ -147,7 +148,6 @@ Copy each file from `project/` in this repo to the target, overwriting whatever 
 
 ```
 project/.claude/hooks/compact-reorient.js              →  [target]/.claude/hooks/compact-reorient.js
-project/.claude/settings.json                          →  [target]/.claude/settings.json
 project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
 project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
 project/.claude/commands/aam-revise.md                     →  [target]/.claude/commands/aam-revise.md
@@ -157,6 +157,9 @@ project/.claude/commands/aam-scope-check.md                →  [target]/.claude
 project/.claude/commands/aam-self-review.md                →  [target]/.claude/commands/aam-self-review.md
 project/.claude/commands/aam-milestone.md                  →  [target]/.claude/commands/aam-milestone.md
 project/.claude/commands/aam-retrospective.md              →  [target]/.claude/commands/aam-retrospective.md
+project/.claude/commands/aam-tdd.md                        →  [target]/.claude/commands/aam-tdd.md
+project/.claude/commands/aam-triage.md                     →  [target]/.claude/commands/aam-triage.md
+project/.claude/commands/aam-grill.md                      →  [target]/.claude/commands/aam-grill.md
 project/.claude/rules/git-workflow.md                  →  [target]/.claude/rules/git-workflow.md
 project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
 project/.claude/rules/approach-first.md                →  [target]/.claude/rules/approach-first.md
@@ -167,6 +170,21 @@ project/.claude/rules/tool-first.md                   →  [target]/.claude/rule
 Print each file as it's updated: `✓ Updated: .claude/commands/aam-checkup.md`
 
 Also copy `project/.claude/rules/README.md` to `[target]/.claude/rules/README.md` if `.claude/rules/` exists in the target.
+
+### settings.json — Additive Merge
+
+Do **not** copy `project/.claude/settings.json` directly. Overwriting it would erase any hooks the user has added (e.g., accessibility hooks, custom PostToolUse handlers).
+
+Instead, perform an additive merge:
+
+1. Read `[target]/.claude/settings.json`. If it doesn't exist, create it as `{ "hooks": {} }`.
+2. Read `project/.claude/settings.json` for the AIAgentMinder-managed hook entries.
+3. **SessionStart `compact` entry:** Add or replace the entry with `matcher: "compact"` under `SessionStart`. This is always managed by AIAgentMinder.
+4. **PostToolUse `Bash` entry:** Only include if `pr-pipeline-trigger.js` exists in `[target]/.claude/hooks/`. Add or replace the entry with `matcher: "Bash"` under `PostToolUse`. If the file doesn't exist, remove that entry if present (orphaned hook).
+5. Preserve all other hook entries in the target file unchanged.
+6. Write the merged JSON back to `[target]/.claude/settings.json`.
+
+Print: `✓ Updated: .claude/settings.json (merged — user hooks preserved)`
 
 Then handle default-on and optional rules files:
 
@@ -283,7 +301,7 @@ AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
 
 Updated:
 - .claude/hooks/ (1 file: compact-reorient.js)
-- .claude/settings.json
+- .claude/settings.json (merged — user hooks preserved)
 - .claude/commands/aam-handoff.md
 - .claude/commands/aam-brief.md
 - .claude/commands/aam-revise.md
@@ -293,6 +311,9 @@ Updated:
 - .claude/commands/aam-self-review.md
 - .claude/commands/aam-milestone.md
 - .claude/commands/aam-retrospective.md
+- .claude/commands/aam-tdd.md
+- .claude/commands/aam-triage.md
+- .claude/commands/aam-grill.md
 - .claude/rules/git-workflow.md
 - .claude/rules/scope-guardian.md
 - .claude/rules/approach-first.md

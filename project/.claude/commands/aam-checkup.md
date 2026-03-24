@@ -58,7 +58,41 @@ Read `.claude/aiagentminder-version`.
 - **INFO:** Show installed version (e.g., "v1.0.0")
 - **WARN if missing:** "No version stamp found. Run /aam-update to write one."
 
-### 7. Git Status
+### 7. PR Pipeline (conditional)
+
+Run this check only if `.claude/commands/aam-pr-pipeline.md` OR `.claude/hooks/pr-pipeline-trigger.js` exists in the project — indicating the pipeline was installed.
+
+**7a. Hook script:**
+
+Check that `.claude/hooks/pr-pipeline-trigger.js` exists.
+
+- **PASS:** Found
+- **FAIL:** Missing — "PR pipeline command is installed but hook script is missing. Run /aam-update to restore it."
+
+**7b. Hook configuration:**
+
+Read `.claude/settings.json` and check for a `PostToolUse` entry with `matcher: "Bash"` referencing `pr-pipeline-trigger.js`.
+
+- **PASS:** Entry found
+- **WARN:** Missing — "PostToolUse hook entry not in settings.json — the pipeline will not auto-trigger after `gh pr create`. Run /aam-update to restore it."
+
+**7c. Config file:**
+
+Check that `.pr-pipeline.json` exists at the project root.
+
+- **PASS:** Found
+- **WARN:** Missing — "`.pr-pipeline.json` not found — pipeline will use default settings. Copy it from the AIAgentMinder template or run /aam-update."
+
+**7d. `gh` CLI:**
+
+```bash
+gh --version
+```
+
+- **PASS:** Found — show version
+- **WARN:** Not found — "`gh` CLI not installed. The PR pipeline requires it. Install from https://cli.github.com."
+
+### 8. Git Status
 
 Check git status in the project directory:
 
@@ -85,6 +119,11 @@ AIAgentMinder Health Check — v{version}
 ✓ .claude/settings.json: valid JSON, hook entry present (compact-reorient)
 ✓ .claude/hooks/compact-reorient.js: found
 ✓ Git: branch main, remote origin configured
+[if PR pipeline installed:]
+✓ .claude/hooks/pr-pipeline-trigger.js: found
+✓ .claude/settings.json: PostToolUse:Bash hook entry present
+✓ .pr-pipeline.json: found
+✓ gh CLI: v2.45.0
 
 Status: Healthy (1 warning)
 ```
