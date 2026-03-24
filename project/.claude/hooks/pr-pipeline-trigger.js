@@ -17,11 +17,25 @@ const { execSync, spawn } = require('child_process');
 
 const PR_URL_PATTERN = /https:\/\/github\.com\/([^/\s]+)\/([^/\s]+)\/pull\/(\d+)/;
 
-function main() {
-  // Read hook payload from stdin
+function readStdin() {
+  return new Promise((resolve) => {
+    if (process.stdin.isTTY) {
+      resolve('');
+      return;
+    }
+    const chunks = [];
+    process.stdin.setEncoding('utf8');
+    process.stdin.on('data', (chunk) => chunks.push(chunk));
+    process.stdin.on('end', () => resolve(chunks.join('')));
+    process.stdin.on('error', () => resolve(''));
+  });
+}
+
+async function main() {
+  // Read hook payload from stdin (cross-platform — no /dev/stdin)
   let input = '';
   try {
-    input = fs.readFileSync('/dev/stdin', 'utf8');
+    input = await readStdin();
   } catch {
     process.exit(0);
   }
@@ -122,4 +136,4 @@ function main() {
   );
 }
 
-main();
+main().catch(() => process.exit(0));
