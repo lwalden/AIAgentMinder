@@ -1,0 +1,35 @@
+{
+  "highRiskPatterns": [
+    "**/auth/**",
+    "**/security/**",
+    "**/payment/**",
+    "**/billing/**",
+    "**/migration/**",
+    ".github/workflows/**",
+    "Dockerfile*",
+    "docker-compose*",
+    "*.tf",
+    "*.tfvars"
+  ],
+  "cycleLimit": 5,
+  "autoMerge": true,
+  "mergeMethod": "squash",
+  "skipPatterns": [
+    "package-lock.json",
+    "yarn.lock",
+    "pnpm-lock.yaml",
+    "*.lock",
+    "dist/**",
+    "build/**",
+    ".next/**"
+  ],
+  "notification": {
+    "email": "",
+    "from": "pipeline@resend.dev"
+  },
+  "testCommand": null,
+  "mergeWait": {
+    "pollIntervalSeconds": 30,
+    "timeoutMinutes": 15
+  }
+}

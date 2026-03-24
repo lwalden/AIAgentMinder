@@ -16,6 +16,12 @@ Chose: [X] over [alternatives considered]. Why: [rationale]. Tradeoff: [what you
 
 ---
 
+### PostToolUse hook over webhook-only for PR pipeline trigger | 2026-03 | Status: Active
+
+Chose: PostToolUse hook on `Bash` detecting `gh pr create` output to spawn background `claude -p` in a worktree over relying solely on GitHub webhook → n8n → spawn. Why: the hook path eliminates n8n as a dependency for the primary use case (PRs created from Claude Code sessions), removes the cloudflare tunnel dependency, reduces latency, and keeps pipeline logic in AIAgentMinder where it's version-controlled alongside governance rules. The n8n webhook path is retained as a fallback for PRs created outside Claude Code. Tradeoff: two trigger paths to maintain; hook depends on `claude -p` being available with the user's active Claude subscription.
+
+---
+
 ### aam- command prefix | 2025-11 | Status: Active
 
 Chose: `aam-` prefix for all commands over unprefixed names (e.g., `/handoff`, `/milestone`). Why: Claude Code ships built-in commands (`/plan`, `/doctor`, `/review`) and other plugins use short names — collisions break silently. `aam-` is a namespace that cannot collide. Tradeoff: slightly more typing for users.
