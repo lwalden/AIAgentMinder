@@ -4,9 +4,8 @@ Review, fix, test, and merge a pull request autonomously. Handles the full
 review→fix→test→merge loop with human escalation for high-risk or genuinely
 blocked cases.
 
-Runs in a git worktree (when spawned by hook) so it never touches the user's
-working copy. Can also be invoked manually: `/aam-pr-pipeline` (uses current
-branch PR) or `/aam-pr-pipeline <PR-URL>`.
+Invoked in-session by the sprint workflow after PR creation, or manually:
+`/aam-pr-pipeline` (uses current branch PR) or `/aam-pr-pipeline <PR-URL>`.
 
 ---
 
@@ -489,77 +488,6 @@ Reviewed, tested, and merged automatically.
 - Tests executed: {count} ({passed} passed)"
 ```
 
-**Sprint continuation check:**
-
-Run this block only after a successful merge. It is a no-op in all other exit paths.
-
-1. **Check config.** Read `autoContinueSprint` from config. If `false` or absent: skip all remaining steps in this block and proceed to Step 9.
-
-2. **Locate main repo root.**
-   ```bash
-   REPO_ROOT=$(git worktree list | head -1 | awk '{print $1}')
-   SPRINT_FILE="$REPO_ROOT/SPRINT.md"
-   ```
-
-3. **Read SPRINT.md.** If `$SPRINT_FILE` does not exist: skip continuation (no active sprint).
-
-   Check sprint status: look for `**Status:** in-progress` in the file. If not found: skip.
-
-   Check for remaining todo issues: look for `| todo |` in the issue table. If none found: skip (sprint complete — all issues done or blocked).
-
-4. **Parallelism guard.** Detect other active pipeline worktrees for this repo:
-   ```bash
-   git worktree list --porcelain \
-     | grep "worktree" \
-     | grep ".pr-pipeline-worktrees/${repo}-pr-" \
-     | grep -v "pr-${number}$"
-   ```
-   If any other pipeline worktrees exist for this repo: skip continuation (another pipeline is mid-flight — it will handle its own continuation when it finishes).
-
-5. **Check continueMaxIssues.** Read `continueMaxIssues` from config. If not null:
-
-   Read the current auto-continue counter from `$SPRINT_FILE`. Look for an HTML comment matching `<!-- ai-continues: (\d+) -->`. Parse N (default 0 if absent).
-
-   If `N >= continueMaxIssues`:
-   ```bash
-   gh pr comment {number} --body "## PR Pipeline — Sprint Continuation Limit Reached
-
-   The autonomous sprint loop has auto-continued {continueMaxIssues} time(s).
-   Pausing for human review. Resume by setting \`continueMaxIssues\` higher or
-   starting the next issue manually."
-   ```
-   Skip continuation and proceed to Step 9.
-
-   Otherwise: increment the counter in `$SPRINT_FILE`. Replace the existing `<!-- ai-continues: N -->` comment (or append `<!-- ai-continues: 1 -->` before the first `##` heading if absent). Write the file. This update is NOT committed — it is ephemeral sprint state that resets when the sprint is archived.
-
-6. **Identify next issue.** From `$SPRINT_FILE`, read the first table row with status `| todo |`. Extract its title for the continuation prompt.
-
-7. **Spawn continuation agent.**
-   ```bash
-   LOG_FILE="$REPO_ROOT/sprint-continuation.log"
-   PROMPT="Sprint continuation: PR #${number} (${title}) was just merged to ${baseRefName}. Read SPRINT.md and native Tasks for current sprint context, then continue the sprint by starting the next todo issue. Follow sprint-workflow.md for execution — branch, implement, run quality gate, create PR."
-
-   cd "$REPO_ROOT"
-   nohup claude -p \
-     --model claude-sonnet-4-6 \
-     --max-turns 80 \
-     --allowedTools "Read,Write,Edit,Bash(*),Grep,Glob,WebFetch,Task,TaskCreate,TaskUpdate,TaskList,TaskGet" \
-     "$PROMPT" >> "$LOG_FILE" 2>&1 &
-   CONTINUATION_PID=$!
-   disown $CONTINUATION_PID
-   ```
-
-8. **Post continuation notice** on the merged PR:
-   ```bash
-   gh pr comment {number} --body "## Sprint Continuation Spawned
-
-   Moving to next sprint issue autonomously.
-
-   - Next issue: {next issue title from SPRINT.md}
-   - Log: {LOG_FILE}
-   - Auto-continue count: {N+1}{if continueMaxIssues is set: / {continueMaxIssues}}"
-   ```
-
 **If merge fails — attempt self-resolution first:**
 
 Check the failure reason:
@@ -639,9 +567,11 @@ curl -s -X POST https://api.resend.com/emails \
 
 ## Integration with Sprint Workflow
 
-When this skill completes successfully (PR merged), the sprint workflow can
-proceed to the next issue without waiting for manual confirmation.
+The sprint workflow invokes `/aam-pr-pipeline` in-session after creating a PR.
+When the pipeline completes successfully (PR merged), control returns to the
+sprint workflow which continues to the next issue.
 
-When this skill stops with an escalation, the notification email or PR label
-(`needs-human-review`, `ci-failure`, `ai-cycle-{N}`) indicates the current
-state. Resolve the issue, then re-invoke `/aam-pr-pipeline` to resume.
+When the pipeline escalates, the PR label (`needs-human-review`, `ci-failure`,
+`ai-cycle-{N}`) indicates the current state. The sprint workflow stops and
+notifies the user. Resolve the issue, then re-invoke `/aam-pr-pipeline` to
+resume.
