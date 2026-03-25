@@ -102,11 +102,18 @@ async function main() {
   const logFile = path.join(worktreePath, 'pipeline.log');
   const logFd = fs.openSync(logFile, 'a');
 
-  // Build prompt
+  // Build prompt — explicitly instruct the agent to read the command file.
+  // In -p mode, .claude/commands/ files are NOT auto-loaded like rules are.
+  // The agent must read the spec with the Read tool to get the full 9-step pipeline.
   const prompt =
-    `Run /aam-pr-pipeline for PR #${prNumber} (${prUrl}) on branch ${branch} ` +
+    `You are an autonomous PR pipeline agent. Your FIRST action must be to read ` +
+    `the file .claude/commands/aam-pr-pipeline.md — it contains the complete ` +
+    `9-step pipeline specification you must follow exactly. ` +
+    `Execute every step for PR #${prNumber} (${prUrl}) on branch ${branch} ` +
     `in repo ${owner}/${repo}. The pipeline is running in a git worktree — ` +
-    `clean up the worktree when done.`;
+    `clean up the worktree when done. ` +
+    `IMPORTANT: Do NOT stop after posting a review comment. The pipeline ` +
+    `continues through fix, test, and merge steps.`;
 
   // Spawn background claude -p process (detached, unref'd so it outlives this hook)
   const child = spawn(
@@ -114,7 +121,7 @@ async function main() {
     [
       '-p',
       '--model', 'claude-sonnet-4-6',
-      '--max-turns', '50',
+      '--max-turns', '100',
       '--allowedTools', 'Read,Write,Edit,Bash(*),Grep,Glob,WebFetch',
       prompt
     ],
