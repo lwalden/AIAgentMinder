@@ -51,76 +51,24 @@ Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/
 
 ---
 
-## v2.0 — Autonomous PR Pipeline
+## v2.0 — Autonomous PR Pipeline (shipped)
 
 - **`/aam-pr-pipeline` skill** — Autonomous review-fix-test-merge pipeline for PRs. Reviews with full repo context (not just the diff), evaluates each issue with a developer perspective, applies fixes, runs the test suite, waits for external CI checks, and auto-merges when everything is green. Escalates to the user via email or PR label for high-risk files, cycle limit, blocked tests, or unresolvable merge blockers.
-- **`pr-pipeline-trigger.js` hook** — PostToolUse hook that detects `gh pr create` output and spawns a background `claude -p` in an isolated git worktree. The pipeline runs autonomously without blocking the active Claude Code session.
 - **`.pr-pipeline.json` config template** — Per-repo configuration for high-risk file patterns, cycle limit, auto-merge preference, merge method, notification email, and external check timeout.
-- **Sprint workflow integration** — `sprint-workflow.md` updated so the post-PR flow proceeds to the next issue without waiting for manual merge confirmation when the pipeline is installed.
+- **Sprint workflow integration** — `sprint-workflow.md` invokes `/aam-pr-pipeline` in-session after PR creation. On success (merged), the sprint continues to the next issue. On escalation, the sprint stops for human intervention.
 
 ---
 
-## v2.1 — Autonomous Sprint Loop (shipped)
+## v2.1 — In-Session Pipeline Execution (shipped)
 
-Close the automation gap between pipeline merges and the next sprint issue. Currently the sprint proceeds automatically only when the Claude Code session is still open. This milestone makes sprint execution fully self-driving.
+Replaced the background hook-based pipeline with in-session execution. The sprint workflow now invokes `/aam-pr-pipeline` directly after creating a PR, eliminating the headless `claude -p` worktree approach and its associated issues (command files not loading, insufficient turns, context gaps).
 
-### Feature: Post-Merge Sprint Continuation
+### Changes from v2.0
 
-After `aam-pr-pipeline.md` Step 8 (Auto-Merge) succeeds, check for remaining sprint work and spawn a continuation agent if conditions are met.
-
-**Implementation — `aam-pr-pipeline.md` (Step 8 addition):**
-
-After a successful merge, and before Step 9 (Cleanup):
-
-1. Check `autoContinueSprint` in `.pr-pipeline.json`. If `false` or absent: skip continuation entirely.
-2. Read `SPRINT.md` in the main repo root (not the worktree). Check sprint status:
-   - If status is not `in-progress`: skip.
-   - If no issues remain with status `todo`: skip (sprint complete).
-3. Check for active pipeline worktrees to prevent runaway parallelism:
-   ```bash
-   ls ../.pr-pipeline-worktrees/ 2>/dev/null | grep "^{repo}-pr-"
-   ```
-   If any exist (another pipeline is already running): skip.
-4. Check `continueMaxIssues` against the number of `[ai-fix]` commits accumulated across the sprint (tracked via PR label `ai-sprint-continues-N` on the sprint's milestone, or simply checked against a counter in SPRINT.md). If limit reached: post a comment on the merged PR noting the limit and stop.
-5. Identify the next `todo` issue from SPRINT.md (first row with status `todo`).
-6. Spawn continuation:
-   ```bash
-   claude -p \
-     --model claude-sonnet-4-6 \
-     --max-turns 80 \
-     --allowedTools "Read,Write,Edit,Bash(*),Grep,Glob,WebFetch,Task,TaskCreate,TaskUpdate,TaskList,TaskGet" \
-     "Sprint continuation: PR #{prNumber} ({prTitle}) was just merged. \
-      Continue the sprint by starting the next todo issue from SPRINT.md. \
-      Read SPRINT.md and native Tasks for current context. \
-      Follow sprint-workflow.md for execution."
-   ```
-   Spawn detached, log to `sprint-continuation.log` in the project root.
-7. Post a comment on the merged PR:
-   ```
-   Sprint continuation spawned — moving to next issue.
-   Log: {absolute path to sprint-continuation.log}
-   ```
-
-**`.pr-pipeline.json` additions:**
-
-```json
-{
-  "autoContinueSprint": false,
-  "continueMaxIssues": null
-}
-```
-
-- `autoContinueSprint`: default `false` (opt-in). Set `true` to enable fully autonomous sprint execution.
-- `continueMaxIssues`: integer or null. Caps the number of issues the autonomous loop will start without human confirmation. `null` = unlimited.
-
-**Acceptance criteria:**
-
-- When `autoContinueSprint: false` (default): behavior is unchanged from v2.0.
-- When `autoContinueSprint: true` and sprint has remaining `todo` issues: continuation agent spawns after merge.
-- When `continueMaxIssues: 3` and 3 issues have been auto-continued: continuation stops and posts a PR comment.
-- When another pipeline worktree is already active: no new continuation spawned.
-- When sprint status is not `in-progress` or SPRINT.md has no `todo` rows: no continuation spawned.
-- `aam-setup.md` and `aam-update.md` updated to include the new `.pr-pipeline.json` fields in documentation.
+- **Removed `pr-pipeline-trigger.js` hook** — No longer needed. The PostToolUse Bash hook that detected `gh pr create` output and spawned a background agent is gone.
+- **Sprint continuation simplified** — After the pipeline merges a PR, control returns to the sprint workflow which naturally continues to the next issue. No headless spawning, no `autoContinueSprint` / `continueMaxIssues` config needed.
+- **Reduced hook count** — Down to 1 hook script (`compact-reorient.js`).
+- **`/aam-update` migration** — Removes the old hook file and PostToolUse settings entry from target projects.
 
 ---
 
