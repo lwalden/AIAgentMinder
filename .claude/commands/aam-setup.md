@@ -55,8 +55,6 @@ If no git repo exists, run `git init`. Then copy all files from this repo's `pro
 
 Copy these to the target unconditionally (create directories as needed).
 
-**Note:** Copy `project/.claude/settings.json` as part of the `.claude/` directory. After copying, if PR pipeline was **not** enabled in Step 2, remove the `PostToolUse` hook entry from the copied `settings.json` — without `pr-pipeline-trigger.js` present, that entry would fire on every Bash call and fail silently.
-
 - `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
 - `project/.claude/rules/scope-guardian.md` → `[target]/.claude/rules/scope-guardian.md`
 - `project/.claude/rules/approach-first.md` → `[target]/.claude/rules/approach-first.md`
@@ -94,16 +92,11 @@ Copy these to the target unconditionally (create directories as needed).
 - Copy `project/.claude/commands/aam-sync-issues.md` to `[target]/.claude/commands/aam-sync-issues.md`
 
 **PR pipeline automation:** If enabled:
-- Copy `project/.claude/hooks/pr-pipeline-trigger.js` to `[target]/.claude/hooks/pr-pipeline-trigger.js`
 - Copy `project/.claude/commands/aam-pr-pipeline.md` to `[target]/.claude/commands/aam-pr-pipeline.md`
 - Copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json`
 - Ask: "Email address for escalation notifications? (leave blank to use PR comments only)"
   - If provided, update `notification.email` in the copied `.pr-pipeline.json`
-- Ask: "Enable autonomous sprint loop? After each merge, automatically start the next sprint issue without waiting for human confirmation. (y/n — default: n)"
-  - If yes: set `autoContinueSprint: true` in the copied `.pr-pipeline.json`
-  - If yes: Ask: "Maximum issues to auto-continue per sprint? (enter a number, or leave blank for unlimited)"
-    - If a number provided: set `continueMaxIssues: {value}` in `.pr-pipeline.json`
-- Tell the user: "PR pipeline installed. After `gh pr create`, a background agent will review, fix, test, and merge the PR automatically. Check `.pr-pipeline.json` to configure high-risk patterns, cycle limit, auto-merge, and sprint loop behavior."
+- Tell the user: "PR pipeline installed. The sprint workflow will run `/aam-pr-pipeline` in-session after creating a PR to review, test, and merge automatically. You can also invoke `/aam-pr-pipeline` manually. Check `.pr-pipeline.json` to configure high-risk patterns, cycle limit, and auto-merge."
 
 ---
 

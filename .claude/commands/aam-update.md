@@ -13,7 +13,8 @@ Before touching anything, understand what each file is:
 | **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
-| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md`, `.claude/hooks/pr-pipeline-trigger.js`, `.claude/commands/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
+| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md`, `.claude/commands/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
+| **Obsolete (v2.1 → v2.2)** | `.claude/hooks/pr-pipeline-trigger.js` | Delete during migration — pipeline now runs in-session |
 | **User-owned (AIAgentMinder creates initial)** | `.pr-pipeline.json` | Never overwrite — user configures high-risk patterns and notification email |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
 | **Obsolete (v0.7.0 → v0.8.0)** | `.claude/hooks/session-end-commit.js`, `.claude/commands/plan.md` | Delete during migration |
@@ -180,7 +181,7 @@ Instead, perform an additive merge:
 1. Read `[target]/.claude/settings.json`. If it doesn't exist, create it as `{ "hooks": {} }`.
 2. Read `project/.claude/settings.json` for the AIAgentMinder-managed hook entries.
 3. **SessionStart `compact` entry:** Add or replace the entry with `matcher: "compact"` under `SessionStart`. This is always managed by AIAgentMinder.
-4. **PostToolUse `Bash` entry:** Only include if `pr-pipeline-trigger.js` exists in `[target]/.claude/hooks/`. Add or replace the entry with `matcher: "Bash"` under `PostToolUse`. If the file doesn't exist, remove that entry if present (orphaned hook).
+4. **PostToolUse `Bash` entry (cleanup):** If a `PostToolUse` entry referencing `pr-pipeline-trigger.js` exists, remove it — this hook is obsolete (the pipeline now runs in-session).
 5. Preserve all other hook entries in the target file unchanged.
 6. Write the merged JSON back to `[target]/.claude/settings.json`.
 
@@ -215,20 +216,24 @@ Then handle default-on and optional rules files:
 - If present: overwrite. Print `✓ Updated: .claude/commands/aam-sync-issues.md`
 - If absent: prompt "GitHub Issues sync is available (/aam-sync-issues — pushes sprint issues to GitHub Issues). Enable? (y/n)"
 
-### aam-pr-pipeline.md and pr-pipeline-trigger.js
+### aam-pr-pipeline.md
 
-- If both present: overwrite both. Print `✓ Updated: .claude/commands/aam-pr-pipeline.md` and `✓ Updated: .claude/hooks/pr-pipeline-trigger.js`
-- If absent: prompt "PR pipeline automation is available (/aam-pr-pipeline — autonomous review, fix, test, and merge after PR creation). Enable? (y/n)"
-  - If yes: copy both files and copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json` (unless it already exists — never overwrite user config)
+- If present: overwrite. Print `✓ Updated: .claude/commands/aam-pr-pipeline.md`
+- If absent: prompt "PR pipeline automation is available (/aam-pr-pipeline — in-session review, fix, test, and merge after PR creation). Enable? (y/n)"
+  - If yes: copy `project/.claude/commands/aam-pr-pipeline.md` and copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json` (unless it already exists — never overwrite user config)
+
+### v2.1 → v2.2 Migration: Remove pr-pipeline-trigger.js
+
+If `[target]/.claude/hooks/pr-pipeline-trigger.js` exists: delete it. The pipeline now runs in-session via the sprint workflow instead of spawning a background process.
+
+Print: `✓ Removed (obsolete): .claude/hooks/pr-pipeline-trigger.js — pipeline now runs in-session`
 
 ### .pr-pipeline.json
 
 - **Never overwrite.** This is user-configured per-project.
 - If absent and `aam-pr-pipeline.md` is being added: copy from `project/.pr-pipeline.json`
 - If present: print `⊘ Kept: .pr-pipeline.json (user-owned — edit manually to update settings)`
-- **v2.1+ upgrade note:** Check whether `autoContinueSprint` and `continueMaxIssues` are present. If absent, tell the user to add them manually:
-  - `"autoContinueSprint": false` — set `true` to spawn a continuation agent after each merge and drive the full sprint autonomously
-  - `"continueMaxIssues": null` — integer cap on autonomous continuations per sprint; `null` = unlimited
+- **v2.2 cleanup:** If `autoContinueSprint` or `continueMaxIssues` are present, tell the user these fields are no longer used — sprint continuation is now handled by the sprint workflow loop in-session. They can be safely removed.
 
 ---
 
@@ -336,7 +341,6 @@ Optional features:
 - SPRINT.md
 - .claude/rules/architecture-fitness.md
 - .claude/commands/aam-pr-pipeline.md
-- .claude/hooks/pr-pipeline-trigger.js
 - .pr-pipeline.json (⊘ user-owned if present)
 
 [If migrating from v0.9.1:]
