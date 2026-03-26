@@ -8,7 +8,7 @@ Generate a brief retrospective for the completed sprint. Called automatically at
 
 Read the following:
 
-1. `SPRINT.md` — sprint goal, issue list, final statuses (including any risk-tagged issues)
+1. `SPRINT.md` — sprint goal, issue list, final statuses (including Post-Merge column)
 2. Use TaskList to get final task states and any notes
 3. `DECISIONS.md` — identify entries added during this sprint (by date or sprint reference)
 4. Recent git log for this sprint's branches:
@@ -27,8 +27,10 @@ From the data gathered, calculate:
 | --- | --- |
 | **Planned issues** | How many issues were in the approved sprint |
 | **Completed issues** | How many reached `done` |
+| **Rework items** | How many items required rework (post-merge validation failures or test failures after initial "done") |
 | **Blocked issues** | How many are still `blocked` at sprint end |
-| **Risk-tagged issues** | How many had `[risk]` tag; how many triggered `/aam-self-review` |
+| **Post-merge validations** | How many items had post-merge validation tasks; how many passed vs. failed |
+| **Risk-tagged issues** | How many had `[risk]` tag |
 | **Scope additions** | Issues added after sprint approval |
 | **Scope removals** | Issues removed after sprint approval |
 | **Decisions logged** | DECISIONS.md entries added this sprint |
@@ -45,8 +47,12 @@ Date: {today}
 Delivery:
   Planned:    {n} issues
   Completed:  {n} issues  ({%} completion rate)
+  Rework:     {n} items   [list IDs and failure description if any]
   Blocked:    {n} issues  [list IDs and blocker reason if any]
-  Risk-tagged: {n} issues  [list which ones, note if self-review found issues]
+
+Quality:
+  Post-merge validations: {n} defined, {n} passed, {n} failed
+  {If rework items exist: "Rework was needed for: [list items and root cause]"}
 
 Scope:
   {No scope changes} OR {Added: [issue titles] / Removed: [issue titles]}
@@ -57,7 +63,7 @@ Decisions:
 
 Patterns:
   [One honest observation about what went well]
-  [One honest observation about what was harder than expected]
+  [One honest observation about what was harder than expected — e.g., "S2-003 required rework due to staging env mismatch"]
 ```
 
 ---
@@ -69,6 +75,7 @@ Read prior archived sprint lines from `SPRINT.md` (lines starting with `S{n} arc
 From each archived line and from the current sprint's metrics (Step 2), identify **stress indicators**:
 - **Scope churn**: any scope additions or removals occurred during the sprint
 - **Blocked issues**: any issues ended the sprint in `blocked` status
+- **Rework items**: any items required rework (post-merge validation failures). Each rework item counts as a stress indicator.
 - **Context pressure**: the sprint had 7+ planned issues
 
 **Recommendation logic:**
@@ -79,6 +86,7 @@ From each archived line and from the current sprint's metrics (Step 2), identify
   - 1 stress indicator in the most recent sprint: reduce max by 1.
   - 2+ stress indicators in the most recent sprint: reduce both min and max by 1.
   - Stress indicators present in 2+ of the last 3 sprints: reduce both min and max by 1 (cumulative with above).
+  - Rework items in the most recent sprint: each rework item counts as a stress indicator.
 
 **Hard boundaries:** The recommendation must fall within 3–7 issues. Clamp to this range after all adjustments. Never recommend more than 7 regardless of history.
 
