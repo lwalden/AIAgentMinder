@@ -34,7 +34,9 @@ From the data gathered, calculate:
 |--------|-------|
 | **Planned issues** | How many issues were in the approved sprint |
 | **Completed issues** | How many reached `done` |
+| **Rework items** | How many items required rework (post-merge validation failures or test failures after initial "done") |
 | **Blocked issues** | How many are still `blocked` at sprint end |
+| **Post-merge validations** | How many items had post-merge validation tasks; how many passed vs. failed |
 | **Scope additions** | Issues added after sprint approval |
 | **Scope removals** | Issues removed after sprint approval |
 | **Decisions logged** | DECISIONS.md entries added this sprint |
@@ -51,7 +53,12 @@ Date: {today}
 Delivery:
   Planned:   {n} issues
   Completed: {n} issues  ({%} completion rate)
+  Rework:    {n} items   [list IDs and failure description if any]
   Blocked:   {n} issues  [list IDs and blocker reason if any]
+
+Quality:
+  Post-merge validations: {n} defined, {n} passed, {n} failed
+  {If rework items exist: "Rework was needed for: [list items and root cause]"}
 
 Scope:
   {No scope changes} OR {Added: [issue titles] / Removed: [issue titles]}
@@ -62,7 +69,7 @@ Decisions:
 
 Patterns:
   [One honest observation about what went well — e.g., "All issues completed with no blockers"]
-  [One honest observation about what was harder than expected — e.g., "S2-003 took longer due to unexpected API rate limits"]
+  [One honest observation about what was harder than expected — e.g., "S2-003 required rework due to staging env mismatch"]
 ```
 
 ---
@@ -71,11 +78,11 @@ Patterns:
 
 Check prior archived sprint lines from `SPRINT.md` and the current sprint's metrics (Step 2).
 
-Identify **stress indicators** from each sprint: scope churn (additions or removals), blocked issues, or context pressure (7+ planned issues).
+Identify **stress indicators** from each sprint: scope churn (additions or removals), blocked issues, rework items (post-merge failures), or context pressure (7+ planned issues).
 
 **Sizing logic:**
 - **Sprint 1:** Recommend 4–5 issues to establish a baseline.
-- **Sprint 2+:** Start from the previous sprint's planned count (or 5). Hold steady if no stress indicators. Reduce by 1 for each: stress in the most recent sprint, and repeated stress across 2+ of the last 3 sprints.
+- **Sprint 2+:** Start from the previous sprint's planned count (or 5). Hold steady if no stress indicators. Reduce by 1 for each: stress in the most recent sprint, repeated stress across 2+ of the last 3 sprints, and rework items in the most recent sprint (each rework item counts as a stress indicator).
 - **Hard boundaries:** Always 3–7. Never recommend more than 7. Never fewer than 3.
 
 If stress indicators are present, explain which ones drove the recommendation:

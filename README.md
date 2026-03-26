@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-1.4.1-blue)
+![Version](https://img.shields.io/badge/version-3.0.0-blue)
 
 Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
 
@@ -48,12 +48,12 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 | `debug-checkpoint.md` | Stops debugging spirals after 3 failed attempts at the same error |
 | `tool-first.md` | Use CLI/API tools instead of asking the user to perform actions manually |
 
-**Optional rules** (enabled at setup or on request):
+**Governance rules** (enabled by default at setup):
 
 | Rule | What it does |
 |------|-------------|
 | `code-quality.md` | TDD cycle, build-before-commit, small focused functions, read-before-write |
-| `sprint-workflow.md` | Sprint planning, approval gates, risk tagging, review/archive cycle |
+| `sprint-workflow.md` | State machine sprint execution with mandatory quality checklist, spec phase, autonomous execution, post-merge validation, and rework cycle |
 | `architecture-fitness.md` | Project-specific structural constraints — customize layer boundaries, external API rules, etc. |
 
 **Commands** structure your workflow:
@@ -65,8 +65,8 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 | `/aam-scope-check` | Before building something — Claude compares the proposed work against your roadmap and returns a clear verdict |
 | `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features directly in the roadmap with decision logging and sprint impact checks |
 | `/aam-handoff` | End of a session — writes priorities to auto-memory, updates DECISIONS.md, commits |
-| `/aam-quality-gate` | Pre-PR — tiered checks matching your project's quality tier (Lightweight / Standard / Rigorous / Comprehensive) |
-| `/aam-self-review` | Pre-PR (Rigorous/Comprehensive, and any risk-flagged issue) — specialist subagents review the diff for security, performance, and API design |
+| `/aam-quality-gate` | Pre-PR — full quality checklist (build, tests, coverage, lint, security) run every time |
+| `/aam-self-review` | Pre-PR — specialist subagents review the diff for security, performance, and API design. Runs for every item. |
 | `/aam-milestone` | Sprint boundaries — health assessment across phase progress, timeline, scope drift, dependency health, complexity budget, and known debt |
 | `/aam-retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
 | `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor. Full methodology behind `code-quality.md`'s one-liner |
@@ -116,7 +116,7 @@ Run `/aam-brief` to create your product brief and strategy roadmap. Claude inter
 
 For an **existing project**, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files from what it finds.
 
-After the roadmap, `/aam-brief` asks whether to enable optional features: code quality guidance, sprint planning, and architecture fitness rules. Recommended for Standard+ projects.
+After the roadmap, `/aam-brief` installs all governance features (code quality, sprint planning, architecture fitness) with Comprehensive quality tier by default.
 
 ### 5. Build
 
@@ -141,24 +141,24 @@ Use `claude --continue` to restore the previous session's full message history, 
 ## What a Session Looks Like
 
 **Session 1 — Planning:**
-Run `/aam-brief`. Claude asks about your project in grouped rounds. You describe a recipe sharing API, select Standard quality tier, enable sprint planning.
-Claude generates `docs/strategy-roadmap.md`. Run `/aam-handoff`. Priorities are written to auto-memory.
+Run `/aam-brief`. Claude asks about your project in grouped rounds. You describe a recipe sharing API.
+Claude defaults to Comprehensive quality tier with all governance features, generates `docs/strategy-roadmap.md`. Run `/aam-handoff`. Priorities are written to auto-memory.
 
 **Session 2 — Sprint planning + building:**
 Open Claude Code. Session Memory knows the project state.
 Say "Start a sprint for Phase 1." Claude proposes 5 issues with acceptance criteria — one flagged `[risk]` because it touches auth. You review and approve.
-Claude creates a branch, implements S1-001 (scaffold Express app), passes `/aam-quality-gate`, opens a PR.
-Once the PR is merged (by you, CI, or automation), Claude moves to S1-002 (user registration endpoint).
+Claude writes detailed specs for each item: implementation approach, TDD test plan, integration tests, post-merge validation tasks. You review the specs, add a custom instruction to S1-003 about the auth library to use, and approve.
+Claude begins autonomous execution: creates branch for S1-001, writes failing tests, implements, runs full test suite, quality gate, self-review, creates PR, runs the PR pipeline, merges — then moves straight to S1-002 without asking permission.
 
 **Between sprints — revising the plan:**
 You research a competing API and realize you need WebSocket support but can drop RSS feeds. Run `/aam-revise` — describe the changes, and Claude updates the roadmap directly: adds WebSocket to Phase 2, moves RSS to Out of Scope, logs both decisions. The next sprint proposal reflects the updated plan.
 
 **Session 3 — Continuing:**
 Open a fresh Claude Code tab. SPRINT.md is loaded automatically.
-Say "Resume." Claude picks up where it left off — runs `/aam-self-review` on the risk-flagged auth issue before creating the PR.
+Say "Resume." Claude identifies it's on S1-004 in the EXECUTE state, picks up from there.
 
 **Sprint completion:**
-All issues done. Claude runs `/aam-retrospective` — 5 planned, 5 completed, 0 scope changes, 0 blocked, 1 decision logged. Adaptive sizing: "First sprint — recommend 4–5 issues next sprint. No stress indicators."
+All items done, all post-merge validations pass. Claude runs `/aam-retrospective` — 5 planned, 5 completed, 0 rework, 0 blocked, 1 decision logged. Adaptive sizing: "First sprint — recommend 4–5 issues next sprint. No stress indicators."
 Sprint is archived with sizing metadata. Start Sprint 2.
 
 **Phase boundary:**
@@ -178,23 +178,21 @@ AI-assisted development moves fast. Without governance structure, projects accum
 
 | Step | Command / Mechanism | What happens |
 | ---- | ------------------- | ------------ |
-| **1. Plan** | `/aam-brief` | Interview-driven product brief. Defines MVP features, phases, quality tier, and surfaces hard-to-reverse decisions early. |
+| **1. Plan** | `/aam-brief` | Interview-driven product brief. Defines MVP features, phases, and surfaces hard-to-reverse decisions early. Comprehensive quality tier and all governance features enabled by default. |
 | **2. Revise** | `/aam-revise` | Update the plan when requirements change — add, drop, or reprioritize features with decision logging and roadmap history. |
-| **3. Decompose** | Sprint planning (`sprint-workflow.md`) | Break phase features into 4–7 sprint issues with acceptance criteria, risk tags, and dependencies. Human approves before work starts. |
-| **4. Execute** | Native Tasks + feature branches | One issue at a time. Each issue tracked as a persistent Task, implemented on its own branch, committed with issue ID reference. |
-| **5. Gate** | `/aam-quality-gate` + `/aam-self-review` | Pre-PR checks matching your quality tier. Specialist subagent review for Rigorous/Comprehensive tiers and risk-flagged issues. |
-| **6. Checkpoint** | `/aam-handoff` | Session-end discipline. Captures decisions, writes next-session priorities to auto-memory, commits checkpoint. |
-| **7. Reflect** | `/aam-retrospective` + `/aam-milestone` | Sprint metrics, adaptive sizing guidance, and phase-level health assessment at boundaries. |
+| **3. Decompose** | Sprint planning (`sprint-workflow.md`) | Break phase features into 4–7 sprint issues with acceptance criteria, risk tags, and dependencies. Human approves the issue list. |
+| **4. Spec** | Spec phase (`sprint-workflow.md`) | Detailed implementation spec per item: approach, test plan, integration tests, post-merge validation, file list. Human approves specs before coding begins. |
+| **5. Execute** | Autonomous execution | Items execute in sequence without permission prompts. TDD, full test suite, quality gate, and self-review run for every item — mandatory, never skipped. |
+| **6. Gate** | `/aam-quality-gate` + `/aam-self-review` + `/aam-pr-pipeline` | Full quality checklist, specialist code review, and autonomous PR merge. Escalates to human only on blockers. |
+| **7. Validate** | Post-merge validation | Tests requiring deployment or external services run after merge. Failures create rework tasks within the sprint. |
+| **8. Checkpoint** | `/aam-handoff` | Session-end discipline. Captures decisions, writes next-session priorities to auto-memory, commits checkpoint. |
+| **9. Reflect** | `/aam-retrospective` + `/aam-milestone` | Sprint metrics including rework count and post-merge failures, adaptive sizing guidance, and phase-level health assessment. |
 
 ### Sprint completion = full completion
 
-AAM sprints don't carry over incomplete work. Every issue in a sprint is accepted as done before the sprint closes. Feature decomposition happens naturally during sprint planning — you size issues to fit, and the sprint isn't done until they all pass quality gates and review.
+AAM sprints don't carry over incomplete work. Every issue in a sprint is accepted as done — including post-merge validation — before the sprint closes. Failed post-merge tests create rework tasks within the same sprint. The sprint isn't done until all items pass quality gates, review, merge, and validation.
 
-This eliminates the need for separate feature-level design documents that persist across sprints. The combination of sprint issue acceptance criteria, `DECISIONS.md` for architectural choices, and `/aam-revise` for plan changes gives you full traceability without an extra artifact layer.
-
-### When to add feature-level spec tools
-
-For most projects, the lifecycle above is sufficient. Consider adding a spec-driven development tool alongside AIAgentMinder only if you're designing complex API surfaces where getting the contract wrong before implementation starts would mean significant rework. Even then, it's an optional complement — not a prerequisite.
+The spec phase replaces the need for separate feature-level design documents. Each item gets a detailed implementation spec (approach, test plan, post-merge validation) that is reviewed before coding begins. The combination of item specs, `DECISIONS.md` for architectural choices, and `/aam-revise` for plan changes gives you full traceability without an extra artifact layer.
 
 ---
 
@@ -230,9 +228,9 @@ your-project/
     │   ├── approach-first.md      # Always active
     │   ├── debug-checkpoint.md    # Always active
     │   ├── tool-first.md          # Always active
-    │   ├── code-quality.md        # Optional
-    │   ├── sprint-workflow.md     # Optional
-    │   └── architecture-fitness.md  # Optional, project-customized
+    │   ├── code-quality.md        # Default on
+    │   ├── sprint-workflow.md     # Default on — state machine with mandatory quality
+    │   └── architecture-fitness.md  # Default on, project-customized
     └── hooks/
         └── compact-reorient.js    # Sprint summary after context compaction
 ```
@@ -256,7 +254,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 **Use AIAgentMinder if** you're a solo developer or small team who wants structured planning, scope enforcement, decision logging, and optional sprint governance without heavy infrastructure.
 
-**Spec-driven development tools are optional complements.** AIAgentMinder's lifecycle — brief → revise → sprint decompose → execute → gate — handles most projects without additional feature-level planning. If you're designing complex API surfaces where the contract must be right before implementation starts, tools like cc-ssd can layer on top. They're complementary, not required.
+**Spec-driven development tools are optional complements.** AIAgentMinder's lifecycle — brief → revise → sprint decompose → spec → execute → gate → validate — handles most projects without additional feature-level planning. The built-in spec phase covers implementation planning per item. For complex API surfaces where a broader product spec is needed before decomposition, tools like cc-ssd can layer on top.
 
 **Use Conductor or CCPM if** you need full project management with GitHub Issues integration, Linear sync, and parallel multi-agent execution across branches. These target teams, not solo devs.
 

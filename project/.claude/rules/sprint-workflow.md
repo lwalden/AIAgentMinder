@@ -1,8 +1,8 @@
 ---
-description: Sprint planning and execution workflow
+description: Sprint planning and execution workflow — state machine with mandatory quality steps
 ---
 
-# Sprint Workflow Guidance
+# Sprint Workflow
 # AIAgentMinder-managed. Delete this file to opt out of sprint-driven development.
 
 ## Overview
@@ -14,14 +14,93 @@ Sprint workflow has two layers:
 
 `SPRINT.md` is the sprint header: goal, approved scope, sprint number, and status. Individual issues live as native Tasks.
 
-## Sprint Planning
+---
+
+## Sprint States
+
+Every sprint follows this state machine. Each state has mandatory steps and defined transitions.
+
+```
+PLAN → SPEC → APPROVE → [for each item: EXECUTE → TEST → REVIEW → MERGE → VALIDATE] → COMPLETE
+```
+
+**Human checkpoints** (ONLY these pause for input):
+- **PLAN**: present sprint issues for approval
+- **APPROVE**: present item specs for approval/revision
+- **BLOCKED**: any state where Claude cannot proceed without human help
+- **REWORK**: post-merge test failure requires human decision
+
+**Autonomous transitions** (proceed WITHOUT asking):
+- Approved spec → begin execution
+- Execution complete → run tests
+- Tests pass → quality gate → self-review → create PR
+- PR pipeline passes → merge
+- Merge complete → post-merge validation (or next item if none)
+- Post-merge validation passes → next item
+- All items complete → sprint review
+
+---
+
+## Mandatory Quality Checklist
+
+**NEVER SKIP these steps. Not when the user says "go faster." Not when the user says "stop asking." Not when context is running low. These are non-negotiable.**
+
+For every sprint item, in order:
+
+1. Read the item spec and gather project context
+2. Create a feature branch
+3. Write failing test(s) for acceptance criteria (TDD RED)
+4. Implement until tests pass (TDD GREEN)
+5. Refactor if needed (tests must stay green)
+6. Run the full test suite — zero failures required
+7. Run `/aam-quality-gate`
+8. Run `/aam-self-review` (always — not tier-dependent)
+9. Create PR
+10. Run `/aam-pr-pipeline` (review → fix → test → merge)
+11. Execute post-merge validation tasks (if any)
+
+If ANY step fails, fix it before proceeding to the next step. Do not skip a step to "come back to it later."
+
+---
+
+## Autonomous Execution Directive
+
+After the human approves the sprint specs, execute all items in sequence without asking permission between items. The approved spec IS the permission.
+
+**ASK FOR HUMAN INPUT ONLY WHEN:**
+- Blocked (external dependency, missing credentials, ambiguous AC)
+- Debug checkpoint triggered (3 failed attempts at same error)
+- Test requires human action (physical device, hardware interaction, or visual judgment Claude cannot resolve via Playwright screenshots)
+- Post-merge test fails (rework decision needed)
+- Insufficient information to write a meaningful spec
+
+**NEVER ASK:**
+- "Shall I proceed to the next item?" — yes, always
+- "Shall I create the PR?" — yes, always
+- "Shall I run the quality gate?" — yes, always
+- "Shall I run tests?" — yes, always
+- "Shall I merge?" — yes, if pipeline passes
+
+**NEVER SKIP (even if the user says "go faster" or "don't ask me"):**
+- TDD (write failing test before implementation)
+- Full test suite execution before PR
+- Quality gate
+- Self-review
+- PR pipeline review step
+- Post-merge validation (if defined for the item)
+
+The user's instruction to reduce interruptions means "stop asking permission on approved work." It does NOT mean "skip quality steps." If you are unsure whether something is a permission prompt or a quality step, it is a quality step.
+
+---
+
+## State: PLAN
 
 When the user asks to start a sprint or begin a phase:
 
 1. Read `docs/strategy-roadmap.md` for the phase's features and acceptance criteria.
 2. Read `DECISIONS.md` for architectural context that affects implementation choices.
-3. Check `SPRINT.md` for archived sprint lines. If present, read the `<!-- sizing: {min}-{max} -->` comment from the most recent archive — use that range as the recommended issue count. If no archive exists, default to 4–5 issues. Never plan more than 7 issues regardless of sizing comment.
-4. Determine sprint scope. A sprint covers a coherent subset of the phase's work — typically 4–7 issues. Prefer fitting whole features over hitting an exact count: if a feature needs 6 issues and the sizing range says 4–5, plan 6 but confirm with the user. More than 7 issues signals context overload; fewer than 3 signals insufficient granularity.
+3. Check `SPRINT.md` for archived sprint lines. If present, read the `<!-- sizing: {min}-{max} -->` comment from the most recent archive — use that range as the recommended issue count. If no archive exists, default to 4-5 issues. Never plan more than 7 issues regardless of sizing comment.
+4. Determine sprint scope. A sprint covers a coherent subset of the phase's work — typically 4-7 issues. Prefer fitting whole features over hitting an exact count. More than 7 issues signals context overload; fewer than 3 signals insufficient granularity.
 5. Decompose into discrete issues. Each issue must be completable in a single focused effort. One PR per issue. Each issue must have: a title, a type (feature/fix/chore/spike), acceptance criteria, and references to relevant roadmap items.
 6. **Risk tagging:** For each issue, check if it touches a high-risk area:
    - Auth or session handling
@@ -30,7 +109,7 @@ When the user asks to start a sprint or begin a phase:
    - Public API changes (breaking or additive)
    - Security-sensitive config or secrets handling
 
-   If yes, add `[risk]` to the issue title. Risk-tagged issues trigger automatic `/aam-self-review` before PR creation regardless of quality tier.
+   If yes, add `[risk]` to the issue title.
 
 7. Write the sprint header to `SPRINT.md`:
 
@@ -40,60 +119,243 @@ When the user asks to start a sprint or begin a phase:
    **Phase:** {phase name from roadmap}
    **Issues:** {count} issues proposed
 
-   | ID | Title | Type | Risk | Status |
-   |---|---|---|---|---|
-   | S{n}-001 | {title} | feature |  | todo |
-   | S{n}-002 | {title} [risk] | fix | ⚠ | todo |
+   | ID | Title | Type | Risk | Status | Post-Merge |
+   |---|---|---|---|---|---|
+   | S{n}-001 | {title} | feature |  | todo | n/a |
+   | S{n}-002 | {title} [risk] | fix | ⚠ | todo | n/a |
    ```
 
 8. Present the sprint to the user as a numbered list with acceptance criteria for each issue. Note any risk-tagged issues. If phase work was deferred, briefly note what was left out and why. **Wait for the user to review, edit, discuss, and approve before proceeding.**
 
 Issue ID format: `S{sprint_number}-{sequence}` (e.g., S1-001, S1-002, S2-001).
 
-## After User Approval
+→ **Transition:** User approves → move to SPEC.
 
-Once the user approves:
+---
+
+## State: SPEC
+
+After the user approves the sprint issue list, write a detailed spec for each item before any coding begins.
+
+### Per-Item Spec Format
+
+For each sprint item, produce:
+
+```markdown
+### S{n}-{seq}: {title}
+
+**Approach:**
+{Which files to create or modify. What patterns to follow from existing code. Key implementation decisions.}
+
+**Test Plan (TDD RED targets):**
+1. {Failing test description — behavior-focused, not implementation-focused}
+2. {Next failing test}
+3. ...
+
+**Integration / E2E Tests:**
+{Playwright tests, API tests, or other integration tests to run before PR. "None" if unit tests cover it.}
+
+**Post-Merge Validation:**
+{Tests that require deployment or external services. "None" if all testing is pre-merge.}
+
+**Files:**
+- Create: {list}
+- Modify: {list}
+
+**Dependencies:**
+{Other sprint items that must complete first. "None" if independent.}
+
+**Custom Instructions:**
+{Slot for human-provided per-item guidance. "None" unless human adds them.}
+```
+
+### Spec Presentation
+
+Present all specs to the user in a single message. The user may:
+- **Approve all** — proceed to execution
+- **Revise specific items** — update those specs, re-present for approval
+- **Add custom instructions** — per-item guidance that becomes part of the spec
+- **Reorder items** — change execution sequence
+
+If writing a spec requires information Claude doesn't have (unclear AC, unknown API contract, missing design), ask the human for that specific information before finalizing the spec. Do not guess.
+
+→ **Transition:** User approves specs → move to APPROVE.
+
+---
+
+## State: APPROVE
+
+Once the user approves all specs:
 
 1. Update `SPRINT.md` status from `proposed` to `in-progress`.
 2. Create a native Task for each approved issue using the TaskCreate tool:
    - Title: the issue title (including `[risk]` tag if applicable)
-   - Description: acceptance criteria + issue ID (e.g., `[S1-001]`)
-   - Use task dependencies where one issue must complete before another starts
-3. Confirm to the user: "Sprint S{n} started. {count} tasks created. Working issues in order."
+   - Description: acceptance criteria + spec summary + issue ID (e.g., `[S1-001]`)
+   - Use task dependencies where the spec defines them
+3. Confirm to the user: "Sprint S{n} started. {count} tasks created. Beginning execution."
 
-## Sprint Execution
+→ **Transition:** Autonomous — immediately begin EXECUTE for the first item.
 
-- Work issues in the proposed order unless the user directs otherwise.
-- For each issue: create a feature branch (`{type}/S{n}-{seq}-{short-desc}`), implement, commit referencing the issue ID (`feat(auth): implement login endpoint [S1-003]`).
-- Before creating a PR: run `/aam-quality-gate` to confirm the issue meets the project's quality tier. Fix any failures before proceeding.
-- For **Rigorous** and **Comprehensive** quality tiers: also run `/aam-self-review` after the quality gate passes. Address any High severity findings before proceeding.
-- For **risk-tagged issues** (`[risk]`): run `/aam-self-review` regardless of quality tier (even Lightweight/Standard). Address any High severity findings before creating the PR.
-- After all checks pass, create the PR. If `.claude/commands/aam-pr-pipeline.md` exists, run `/aam-pr-pipeline` in the current session to review, test, and merge the PR. If the pipeline succeeds (PR merged), update the issue's Task to `completed` and SPRINT.md row to `done`, then switch back to the base branch and pull (`git checkout main && git pull`) before starting the next sprint issue. If the pipeline escalates (`needs-human-review` or `ci-failure` label), stop and notify the user before continuing. If the pipeline command is not installed, wait for the user to confirm the PR is handled before beginning the next issue.
-- Update the native Task status as you work: pending → in_progress → completed (or leave pending if blocked).
-- Update SPRINT.md issue status to match: `todo` → `in-progress` → `done` or `blocked`.
-- If an issue cannot be completed: mark both the Task and SPRINT.md entry as `blocked` and notify the user with a clear description of what's needed.
+---
 
-## Sprint Completion
+## State: EXECUTE
 
-A sprint ends when all issues are `done` or `blocked`.
+For each item, in order (or as directed by approved spec dependencies):
 
-- If blocked issues exist: notify the user and wait for resolution. Once blocks are resolved, complete remaining issues, then proceed to review.
-- Present a sprint review: completed issues with PR links, decisions logged to DECISIONS.md, any risk-tagged issues and their self-review outcomes, summary of what was accomplished, and what remains for the next sprint.
-- Run `/aam-retrospective` to generate metrics for the sprint. Present it alongside the review.
-- If the user accepts the review: archive the sprint — replace SPRINT.md contents with:
+1. Update the native Task status to `in_progress`. Update SPRINT.md row to `in-progress`.
+2. Read the item's spec (from the approved spec phase).
+3. Read relevant source files to understand existing patterns and context.
+4. Create a feature branch: `{type}/S{n}-{seq}-{short-desc}`.
+5. **TDD RED:** Write failing test(s) matching the spec's Test Plan. Run them — confirm they fail for the right reason.
+6. **TDD GREEN:** Implement the minimal code to make tests pass. Run tests after each meaningful change.
+7. **Refactor:** Clean up while tests stay green. Extract duplication, improve naming, simplify.
+8. **Integration/E2E tests:** If the spec defines integration or Playwright tests, write and run them.
+9. Run the **full test suite**. Zero failures. If a test fails that is unrelated to this item, investigate — it may indicate a regression. Fix it or document it as a blocker.
 
-  ```
-  S{n} archived ({date}): {planned} planned, {completed} completed. {scope_changes} scope changes, {blocked} blocked. {brief summary}.
-  <!-- sizing: {recommended_min}-{recommended_max} -->
-  ```
+→ **Transition:** All tests pass → move to TEST.
 
-  The `sizing` comment is the recommended issue range for the next sprint, derived from `/aam-retrospective` Step 4. Scope changes and blocked counts are recorded as stress indicators for future sizing adjustments. Full sprint detail is preserved in git history and in native task history.
+---
 
-- The user can then ask to begin a new sprint. Increment the sprint number.
+## State: TEST
+
+Verification that the item meets its acceptance criteria:
+
+1. Run the project's full test suite one final time (clean run, not incremental).
+2. Run `/aam-quality-gate`. Fix any failures.
+3. Run `/aam-self-review`. Address any High severity findings. For Medium/Low, fix them — do not ask whether to proceed.
+4. If the spec includes Playwright or browser tests: execute them. Use screenshots to verify visual correctness. Only escalate to human if visual judgment cannot be resolved from screenshots.
+
+→ **Transition:** All checks pass → move to REVIEW (PR creation + pipeline).
+
+---
+
+## State: REVIEW
+
+1. Create the PR with a clear title referencing the sprint item ID and a body summarizing what was built, how it was tested, and any decisions made.
+2. Run `/aam-pr-pipeline` in the current session.
+   - Pipeline handles: code review → fix issues → re-test → merge.
+   - If the pipeline finds issues and fixes them, that's normal — let it cycle.
+   - If the pipeline escalates (`needs-human-review`, `ci-failure`, cycle limit), stop and notify the user. This is a BLOCKED state.
+
+→ **Transition:** Pipeline succeeds (PR merged) → move to MERGE.
+→ **Transition:** Pipeline escalates → move to BLOCKED. Wait for human.
+
+---
+
+## State: MERGE
+
+PR has been merged. Housekeeping:
+
+1. Switch back to the base branch and pull: `git checkout main && git pull`.
+2. Update the native Task status to `completed`.
+3. Update SPRINT.md row status to `done`.
+4. Check the item's spec for post-merge validation tasks.
+
+→ **Transition:** Post-merge tasks exist → move to VALIDATE.
+→ **Transition:** No post-merge tasks → move to NEXT.
+
+---
+
+## State: VALIDATE
+
+Execute post-merge validation defined in the item's spec:
+
+1. If validation requires a deployed environment, check if it's available. If a wait is needed (deploy pipeline, build, etc.), poll at reasonable intervals. If the wait exceeds 15 minutes, notify the human and continue to the next item — but the Post-Merge column stays `pending` and **the sprint CANNOT close until this validation runs.** The NEXT and COMPLETE states will enforce this.
+2. Run post-merge tests (API smoke tests against deployed environment, browser tests against staging, etc.).
+3. Update SPRINT.md Post-Merge column:
+   - Tests pass → `pass`
+   - Tests fail → `fail`
+   - Still waiting → leave as `pending` (validation will be retried from NEXT or before COMPLETE)
+
+**A `pending` post-merge validation is a blocking obligation, not a note.** It must be executed before the sprint can close. Do not treat it as informational.
+
+→ **Transition:** Pass → move to NEXT.
+→ **Transition:** Fail → move to REWORK.
+→ **Transition:** Deferred (wait timeout) → move to NEXT, but validation remains pending.
+
+---
+
+## State: REWORK
+
+A post-merge validation test has failed.
+
+1. Notify the human: describe what failed, the expected vs. actual behavior, and your diagnosis.
+2. Create a rework task in SPRINT.md:
+
+   ```
+   | S{n}-{seq}r | Rework: {original title} — {failure description} | fix | ⚠ | todo | n/a |
+   ```
+
+3. Create a corresponding native Task.
+4. Wait for human acknowledgment, then execute the rework item through the full cycle (EXECUTE → TEST → REVIEW → MERGE → VALIDATE).
+
+The sprint cannot close while rework items are outstanding.
+
+→ **Transition:** Human acknowledges → execute rework item from EXECUTE state.
+
+---
+
+## State: NEXT
+
+Move to the next sprint item.
+
+1. Check SPRINT.md for the next `todo` item.
+2. Check for any deferred VALIDATE steps from earlier items (where deploy wait exceeded the timeout). If any are now ready, complete validation first — return to VALIDATE for those items before proceeding.
+
+→ **Transition:** Next item exists → move to EXECUTE for that item.
+→ **Transition:** All items `done` AND every Post-Merge column is `pass` or `n/a` → move to COMPLETE.
+→ **Transition:** All items `done` BUT any Post-Merge column is `pending` → **do NOT move to COMPLETE.** Execute those pending validations now (return to VALIDATE for each). If validation cannot run yet (deploy not ready), notify the human and WAIT — do not present the sprint review.
+
+---
+
+## State: COMPLETE
+
+**PRECONDITION CHECK (mandatory — run this before anything else):**
+Read SPRINT.md and verify that EVERY row's Post-Merge column is either `pass` or `n/a`. If ANY row shows `pending`, STOP — you are not in COMPLETE state. Return to VALIDATE for those items. Do not present the sprint review, do not run the retrospective, do not ask for archival. This is not optional.
+
+Once the precondition is verified:
+
+1. Present a sprint review: completed issues with PR links, decisions logged to DECISIONS.md, any risk-tagged issues and their self-review outcomes, rework items and their resolution, summary of what was accomplished.
+2. Run `/aam-retrospective` to generate metrics. Present alongside the review.
+3. If a final documentation-only PR is needed (README updates, API docs, etc.), create it and run it through the pipeline.
+4. **Wait for human to accept the review.** If accepted, archive the sprint:
+
+   ```
+   S{n} archived ({date}): {planned} planned, {completed} completed, {rework} rework. {scope_changes} scope changes, {blocked} blocked. {brief summary}.
+   <!-- sizing: {recommended_min}-{recommended_max} -->
+   ```
+
+5. Notify the human: "Sprint S{n} complete. Ready for the next sprint when you are."
+
+→ **Transition:** Human asks for next sprint → increment sprint number, move to PLAN.
+
+---
+
+## State: BLOCKED
+
+Any state can transition to BLOCKED when Claude cannot proceed.
+
+Triggers:
+- External dependency unavailable
+- Missing credentials or secrets
+- Ambiguous acceptance criteria that cannot be resolved from existing docs
+- Debug checkpoint (3 failed attempts at same error)
+- Test requires human action (physical device, hardware interaction, or visual judgment Claude cannot resolve via Playwright screenshots)
+- PR pipeline escalation
+
+When blocked:
+1. Update SPRINT.md row to `blocked`.
+2. Notify the human with: what's blocked, why, what information or action would unblock it.
+3. Wait for human response.
+
+→ **Transition:** Human provides resolution → return to the state that was blocked.
+
+---
 
 ## Cross-Session Behavior
 
 - `SPRINT.md` persists across sessions via git — it's the sprint header and authoritative scope record.
 - Native Tasks persist across sessions automatically (stored at `~/.claude/tasks/`).
-- When resuming a session with an active sprint: read `SPRINT.md` to get context, then use TaskList to see current task states. Resume from where you left off.
+- When resuming a session with an active sprint: read `SPRINT.md` to get context, then use TaskList to see current task states. Resume from where you left off — identify which state the current item is in and continue from there.
+- Item specs are preserved in git history (committed during the APPROVE state). If context is lost after compaction, re-read the spec from the committed version.
 - `/aam-handoff` works independently — it checkpoints decisions and key context. Do not modify SPRINT.md or tasks during handoff; sprint state is updated during sprint execution.
