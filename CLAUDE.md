@@ -17,7 +17,7 @@
 
 ## Current State
 
-v1.1 shipped. Project is in maintenance/backlog mode. See ROADMAP.md for post-v1.1 direction and backlog.md for acceptance criteria.
+v3.0 in progress. Autonomous sprint execution rework — state machine workflow, mandatory quality checklist, spec phase, post-merge validation. See ROADMAP.md for details.
 
 ## Behavioral Rules
 
