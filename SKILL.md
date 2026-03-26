@@ -1,6 +1,6 @@
 # AIAgentMinder Plugin
 
-> **Status:** v1.3.1 — Agent-aware sprint sizing, stress-indicator-based adaptive sizing.
+> **Status:** v3.0.0 — Autonomous sprint execution with mandatory quality checklist, spec phase, and post-merge validation.
 
 ---
 
@@ -33,7 +33,7 @@ The `/aam-setup` interview copies governance files to your project and customize
 ```json
 {
   "name": "aiagentminder",
-  "version": "1.2.0",
+  "version": "3.0.0",
   "description": "Project governance and methodology layer for AI-assisted development.",
   "repository": "https://github.com/lwalden/AIAgentMinder",
   "license": "MIT"
@@ -53,8 +53,8 @@ See `.claude-plugin/plugin.json` for the full manifest.
 | `/aam-handoff` | Session checkpoint — log decisions, write priorities to memory |
 | `/aam-checkup` | Installation health check — files, hooks, Node.js, version stamp |
 | `/aam-scope-check` | Active scope governance — compare proposed work against roadmap |
-| `/aam-quality-gate` | Tiered pre-PR checks matching the project's quality tier |
-| `/aam-self-review` | Subagent-based code review (security, performance, API design) |
+| `/aam-quality-gate` | Full pre-PR quality checklist (build, tests, coverage, lint, security) |
+| `/aam-self-review` | Subagent-based code review (security, performance, API design) — runs for every item |
 | `/aam-milestone` | Project health assessment — scope drift, complexity, timeline, known debt |
 | `/aam-retrospective` | Sprint retrospective with metrics and adaptive sizing |
 | `/aam-sync-issues` | Sync current sprint issues to GitHub Issues (optional — team projects) |

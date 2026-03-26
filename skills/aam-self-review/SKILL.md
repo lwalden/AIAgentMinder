@@ -128,6 +128,6 @@ After all subagents complete:
 
 ## Integration with Sprint Workflow
 
-`/aam-self-review` is called by the sprint workflow before PR creation for **Rigorous** and **Comprehensive** quality tiers. For **Standard** tier it's optional. For **Lightweight** tier it's skipped.
+`/aam-self-review` is called by the sprint workflow before PR creation for every item. During autonomous sprint execution, address High severity findings by fixing them — do not prompt. Fix Medium/Low findings as well — do not ask whether to proceed.
 
 You can also invoke it manually at any time with `/aam-self-review`.

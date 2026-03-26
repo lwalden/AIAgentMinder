@@ -236,9 +236,28 @@ Release v{new_version} complete
 
 ---
 
-## Post-v1.4 Direction
+## v3.0 — Autonomous Sprint Execution (current)
 
-Remaining maintenance work (lower priority than v2.1 and v2.2):
+Complete rework of the sprint execution model. Addresses quality regression when users request reduced interruptions — Claude was conflating "stop asking permission" with "skip quality steps."
+
+### Changes
+
+- **State machine sprint workflow** — `sprint-workflow.md` rewritten as a numbered state machine (PLAN → SPEC → APPROVE → EXECUTE → TEST → REVIEW → MERGE → VALIDATE → NEXT → COMPLETE) with mandatory steps and defined transitions. Replaces prose-style guidance.
+- **Mandatory quality checklist** — Non-skippable ordered checklist per item: TDD, full test suite, quality gate, self-review, PR pipeline. Explicit "NEVER SKIP" directive that overrides user requests to go faster.
+- **Autonomous execution directive** — After spec approval, execute all items without asking permission between items. Human checkpoints only for: blockers, debug checkpoint, tests requiring human action, post-merge failures.
+- **Spec phase** — New phase between sprint approval and execution. Each item gets a detailed implementation spec with approach, test plan (TDD RED targets), integration tests, post-merge validation tasks, file list, and dependencies. Specs are presented for human approval before coding begins.
+- **Post-merge validation** — New `Post-Merge` column in SPRINT.md. Items can define tests that require deployment or external services. Sprint cannot close until all post-merge validations pass. Failed validations create rework tasks.
+- **Rework cycle** — Defined path for test failures: diagnose → create rework task → execute through full cycle → re-validate. Sprint tracks rework count as a stress indicator.
+- **Default to Comprehensive** — `/aam-brief` no longer asks about quality tiers or optional features. Defaults to Comprehensive with all governance features enabled. One-line notification instead of multi-round ceremony.
+- **Quality gate always full** — `/aam-quality-gate` runs all checks every time (build, tests, coverage, lint, security). No tier-dependent skipping.
+- **Self-review always runs** — `/aam-self-review` runs for every item, not just risk-tagged or high-tier items.
+- **Retrospective tracks rework** — `/aam-retrospective` includes rework count and post-merge validation metrics as stress indicators for adaptive sizing.
+
+---
+
+## Post-v2.2 Direction
+
+Remaining maintenance work:
 
 1. **Reducing overhead** — evaluating whether the compact-reorient.js hook is still needed as Claude Code's native context handling improves
 2. **Distribution improvements** — `/aam-update` dry-run mode
@@ -256,6 +275,7 @@ Remaining maintenance work (lower priority than v2.1 and v2.2):
 
 - **`/aam-handoff` JSON digest** — Speculative value for the target audience. Nobody has asked for it.
 - **`/onboard` command** — The existing `/aam-brief` Starting Point E (existing project audit) covers this use case adequately. A separate command would duplicate effort.
+- **Quality tier selection** — Replaced with always-Comprehensive default. Users who want lighter governance can edit the roadmap after setup.
 
 ---
 
