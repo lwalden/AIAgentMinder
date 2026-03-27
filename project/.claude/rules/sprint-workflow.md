@@ -22,6 +22,8 @@ Every sprint follows this state machine. Each state has mandatory steps and defi
 
 ```
 PLAN → SPEC → APPROVE → [for each item: EXECUTE → TEST → REVIEW → MERGE → VALIDATE] → COMPLETE
+                                                     ↑
+                                              CONTEXT_CYCLE (at NEXT transition — fresh session, resume from here)
 ```
 
 **Human checkpoints** (ONLY these pause for input):
@@ -301,8 +303,10 @@ Move to the next sprint item.
 
 1. Check SPRINT.md for the next `todo` item.
 2. Check for any deferred VALIDATE steps from earlier items (where deploy wait exceeded the timeout). If any are now ready, complete validation first — return to VALIDATE for those items before proceeding.
+3. **Context pressure check** — evaluate whether to cycle before the next item (see CONTEXT_CYCLE state below). This check runs BEFORE starting the next EXECUTE.
 
-→ **Transition:** Next item exists → move to EXECUTE for that item.
+→ **Transition:** Context cycle warranted → move to CONTEXT_CYCLE.
+→ **Transition:** Next item exists (no cycle needed) → move to EXECUTE for that item.
 → **Transition:** All items `done` AND every Post-Merge column is `pass` or `n/a` → move to COMPLETE.
 → **Transition:** All items `done` BUT any Post-Merge column is `pending` → **do NOT move to COMPLETE.** Execute those pending validations now (return to VALIDATE for each). If validation cannot run yet (deploy not ready), notify the human and WAIT — do not present the sprint review.
 
@@ -352,6 +356,97 @@ When blocked:
 
 ---
 
+## State: CONTEXT_CYCLE
+
+Autonomous context management. When context pressure is high, Claude persists sprint state, self-terminates, and a fresh session resumes automatically. **No human intervention required** (if the profile hook or sprint-runner wrapper is set up).
+
+### When to Cycle
+
+Evaluate at every NEXT transition. Cycle if ANY of these are true:
+
+- **Item count threshold:** 3 or more items completed in this session. Each item consumes significant context (spec reading, implementation, test output, PR pipeline, review comments). By item 4+, quality visibly degrades.
+- **Compaction has occurred:** If the `compact-reorient.js` hook has fired during this session, context has already been lossy-compressed once. A second compaction will degrade further. Cycle before it happens.
+- **Heavy debugging occurred:** If a debug checkpoint was triggered (3+ failed attempts on an error) during the current or most recent item, that debugging consumed disproportionate context. Factor this into the decision.
+- **Complex rework:** If a REWORK item was executed in this session, its full cycle (diagnosis + fix + re-test + re-review) added substantial context on top of the original items.
+
+Use judgment — these are heuristics, not hard rules. The goal is to cycle BEFORE quality degrades, not after. When in doubt, cycle. A fresh session with good state recovery is always better than a degraded session that limps through the remaining items.
+
+### How to Cycle
+
+Execute these steps in order. Do NOT skip any step.
+
+**Step 1: Commit all work.** Ensure the current item is fully merged or that any in-progress work is committed to a branch. The cycle must not lose uncommitted code.
+
+**Step 2: Write the continuation file.** Create `.sprint-continuation.md` in the project root:
+
+```markdown
+# Sprint Continuation State
+**Generated:** {ISO timestamp}
+**Reason:** {why cycling — e.g., "3 items completed, context pressure high"}
+**Session items completed:** {count}
+
+## Resume Point
+**Sprint:** S{n}
+**Next item:** S{n}-{seq}
+**Next item state:** EXECUTE (beginning)
+**Branch:** main (or specify if mid-item)
+
+## Completed This Session
+{list of items completed with one-line status each}
+
+## Critical Context
+{2-5 bullets of non-obvious context the next session needs that isn't in SPRINT.md,
+DECISIONS.md, or the item spec. Examples:}
+- {architectural decision made during this session not yet in DECISIONS.md}
+- {dependency discovered during implementation}
+- {test environment state that matters}
+
+## Instructions for Next Session
+1. Read SPRINT.md for sprint state and approved specs
+2. Use TaskList to see native task states
+3. Begin EXECUTE for S{n}-{seq} following the approved spec
+4. Continue autonomous execution through remaining items
+```
+
+Keep Critical Context minimal — most state is already in SPRINT.md, DECISIONS.md, native Tasks, and git history. Only include what would be LOST without this file.
+
+**Step 3: Write the signal file.** Create `.sprint-continue-signal` in the project root. Contents don't matter (can be empty) — its existence is the signal.
+
+```bash
+echo "cycle" > .sprint-continue-signal
+```
+
+**Step 4: Self-terminate.** Run the context cycle script:
+
+```bash
+bash .claude/scripts/context-cycle.sh
+```
+
+This traces the process tree to find the Claude CLI process and kills it. The profile hook or sprint-runner wrapper catches the signal file and starts a fresh Claude instance with the continuation prompt.
+
+**Step 5 (fallback): If self-termination fails** (script error, process not found), tell the user:
+
+```
+Context cycle needed but self-termination failed.
+State files are written. Please type /exit, then run:
+  claude "CONTEXT CYCLE: Read .sprint-continuation.md and resume sprint execution."
+```
+
+### After Cycling (new session)
+
+The new session starts with a `CONTEXT CYCLE:` prompt. On receiving this:
+
+1. Read `.sprint-continuation.md` for the resume point and critical context.
+2. Read `SPRINT.md` for full sprint state and approved specs.
+3. Use `TaskList` to see native task states.
+4. Read the spec for the next item (from SPRINT.md or git history).
+5. Delete `.sprint-continuation.md` (it has served its purpose).
+6. Resume from EXECUTE for the indicated item. Continue autonomous execution.
+
+→ **Transition:** Self-terminate → fresh session → EXECUTE for next item.
+
+---
+
 ## Cross-Session Behavior
 
 - `SPRINT.md` persists across sessions via git — it's the sprint header and authoritative scope record.
@@ -359,3 +454,5 @@ When blocked:
 - When resuming a session with an active sprint: read `SPRINT.md` to get context, then use TaskList to see current task states. Resume from where you left off — identify which state the current item is in and continue from there.
 - Item specs are preserved in git history (committed during the APPROVE state). If context is lost after compaction, re-read the spec from the committed version.
 - `/aam-handoff` works independently — it checkpoints decisions and key context. Do not modify SPRINT.md or tasks during handoff; sprint state is updated during sprint execution.
+- **Context cycling** preserves sprint continuity across automatic session restarts. The continuation file (`.sprint-continuation.md`) bridges the gap between sessions with ephemeral context that isn't captured in SPRINT.md or git. The signal file (`.sprint-continue-signal`) triggers the restart mechanism. Both are ephemeral and gitignored.
+- **Setup requirement:** Context cycling self-termination works on Windows (Git Bash). The restart requires either the PowerShell profile hook (installed via `.claude/scripts/install-profile-hook.ps1`) or the sprint-runner wrapper (`.claude/scripts/sprint-runner.ps1`). Without either, Claude falls back to telling the user what command to run.

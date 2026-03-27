@@ -236,7 +236,7 @@ Release v{new_version} complete
 
 ---
 
-## v3.0 — Autonomous Sprint Execution (current)
+## v3.0 — Autonomous Sprint Execution (shipped)
 
 Complete rework of the sprint execution model. Addresses quality regression when users request reduced interruptions — Claude was conflating "stop asking permission" with "skip quality steps."
 
@@ -252,6 +252,21 @@ Complete rework of the sprint execution model. Addresses quality regression when
 - **Quality gate always full** — `/aam-quality-gate` runs all checks every time (build, tests, coverage, lint, security). No tier-dependent skipping.
 - **Self-review always runs** — `/aam-self-review` runs for every item, not just risk-tagged or high-tier items.
 - **Retrospective tracks rework** — `/aam-retrospective` includes rework count and post-merge validation metrics as stress indicators for adaptive sizing.
+
+---
+
+## v3.1 — Autonomous Context Cycling (current)
+
+Addresses context degradation during long sprint sessions. After 3+ items, conversation context fills up, compaction loses fidelity, and quality drops on remaining items. Claude now detects this and cycles to a fresh session autonomously.
+
+### Changes
+
+- **CONTEXT_CYCLE state** — New state in the sprint state machine. At each NEXT transition, Claude evaluates context pressure (items completed, compaction history, debugging intensity). When warranted, persists state and self-terminates.
+- **Self-termination mechanism** — `context-cycle.sh` traces `/proc/$$/winpid` up the Windows process tree via WMI to find `claude.exe`, then kills it with `taskkill`. Same terminal, same env vars.
+- **PowerShell profile hook** — `install-profile-hook.ps1` adds a prompt function to `$PROFILE` that catches the signal file after Claude exits and auto-starts a fresh instance. Works regardless of how Claude was started — no wrapper required.
+- **Sprint-runner wrapper** — `sprint-runner.ps1` provides a loop-based alternative for dedicated sprint sessions.
+- **Continuation file format** — `.sprint-continuation.md` captures resume point, completed items, and critical ephemeral context. New session reads it alongside CLAUDE.md, rules, and SPRINT.md (all auto-loaded).
+- **Cross-platform** — Windows (PowerShell + Git Bash WMI tracing), macOS, and Linux (bash/zsh + native `ps` ppid tracing). Scripts provided for both platforms.
 
 ---
 
