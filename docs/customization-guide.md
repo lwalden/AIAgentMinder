@@ -157,7 +157,7 @@ When a new version of AIAgentMinder is released, run `/aam-update` from the AIAg
 
 **Overwritten (AIAgentMinder-owned):**
 - `.claude/hooks/compact-reorient.js`
-- `.claude/scripts/context-cycle.sh`, `sprint-runner.ps1`, `install-profile-hook.ps1`
+- `.claude/scripts/context-cycle.sh`
 - `.claude/settings.json` (hook configuration)
 - `.claude/commands/aam-brief.md`, `aam-revise.md`, `aam-handoff.md`, `aam-checkup.md`, `aam-quality-gate.md`, `aam-scope-check.md`, `aam-self-review.md`, `aam-milestone.md`, `aam-retrospective.md`
 - `.claude/rules/git-workflow.md`, `scope-guardian.md`, `approach-first.md`, `debug-checkpoint.md`

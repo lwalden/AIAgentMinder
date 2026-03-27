@@ -188,7 +188,7 @@ Created files:
 - .claude/commands/aam-triage.md (/aam-triage — structured bug triage)
 - .claude/commands/aam-grill.md (/aam-grill — plan interrogation)
 - .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
-- .claude/scripts/ (context cycling: self-kill, sprint-runner wrapper, profile hook installer)
+- .claude/scripts/ (context cycling: self-kill script is per-project; sprint-runner and profile hook installers are user-level setup tools — copied for discoverability)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
 - .claude/rules/approach-first.md (approach-first protocol — state intent before executing)

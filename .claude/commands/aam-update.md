@@ -150,10 +150,6 @@ Copy each file from `project/` in this repo to the target, overwriting whatever 
 ```
 project/.claude/hooks/compact-reorient.js              →  [target]/.claude/hooks/compact-reorient.js
 project/.claude/scripts/context-cycle.sh              →  [target]/.claude/scripts/context-cycle.sh
-project/.claude/scripts/sprint-runner.ps1             →  [target]/.claude/scripts/sprint-runner.ps1
-project/.claude/scripts/sprint-runner.sh              →  [target]/.claude/scripts/sprint-runner.sh
-project/.claude/scripts/install-profile-hook.ps1      →  [target]/.claude/scripts/install-profile-hook.ps1
-project/.claude/scripts/install-profile-hook.sh       →  [target]/.claude/scripts/install-profile-hook.sh
 project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
 project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
 project/.claude/commands/aam-revise.md                     →  [target]/.claude/commands/aam-revise.md
