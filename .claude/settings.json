@@ -1,12 +1,1 @@
-{
-  "permissions": {
-    "allow": [
-      "Edit(*)",
-      "Write(*)"
-    ],
-    "additionalDirectories": [
-      "D:\\Source\\aiagentminder\\project\\.claude\\commands",
-      "D:\\Source\\aiagentminder\\project\\.claude\\hooks"
-    ]
-  }
-}
+{}

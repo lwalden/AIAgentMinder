@@ -108,6 +108,40 @@ One hook script (Node.js, cross-platform) in `.claude/hooks/`, configured in `.c
 **Add a custom hook:** Add a new entry to `settings.json` and create the script in `.claude/hooks/`. See the [Claude Code hooks documentation](https://docs.anthropic.com/en/docs/claude-code/hooks) for the full event list and JSON input format.
 
 
+### Context Cycling (Sprint Sessions)
+
+Scripts in `.claude/scripts/` enable automatic context cycling during long sprint sessions. When Claude detects context pressure, it persists state and self-terminates. A restart mechanism catches the exit and starts a fresh session automatically.
+
+**One-time setup (recommended):**
+
+```powershell
+# Windows (PowerShell)
+.\.claude\scripts\install-profile-hook.ps1
+. $PROFILE
+```
+
+```bash
+# macOS / Linux
+bash .claude/scripts/install-profile-hook.sh
+source ~/.bashrc  # or ~/.zshrc
+```
+
+**Alternative: Wrapper script (for dedicated sprint sessions):**
+
+```powershell
+# Windows
+.\.claude\scripts\sprint-runner.ps1 -Prompt "plan and start a sprint for phase 2"
+```
+
+```bash
+# macOS / Linux
+bash .claude/scripts/sprint-runner.sh "plan and start a sprint for phase 2"
+```
+
+The profile hook is recommended because it works regardless of how you start Claude — even if you begin with a planning conversation and only later start a sprint.
+
+**Platform:** Cross-platform. Windows uses PowerShell hooks + Git Bash WMI tracing. macOS/Linux uses bash/zsh hooks + native `ps` ppid tracing.
+
 ### Custom Slash Commands
 
 Create `.claude/commands/your-command.md` files for project-specific workflows:
@@ -123,6 +157,7 @@ When a new version of AIAgentMinder is released, run `/aam-update` from the AIAg
 
 **Overwritten (AIAgentMinder-owned):**
 - `.claude/hooks/compact-reorient.js`
+- `.claude/scripts/context-cycle.sh`
 - `.claude/settings.json` (hook configuration)
 - `.claude/commands/aam-brief.md`, `aam-revise.md`, `aam-handoff.md`, `aam-checkup.md`, `aam-quality-gate.md`, `aam-scope-check.md`, `aam-self-review.md`, `aam-milestone.md`, `aam-retrospective.md`
 - `.claude/rules/git-workflow.md`, `scope-guardian.md`, `approach-first.md`, `debug-checkpoint.md`
