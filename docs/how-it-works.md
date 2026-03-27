@@ -24,6 +24,8 @@ Claude reads `CLAUDE.md` automatically every session. `.claude/rules/*.md` files
 
 **After context compaction:** The `compact-reorient.js` hook fires via the SessionStart `compact` matcher and outputs the first 15 lines of SPRINT.md (if active) to reorient Claude to the current sprint. Session Memory handles the broader context restoration.
 
+**Context cycling (autonomous):** During sprint execution, Claude evaluates context pressure at each item transition. When pressure is high (3+ items completed, compaction already occurred, heavy debugging), Claude writes a continuation file with sprint state, self-terminates, and a fresh session starts automatically via the PowerShell profile hook or sprint-runner wrapper. Zero human intervention required. See "Context Cycling" under Optional Features.
+
 ## Context Budget
 
 | File | Target Lines | Read Frequency |
@@ -66,6 +68,26 @@ When enabled, `project/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` 
 3. Works issues one-by-one with per-issue feature branches and PRs
 4. Tracks status in SPRINT.md (todo → in-progress → done/blocked)
 5. Archives completed sprints to git history
+
+### Context Cycling
+
+Autonomous context management for long sprint sessions. When Claude detects context pressure mid-sprint, it:
+
+1. Commits all work and writes a continuation file (`.sprint-continuation.md`) with the resume point, completed items, and critical context
+2. Creates a signal file (`.sprint-continue-signal`)
+3. Self-terminates by tracing its own process tree and killing the Claude CLI process
+
+The restart mechanism catches the signal and starts a fresh Claude instance in the same terminal with the same environment variables:
+
+| Mechanism | Setup | How it works |
+|-----------|-------|--------------|
+| **Profile hook** (recommended) | Run `.claude/scripts/install-profile-hook.ps1` once | PowerShell prompt function detects signal file after Claude exits |
+| **Sprint-runner wrapper** | Start sessions with `.claude/scripts/sprint-runner.ps1` | Loop-based wrapper restarts Claude on signal |
+| **Fallback** | None needed | Claude tells you what command to paste |
+
+The new session reads CLAUDE.md, rules, and SPRINT.md automatically (native loading), then reads the continuation file for ephemeral context. It resumes sprint execution from where the previous session left off.
+
+**Platform:** Cross-platform. Windows uses Git Bash `/proc/$$/winpid` + WMI tracing; macOS/Linux uses native `ps` ppid tracing. Profile hooks available for PowerShell (Windows) and bash/zsh (macOS/Linux).
 
 ## Governance Hooks
 
