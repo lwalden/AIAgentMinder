@@ -87,7 +87,7 @@ The restart mechanism catches the signal and starts a fresh Claude instance in t
 
 The new session reads CLAUDE.md, rules, and SPRINT.md automatically (native loading), then reads the continuation file for ephemeral context. It resumes sprint execution from where the previous session left off.
 
-**Platform:** Windows (Git Bash) for self-termination. The continuation file and resume flow work on any platform — only the automatic self-kill requires Windows process tracing.
+**Platform:** Cross-platform. Windows uses Git Bash `/proc/$$/winpid` + WMI tracing; macOS/Linux uses native `ps` ppid tracing. Profile hooks available for PowerShell (Windows) and bash/zsh (macOS/Linux).
 
 ## Governance Hooks
 

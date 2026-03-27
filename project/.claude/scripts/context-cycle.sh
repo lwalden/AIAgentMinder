@@ -3,19 +3,18 @@
 # Called by Claude when context pressure warrants a fresh session.
 #
 # How it works:
-#   1. Traces from the current bash shell's Windows PID up the process tree
-#   2. Finds the parent claude.exe (CLI) process
-#   3. Kills it with taskkill
-#   4. The parent shell (pwsh) gets its prompt back
-#   5. The PowerShell prompt hook or sprint-runner.ps1 catches the signal file
+#   1. Traces from the current bash shell up the process tree
+#   2. Finds the parent claude/claude.exe (CLI) process
+#   3. Kills it
+#   4. The parent shell gets its prompt back
+#   5. The shell prompt hook or sprint-runner catches the signal file
 #      and starts a new Claude instance with the continuation prompt.
 #
 # Prerequisites:
-#   - Windows with PowerShell available
 #   - .sprint-continuation.md and .sprint-continue-signal already written
-#   - Either the profile hook or sprint-runner.ps1 set up to catch the restart
+#   - Either the profile hook or sprint-runner set up to catch the restart
 #
-# Cross-platform: Windows only (Git Bash on Windows). macOS/Linux TBD.
+# Cross-platform: Windows (Git Bash), macOS, Linux.
 
 set -euo pipefail
 
@@ -35,32 +34,62 @@ if [ ! -f "$PROJECT_DIR/.sprint-continue-signal" ]; then
     exit 1
 fi
 
-# Get the persistent bash shell's Windows PID
-BASH_WINPID=$(cat /proc/$$/winpid 2>/dev/null)
-if [ -z "$BASH_WINPID" ]; then
-    echo "ERROR: Could not read /proc/\$\$/winpid — not running in Git Bash on Windows?" >&2
-    exit 1
+# --- Platform-specific PID tracing ---
+
+find_claude_pid_windows() {
+    # Git Bash on Windows: use /proc/$$/winpid + WMI
+    local BASH_WINPID
+    BASH_WINPID=$(cat /proc/$$/winpid 2>/dev/null) || return 1
+
+    powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
+        \$current = $BASH_WINPID
+        for (\$i = 0; \$i -lt 15; \$i++) {
+            \$proc = Get-CimInstance Win32_Process -Filter \"ProcessId=\$current\" -ErrorAction SilentlyContinue
+            if (-not \$proc) { break }
+            if (\$proc.Name -eq 'claude.exe' -and \$proc.ExecutablePath -like '*\.local*') {
+                Write-Output \$current
+                exit 0
+            }
+            \$current = \$proc.ParentProcessId
+        }
+        exit 1
+    " 2>/dev/null | tr -d '\r\n'
+}
+
+find_claude_pid_unix() {
+    # macOS / Linux: trace ppid chain using ps
+    local current=$$
+    for _ in $(seq 1 15); do
+        local ppid
+        ppid=$(ps -o ppid= -p "$current" 2>/dev/null | tr -d ' ') || return 1
+        [ -z "$ppid" ] && return 1
+        [ "$ppid" = "0" ] && return 1
+
+        # Check if the parent process is claude
+        local pname
+        pname=$(ps -o comm= -p "$ppid" 2>/dev/null | tr -d ' ') || return 1
+
+        if [[ "$pname" == "claude" || "$pname" == "claude.exe" ]]; then
+            echo "$ppid"
+            return 0
+        fi
+        current="$ppid"
+    done
+    return 1
+}
+
+# Detect platform and find Claude PID
+CLAUDE_PID=""
+if [ -f /proc/$$/winpid ] 2>/dev/null; then
+    # Windows (Git Bash)
+    CLAUDE_PID=$(find_claude_pid_windows) || true
+else
+    # macOS / Linux
+    CLAUDE_PID=$(find_claude_pid_unix) || true
 fi
 
-# Trace up the process tree to find claude.exe
-# Uses PowerShell + WMI since we're on Windows
-CLAUDE_PID=$(powershell.exe -NoProfile -ExecutionPolicy Bypass -Command "
-    \$current = $BASH_WINPID
-    for (\$i = 0; \$i -lt 15; \$i++) {
-        \$proc = Get-CimInstance Win32_Process -Filter \"ProcessId=\$current\" -ErrorAction SilentlyContinue
-        if (-not \$proc) { break }
-        if (\$proc.Name -eq 'claude.exe' -and \$proc.ExecutablePath -like '*\.local*') {
-            Write-Output \$current
-            exit 0
-        }
-        \$current = \$proc.ParentProcessId
-    }
-    exit 1
-" 2>/dev/null | tr -d '\r\n')
-
 if [ -z "$CLAUDE_PID" ]; then
-    echo "ERROR: Could not find claude.exe in process ancestry" >&2
-    echo "The process trace from bash PID $BASH_WINPID did not reach a Claude CLI process." >&2
+    echo "ERROR: Could not find claude in process ancestry" >&2
     echo "Context cycle aborted — state files are preserved. Restart manually:" >&2
     echo "  claude \"CONTEXT CYCLE: Read .sprint-continuation.md and resume sprint execution.\"" >&2
     exit 1
@@ -71,9 +100,12 @@ echo "Fresh session will start automatically via profile hook or sprint-runner."
 
 # Kill the Claude process. This terminates our parent — we become orphaned.
 # The signal file tells the restart mechanism to pick up.
-taskkill //PID "$CLAUDE_PID" //F > /dev/null 2>&1
+if [ -f /proc/$$/winpid ] 2>/dev/null; then
+    taskkill //PID "$CLAUDE_PID" //F > /dev/null 2>&1
+else
+    kill -9 "$CLAUDE_PID" 2>/dev/null || true
+fi
 
-# If we get here, taskkill may have failed (or hasn't taken effect yet).
-# Give it a moment, then exit. The orphaned process will terminate shortly.
+# If we get here, the kill may not have taken effect yet.
 sleep 2
 exit 0

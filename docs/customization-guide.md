@@ -115,26 +115,32 @@ Scripts in `.claude/scripts/` enable automatic context cycling during long sprin
 **One-time setup (recommended):**
 
 ```powershell
-# Install the PowerShell profile hook — works for ALL Claude sessions
+# Windows (PowerShell)
 .\.claude\scripts\install-profile-hook.ps1
-
-# Reload your profile to activate
 . $PROFILE
+```
+
+```bash
+# macOS / Linux
+bash .claude/scripts/install-profile-hook.sh
+source ~/.bashrc  # or ~/.zshrc
 ```
 
 **Alternative: Wrapper script (for dedicated sprint sessions):**
 
 ```powershell
-# Start Claude with context cycling enabled
-.\.claude\scripts\sprint-runner.ps1
-
-# Or with an initial prompt
+# Windows
 .\.claude\scripts\sprint-runner.ps1 -Prompt "plan and start a sprint for phase 2"
+```
+
+```bash
+# macOS / Linux
+bash .claude/scripts/sprint-runner.sh "plan and start a sprint for phase 2"
 ```
 
 The profile hook is recommended because it works regardless of how you start Claude — even if you begin with a planning conversation and only later start a sprint.
 
-**Platform:** Self-termination requires Windows (Git Bash). The continuation file and manual resume work on any platform.
+**Platform:** Cross-platform. Windows uses PowerShell hooks + Git Bash WMI tracing. macOS/Linux uses bash/zsh hooks + native `ps` ppid tracing.
 
 ### Custom Slash Commands
 
