@@ -57,8 +57,7 @@ Ask in a single grouped message:
 - What are the immediate next priorities?
 - What significant decisions have already been made? (stack choices, auth approach, DB, APIs, key libraries) -- these become DECISIONS.md entries
 - Any known blockers or open questions?
-- Do you want **code quality guidance** enabled? (TDD, review-before-commit, build-before-commit — adds ~18 lines of context per session)
-- Do you want **sprint-driven development**? (structured issue decomposition with per-issue PRs — recommended for multi-phase projects)
+- Any governance features you want to disable? (TDD, sprint planning, architecture fitness rules are all enabled by default)
 
 ### Step E3: Generate State Files
 
@@ -74,9 +73,10 @@ Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
 
 3. **Populate `CLAUDE.md` Project Identity** with actual values from the audit.
 
-4. **Handle optional features** based on Step E2 answers:
-   - If code quality guidance enabled: copy `code-quality.md` from the AIAgentMinder template to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
-   - If sprint planning enabled: copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template. Add `@SPRINT.md` to CLAUDE.md (after the Context Budget table — this is Claude Code's native import syntax, loads SPRINT.md every session). Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`. Add reminder to Human Actions: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval."
+4. **Install all governance features** (all enabled by default — same as new projects):
+   - Copy `code-quality.md` from the AIAgentMinder template to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
+   - Copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template. Add `@SPRINT.md` to CLAUDE.md (after the Context Budget table — this is Claude Code's native import syntax, loads SPRINT.md every session). Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`. Add reminder to Human Actions: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
+   - Copy `architecture-fitness.md` from template to `[target]/.claude/rules/architecture-fitness.md`. Tell the user to customize it.
 
 5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases."
 
@@ -108,51 +108,27 @@ Ask questions in grouped rounds, not one at a time. Adapt based on project type.
 - MCP servers? (database tools, browser automation, etc. -- or "none")
 - Target launch date?
 
-### Round 3: Quality & Testing
+### Round 3: Governance Setup
 
-**For personal tools or simple CLI/library projects:** Skip this round. Default to Lightweight tier. Tell the user: "Based on the project scope, I'm defaulting to Lightweight testing (smoke tests for critical paths). Let me know if you want more thorough testing."
+**All governance features are enabled by default.** Do not ask the user to choose a tier or opt into individual features. Install everything:
 
-**For all other projects**, ask:
-- How important is reliability?
-- Users beyond yourself?
-- Testing preference? (or should I recommend?)
+- **Code quality guidance:** TDD, review-before-commit, build-before-commit
+- **Sprint planning:** structured issue decomposition with spec phase, per-issue PRs, autonomous execution
+- **Architecture fitness rules:** structural constraints — user customizes after setup
 
-Then determine quality tier:
+Tell the user in one line:
+> "All governance features enabled — TDD, sprint planning, self-review, and architecture fitness rules. Edit `.claude/rules/` to disable any you don't want."
 
-| Signal | Tier | Testing |
-|--------|------|---------|
-| Personal, simple, solo | **Lightweight** | Smoke tests only |
-| Small team, moderate complexity | **Standard** | Unit + integration tests, CI |
-| Public-facing, user data, payments | **Rigorous** | Unit + integration + E2E + security scanning |
-| Safety-critical, compliance | **Comprehensive** | All above + load testing + audit logging |
+**Install all governance files:**
 
-After determining the quality tier, ask about optional features:
-
-**Code quality guidance:**
-- For **Standard, Rigorous, Comprehensive** tiers: "I recommend enabling code quality guidance (TDD, review-before-commit, build-before-commit). This adds ~18 lines of context per session. Enable? (y/n)" — default yes
-- For **Lightweight** tier: "Code quality guidance is available (TDD, review-before-commit). It's optional for Lightweight projects. Enable? (y/n)" — default no
-
-**Sprint planning:**
-- For **Standard, Rigorous, Comprehensive** tiers: "I recommend enabling sprint planning. When you start a phase, I'll decompose work into reviewable issues and work them one-by-one with per-issue PRs. Enable? (y/n)" — default yes
-- For **Lightweight** tier: "Sprint planning is available — structured issue decomposition with per-issue PRs. It's optional for simple projects. Enable? (y/n)" — default no
-
-**Architecture fitness rules:**
-- For **Rigorous, Comprehensive** tiers: "I recommend enabling architecture fitness rules. These are structural constraints (layer boundaries, external API rules, etc.) that you customize for your project. Claude enforces them during code review and PR creation. Enable? (y/n)" — default yes
-- For **Standard** tier: "Architecture fitness rules are available — structural constraints for your project architecture. They're most valuable when you have a clear layered architecture. Enable? (y/n)" — default no
-- For **Lightweight** tier: skip entirely
-
-If code quality guidance enabled: copy `code-quality.md` from the AIAgentMinder template (`project/.claude/rules/code-quality.md`) to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
-
-If sprint planning enabled:
-- Copy `sprint-workflow.md` from template (`project/.claude/rules/sprint-workflow.md`) to `[target]/.claude/rules/sprint-workflow.md`
-- Create `SPRINT.md` from template (`project/SPRINT.md`) if it doesn't exist
-- Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists)
-- Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`
-- Add to `docs/strategy-roadmap.md` Human Actions Needed: "Review and approve sprint issues before Claude begins coding — every sprint starts with your approval"
-
-If architecture fitness rules enabled:
-- Copy `architecture-fitness.md` from template (`project/.claude/rules/architecture-fitness.md`) to `[target]/.claude/rules/architecture-fitness.md`
-- Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder constraints with rules for your project's architecture."
+1. Copy `code-quality.md` from the AIAgentMinder template (`project/.claude/rules/code-quality.md`) to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
+2. Copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`.
+3. Create `SPRINT.md` from template (`project/SPRINT.md`) if it doesn't exist.
+4. Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists).
+5. Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`.
+6. Add to `docs/strategy-roadmap.md` Human Actions Needed: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
+7. Copy `architecture-fitness.md` from template to `[target]/.claude/rules/architecture-fitness.md`.
+8. Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder constraints with rules for your project's architecture."
 
 ### Decision Forcing: Surface Hard-to-Reverse Choices
 
@@ -223,6 +199,5 @@ not vague disclaimers. "Won't support offline mode" is good. "Won't do everythin
    - For deferred decisions: add a `<!-- TODO: [decision question] | WHEN: [trigger] | BLOCKS: [what] -->` marker in the roadmap's Open Questions section.
 4. Populate `## MVP Goals` in `CLAUDE.md` with Phase 1 deliverables (3-5 testable bullet points)
 5. If MCP servers were mentioned, add `**MCP Servers:**` line to Project Identity in `CLAUDE.md`
-6. Summarize what was enabled: mention code quality guidance and/or sprint planning if enabled. If code quality guidance enabled, note it lives in `.claude/rules/` and is loaded natively by Claude Code each session. If sprint planning enabled, note SPRINT.md is loaded via `@import` in CLAUDE.md.
-7. If sprint planning was enabled: "Sprint planning enabled. When you're ready, say 'start a sprint' or 'begin Phase 1' and I'll propose issues for your review."
-8. Tell the user: "Your roadmap is ready. Tell me to start Phase 1 when you're ready."
+6. Summarize what was installed: "All governance features enabled — TDD, sprint planning, self-review, and architecture fitness rules. Governance rules live in `.claude/rules/` and are loaded automatically each session. SPRINT.md is loaded via `@import` in CLAUDE.md."
+7. Tell the user: "Your roadmap is ready. When you're ready, say 'start a sprint' or 'begin Phase 1' and I'll propose issues with detailed specs for your review."

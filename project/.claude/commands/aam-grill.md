@@ -16,7 +16,7 @@ Read the plan or design being questioned. Sources may include:
 Also read:
 
 - `DECISIONS.md` — for prior decisions that constrain the design space
-- `docs/strategy-roadmap.md` — for quality tier and scope context
+- `docs/strategy-roadmap.md` — for scope context
 
 ---
 
@@ -78,7 +78,7 @@ If yes, append each decision to DECISIONS.md in the project's existing format, i
 
 - **Use `/aam-grill`** when a design is non-obvious, high-stakes, or has multiple interdependent decisions.
 - **Use `approach-first.md`** for routine check-ins — state intent, confirm, proceed.
-- For Rigorous+ quality tiers, consider running `/aam-grill` before architecture changes touching more than 5 files.
+- Consider running `/aam-grill` before architecture changes touching more than 5 files.
 
 ---
 

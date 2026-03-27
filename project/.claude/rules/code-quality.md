@@ -7,7 +7,7 @@ description: Code quality and development discipline rules
 
 ## Development Discipline
 
-**TDD cycle (Standard tier and above):** Write a failing test first. Implement the minimal solution to make it pass. Refactor only after tests are green.
+**TDD cycle:** Write a failing test first. Implement the minimal solution to make it pass. Refactor only after tests are green.
 
 **Build and test before every commit:** Run the project's build command and full test suite before staging anything. Never commit code that doesn't compile or has failing tests.
 

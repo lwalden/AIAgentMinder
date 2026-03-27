@@ -32,7 +32,7 @@ Ask all of these in one grouped prompt:
 7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
 8. **Code quality guidance:** Enable? (TDD, review-before-commit, build-before-commit — loaded via `.claude/rules/` natively, ~18 lines per session) (y/n)
 9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
-10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc.) (y/n — recommended for Rigorous/Comprehensive quality tiers)
+10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc.) (y/n — recommended)
 11. **GitHub Issues sync:** Enable `/aam-sync-issues` command? Syncs current sprint issues to GitHub Issues for visibility outside Claude Code. (y/n — recommended for team projects with a GitHub remote)
 12. **PR pipeline automation:** Enable `/aam-pr-pipeline`? Automatically reviews, fixes, tests, and merges PRs after creation. Requires Node.js and `gh` CLI. (y/n — recommended for any project where you create PRs from Claude Code)
 
@@ -144,8 +144,8 @@ The template `.gitignore` covers secrets, IDE files, OS artifacts. Append stack-
 - **Rust**: `target/`, `*.rs.bk`
 - **Go**: `*.exe`, `*.test`, `*.out`
 
-### docs/strategy-roadmap.md -- Set Initial Quality Tier
-Based on project scale: Personal → Lightweight, Small team → Standard, Public → Rigorous.
+### docs/strategy-roadmap.md -- Set Testing Strategy
+Based on project scope, fill in the Testing Strategy section with appropriate testing approach.
 
 ---
 
@@ -179,7 +179,7 @@ Created files:
 - .claude/commands/aam-revise.md (/aam-revise — mid-stream plan revision)
 - .claude/commands/aam-checkup.md (/aam-checkup — installation health check)
 - .claude/commands/aam-handoff.md (/aam-handoff — session checkpoint)
-- .claude/commands/aam-quality-gate.md (/aam-quality-gate — tiered pre-PR checks)
+- .claude/commands/aam-quality-gate.md (/aam-quality-gate — pre-PR quality checks)
 - .claude/commands/aam-scope-check.md (/aam-scope-check — active scope governance)
 - .claude/commands/aam-self-review.md (/aam-self-review — subagent code review before PR)
 - .claude/commands/aam-milestone.md (/aam-milestone — project health assessment)

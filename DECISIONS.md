@@ -22,15 +22,19 @@ Chose: `<!-- ai-continues: N -->` HTML comment written directly into SPRINT.md a
 
 ---
 
-### nohup + disown spawn pattern for continuation agent | 2026-03 | Status: Active
+### nohup + disown spawn pattern for continuation agent | 2026-03 | Status: Superseded
 
-Chose: `nohup claude -p ... >> log 2>&1 & disown $!` over Node.js `spawn({detached: true})` or a separate trigger script for spawning the continuation agent. Why: the continuation is spawned from inside a `claude -p` bash invocation (not a Node.js hook), so `nohup`/`disown` is the natural detach mechanism. Running in the main repo root (`cd $REPO_ROOT`) ensures the continuation agent has the correct working directory for git operations. Tradeoff: `nohup` is not available on Windows natively, but the pipeline already runs in bash (git bash or WSL) and uses other bash-only patterns throughout.
+Superseded by in-session pipeline execution (v2.1). The background `claude -p` spawn approach was replaced — the sprint workflow now invokes `/aam-pr-pipeline` directly in-session.
+
+Original: Chose `nohup claude -p ... >> log 2>&1 & disown $!` over Node.js `spawn({detached: true})` for spawning the continuation agent from bash.
 
 ---
 
-### PostToolUse hook over webhook-only for PR pipeline trigger | 2026-03 | Status: Active
+### PostToolUse hook over webhook-only for PR pipeline trigger | 2026-03 | Status: Superseded
 
-Chose: PostToolUse hook on `Bash` detecting `gh pr create` output to spawn background `claude -p` in a worktree over relying solely on GitHub webhook → n8n → spawn. Why: the hook path eliminates n8n as a dependency for the primary use case (PRs created from Claude Code sessions), removes the cloudflare tunnel dependency, reduces latency, and keeps pipeline logic in AIAgentMinder where it's version-controlled alongside governance rules. The n8n webhook path is retained as a fallback for PRs created outside Claude Code. Tradeoff: two trigger paths to maintain; hook depends on `claude -p` being available with the user's active Claude subscription.
+Superseded by in-session pipeline execution (v2.1). The PostToolUse hook and background spawn approach were removed entirely — the sprint workflow now invokes `/aam-pr-pipeline` directly in-session.
+
+Original: Chose PostToolUse hook on `Bash` detecting `gh pr create` output to spawn background `claude -p` in a worktree over relying solely on GitHub webhook → n8n → spawn.
 
 ---
 
