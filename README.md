@@ -3,7 +3,7 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-3.1.0-blue)
 
-An opinionated governance framework for Claude Code. Removes friction so you can get out of the AI's way, enforces engineering practices so it doesn't make mistakes, and fills gaps Claude Code can't handle natively — all as plain markdown files and slash commands in your repo.
+An opinionated governance framework for Claude Code. Removes friction, empowering the AI where safe to do so, enforces engineering practices so it doesn't make (as many) mistakes, and fills gaps Claude Code can't handle natively.
 
 > **What this is:** Slash commands, rules files, and scripts that add governance structure to Claude Code. No CLI, no MCP server, no database. Built for a solo developer who wants more code, written faster, with fewer errors.
 >
@@ -175,7 +175,7 @@ Say "Resume." Claude identifies it's on S1-004 in the EXECUTE state, picks up fr
 
 **Sprint completion:**
 All items done, all post-merge validations pass. Claude runs `/aam-retrospective` — 5 planned, 5 completed, 0 rework, 0 blocked, 1 decision logged. Adaptive sizing: "First sprint — recommend 4–5 issues next sprint. No stress indicators."
-Sprint is archived with sizing metadata. Start Sprint 2.
+You review and approve, sprint is archived with sizing metadata. Start Sprint 2.
 
 **Phase boundary:**
 Run `/aam-milestone`. Health report: 6/6 MVP features complete, timeline on track, 3 known debt items (oldest 1 sprint), largest file 180 lines (healthy for Phase 1). Recommendations: none — clean bill of health.
@@ -281,7 +281,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 ## When to Use This vs. Alternatives
 
-**Use AIAgentMinder if** you're a solo developer who wants to get out of the AI's way while keeping quality high. You want autonomous sprint execution, enforced engineering practices, and structured planning — without running infrastructure.
+**Use AIAgentMinder if** you're a solo developer who wants the AI to stop asking repetivite low impact questions that disprupt the workflow , while maintaining high quality. You want autonomous sprint execution, enforced engineering practices, and structured planning — without having to steer constantly.
 
 **Use Conductor or CCPM if** you need full project management with GitHub Issues integration, Linear sync, and parallel multi-agent execution across branches. These target teams, not solo devs.
 
@@ -292,9 +292,9 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 ## Non-Goals
 
 - **Not a ticket tracker.** AIAgentMinder keeps a living plan (`docs/strategy-roadmap.md`) and decomposes it into sprints on demand. Use `/aam-revise` to update the plan mid-stream. If you need persistent epics or a kanban board, layer GitHub Issues or Linear on top.
-- **Not a multi-agent orchestrator.** AIAgentMinder governs a single-agent session. It doesn't coordinate parallel Claude Code instances.
+- **Not a multi-agent orchestrator.** Claude may sometimes run its own subagents but AIAgentMinder does not govern that behaviour and doesn't coordinate parallel Claude Code instances.
 - **Not a CLI tool.** There's nothing to install or run. Everything is markdown files and slash commands in your repo.
-- **Not a memory system.** Claude Code's native Session Memory, auto-memory, and `--continue` handle session continuity. AIAgentMinder adds governance structure on top, not a parallel memory layer.
+- **Not a memory system replacement.** Claude Code's native Session Memory, auto-memory, and `--continue` are leveraged along with a couple polishes where Claude needs it - we head off compaction degradation early when possible, and recover vital instructions without loss when compaction does occur.
 
 ---
 
