@@ -54,7 +54,14 @@ AIAgentMinder addresses three gaps:
 | `correction-capture.md` | Self-monitors for repeated wrong-first-approach patterns and proposes permanent rules |
 | `architecture-fitness.md` | Project-specific structural constraints — customize layer boundaries, external API rules, etc. |
 
-**Commands** structure your workflow:
+**Meta-commands** run from the AIAgentMinder repo to manage target projects:
+
+| Command | When to use |
+|---------|------------|
+| `/aam-setup` | Install AIAgentMinder into a target project — copies commands, rules, hooks, and scripts |
+| `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
+
+**Project commands** are installed to your repo by `/aam-setup` and run from your project directory:
 
 | Command | When to use |
 |---------|------------|
@@ -72,13 +79,23 @@ AIAgentMinder addresses three gaps:
 | `/aam-triage` | Structured bug triage — reproduce, diagnose root cause, design durable fix plan, create GitHub issue |
 | `/aam-grill` | Plan interrogation — walk every branch of the decision tree before implementation. Intensive counterpart to `approach-first.md` |
 | `/aam-sync-issues` | Optional — push current sprint issues to GitHub Issues using `gh` CLI |
-| `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
+
+> **Skills vs commands:** These project commands are also available as skills via the plugin marketplace (`/plugin marketplace add lwalden/AIAgentMinder`). Skills and commands are the same functionality in different distribution formats — skills are the plugin-packaged versions in `skills/`, commands are the `.claude/commands/*.md` files copied by `/aam-setup`.
 
 **One hook** runs automatically:
 
 | What | When |
 | ------ | ------ |
 | Sprint reorientation | After context compaction — outputs active sprint summary so Claude doesn't lose its place |
+
+**Context degradation detection and mitigation** handles the reality that Claude's output quality drops as context fills up:
+
+- **Detection:** During sprint execution, Claude evaluates context pressure at each item transition. Signals include: 3+ items completed in the current session, context compaction already occurred, and heavy debugging activity. These are heuristics in `sprint-workflow.md` — the goal is to cycle *before* quality degrades, not after.
+- **Post-compaction reorientation:** When Claude Code compresses context mid-session, the `compact-reorient.js` hook fires and outputs the active sprint summary so Claude doesn't lose its place.
+- **Autonomous context cycling:** When pressure is high, Claude commits all work, writes a continuation file with the resume point and critical context, self-terminates, and a fresh session starts automatically. Zero human intervention required (after one-time setup of a profile hook or sprint-runner wrapper).
+- **Setup:** Run `.claude/scripts/install-profile-hook.ps1` (Windows) or `.claude/scripts/install-profile-hook.sh` (macOS/Linux) once. Alternatively, start sprint sessions via `.claude/scripts/sprint-runner.ps1` or `sprint-runner.sh`.
+
+See [Customization Guide — Context Cycling](docs/customization-guide.md#context-cycling-sprint-sessions) and [How It Works — Context Cycling](docs/how-it-works.md#context-cycling) for full details.
 
 **Native Claude Code features do the rest.** Session Memory preserves context within a session. Auto-memory (MEMORY.md) persists priorities across sessions. `claude --continue` restores full message history. AIAgentMinder complements these; it doesn't duplicate them.
 
@@ -191,7 +208,11 @@ The spec phase replaces the need for separate feature-level design documents. Ea
 
 ---
 
-## What Gets Copied to Your Project
+## What Lives Where
+
+AIAgentMinder has two sides: the **source repo** (where you cloned AIAgentMinder) and the **target project** (where you build things). `/aam-setup` and `/aam-update` are the only commands that run from the source repo — everything else runs from your project.
+
+**Installed to your project by `/aam-setup`:**
 
 ```
 your-project/
@@ -239,7 +260,11 @@ your-project/
         └── install-profile-hook.sh    # One-time setup: bash/zsh prompt hook (macOS/Linux)
 ```
 
-`/aam-setup` and `/aam-update` are **meta-commands** — they run from the AIAgentMinder repo to install or upgrade a target project. They are not copied into your project.
+**Stays in the AIAgentMinder repo** (not copied to your project):
+
+- `/aam-setup` and `/aam-update` — meta-commands for installing and upgrading target projects
+- `skills/` — plugin marketplace packaging of the project commands
+- `project/` — the source templates that `/aam-setup` copies from
 
 ---
 
