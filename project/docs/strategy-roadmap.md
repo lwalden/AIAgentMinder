@@ -31,10 +31,9 @@
 
 ---
 
-## Quality Tier
+## Testing Strategy
 
-**Tier:** [Lightweight | Standard | Rigorous | Comprehensive]
-**Testing:** [What gets tested and how]
+**Testing:** [What gets tested and how — TDD, integration tests, E2E, etc.]
 
 ---
 

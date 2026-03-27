@@ -80,11 +80,11 @@ Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
 
 3. **Populate `CLAUDE.md` Project Identity** with actual values from the audit.
 
-4. **Install all governance features** (Comprehensive tier, all features enabled — same as new projects):
+4. **Install all governance features** (all enabled by default — same as new projects):
    - Copy `code-quality.md` from the AIAgentMinder template to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
    - Copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template. Add `@SPRINT.md` to CLAUDE.md (after the Context Budget table — this is Claude Code's native import syntax, loads SPRINT.md every session). Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`. Add reminder to Human Actions: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
    - Copy `architecture-fitness.md` from template to `[target]/.claude/rules/architecture-fitness.md`. Tell the user to customize it.
-   - Tell the user: "Defaulting to Comprehensive quality tier with all governance features enabled. Edit `docs/strategy-roadmap.md` Quality Tier section if you want a lighter setup."
+   - Tell the user: "All governance features enabled — TDD, sprint planning, self-review, and architecture fitness rules. Delete any `.claude/rules/` file to disable that feature."
 
 5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases."
 
@@ -116,17 +116,16 @@ Ask questions in grouped rounds, not one at a time. Adapt based on project type.
 - MCP servers? (database tools, browser automation, etc. -- or "none")
 - Target launch date?
 
-### Round 3: Quality & Governance Setup
+### Round 3: Governance Setup
 
-**Default to Comprehensive tier with all features enabled.** Do not ask the user to choose a tier or opt into individual features. Enable everything:
+**All governance features are enabled by default.** Do not ask the user to choose a tier or opt into individual features. Install everything:
 
-- **Quality tier:** Comprehensive (unit + integration + E2E + security scanning + load testing + audit logging)
-- **Code quality guidance:** enabled (TDD, review-before-commit, build-before-commit)
-- **Sprint planning:** enabled (structured issue decomposition with spec phase, per-issue PRs, autonomous execution)
-- **Architecture fitness rules:** enabled (structural constraints — user customizes after setup)
+- **Code quality guidance:** TDD, review-before-commit, build-before-commit
+- **Sprint planning:** structured issue decomposition with spec phase, per-issue PRs, autonomous execution
+- **Architecture fitness rules:** structural constraints — user customizes after setup
 
 Tell the user in one line:
-> "Defaulting to Comprehensive quality tier with code quality guidance, sprint planning, and architecture fitness rules enabled. Edit `docs/strategy-roadmap.md` Quality Tier section if you want a lighter setup."
+> "All governance features enabled — TDD, sprint planning, self-review, and architecture fitness rules. Edit `.claude/rules/` to disable any you don't want."
 
 **Install all governance files:**
 
@@ -208,5 +207,5 @@ not vague disclaimers. "Won't support offline mode" is good. "Won't do everythin
    - For deferred decisions: add a `<!-- TODO: [decision question] | WHEN: [trigger] | BLOCKS: [what] -->` marker in the roadmap's Open Questions section.
 4. Populate `## MVP Goals` in `CLAUDE.md` with Phase 1 deliverables (3-5 testable bullet points)
 5. If MCP servers were mentioned, add `**MCP Servers:**` line to Project Identity in `CLAUDE.md`
-6. Summarize what was installed: "Comprehensive quality tier enabled with TDD, sprint planning, self-review, and architecture fitness rules. Governance rules live in `.claude/rules/` and are loaded automatically each session. SPRINT.md is loaded via `@import` in CLAUDE.md."
+6. Summarize what was installed: "All governance features enabled — TDD, sprint planning, self-review, and architecture fitness rules. Governance rules live in `.claude/rules/` and are loaded automatically each session. SPRINT.md is loaded via `@import` in CLAUDE.md."
 7. Tell the user: "Your roadmap is ready. When you're ready, say 'start a sprint' or 'begin Phase 1' and I'll propose issues with detailed specs for your review."

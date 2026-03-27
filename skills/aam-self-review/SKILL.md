@@ -1,6 +1,6 @@
 ---
 name: aam-self-review
-description: Run a focused pre-PR code review using specialist subagents. Each subagent reviews the diff with a specific lens (security, performance, API design) — not the full codebase. High severity findings block PR creation. Called automatically for Rigorous and Comprehensive quality tiers.
+description: Run a focused pre-PR code review using specialist subagents. Each subagent reviews the diff with a specific lens (security, performance, API design) — not the full codebase. High severity findings block PR creation. Called automatically for every sprint item.
 user-invocable: true
 allowed-tools: Read, Bash, Grep, Agent
 ---
@@ -24,7 +24,6 @@ If the diff is empty: tell the user "No changes vs main — nothing to review."
 Also read:
 - `.claude/rules/architecture-fitness.md` if it exists (structural constraints to enforce)
 - `.claude/rules/code-quality.md` if it exists (quality standards for this project)
-- `docs/strategy-roadmap.md` Quality Tier section (to calibrate review depth)
 
 ---
 

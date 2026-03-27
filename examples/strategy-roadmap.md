@@ -39,9 +39,8 @@
 
 ---
 
-## Quality Tier
+## Testing Strategy
 
-**Tier:** Standard
 **Testing:** Integration tests for all API endpoints (happy path + key error cases). Unit tests for validation schemas and utility functions. No E2E or load testing for Phase 1. CI runs tests on every PR via GitHub Actions.
 
 ---
