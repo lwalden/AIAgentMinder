@@ -231,8 +231,12 @@ your-project/
     │   ├── code-quality.md        # Default on
     │   ├── sprint-workflow.md     # Default on — state machine with mandatory quality
     │   └── architecture-fitness.md  # Default on, project-customized
-    └── hooks/
-        └── compact-reorient.js    # Sprint summary after context compaction
+    ├── hooks/
+    │   └── compact-reorient.js    # Sprint summary after context compaction
+    └── scripts/
+        ├── context-cycle.sh           # Self-termination for context cycling (Windows/Git Bash)
+        ├── sprint-runner.ps1          # Wrapper that auto-restarts Claude on context cycle
+        └── install-profile-hook.ps1   # One-time setup: PowerShell prompt hook for auto-restart
 ```
 
 `/aam-setup` and `/aam-update` are **meta-commands** — they run from the AIAgentMinder repo to install or upgrade a target project. They are not copied into your project.
@@ -283,6 +287,8 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 | Claude starts building something out of scope | Run `/aam-scope-check` before starting work; the passive `scope-guardian.md` rule also catches this during execution |
 | Claude asks you to look up values or do things in a UI | The `tool-first.md` rule should prevent this — verify it's installed with `/aam-checkup`. If Claude still asks, remind it: "Use the CLI" |
 | Sprint context lost after compaction | The `compact-reorient.js` hook fires automatically and outputs the active sprint summary — verify Node.js is installed |
+| Sprint quality degrades late in session | Context pressure — run `.claude/scripts/install-profile-hook.ps1` to enable automatic context cycling, or start sprints with `.claude/scripts/sprint-runner.ps1` |
+| Context cycle doesn't auto-restart | Verify the profile hook is installed (check `$PROFILE` for the AIAgentMinder block) or that you started via sprint-runner.ps1. Fallback: run the command Claude printed before exiting |
 | Upgrading an existing project | Run `/aam-update` from the AIAgentMinder repo — it handles all migrations, overwrites framework files, surgically merges CLAUDE.md, and runs `/aam-checkup` at the end |
 
 ---

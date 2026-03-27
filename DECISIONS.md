@@ -34,6 +34,12 @@ Chose: PostToolUse hook on `Bash` detecting `gh pr create` output to spawn backg
 
 ---
 
+### Autonomous context cycling via self-kill + profile hook | 2026-03 | Status: Active
+
+Chose: Process self-termination (`taskkill` via `/proc/$$/winpid` → WMI trace → `claude.exe`) with PowerShell prompt hook restart over (a) subagent-per-item (loses interactive flow), (b) `RemoteTrigger` chaining (server-side, loses terminal env), (c) manual handoff only. Why: The profile hook fires when the shell prompt renders after Claude dies — same terminal, same env vars (BW_SESSION, etc.), zero human intervention. Works whether Claude was started via wrapper or directly. Tradeoff: Windows-only for self-kill (Git Bash `/proc/$$/winpid` + WMI). Continuation file + manual resume work cross-platform. The `taskkill` is a hard kill — no exit hooks fire, so all state must be persisted before the kill. First cycle in a non-wrapper session requires one user action (type `/exit`) only if the profile hook isn't installed.
+
+---
+
 ### aam- command prefix | 2025-11 | Status: Active
 
 Chose: `aam-` prefix for all commands over unprefixed names (e.g., `/handoff`, `/milestone`). Why: Claude Code ships built-in commands (`/plan`, `/doctor`, `/review`) and other plugins use short names — collisions break silently. `aam-` is a namespace that cannot collide. Tradeoff: slightly more typing for users.
