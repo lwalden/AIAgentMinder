@@ -8,12 +8,9 @@ Guided TDD workflow for implementing features through red-green-refactor cycles.
 
 ## Step 0: Read Context
 
-Read `docs/strategy-roadmap.md` and find the **Quality Tier** section.
+Read `.claude/rules/code-quality.md` if it exists — this skill complements that rule with the full structured methodology.
 
-- **Standard tier and above:** TDD is the expected workflow. Proceed.
-- **Lightweight tier:** TDD is optional. Ask: "Quality tier is Lightweight — TDD is optional. Proceed with TDD anyway? (y/n)"
-
-Also read `.claude/rules/code-quality.md` if it exists — the skill complements that rule, not replaces it.
+Also read `docs/strategy-roadmap.md` for scope context and any testing strategy notes.
 
 ---
 
@@ -92,7 +89,7 @@ Run tests after each refactor step. Never refactor while RED — get to GREEN fi
 ## When to Use This
 
 - **Use `/aam-tdd`** when starting a new feature or when the test plan is non-obvious.
-- **Use `code-quality.md`** (loaded automatically at Standard+ tiers) for day-to-day TDD discipline without the full structured workflow.
+- **Use `code-quality.md`** (loaded automatically) for day-to-day TDD discipline without the full structured workflow.
 - Pairs well with `/aam-triage` — triage produces a fix plan as RED-GREEN cycles that this skill can execute.
 
 ---

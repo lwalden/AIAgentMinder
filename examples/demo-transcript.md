@@ -12,9 +12,9 @@ A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-h
 
 > **User:** B
 
-[Claude asks grouped rounds — core concept, scope, quality tier]
+[Claude asks grouped rounds — core concept, scope, tech stack]
 
-> **User:** REST API for saving and sharing recipes. Search by ingredient — "what can I make with chicken and lemon?" Node/Express/Postgres stack. Must-haves: auth, recipe CRUD, ingredient search, favorites, rate limiting. Out of scope: mobile app, URL import, social features, nutrition data. Standard quality tier.
+> **User:** REST API for saving and sharing recipes. Search by ingredient — "what can I make with chicken and lemon?" Node/Express/Postgres stack. Must-haves: auth, recipe CRUD, ingredient search, favorites, rate limiting. Out of scope: mobile app, URL import, social features, nutrition data.
 
 [Claude confirms scope, generates `docs/strategy-roadmap.md` — see `examples/strategy-roadmap.md`]
 

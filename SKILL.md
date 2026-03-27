@@ -1,6 +1,6 @@
 # AIAgentMinder Plugin
 
-> **Status:** v3.0.0 — Autonomous sprint execution with mandatory quality checklist, spec phase, and post-merge validation.
+> **Status:** v3.1.0 — Autonomous sprint execution with context cycling, mandatory quality checklist, spec phase, and post-merge validation.
 
 ---
 
@@ -33,8 +33,8 @@ The `/aam-setup` interview copies governance files to your project and customize
 ```json
 {
   "name": "aiagentminder",
-  "version": "3.0.0",
-  "description": "Project governance and methodology layer for AI-assisted development.",
+  "version": "3.1.0",
+  "description": "Opinionated governance framework for Claude Code — autonomous sprint execution, enforced engineering practices, and structured planning for solo developers.",
   "repository": "https://github.com/lwalden/AIAgentMinder",
   "license": "MIT"
 }
@@ -55,9 +55,13 @@ See `.claude-plugin/plugin.json` for the full manifest.
 | `/aam-scope-check` | Active scope governance — compare proposed work against roadmap |
 | `/aam-quality-gate` | Full pre-PR quality checklist (build, tests, coverage, lint, security) |
 | `/aam-self-review` | Subagent-based code review (security, performance, API design) — runs for every item |
+| `/aam-pr-pipeline` | Autonomous PR review-fix-test-merge pipeline. Escalates to human on blockers |
 | `/aam-milestone` | Project health assessment — scope drift, complexity, timeline, known debt |
 | `/aam-retrospective` | Sprint retrospective with metrics and adaptive sizing |
-| `/aam-sync-issues` | Sync current sprint issues to GitHub Issues (optional — team projects) |
+| `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor |
+| `/aam-triage` | Structured bug triage — reproduce, diagnose, design fix plan, create issue |
+| `/aam-grill` | Plan interrogation — walk every decision branch before implementation |
+| `/aam-sync-issues` | Sync current sprint issues to GitHub Issues (optional) |
 
 Skill definitions live in `skills/<name>/SKILL.md`.
 
@@ -73,11 +77,13 @@ Always active:
 | `scope-guardian.md` | Scope governance against the roadmap |
 | `approach-first.md` | State approach before executing architecture/multi-file changes |
 | `debug-checkpoint.md` | Stop debugging spirals after 3 failed attempts |
+| `tool-first.md` | Use CLI/API tools instead of asking the user to act manually |
 
-Optional:
+Default on (installed by setup, optional during update):
 
 | Rule | Purpose |
 |------|---------|
 | `code-quality.md` | TDD, review-before-commit, build-before-commit |
-| `sprint-workflow.md` | Sprint governance over native Tasks |
+| `sprint-workflow.md` | State machine sprint execution with mandatory quality |
+| `correction-capture.md` | Self-monitors for repeated wrong-first-approach patterns |
 | `architecture-fitness.md` | Project-customizable structural constraints |

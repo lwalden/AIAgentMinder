@@ -44,15 +44,20 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 |---------|---------|----------------|
 | `/aam-setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
 | `/aam-update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md (run from AIAgentMinder repo) | Yes |
-| `/aam-brief` | Create or update strategy-roadmap.md interactively; optionally enable code quality guidance and sprint planning | Yes |
+| `/aam-brief` | Create or update strategy-roadmap.md interactively | Yes |
 | `/aam-checkup` | Validate installation health — files, hooks, Node.js, version stamp, CLAUDE.md placeholders | No |
 | `/aam-scope-check` | Compare proposed work against roadmap — returns in-scope / out-of-scope / deferred verdict | No |
 | `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features in the roadmap | Yes |
 | `/aam-handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
-| `/aam-quality-gate` | Pre-PR quality checks — four tiers matching the project quality tier | No |
-| `/aam-self-review` | Specialist review subagents (security, performance, API design) — Rigorous/Comprehensive tiers | No |
+| `/aam-quality-gate` | Pre-PR quality checks — full checklist (build, tests, coverage, lint, security) | No |
+| `/aam-self-review` | Specialist review subagents (security, performance, API design) — runs for every item | No |
+| `/aam-pr-pipeline` | Autonomous PR review-fix-test-merge pipeline. Escalates to human on blockers | No |
 | `/aam-milestone` | Project health assessment: phase progress, timeline, complexity budget, scope drift, known debt | No |
 | `/aam-retrospective` | Sprint retrospective with metrics and adaptive sizing guidance | No |
+| `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor | No |
+| `/aam-triage` | Structured bug triage — reproduce, diagnose, design fix plan, create issue | Yes |
+| `/aam-grill` | Plan interrogation — walk every decision branch before implementation | No |
+| `/aam-sync-issues` | Push current sprint issues to GitHub Issues (optional) | No |
 
 ## Optional Features
 
@@ -63,10 +68,10 @@ When enabled, `project/.claude/rules/code-quality.md` is copied to the target pr
 ### Sprint Planning
 
 When enabled, `project/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` is created, and `@SPRINT.md` is added to CLAUDE.md. When you ask Claude to "start a sprint" or "begin Phase 1," it:
-1. Decomposes the phase work into discrete issues with acceptance criteria
-2. Presents the sprint for your review and approval
-3. Works issues one-by-one with per-issue feature branches and PRs
-4. Tracks status in SPRINT.md (todo → in-progress → done/blocked)
+1. Decomposes the phase work into discrete issues with acceptance criteria — waits for approval
+2. Writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for approval
+3. Executes items autonomously in sequence: TDD, full test suite, quality gate, self-review, PR pipeline — no permission prompts between items
+4. Runs post-merge validation; failures create rework tasks within the sprint
 5. Archives completed sprints to git history
 
 ### Context Cycling

@@ -17,7 +17,6 @@ If the diff is empty: tell the user "No changes vs main — nothing to review."
 Also read:
 - `.claude/rules/architecture-fitness.md` if it exists (structural constraints to enforce)
 - `.claude/rules/code-quality.md` if it exists (quality standards for this project)
-- `docs/strategy-roadmap.md` Quality Tier section (to calibrate review depth)
 
 ---
 

@@ -34,8 +34,7 @@ Run `/aam-brief` to fill it interactively, or edit manually. At minimum, fill in
 
 A small set of development discipline instructions loaded natively at every session start. Covers TDD cycle, build-before-commit, small focused functions, and read-before-write.
 
-**Enable during setup:** Answer yes to "Enable code quality guidance?" in `/aam-setup` or `/aam-brief`.
-**Enable later:** Run `/aam-update` from the AIAgentMinder repo — it will prompt to add the file if absent.
+**Enabled by default** during `/aam-setup` and `/aam-brief`.
 **Disable:** Delete `.claude/rules/code-quality.md` from your project.
 
 The file lives at `.claude/rules/code-quality.md` and is overwritten by `/aam-update` to stay current. Claude Code loads all `.md` files in `.claude/rules/` natively — no hooks needed.
@@ -51,10 +50,12 @@ A sprint in AIAgentMinder is not a time-boxed agile sprint — there's no two-we
 **Full lifecycle:**
 1. Tell Claude "start a sprint" or "begin Phase 1"
 2. Claude reads the roadmap, proposes issues with acceptance criteria — waits for your approval
-3. Claude works issues in order: feature branch → implement → PR — waits for your PR review before merging
-4. Sprint ends when all issues are done or blocked
-5. Claude presents a sprint review; you accept → sprint is archived to git history
-6. Start the next sprint
+3. Claude writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for your approval
+4. Claude executes items autonomously in sequence: TDD, full test suite, quality gate, self-review, PR pipeline — no permission prompts between items
+5. Post-merge validation runs; failures create rework tasks within the sprint
+6. Sprint ends when all items pass quality gates, review, merge, and validation
+7. Claude presents a sprint review; you accept → sprint is archived to git history
+8. Start the next sprint
 
 **Blocked issues and user interaction**
 
@@ -66,7 +67,7 @@ You resolve the block (answer the question, provide the missing resource, make t
 
 A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, preserved in full in git history. You can then ask to begin the next sprint.
 
-**Enable during setup:** Answer yes to "Enable sprint planning?" in `/aam-setup` or `/aam-brief`.
+**Enabled by default** during `/aam-setup` and `/aam-brief`.
 **Disable:** Delete `.claude/rules/sprint-workflow.md`. SPRINT.md can be left or removed.
 
 Sprint workflow instructions live in `.claude/rules/sprint-workflow.md` (overwritten by `/aam-update`). Sprint state lives in `SPRINT.md` (user-owned; `/aam-update` never overwrites an active sprint).
@@ -157,14 +158,16 @@ When a new version of AIAgentMinder is released, run `/aam-update` from the AIAg
 
 **Overwritten (AIAgentMinder-owned):**
 - `.claude/hooks/compact-reorient.js`
-- `.claude/scripts/context-cycle.sh`
+- `.claude/scripts/*` (context-cycle.sh, sprint-runner.ps1/.sh, install-profile-hook.ps1/.sh)
 - `.claude/settings.json` (hook configuration)
-- `.claude/commands/aam-brief.md`, `aam-revise.md`, `aam-handoff.md`, `aam-checkup.md`, `aam-quality-gate.md`, `aam-scope-check.md`, `aam-self-review.md`, `aam-milestone.md`, `aam-retrospective.md`
-- `.claude/rules/git-workflow.md`, `scope-guardian.md`, `approach-first.md`, `debug-checkpoint.md`
+- `.claude/commands/aam-brief.md`, `aam-revise.md`, `aam-handoff.md`, `aam-checkup.md`, `aam-quality-gate.md`, `aam-scope-check.md`, `aam-self-review.md`, `aam-pr-pipeline.md`, `aam-tdd.md`, `aam-triage.md`, `aam-grill.md`, `aam-milestone.md`, `aam-retrospective.md`, `aam-sync-issues.md`
+- `.claude/rules/git-workflow.md`, `scope-guardian.md`, `approach-first.md`, `debug-checkpoint.md`, `tool-first.md`
+- `.pr-pipeline.json`
 
 **Overwritten if present, prompted if absent (optional features):**
 - `.claude/rules/code-quality.md`
 - `.claude/rules/sprint-workflow.md`
+- `.claude/rules/correction-capture.md`
 - `.claude/rules/architecture-fitness.md`
 
 **Surgically merged:**
@@ -174,25 +177,7 @@ When a new version of AIAgentMinder is released, run `/aam-update` from the AIAg
 - `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore`
 - `SPRINT.md` — never overwritten if an active sprint exists
 
-**v1.0 → v1.1 migration (handled automatically by `/aam-update`):**
-- Command files renamed with `aam-` prefix — old unprefixed command files are deleted
-- Skill names updated to match
-
-**v0.9.1 → v1.0 migration:**
-- PROGRESS.md offered for deletion (no longer AIAgentMinder-managed)
-- CLAUDE.md Context Budget simplified
-
-**v0.7.0 → v0.8.0 migration:**
-- Deletes obsolete hooks: `session-end-commit.js`
-- Deletes old `plan.md` command (replaced by `aam-brief.md`)
-
-**v0.6.0 → v0.7.0 migration:**
-- Deletes obsolete hooks: `session-start-context.js`, `session-end-timestamp.js`, `pre-compact-save.js`
-- Migrates `.claude/guidance/` files to `.claude/rules/` and removes the old directory
-- Removes `## Session Protocol` section from CLAUDE.md
-- Adds `@SPRINT.md` import to CLAUDE.md if sprint planning was previously enabled
-
-After updating, `/aam-update` writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
+All version migrations are handled automatically by `/aam-update`. After updating, it writes a version stamp to `.claude/aiagentminder-version` and commits the changes in your project.
 
 ---
 
