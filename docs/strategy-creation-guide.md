@@ -11,18 +11,8 @@ If you prefer to fill out `docs/strategy-roadmap.md` yourself:
 - **What & Why:** Problem, vision, target users.
 - **MVP Features:** 3-5 features with testable acceptance criteria.
 - **Technical Stack:** Choices with rationale.
-- **Quality Tier:** Lightweight / Standard / Rigorous / Comprehensive.
 - **Phases:** Phase 1 = MVP. Future phases as focus areas.
 - **Human Actions:** Service signups, API keys, decisions with timing.
-
-## Quality Tiers
-
-| Tier | When to Use | What It Means |
-|------|-------------|---------------|
-| **Lightweight** | Personal tools, prototypes | Smoke tests only |
-| **Standard** | Team tools, moderate complexity | Unit + integration tests, CI |
-| **Rigorous** | Public products, user data | Unit + integration + E2E + security scanning |
-| **Comprehensive** | Safety-critical, compliance | All above + load testing + audit logging |
 
 ## Handling Unknowns
 

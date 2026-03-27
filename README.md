@@ -1,11 +1,11 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.0.0-blue)
+![Version](https://img.shields.io/badge/version-3.1.0-blue)
 
-Project governance for AI-assisted development. Structured planning, sprint workflows, decision tracking, and scope enforcement — built as plain markdown files and slash commands on top of Claude Code.
+An opinionated governance framework for Claude Code. Removes friction so you can get out of the AI's way, enforces engineering practices so it doesn't make mistakes, and fills gaps Claude Code can't handle natively — all as plain markdown files and slash commands in your repo.
 
-> **What this is:** Slash commands, rules files, and a lifecycle hook that add governance structure to Claude Code. No CLI, no MCP server, no database. Everything lives in your repo as markdown.
+> **What this is:** Slash commands, rules files, and scripts that add governance structure to Claude Code. No CLI, no MCP server, no database. Built for a solo developer who wants more code, written faster, with fewer errors.
 >
 > **Command prefix:** All AIAgentMinder commands use the `aam-` prefix (e.g., `/aam-brief`, `/aam-handoff`) to avoid collision with Claude Code built-in commands and other plugins.
 
@@ -13,16 +13,13 @@ Project governance for AI-assisted development. Structured planning, sprint work
 
 ## The Problem
 
-Claude Code's native memory system (Session Memory, auto-memory, `claude --continue`) handles session continuity well. What it doesn't provide:
+Claude Code is fast. Without structure, that speed creates problems: scope drift, undocumented decisions, skipped quality steps, and context degradation in long sessions. You end up rubber-stamping trivial approvals, answering questions the AI could resolve itself, or catching defects that should have been prevented.
 
-- **Structured project planning.** No interview-driven product brief, quality tier selection, or MVP decomposition.
-- **Sprint governance.** No structured issue decomposition with human approval gates before implementation starts.
-- **Scope enforcement.** Nothing that checks whether new work belongs in the current phase before Claude starts writing code.
-- **Architectural decision logging.** No convention for recording what was decided and why — so Claude re-debates the same decisions in future sessions.
-- **Ongoing complexity tracking.** Nothing that monitors file count, coupling, and dependency growth over weeks of development.
-- **Session-end discipline.** No structured checkpoint to capture priorities and decisions before closing.
+AIAgentMinder addresses three gaps:
 
-Spec-driven development tools have emerged as strong options for *feature-level* planning — requirements to design to tasks to implementation. AIAgentMinder doesn't compete with those. It answers a different question: how do you govern a multi-phase project across weeks of AI-assisted development, with scope drift, complexity growth, and architectural decisions accumulating the whole time?
+- **Remove friction.** Autonomous sprint execution, in-session PR pipelines, context cycling across sessions, CLI-first rules — so you spend time deciding and evaluating, not typing approvals or taking manual actions the AI could handle.
+- **Enforce quality.** Mandatory TDD, quality gates, self-review, and scope checks that Claude cannot skip even when asked to go fast. Engineering practices that minimize defects and catch them early.
+- **Fill native gaps.** Structured project planning, session handoff, post-compaction sprint reorientation, context degradation detection — things Claude Code doesn't provide through prompting alone.
 
 ---
 
@@ -32,7 +29,7 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 
 | File | Purpose | When Claude reads it |
 | ------ | --------- | --------------------- |
-| `CLAUDE.md` | Project identity, behavioral rules, quality tier | Every session (auto) |
+| `CLAUDE.md` | Project identity, behavioral rules | Every session (auto) |
 | `DECISIONS.md` | Architectural decisions, rationale, and known debt log | On-demand; add `@DECISIONS.md` to CLAUDE.md to auto-load |
 | `docs/strategy-roadmap.md` | Product brief — what you're building, phases, out-of-scope items | On-demand |
 | `.claude/rules/*.md` | Development discipline rules — loaded natively by Claude Code | Every session (auto) |
@@ -54,25 +51,27 @@ Spec-driven development tools have emerged as strong options for *feature-level*
 |------|-------------|
 | `code-quality.md` | TDD cycle, build-before-commit, small focused functions, read-before-write |
 | `sprint-workflow.md` | State machine sprint execution with mandatory quality checklist, spec phase, autonomous execution, post-merge validation, and rework cycle |
+| `correction-capture.md` | Self-monitors for repeated wrong-first-approach patterns and proposes permanent rules |
 | `architecture-fitness.md` | Project-specific structural constraints — customize layer boundaries, external API rules, etc. |
 
 **Commands** structure your workflow:
 
 | Command | When to use |
 |---------|------------|
-| `/aam-brief` | Start of a project — Claude interviews you and generates a product brief with MVP features, tech stack, and quality tier |
+| `/aam-brief` | Start of a project — Claude interviews you and generates a product brief with MVP features and tech stack |
 | `/aam-checkup` | After `/aam-update` or when something seems broken — validates installation health (files, hooks, version, Node.js) |
 | `/aam-scope-check` | Before building something — Claude compares the proposed work against your roadmap and returns a clear verdict |
 | `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features directly in the roadmap with decision logging and sprint impact checks |
 | `/aam-handoff` | End of a session — writes priorities to auto-memory, updates DECISIONS.md, commits |
 | `/aam-quality-gate` | Pre-PR — full quality checklist (build, tests, coverage, lint, security) run every time |
-| `/aam-self-review` | Pre-PR — specialist subagents review the diff for security, performance, and API design. Runs for every item. |
+| `/aam-self-review` | Pre-PR — specialist subagents review the diff for security, performance, and API design. Runs for every item |
+| `/aam-pr-pipeline` | After PR creation — autonomous review-fix-test-merge pipeline. Escalates to human only on blockers |
 | `/aam-milestone` | Sprint boundaries — health assessment across phase progress, timeline, scope drift, dependency health, complexity budget, and known debt |
 | `/aam-retrospective` | Sprint completion — metrics, adaptive sizing guidance, lessons |
 | `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor. Full methodology behind `code-quality.md`'s one-liner |
 | `/aam-triage` | Structured bug triage — reproduce, diagnose root cause, design durable fix plan, create GitHub issue |
 | `/aam-grill` | Plan interrogation — walk every branch of the decision tree before implementation. Intensive counterpart to `approach-first.md` |
-| `/aam-sync-issues` | Optional — push current sprint issues to GitHub Issues using `gh` CLI (team projects) |
+| `/aam-sync-issues` | Optional — push current sprint issues to GitHub Issues using `gh` CLI |
 | `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
 
 **One hook** runs automatically:
@@ -112,11 +111,11 @@ After setup, run `/aam-checkup` in your project directory to verify the installa
 
 ### 4. Run `/aam-brief`
 
-Run `/aam-brief` to create your product brief and strategy roadmap. Claude interviews you about your project and generates `docs/strategy-roadmap.md` with MVP features, phase plan, and quality tier.
+Run `/aam-brief` to create your product brief and strategy roadmap. Claude interviews you about your project and generates `docs/strategy-roadmap.md` with MVP features and phase plan.
 
 For an **existing project**, choose **Starting Point E** — Claude audits your codebase and generates filled-in state files from what it finds.
 
-After the roadmap, `/aam-brief` installs all governance features (code quality, sprint planning, architecture fitness) with Comprehensive quality tier by default.
+After the roadmap, `/aam-brief` installs all governance features (code quality, sprint planning, architecture fitness) by default.
 
 ### 5. Build
 
@@ -142,7 +141,7 @@ Use `claude --continue` to restore the previous session's full message history, 
 
 **Session 1 — Planning:**
 Run `/aam-brief`. Claude asks about your project in grouped rounds. You describe a recipe sharing API.
-Claude defaults to Comprehensive quality tier with all governance features, generates `docs/strategy-roadmap.md`. Run `/aam-handoff`. Priorities are written to auto-memory.
+Claude generates `docs/strategy-roadmap.md` and installs all governance features. Run `/aam-handoff`. Priorities are written to auto-memory.
 
 **Session 2 — Sprint planning + building:**
 Open Claude Code. Session Memory knows the project state.
@@ -168,17 +167,13 @@ Run `/aam-milestone`. Health report: 6/6 MVP features complete, timeline on trac
 
 ## Development Lifecycle
 
-AIAgentMinder provides a complete governance flow from initial planning through sprint execution. Each step builds on the previous one — no external feature-spec tools required.
-
-### Why structured governance matters
-
-AI-assisted development moves fast. Without governance structure, projects accumulate scope drift, undocumented decisions, and growing complexity that erodes quality over time. The lifecycle below creates natural checkpoints where you review, approve, and course-correct — so speed doesn't come at the cost of control.
+AIAgentMinder provides a governance flow from planning through sprint execution. Each step builds on the previous one.
 
 ### The flow
 
 | Step | Command / Mechanism | What happens |
 | ---- | ------------------- | ------------ |
-| **1. Plan** | `/aam-brief` | Interview-driven product brief. Defines MVP features, phases, and surfaces hard-to-reverse decisions early. Comprehensive quality tier and all governance features enabled by default. |
+| **1. Plan** | `/aam-brief` | Interview-driven product brief. Defines MVP features, phases, and surfaces hard-to-reverse decisions early. All governance features enabled by default. |
 | **2. Revise** | `/aam-revise` | Update the plan when requirements change — add, drop, or reprioritize features with decision logging and roadmap history. |
 | **3. Decompose** | Sprint planning (`sprint-workflow.md`) | Break phase features into 4–7 sprint issues with acceptance criteria, risk tags, and dependencies. Human approves the issue list. |
 | **4. Spec** | Spec phase (`sprint-workflow.md`) | Detailed implementation spec per item: approach, test plan, integration tests, post-merge validation, file list. Human approves specs before coding begins. |
@@ -203,6 +198,7 @@ your-project/
 ├── CLAUDE.md                  # ~50 lines — project identity, behavioral rules
 ├── DECISIONS.md               # Architectural decisions + Known Debt table
 ├── SPRINT.md                  # Sprint header (optional, sprint planning only)
+├── .pr-pipeline.json          # PR pipeline config (high-risk patterns, cycle limit, merge method)
 ├── docs/
 │   └── strategy-roadmap.md    # Product brief (generated by /aam-brief)
 ├── .gitignore                 # Core + stack-specific entries
@@ -213,9 +209,10 @@ your-project/
     │   ├── aam-checkup.md         # /aam-checkup — installation health check
     │   ├── aam-revise.md          # /aam-revise — mid-stream plan revision
     │   ├── aam-handoff.md         # /aam-handoff — session-end checkpoint
-    │   ├── aam-quality-gate.md    # /aam-quality-gate — tiered pre-PR checks
+    │   ├── aam-quality-gate.md    # /aam-quality-gate — pre-PR quality checks
     │   ├── aam-scope-check.md     # /aam-scope-check — active scope governance
     │   ├── aam-self-review.md     # /aam-self-review — specialist review subagents
+    │   ├── aam-pr-pipeline.md     # /aam-pr-pipeline — autonomous PR merge pipeline
     │   ├── aam-tdd.md             # /aam-tdd — guided TDD workflow
     │   ├── aam-triage.md          # /aam-triage — structured bug triage
     │   ├── aam-grill.md           # /aam-grill — plan interrogation
@@ -229,6 +226,7 @@ your-project/
     │   ├── debug-checkpoint.md    # Always active
     │   ├── tool-first.md          # Always active
     │   ├── code-quality.md        # Default on
+    │   ├── correction-capture.md  # Default on
     │   ├── sprint-workflow.md     # Default on — state machine with mandatory quality
     │   └── architecture-fitness.md  # Default on, project-customized
     ├── hooks/
@@ -258,9 +256,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 ## When to Use This vs. Alternatives
 
-**Use AIAgentMinder if** you're a solo developer or small team who wants structured planning, scope enforcement, decision logging, and optional sprint governance without heavy infrastructure.
-
-**Spec-driven development tools are optional complements.** AIAgentMinder's lifecycle — brief → revise → sprint decompose → spec → execute → gate → validate — handles most projects without additional feature-level planning. The built-in spec phase covers implementation planning per item. For complex API surfaces where a broader product spec is needed before decomposition, tools like cc-ssd can layer on top.
+**Use AIAgentMinder if** you're a solo developer who wants to get out of the AI's way while keeping quality high. You want autonomous sprint execution, enforced engineering practices, and structured planning — without running infrastructure.
 
 **Use Conductor or CCPM if** you need full project management with GitHub Issues integration, Linear sync, and parallel multi-agent execution across branches. These target teams, not solo devs.
 
@@ -270,8 +266,8 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 
 ## Non-Goals
 
-- **Not a ticket tracker.** AIAgentMinder keeps a living plan (`docs/strategy-roadmap.md`) and decomposes it into sprints on demand. Use `/aam-revise` to update the plan mid-stream. If you need 50 open issues, persistent epics, or a kanban board, layer GitHub Issues or Linear on top.
-- **Not a multi-agent orchestrator.** AIAgentMinder governs a single-agent session. It doesn't coordinate parallel Claude Code instances. Tools like CCPM and claude-flow handle that.
+- **Not a ticket tracker.** AIAgentMinder keeps a living plan (`docs/strategy-roadmap.md`) and decomposes it into sprints on demand. Use `/aam-revise` to update the plan mid-stream. If you need persistent epics or a kanban board, layer GitHub Issues or Linear on top.
+- **Not a multi-agent orchestrator.** AIAgentMinder governs a single-agent session. It doesn't coordinate parallel Claude Code instances.
 - **Not a CLI tool.** There's nothing to install or run. Everything is markdown files and slash commands in your repo.
 - **Not a memory system.** Claude Code's native Session Memory, auto-memory, and `--continue` handle session continuity. AIAgentMinder adds governance structure on top, not a parallel memory layer.
 
@@ -298,9 +294,9 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 ## Documentation
 
 - [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
-- [Customization Guide](docs/customization-guide.md) — optional features, architecture fitness rules, quality tiers
+- [Customization Guide](docs/customization-guide.md) — optional features, architecture fitness rules, context cycling
 - [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/aam-brief` or writing `strategy-roadmap.md` manually
-- [Roadmap](ROADMAP.md) — post-v1.0 direction and backlog
+- [Roadmap](ROADMAP.md) — version history and backlog
 
 ---
 
