@@ -17,7 +17,7 @@
 
 ## Current State
 
-v3.3 shipped. npm/npx installer, codebase fingerprinting, architecture fitness defaults, plugin marketplace, GitHub Releases. See ROADMAP.md for details.
+v3.3 shipped. npm/npx installer, codebase fingerprinting, architecture fitness defaults, plugin marketplace, GitHub Releases. See docs/strategy-roadmap.md for details.
 
 ## Behavioral Rules
 
@@ -31,7 +31,7 @@ Never edit `project/` files and the root governance files as if they're the same
 
 ### Scope
 
-ROADMAP.md is the authoritative scope document for this repo. The `docs/strategy-roadmap.md` convention used in target projects is intentionally absent — ROADMAP.md serves that role directly.
+`docs/strategy-roadmap.md` is the authoritative scope document, matching the convention used in target projects.
 
 ### Git Workflow
 

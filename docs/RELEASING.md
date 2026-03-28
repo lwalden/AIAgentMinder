@@ -35,7 +35,7 @@ Also update:
 - `README.md` version badge
 - `SKILL.md` version references
 - `CHANGELOG.md` (add new version section at top)
-- `ROADMAP.md` (mark milestone shipped if applicable)
+- `docs/strategy-roadmap.md` (mark milestone shipped if applicable)
 
 ## Validate
 
