@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.1.0-blue)
+![Version](https://img.shields.io/badge/version-3.2.0-blue)
 
 An opinionated governance framework for Claude Code. Removes friction, empowering the AI where safe to do so, enforces engineering practices so it doesn't make (as many) mistakes, and fills gaps Claude Code can't handle natively.
 
@@ -19,7 +19,7 @@ AIAgentMinder addresses three gaps:
 
 - **Remove friction.** Autonomous sprint execution, in-session PR pipelines, context cycling across sessions, CLI-first rules — so you spend time deciding and evaluating, not typing approvals or taking manual actions the AI could handle.
 - **Enforce quality.** Mandatory TDD, quality gates, self-review, and scope checks that Claude cannot skip even when asked to go fast. Engineering practices that minimize defects and catch them early.
-- **Fill native gaps.** Structured project planning, session handoff, post-compaction sprint reorientation, context degradation detection — things Claude Code doesn't provide through prompting alone.
+- **Fill native gaps.** Structured project planning, session handoff, real-time context monitoring, autonomous context cycling — things Claude Code doesn't provide through prompting alone.
 
 ---
 
@@ -58,7 +58,7 @@ AIAgentMinder addresses three gaps:
 
 | Command | When to use |
 |---------|------------|
-| `/aam-setup` | Install AIAgentMinder into a target project — copies commands, rules, hooks, and scripts |
+| `/aam-setup` | Install AIAgentMinder into a target project — copies commands, rules, and scripts |
 | `/aam-update` | Upgrade an existing installation — handles migration from previous versions |
 
 **Project commands** are installed to your repo by `/aam-setup` and run from your project directory:
@@ -66,7 +66,7 @@ AIAgentMinder addresses three gaps:
 | Command | When to use |
 |---------|------------|
 | `/aam-brief` | Start of a project — Claude interviews you and generates a product brief with MVP features and tech stack |
-| `/aam-checkup` | After `/aam-update` or when something seems broken — validates installation health (files, hooks, version, Node.js) |
+| `/aam-checkup` | After `/aam-update` or when something seems broken — validates installation health (files, settings, version, jq) |
 | `/aam-scope-check` | Before building something — Claude compares the proposed work against your roadmap and returns a clear verdict |
 | `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features directly in the roadmap with decision logging and sprint impact checks |
 | `/aam-handoff` | End of a session — writes priorities to auto-memory, updates DECISIONS.md, commits |
@@ -82,17 +82,10 @@ AIAgentMinder addresses three gaps:
 
 > **Skills vs commands:** These project commands are also available as skills via the plugin marketplace (`/plugin marketplace add lwalden/AIAgentMinder`). Skills and commands are the same functionality in different distribution formats — skills are the plugin-packaged versions in `skills/`, commands are the `.claude/commands/*.md` files copied by `/aam-setup`.
 
-**One hook** runs automatically:
-
-| What | When |
-| ------ | ------ |
-| Sprint reorientation | After context compaction — outputs active sprint summary so Claude doesn't lose its place |
-
 **Context degradation detection and mitigation** handles the reality that Claude's output quality drops as context fills up:
 
-- **Detection:** During sprint execution, Claude evaluates context pressure at each item transition. Signals include: 3+ items completed in the current session, context compaction already occurred, and heavy debugging activity. These are heuristics in `sprint-workflow.md` — the goal is to cycle *before* quality degrades, not after.
-- **Post-compaction reorientation:** When Claude Code compresses context mid-session, the `compact-reorient.js` hook fires and outputs the active sprint summary so Claude doesn't lose its place.
-- **Autonomous context cycling:** When pressure is high, Claude commits all work, writes a continuation file with the resume point and critical context, self-terminates, and a fresh session starts automatically. Zero human intervention required (after one-time setup of a profile hook or sprint-runner wrapper).
+- **Real-time monitoring:** A status line script (`context-monitor.sh`) receives context window metrics after every assistant message and writes `.context-usage` to the project root. Model-specific token thresholds trigger cycling: 250k for Sonnet, 350k for Opus, 35% for unknown models. Falls back to heuristics (3+ items completed, heavy debugging, rework) if the status line isn't configured.
+- **Autonomous context cycling:** When the threshold is hit, Claude commits all work, writes a continuation file with the resume point and critical context, self-terminates, and a fresh session starts automatically. Zero human intervention required (after one-time setup of a profile hook or sprint-runner wrapper).
 - **Setup:** Run `.claude/scripts/install-profile-hook.ps1` (Windows) or `.claude/scripts/install-profile-hook.sh` (macOS/Linux) once. Alternatively, start sprint sessions via `.claude/scripts/sprint-runner.ps1` or `sprint-runner.sh`.
 
 See [Customization Guide — Context Cycling](docs/customization-guide.md#context-cycling-sprint-sessions) and [How It Works — Context Cycling](docs/how-it-works.md#context-cycling) for full details.
@@ -224,7 +217,7 @@ your-project/
 │   └── strategy-roadmap.md    # Product brief (generated by /aam-brief)
 ├── .gitignore                 # Core + stack-specific entries
 └── .claude/
-    ├── settings.json          # Hook configuration
+    ├── settings.json          # Status line configuration
     ├── commands/
     │   ├── aam-brief.md           # /aam-brief — planning interview
     │   ├── aam-checkup.md         # /aam-checkup — installation health check
@@ -250,9 +243,8 @@ your-project/
     │   ├── correction-capture.md  # Default on
     │   ├── sprint-workflow.md     # Default on — state machine with mandatory quality
     │   └── architecture-fitness.md  # Default on, project-customized
-    ├── hooks/
-    │   └── compact-reorient.js    # Sprint summary after context compaction
     └── scripts/
+        ├── context-monitor.sh         # Status line data bridge — writes .context-usage with token thresholds
         ├── context-cycle.sh           # Self-termination for context cycling (cross-platform)
         ├── sprint-runner.ps1          # Wrapper — auto-restarts Claude on context cycle (Windows)
         ├── sprint-runner.sh           # Wrapper — auto-restarts Claude on context cycle (macOS/Linux)
@@ -271,11 +263,11 @@ your-project/
 ## Requirements
 
 - **Claude Code** — VS Code extension or CLI. This is a Claude Code framework; it requires Claude Code to function.
-- **Node.js** — required for the governance hook (`compact-reorient.js`)
+- **jq** — required for the context monitoring status line script (`winget install jqlang.jq` / `brew install jq` / `apt install jq`). Sprint workflow falls back to heuristics without it.
 - **Git** — project state is tracked in git
 - **GitHub CLI (`gh`)** — optional, used by sprint workflow for PR creation
 
-Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no shell dependencies.
+Works on **Windows, macOS, and Linux**. No Node.js dependency — pure Markdown + shell scripts.
 
 ---
 
@@ -294,13 +286,13 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 - **Not a ticket tracker.** AIAgentMinder keeps a living plan (`docs/strategy-roadmap.md`) and decomposes it into sprints on demand. Use `/aam-revise` to update the plan mid-stream. If you need persistent epics or a kanban board, layer GitHub Issues or Linear on top.
 - **Not a multi-agent orchestrator.** Claude may sometimes run its own subagents but AIAgentMinder does not govern that behaviour and doesn't coordinate parallel Claude Code instances.
 - **Not a CLI tool.** There's nothing to install or run. Everything is markdown files and slash commands in your repo.
-- **Not a memory system replacement.** Claude Code's native Session Memory, auto-memory, and `--continue` are leveraged along with a couple polishes where Claude needs it - we head off compaction degradation early when possible, and recover vital instructions without loss when compaction does occur.
+- **Not a memory system replacement.** Claude Code's native Session Memory, auto-memory, and `--continue` are leveraged. AIAgentMinder adds real-time context monitoring to detect degradation before it impacts quality, and autonomous session cycling to recover cleanly.
 
 ---
 
 ## Troubleshooting
 
-**Start with `/aam-checkup`.** Run it in your project directory — it validates that all required files are present, hooks are configured, Node.js is available, and CLAUDE.md placeholders are filled in.
+**Start with `/aam-checkup`.** Run it in your project directory — it validates that all required files are present, status line is configured, jq is available, and CLAUDE.md placeholders are filled in.
 
 | Symptom | Fix |
 | --------- | ----- |
@@ -309,8 +301,7 @@ Works on **Windows, macOS, and Linux**. The hook is a Node.js script with no she
 | Claude re-debates a past decision | Add it to DECISIONS.md with rationale; add `@DECISIONS.md` to CLAUDE.md to auto-load |
 | Claude starts building something out of scope | Run `/aam-scope-check` before starting work; the passive `scope-guardian.md` rule also catches this during execution |
 | Claude asks you to look up values or do things in a UI | The `tool-first.md` rule should prevent this — verify it's installed with `/aam-checkup`. If Claude still asks, remind it: "Use the CLI" |
-| Sprint context lost after compaction | The `compact-reorient.js` hook fires automatically and outputs the active sprint summary — verify Node.js is installed |
-| Sprint quality degrades late in session | Context pressure — run `.claude/scripts/install-profile-hook.ps1` (Windows) or `.claude/scripts/install-profile-hook.sh` (macOS/Linux) to enable automatic context cycling |
+| Sprint quality degrades late in session | Verify `jq` is installed and the status line is configured in `.claude/settings.json`. Run `.claude/scripts/install-profile-hook.ps1` (Windows) or `.claude/scripts/install-profile-hook.sh` (macOS/Linux) to enable automatic context cycling |
 | Context cycle doesn't auto-restart | Verify the profile hook is installed (check `$PROFILE` for the AIAgentMinder block) or that you started via sprint-runner.ps1. Fallback: run the command Claude printed before exiting |
 | Upgrading an existing project | Run `/aam-update` from the AIAgentMinder repo — it handles all migrations, overwrites framework files, surgically merges CLAUDE.md, and runs `/aam-checkup` at the end |
 
