@@ -46,7 +46,7 @@ The template files are in the `project/` directory of this repository. Copy them
 Copy template files into the user's repo. Before copying each file, check if it already exists:
 - If it exists, ask: "You already have [file]. Should I merge, replace, or skip it?"
 - Never overwrite without asking
-- Always copy `.claude/` directory (commands, settings, hooks)
+- Always copy `.claude/` directory (commands, settings, scripts)
 
 ### Scenario B: New/Blank Directory
 If no git repo exists, run `git init`. Then copy all files from this repo's `project/` directory.
@@ -62,6 +62,7 @@ Copy these to the target unconditionally (create directories as needed).
 - `project/.claude/rules/tool-first.md` → `[target]/.claude/rules/tool-first.md`
 - `project/.claude/rules/correction-capture.md` → `[target]/.claude/rules/correction-capture.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
+- `project/.claude/scripts/context-monitor.sh` → `[target]/.claude/scripts/context-monitor.sh`
 - `project/.claude/commands/aam-brief.md` → `[target]/.claude/commands/aam-brief.md`
 - `project/.claude/commands/aam-revise.md` → `[target]/.claude/commands/aam-revise.md`
 - `project/.claude/commands/aam-checkup.md` → `[target]/.claude/commands/aam-checkup.md`
@@ -100,13 +101,9 @@ Copy these to the target unconditionally (create directories as needed).
 
 ---
 
-## Step 4: Check Hook Prerequisites
+## Step 4: Check Prerequisites
 
-The governance hooks require Node.js. Check if `node` is available:
-```bash
-node --version
-```
-If Node.js is not found, warn the user: "Governance hooks require Node.js. The hooks will be copied but won't run until Node.js is installed. You can disable them by removing the hooks section from .claude/settings.json."
+Check `jq --version`. If not found, warn: "Context monitoring requires `jq`. Install: `winget install jqlang.jq` / `brew install jq` / `apt install jq`. The status line script will be copied but won't run without it. Sprint workflow falls back to heuristics."
 
 ---
 
@@ -187,8 +184,7 @@ Created files:
 - .claude/commands/aam-tdd.md (/aam-tdd — guided TDD workflow)
 - .claude/commands/aam-triage.md (/aam-triage — structured bug triage)
 - .claude/commands/aam-grill.md (/aam-grill — plan interrogation)
-- .claude/hooks/ (1 Node.js hook: sprint reorientation post-compaction)
-- .claude/scripts/ (context cycling: self-kill script is per-project; sprint-runner and profile hook installers are user-level setup tools — copied for discoverability)
+- .claude/scripts/ (context-monitor.sh status line data bridge, context-cycle.sh self-kill script, sprint-runner and profile hook installers)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
 - .claude/rules/approach-first.md (approach-first protocol — state intent before executing)
