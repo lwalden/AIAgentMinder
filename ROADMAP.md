@@ -105,7 +105,7 @@ Addresses context degradation during long sprint sessions. After 3+ items, conve
 
 ---
 
-## v3.2 — Real-Time Context Monitoring (planned)
+## v3.2 — Real-Time Context Monitoring (shipped)
 
 Replace heuristic-based context cycling with real token count monitoring via Claude Code's status line system. Also removes the `compact-reorient.js` hook and its Node.js dependency — the status line detects context pressure *before* compaction, making the reactive hook redundant.
 
@@ -120,15 +120,40 @@ Replace heuristic-based context cycling with real token count monitoring via Cla
 
 ---
 
+## v3.3 — Architecture Fitness Defaults (in progress)
+
+Replace the blank placeholder `architecture-fitness.md` with 4 concrete, stack-agnostic rules: file size (300-line flag), secrets in source, test isolation, and layer boundaries. Adds commented stack-specific examples (C#/.NET, TypeScript/React, Python, Java/Spring) that users can uncomment. Based on competitive analysis of 70+ repos — the only rules that survive a universality test across all stacks.
+
+---
+
 ## Direction
 
-The current design is stable. Incremental improvements expected before any v4 rework.
+The current design is stable. The backlog below was populated from a competitive landscape analysis (March 2026) covering 70+ repos and tools. Items are grouped by theme, not priority.
 
 ---
 
 ## Backlog (unscheduled)
 
-- **HTTP hook support** — Leverage Claude Code's HTTP hooks for integrations without requiring Node.js. Becomes the natural path forward now that the Node.js hook is being removed.
+### Distribution & Visibility
+
+- **npm/npx installer** — Every major competitor (SuperClaude, cc-sdd, Spec-Flow, CCPlugins, Ruler) uses npm/npx distribution. Replace git-clone + slash command install with `npx aiagentminder init`. Keeps `project/` as source of truth; the package wraps the copy logic.
+- **Plugin marketplace listing** — Claude Code now has a native plugin marketplace (9,000+ plugins). AAM should be listed there. Also submit to awesome-claude-code (33K stars) for visibility.
+- **AGENTS.md generation** — 60K+ repos adopt AGENTS.md (Linux Foundation standard, backed by Anthropic + OpenAI + Block). AAM could generate an AGENTS.md from its governance files as a read-only export for non-Claude tools to consume — extending influence without changing architecture. Does not replace CLAUDE.md.
+
+### Architecture Fitness Defaults
+
+- ~~**Ship concrete universal rules**~~ — Moved to v3.3.
+- **Stack-aware template selection in `/aam-setup`** — Auto-detect project stack (language, framework, test runner) during setup and pre-configure architecture-fitness rules and code-quality rules with stack-appropriate defaults. Similar to ai-rules' `extends:` template system.
+
+### Quality & Review
+
+- **Automated correction capture** — claude-reflect (858 stars) automates what `correction-capture.md` does passively — it uses hooks to detect correction patterns and auto-queues learnings. Upgrade from passive rule guidance to active hook-based detection, making corrections discoverable without relying on Claude self-reporting.
+- **Multi-model review gate** — Flow-Next and claude-code-skills use cross-model review (Codex/Gemini as second opinion) in their quality gates. Add optional cross-model validation to `/aam-self-review` — when available, query a second model for independent review. Degrades gracefully to single-model when no second model is configured.
+
+### Efficiency
+
+- **Zero-token-cost tracking** — CCPM (7.8K stars) uses deterministic bash scripts for routine tracking instead of burning LLM tokens. Move rote instrumentation (sprint status table updates, context metric writes, version stamp updates) to shell scripts. Saves tokens for actual reasoning.
+- **Codebase fingerprinting in setup** — caliber-ai/ai-setup (151 stars) scans projects and generates tailored configs. `/aam-setup` and `/aam-brief` could auto-detect stack, test runner, CI provider, and existing lint configs to make smarter defaults and skip questions the codebase already answers.
 
 ### Dropped
 
@@ -137,6 +162,7 @@ The current design is stable. Incremental improvements expected before any v4 re
 - **`/onboard` command** — `/aam-brief` Starting Point E (existing project audit) covers this use case.
 - **Quality tier selection** — Replaced with always-Comprehensive default in v3.0.
 - **`/aam-update` dry-run mode** — Git already tracks all changes, the command is idempotent, and user-owned files are never touched. The risk dry-run mitigates is already low enough.
+- **HTTP hook support** — Node.js dependency already removed in v3.2. No further work needed in this area.
 
 ---
 
