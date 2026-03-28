@@ -8,6 +8,7 @@ import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeV
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
 import { writeAgentsMd } from '../lib/agents-md.js';
 import { fingerprint } from '../lib/detect.js';
+import { validateAll } from '../lib/validate.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.resolve(__dirname, '..', 'package.json');
@@ -23,6 +24,7 @@ Usage:
 Commands:
   init          Initialize AIAgentMinder in the current directory (default)
   agents-md     Generate AGENTS.md from installed governance files
+  validate      Validate plugin manifest and skill packages (repo dev tool)
 
 Options:
   --all         Enable all optional features (no prompts) [init]
@@ -195,6 +197,53 @@ function runAgentsMdCommand(options) {
   }
 }
 
+function runValidateCommand() {
+  const repoDir = process.cwd();
+  console.log(`\nValidating AIAgentMinder plugin structure in: ${repoDir}\n`);
+
+  const result = validateAll(repoDir);
+  let hasErrors = false;
+
+  // Plugin.json
+  if (result.pluginJson.valid) {
+    console.log(`  plugin.json: OK (v${result.pluginJson.data.version})`);
+  } else {
+    hasErrors = true;
+    for (const err of result.pluginJson.errors) {
+      console.log(`  plugin.json: FAIL — ${err}`);
+    }
+  }
+
+  // Skills
+  if (result.skills.valid) {
+    console.log(`  skills/: OK (${result.skills.skillCount} packages)`);
+  } else {
+    hasErrors = true;
+    for (const err of result.skills.errors) {
+      console.log(`  skills/: FAIL — ${err}`);
+    }
+  }
+
+  // Version consistency
+  if (result.versions.valid) {
+    const v = result.versions.versions;
+    console.log(`  versions: OK (${v.template || 'unknown'})`);
+  } else {
+    hasErrors = true;
+    for (const err of result.versions.errors) {
+      console.log(`  versions: FAIL — ${err}`);
+    }
+  }
+
+  console.log('');
+  if (hasErrors) {
+    console.log('Validation failed. Fix the issues above before publishing.');
+    process.exit(1);
+  } else {
+    console.log('All checks passed.');
+  }
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
 
@@ -212,6 +261,8 @@ async function main() {
     await runInit(options);
   } else if (options.command === 'agents-md') {
     runAgentsMdCommand(options);
+  } else if (options.command === 'validate') {
+    runValidateCommand();
   }
 }
 
