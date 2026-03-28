@@ -187,7 +187,7 @@ Do **not** copy `project/.claude/settings.json` directly. Overwriting it would e
 Instead, perform an additive merge:
 
 1. Read `[target]/.claude/settings.json`. If it doesn't exist, create it as `{}`.
-2. Read `project/.claude/settings.json` for the AIAgentMinder-managed entries.
+2. Read `project/.claude/settings.json.tpl` for the AIAgentMinder-managed entries.
 3. **`statusLine` entry:** Add or replace the `statusLine` object. This is always managed by AIAgentMinder: `{"type": "command", "command": "bash .claude/scripts/context-monitor.sh"}`.
 4. **SessionStart `compact` entry (cleanup):** If a `SessionStart` entry with `matcher: "compact"` exists referencing `compact-reorient.js`, remove it — this hook is obsolete (replaced by status line monitoring).
 5. **PostToolUse `Bash` entry (cleanup):** If a `PostToolUse` entry referencing `pr-pipeline-trigger.js` exists, remove it — this hook is obsolete (the pipeline runs in-session).

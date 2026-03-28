@@ -6,7 +6,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 // The module under test
-import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, getTemplateDir, customizeArchitectureFitness } from '../lib/init.js';
+import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, getTemplateDir, customizeArchitectureFitness, SOURCE_OVERRIDES } from '../lib/init.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -86,8 +86,9 @@ describe('getCoreFiles', () => {
   it('every listed file exists in the template directory', () => {
     const files = getCoreFiles();
     for (const file of files) {
-      const fullPath = path.join(TEMPLATE_DIR, file);
-      assert.ok(fs.existsSync(fullPath), `core file should exist in template: ${file}`);
+      const sourceFile = SOURCE_OVERRIDES[file] || file;
+      const fullPath = path.join(TEMPLATE_DIR, sourceFile);
+      assert.ok(fs.existsSync(fullPath), `core file should exist in template: ${sourceFile}`);
     }
   });
 });
@@ -134,8 +135,9 @@ describe('getOptionalFiles', () => {
     const opts = getOptionalFiles();
     for (const [feature, files] of Object.entries(opts)) {
       for (const file of files) {
-        const fullPath = path.join(TEMPLATE_DIR, file);
-        assert.ok(fs.existsSync(fullPath), `optional file should exist in template: ${file} (${feature})`);
+        const sourceFile = SOURCE_OVERRIDES[file] || file;
+        const fullPath = path.join(TEMPLATE_DIR, sourceFile);
+        assert.ok(fs.existsSync(fullPath), `optional file should exist in template: ${sourceFile} (${feature})`);
       }
     }
   });
@@ -209,6 +211,24 @@ describe('copyFiles', () => {
     const content = fs.readFileSync(existingPath, 'utf-8');
     const sourceContent = fs.readFileSync(path.join(TEMPLATE_DIR, existingFile), 'utf-8');
     assert.equal(content, sourceContent);
+  });
+
+  it('applies SOURCE_OVERRIDES to rename files during copy', () => {
+    const files = ['.claude/settings.json'];
+    const result = copyFiles(TEMPLATE_DIR, targetDir, files);
+
+    // Target should be settings.json (not .tpl)
+    const targetPath = path.join(targetDir, '.claude', 'settings.json');
+    assert.ok(fs.existsSync(targetPath), 'should install as settings.json');
+    assert.equal(result.copied.length, 1);
+    assert.equal(result.copied[0], '.claude/settings.json');
+
+    // Content should match the .tpl source
+    const sourceContent = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'settings.json.tpl'), 'utf-8'
+    );
+    const targetContent = fs.readFileSync(targetPath, 'utf-8');
+    assert.equal(targetContent, sourceContent);
   });
 });
 
