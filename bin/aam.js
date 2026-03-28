@@ -7,6 +7,7 @@ import { parseArgs } from '../lib/cli.js';
 import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir } from '../lib/init.js';
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
 import { writeAgentsMd } from '../lib/agents-md.js';
+import { fingerprint } from '../lib/detect.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.resolve(__dirname, '..', 'package.json');
@@ -99,14 +100,25 @@ async function runInit(options) {
   } else if (options.core) {
     console.log('\n--core: skipping optional features');
   } else {
-    // Interactive prompts
+    // Interactive prompts with codebase detection
+    const detected = fingerprint(targetDir);
+    if (detected.language) {
+      console.log('\nDetected codebase:');
+      if (detected.stack) console.log(`  Stack: ${detected.stack}`);
+      if (detected.testRunner) console.log(`  Test runner: ${detected.testRunner}`);
+      if (detected.ci) console.log(`  CI: ${detected.ci}`);
+      if (detected.lintTools.length > 0) console.log(`  Lint/format: ${detected.lintTools.join(', ')}`);
+    }
+
     const rl = createInterface();
     try {
       console.log('\nOptional features:');
 
       for (const [key, meta] of Object.entries(OPTIONAL_FEATURES)) {
+        // Auto-suggest code quality when a test runner is detected
+        const defaultYes = key === 'codeQuality' ? !!detected.testRunner : true;
         selectedFeatures[key] = await askYesNo(
-          rl, `  Enable ${meta.label}? (${meta.description})`, true
+          rl, `  Enable ${meta.label}? (${meta.description})`, defaultYes
         );
       }
 
@@ -119,10 +131,10 @@ async function runInit(options) {
         console.log('\nProject identity (populates CLAUDE.md):');
 
         const identity = {
-          name: await askText(rl, '  Project name'),
+          name: await askText(rl, '  Project name', path.basename(targetDir)),
           description: await askText(rl, '  One-sentence description'),
-          type: await askChoice(rl, '  Project type', PROJECT_TYPES, 'web-app'),
-          stack: await askText(rl, '  Tech stack (e.g., TypeScript / React / PostgreSQL)'),
+          type: await askChoice(rl, '  Project type', PROJECT_TYPES, detected.type || 'web-app'),
+          stack: await askText(rl, '  Tech stack', detected.stack || ''),
           experience: await askText(rl, '  Developer experience (e.g., Senior developer, 10 years)'),
           autonomy: await askChoice(rl, '  Autonomy preference', AUTONOMY_LEVELS, 'medium'),
         };
