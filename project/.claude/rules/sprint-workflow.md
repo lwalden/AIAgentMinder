@@ -77,7 +77,7 @@ Present all specs together. User may: approve all, revise items, add custom inst
 
 ## APPROVE
 
-1. Update `SPRINT.md` status to `in-progress`.
+1. Run `bash .claude/scripts/sprint-update.sh sprint-status in-progress` to update sprint status.
 2. Create native Task per issue (title with risk tag, description: AC + spec summary + issue ID, dependencies from spec).
 3. Confirm: "Sprint S{n} started. {count} tasks. Beginning execution."
 
@@ -85,7 +85,7 @@ Present all specs together. User may: approve all, revise items, add custom inst
 
 ## EXECUTE
 
-1. Update Task to `in_progress`, SPRINT.md row to `in-progress`.
+1. Update Task to `in_progress`. Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq} in-progress`.
 2. Read spec + relevant source files.
 3. Branch: `{type}/S{n}-{seq}-{short-desc}`.
 4. TDD RED → TDD GREEN → Refactor → Integration/E2E if spec defines → Full test suite (zero failures; investigate unrelated failures as regressions).
@@ -107,14 +107,14 @@ Present all specs together. User may: approve all, revise items, add custom inst
 
 ## MERGE
 
-1. `git checkout main && git pull`. 2. Update Task to `completed`, SPRINT.md row to `done`. 3. Check spec for post-merge validation.
+1. `git checkout main && git pull`. 2. Update Task to `completed`. Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq} done`. 3. Check spec for post-merge validation.
 
 → Post-merge exists → VALIDATE. None → NEXT.
 
 ## VALIDATE
 
 1. If deployed env needed, poll availability (max 15 min; if exceeded, notify human, continue to NEXT — Post-Merge stays `pending`, **sprint cannot close until validated**).
-2. Run post-merge tests. Update SPRINT.md Post-Merge: `pass`, `fail`, or `pending`. A `pending` validation is a blocking obligation, not informational.
+2. Run post-merge tests. Run `bash .claude/scripts/sprint-update.sh postmerge S{n}-{seq} pass` (or `fail` / `pending: {desc}`). A `pending` validation is a blocking obligation, not informational.
 
 → Pass → NEXT. Fail → REWORK. Deferred → NEXT (pending remains).
 
@@ -152,7 +152,7 @@ Present all specs together. User may: approve all, revise items, add custom inst
 
 Any state → BLOCKED when: external dependency unavailable, missing credentials, ambiguous AC, debug checkpoint (3 failed attempts), test needs human action, pipeline escalation.
 
-Update SPRINT.md to `blocked`. Notify human: what, why, what unblocks. Wait. → Human resolves → return to prior state.
+Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq} blocked`. Notify human: what, why, what unblocks. Wait. → Human resolves → return to prior state.
 
 ## CONTEXT_CYCLE
 
