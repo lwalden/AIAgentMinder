@@ -184,7 +184,7 @@ Created files:
 - .claude/commands/aam-tdd.md (/aam-tdd — guided TDD workflow)
 - .claude/commands/aam-triage.md (/aam-triage — structured bug triage)
 - .claude/commands/aam-grill.md (/aam-grill — plan interrogation)
-- .claude/scripts/ (context-monitor.sh status line data bridge, context-cycle.sh self-kill script, sprint-runner and profile hook installers)
+- .claude/scripts/ (context-monitor.sh status line data bridge, context-cycle.sh self-kill script, context-cycle-hook.sh PreToolUse enforcement hook, sprint-runner and profile hook installers)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
 - .claude/rules/approach-first.md (approach-first protocol — state intent before executing)

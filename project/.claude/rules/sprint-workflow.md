@@ -11,8 +11,8 @@ Sprint governance (bounded scope, approval gates, review/archive) tracks in `SPR
 
 ```
 PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE → VALIDATE] → COMPLETE
-                                                    ↑
-                                             CONTEXT_CYCLE (at NEXT transition)
+                                         ↑
+                              CONTEXT_CYCLE (hook-enforced, any tool call)
 ```
 
 **Human checkpoints** (pause for input): PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK.
@@ -129,9 +129,11 @@ Present all specs together. User may: approve all, revise items, add custom inst
 
 ## NEXT
 
-1. Find next `todo` in SPRINT.md. 2. Complete any deferred VALIDATE steps now ready. 3. Context pressure check (see CONTEXT_CYCLE).
+1. Find next `todo` in SPRINT.md. 2. Complete any deferred VALIDATE steps now ready.
 
-→ Cycle needed → CONTEXT_CYCLE. Next exists → EXECUTE. All `done` + all Post-Merge `pass`/`n/a` → COMPLETE. All `done` but any `pending` → execute those validations — **do not present sprint review**.
+→ Next exists → EXECUTE. All `done` + all Post-Merge `pass`/`n/a` → COMPLETE. All `done` but any `pending` → execute those validations — **do not present sprint review**.
+
+Note: Context cycling is enforced by the `PreToolUse` hook — it fires on every tool call, not just at NEXT transitions. If cycling is needed, non-cycle tools will be blocked automatically.
 
 ## COMPLETE
 
@@ -157,9 +159,9 @@ Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq} blocked`. Notify hu
 
 ## CONTEXT_CYCLE
 
-Autonomous context management at NEXT transitions. Persists state, self-terminates, fresh session resumes (requires profile hook or sprint-runner).
+Autonomous context management. Persists state, self-terminates, fresh session resumes (requires profile hook or sprint-runner).
 
-**Primary signal:** Read `.context-usage` in the project root. If the file exists and `should_cycle` is `true`, cycle. Thresholds: 250k tokens Sonnet, 350k Opus, 35% unknown models.
+**Enforcement:** A `PreToolUse` hook (`context-cycle-hook.sh`) reads `.context-usage` on every tool call. When `should_cycle` is `true`, the hook **blocks all tool calls except Bash, Write, and Read** — which are the only tools needed to execute the cycle steps below. This is involuntary; the agent cannot skip or delay it. Thresholds: 250k tokens Sonnet, 350k Opus, 35% unknown models.
 
 **Fallback** (`.context-usage` absent — status line not configured): Cycle when ANY true: 3+ items completed this session | debug checkpoint triggered | rework executed. When in doubt, cycle.
 
