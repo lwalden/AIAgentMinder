@@ -31,7 +31,5 @@
   "mergeWait": {
     "pollIntervalSeconds": 30,
     "timeoutMinutes": 15
-  },
-  "autoContinueSprint": false,
-  "continueMaxIssues": null
+  }
 }
