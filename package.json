@@ -1,0 +1,35 @@
+{
+  "name": "aiagentminder",
+  "version": "3.2.0",
+  "description": "Opinionated governance framework for Claude Code — sprint execution, quality gates, and structured planning for solo developers.",
+  "type": "module",
+  "bin": {
+    "aiagentminder": "./bin/aam.js"
+  },
+  "files": [
+    "bin/",
+    "lib/",
+    "project/"
+  ],
+  "scripts": {
+    "test": "node --test tests/cli.test.js tests/init.test.js tests/integration.test.js"
+  },
+  "keywords": [
+    "claude-code",
+    "governance",
+    "sprint",
+    "quality",
+    "methodology",
+    "ai-assisted-development"
+  ],
+  "author": "lwalden",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lwalden/AIAgentMinder"
+  },
+  "homepage": "https://github.com/lwalden/AIAgentMinder",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
