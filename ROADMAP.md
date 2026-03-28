@@ -120,6 +120,12 @@ Replace heuristic-based context cycling with real token count monitoring via Cla
 
 ---
 
+## v3.3 — Architecture Fitness Defaults (in progress)
+
+Replace the blank placeholder `architecture-fitness.md` with 4 concrete, stack-agnostic rules: file size (300-line flag), secrets in source, test isolation, and layer boundaries. Adds commented stack-specific examples (C#/.NET, TypeScript/React, Python, Java/Spring) that users can uncomment. Based on competitive analysis of 70+ repos — the only rules that survive a universality test across all stacks.
+
+---
+
 ## Direction
 
 The current design is stable. The backlog below was populated from a competitive landscape analysis (March 2026) covering 70+ repos and tools. Items are grouped by theme, not priority.
@@ -136,7 +142,7 @@ The current design is stable. The backlog below was populated from a competitive
 
 ### Architecture Fitness Defaults
 
-- **Ship concrete universal rules** — The current `architecture-fitness.md` is a blank placeholder. Zero of 9 installed repos have ever customized it. Competitor analysis shows only language-specific rules survive as concrete defaults. Replace the placeholder with 3-4 universal rules that apply to any stack: (1) flag files over 300 lines for decomposition, (2) no hardcoded secrets in source, (3) tests parallel to source not intermingled, (4) external API calls through centralized clients. Keep the rest as commented examples with instructions to customize.
+- ~~**Ship concrete universal rules**~~ — Moved to v3.3.
 - **Stack-aware template selection in `/aam-setup`** — Auto-detect project stack (language, framework, test runner) during setup and pre-configure architecture-fitness rules and code-quality rules with stack-appropriate defaults. Similar to ai-rules' `extends:` template system.
 
 ### Quality & Review

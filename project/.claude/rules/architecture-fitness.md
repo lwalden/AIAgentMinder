@@ -9,8 +9,8 @@ description: Architecture fitness rules — structural constraints for this proj
 ## How to Use This File
 
 These rules are enforced by Claude during code review, PR creation, and when writing new code.
-Replace the examples below with constraints that match YOUR project's architecture.
-Each rule should be specific enough that Claude can check it mechanically.
+The defaults below are stack-agnostic starting points. Tighten, relax, or replace them
+to match YOUR project's architecture. Remove sections that don't apply.
 
 Rules that apply only to certain file types can be scoped with glob patterns in the frontmatter:
 ```yaml
@@ -21,43 +21,67 @@ globs: ["src/routes/**", "src/handlers/**"]
 
 ## Structural Constraints
 
-<!-- Replace these examples with your own. Remove sections that don't apply. -->
+### File Size
 
-### Layer Boundaries
+If a source file exceeds 300 lines, flag it for decomposition before adding more code.
+A file that large usually contains more than one responsibility. Split by extracting
+a helper, a subcomponent, or a dedicated module — don't just continue appending.
 
-<!-- Example: Enforce separation between layers -->
-<!-- Route handlers must not import from the database layer directly.
-     All database access goes through the service layer.
-     Bad: import { db } from '../db' inside a route handler
-     Good: import { UserService } from '../services/user' -->
+Generated files (migrations, lock files, snapshots) are exempt.
 
-[Define your layer boundary rules here]
+### Secrets in Source
 
-### External API Calls
+No hardcoded credentials, API keys, tokens, passwords, or connection strings in source files.
+Use environment variables, `.env` files (gitignored), secret managers (Azure Key Vault, AWS SSM,
+1Password CLI, Bitwarden CLI), or framework-provided config binding.
 
-<!-- Example: Centralize external service calls -->
-<!-- All calls to external HTTP services must go through clients in `src/integrations/`.
-     No direct `fetch()`, `axios.get()`, or HTTP calls from route handlers or services.
-     This ensures retry logic, auth headers, and error handling are applied consistently. -->
-
-[Define where external calls are allowed here]
+Patterns to catch: string literals assigned to variables named `key`, `secret`, `token`,
+`password`, `apiKey`, `connectionString`, `auth`; Base64-encoded blobs in config files;
+URLs containing credentials (`https://user:pass@`).
 
 ### Test Isolation
 
-<!-- Example: Keep tests self-contained -->
-<!-- Test files must not import from other test files.
-     Each test file must be independently runnable.
-     Shared fixtures belong in a `__fixtures__/` or `test/helpers/` directory, not in test files. -->
+Test files live in a dedicated directory (e.g., `tests/`, `__tests__/`, `*.test.*` co-located
+by framework convention) — not scattered arbitrarily through source directories.
 
-[Define your test structure rules here]
+Each test file must be independently runnable. Test files must not import from other test files.
+Shared fixtures and helpers belong in a dedicated test utilities location (e.g., `tests/helpers/`,
+`tests/__fixtures__/`, `tests/conftest.py`), not inside individual test files.
 
-### File Size Limits
+### Layer Boundaries
 
-<!-- Example: Flag files that are getting too large to maintain -->
-<!-- If a source file exceeds 300 lines, flag it for decomposition before adding more code.
-     A file that large usually contains more than one responsibility. -->
+External HTTP calls and direct database access belong in dedicated service or client modules —
+not in route handlers, UI components, CLI entrypoints, or middleware.
 
-[Define your size thresholds here]
+This ensures retry logic, auth headers, error handling, and connection management are
+centralized rather than duplicated across call sites.
+
+Does not apply to projects with only one source file or no external dependencies.
+
+<!-- ──────────────────────────────────────────────────────────────── -->
+<!-- STACK-SPECIFIC EXAMPLES                                         -->
+<!-- Uncomment rules that match your stack. Add your own below.      -->
+<!-- ──────────────────────────────────────────────────────────────── -->
+
+<!-- ### C# / .NET
+     - Controllers must not inject repositories directly — go through a service layer.
+     - All EF Core queries go through repository classes, not inline in controllers.
+     - `<Nullable>enable</Nullable>` must be set in every .csproj. -->
+
+<!-- ### TypeScript / React
+     - UI components must not call fetch/axios directly — use hooks or service modules.
+     - No `any` type annotations — use `unknown` and narrow, or define a proper type.
+     - `strict: true` must be set in tsconfig.json. -->
+
+<!-- ### Python
+     - No raw SQL string concatenation — use parameterized queries or ORM.
+     - `mypy --strict` must pass with zero errors.
+     - No `import *` — all imports must be explicit. -->
+
+<!-- ### Java / Spring
+     - Controllers must not instantiate repositories — inject services.
+     - @RequestBody parameters must have @Valid annotation.
+     - No unbounded .findAll() in service layer — use pagination. -->
 
 ---
 
