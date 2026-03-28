@@ -1,6 +1,6 @@
 # AIAgentMinder Plugin
 
-> **Status:** v3.1.0 — Autonomous sprint execution with context cycling, mandatory quality checklist, spec phase, and post-merge validation.
+> **Status:** v3.3.0 — Governance framework with npm/npx installer, codebase fingerprinting, architecture fitness defaults, and plugin marketplace distribution.
 
 ---
 
@@ -33,7 +33,7 @@ The `/aam-setup` interview copies governance files to your project and customize
 ```json
 {
   "name": "aiagentminder",
-  "version": "3.1.0",
+  "version": "3.3.0",
   "description": "Opinionated governance framework for Claude Code — autonomous sprint execution, enforced engineering practices, and structured planning for solo developers.",
   "repository": "https://github.com/lwalden/AIAgentMinder",
   "license": "MIT"

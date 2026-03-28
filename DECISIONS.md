@@ -112,6 +112,18 @@ Chose: keep `aam-setup.md` and `aam-update.md` in the repo root `.claude/command
 
 ---
 
+### Versioning scheme: continue v3.x with strict semver | 2026-03 | Status: Active
+
+Chose: Continue v3.x lineage with unified versioning (npm, plugin, marketplace, stamp all match) and strict semver (MAJOR = breaking/migration, MINOR = new features/backwards-compatible, PATCH = bug fixes only) over (a) resetting to v1.0.0 for "first public release" or (b) splitting npm and internal versions. Why: 9+ target repos carry 3.2.0 stamps — a reset reads as a downgrade with no semver-aware comparison logic; validate.js enforces all 4 version points match — a hybrid scheme breaks this; cosmetic benefit of v1.0.0 doesn't justify migration cost. Batching policy: multiple PRs land in one version; bump once at release time, not per-PR. Sprint boundaries are the natural release trigger. Tradeoff: external npm users see v3.x on a "new" package — acceptable since the number carries no user-facing confusion.
+
+---
+
+### GitHub Releases: adopt manual release checklist | 2026-03 | Status: Active
+
+Chose: Start using GitHub Releases with git tags and auto-generated notes over (a) continuing "main = released" with no markers or (b) adding CI-driven publish automation. Why: releases are invisible without tags — users can't subscribe, npm publish is disconnected from any git marker, and there's no changelog attached to a version. Manual checklist (bump → commit → tag → gh release → npm publish) is appropriate for a solo developer shipping a few releases per month. CI automation is a future backlog item, not a prerequisite. Tradeoff: manual process has human error risk — mitigated by the release checklist in docs/RELEASING.md.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.

@@ -18,6 +18,7 @@ Before executing, write a brief approach statement:
 1. **What** you're going to do (one sentence)
 2. **Which files** will be created or modified (list them)
 3. **Key assumptions** — anything the user should know before you start
+4. **Cost/billing impact** — if the change touches a paid external service (API calls, webhooks, cloud resources), state the expected cost implications of the design. Flag designs where a failure mode could cause runaway costs (e.g., retry loops hitting a paid API, fallback paths that re-process already-handled work).
 
 Keep it short. This is a check-in, not a design doc.
 

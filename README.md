@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.2.0-blue)
+![Version](https://img.shields.io/badge/version-3.3.0-blue)
 
 An opinionated governance framework for Claude Code. Removes friction, empowering the AI where safe to do so, enforces engineering practices so it doesn't make (as many) mistakes, and fills gaps Claude Code can't handle natively.
 

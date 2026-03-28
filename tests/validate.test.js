@@ -133,12 +133,12 @@ describe('validateVersionConsistency', () => {
     fs.mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.claude-plugin', 'plugin.json'), JSON.stringify({
       name: 'test',
-      version: '3.2.0',
+      version: '3.3.0',
       description: 'test',
     }));
     fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.2.0\n');
-    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.2.0' }));
+    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.3.0' }));
 
     const result = validateVersionConsistency(dir);
     assert.equal(result.valid, true);
@@ -156,8 +156,8 @@ describe('validateVersionConsistency', () => {
       description: 'test',
     }));
     fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.2.0\n');
-    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.2.0' }));
+    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.3.0' }));
 
     const result = validateVersionConsistency(dir);
     assert.equal(result.valid, false);
@@ -171,11 +171,11 @@ describe('validateVersionConsistency', () => {
     fs.mkdirSync(path.join(dir, '.claude-plugin'), { recursive: true });
     fs.writeFileSync(path.join(dir, '.claude-plugin', 'plugin.json'), JSON.stringify({
       name: 'test',
-      version: '3.2.0',
+      version: '3.3.0',
       description: 'test',
     }));
     fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.2.0\n');
+    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0' }));
 
     const result = validateVersionConsistency(dir);
