@@ -27,7 +27,7 @@ shift
 
 case "$subcmd" in
   status)
-    [ $# -ge 2 ] || die "Usage: sprint-update.sh status <issue-id> <value>"
+    [ $# -eq 2 ] || die "Usage: sprint-update.sh status <issue-id> <value>"
     issue_id="$1"
     new_value="$2"
 
@@ -78,7 +78,7 @@ case "$subcmd" in
     ;;
 
   sprint-status)
-    [ $# -ge 1 ] || die "Usage: sprint-update.sh sprint-status <value>"
+    [ $# -eq 1 ] || die "Usage: sprint-update.sh sprint-status <value>"
     new_value="$1"
 
     if ! grep -q '^\*\*Status:\*\*' "$SPRINT_FILE"; then
