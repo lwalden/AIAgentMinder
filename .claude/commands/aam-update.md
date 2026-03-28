@@ -234,7 +234,7 @@ Print: `✓ Removed (obsolete): .claude/hooks/pr-pipeline-trigger.js — pipelin
 - **Never overwrite.** This is user-configured per-project.
 - If absent and `aam-pr-pipeline.md` is being added: copy from `project/.pr-pipeline.json`
 - If present: print `⊘ Kept: .pr-pipeline.json (user-owned — edit manually to update settings)`
-- **v2.2 cleanup:** If `autoContinueSprint` or `continueMaxIssues` are present, tell the user these fields are no longer used — sprint continuation is now handled by the sprint workflow loop in-session. They can be safely removed.
+- **v2.2 cleanup:** If `autoContinueSprint` or `continueMaxIssues` keys are present, **remove them** from the JSON. These were AIAgentMinder-introduced fields, now obsolete — sprint continuation is handled by the sprint workflow loop in-session. Print: `✓ Cleaned: .pr-pipeline.json — removed obsolete autoContinueSprint/continueMaxIssues`
 
 ---
 
