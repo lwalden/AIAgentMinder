@@ -6,7 +6,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 // The module under test
-import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, getTemplateDir } from '../lib/init.js';
+import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, getTemplateDir, customizeArchitectureFitness } from '../lib/init.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -307,5 +307,138 @@ describe('writeProjectIdentity', () => {
 
     const versionPath = path.join(targetDir, '.claude', 'aiagentminder-version');
     assert.ok(fs.existsSync(versionPath));
+  });
+});
+
+describe('customizeArchitectureFitness', () => {
+  let targetDir;
+
+  beforeEach(() => {
+    targetDir = makeTempDir();
+    // Copy the template architecture-fitness.md so there's something to customize
+    const rulesDir = path.join(targetDir, '.claude', 'rules');
+    fs.mkdirSync(rulesDir, { recursive: true });
+    fs.copyFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'rules', 'architecture-fitness.md'),
+      path.join(rulesDir, 'architecture-fitness.md')
+    );
+  });
+
+  afterEach(() => {
+    cleanTempDir(targetDir);
+  });
+
+  it('uncomments the C# / .NET section when language is C#', () => {
+    customizeArchitectureFitness(targetDir, 'C#');
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    // C# section should be uncommented
+    assert.ok(content.includes('### C# / .NET'));
+    assert.ok(content.includes('- Controllers must not inject repositories directly'));
+    // Should NOT still be wrapped in HTML comments
+    assert.ok(!content.includes('<!-- ### C# / .NET'));
+
+    // Other sections should remain commented
+    assert.ok(content.includes('<!-- ### TypeScript / React'));
+    assert.ok(content.includes('<!-- ### Python'));
+    assert.ok(content.includes('<!-- ### Java / Spring'));
+  });
+
+  it('uncomments the TypeScript / React section when language is TypeScript', () => {
+    customizeArchitectureFitness(targetDir, 'TypeScript');
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    assert.ok(content.includes('### TypeScript / React'));
+    assert.ok(content.includes('- No `any` type annotations'));
+    assert.ok(!content.includes('<!-- ### TypeScript / React'));
+
+    // Others stay commented
+    assert.ok(content.includes('<!-- ### C# / .NET'));
+    assert.ok(content.includes('<!-- ### Python'));
+  });
+
+  it('uncomments the TypeScript / React section when language is JavaScript', () => {
+    customizeArchitectureFitness(targetDir, 'JavaScript');
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    assert.ok(content.includes('### TypeScript / React'));
+    assert.ok(!content.includes('<!-- ### TypeScript / React'));
+  });
+
+  it('uncomments the Python section when language is Python', () => {
+    customizeArchitectureFitness(targetDir, 'Python');
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    assert.ok(content.includes('### Python'));
+    assert.ok(content.includes('- No raw SQL string concatenation'));
+    assert.ok(!content.includes('<!-- ### Python'));
+
+    assert.ok(content.includes('<!-- ### C# / .NET'));
+    assert.ok(content.includes('<!-- ### Java / Spring'));
+  });
+
+  it('uncomments the Java / Spring section when language is Java', () => {
+    customizeArchitectureFitness(targetDir, 'Java');
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    assert.ok(content.includes('### Java / Spring'));
+    assert.ok(content.includes('- @RequestBody parameters must have @Valid annotation'));
+    assert.ok(!content.includes('<!-- ### Java / Spring'));
+
+    assert.ok(content.includes('<!-- ### C# / .NET'));
+    assert.ok(content.includes('<!-- ### TypeScript / React'));
+  });
+
+  it('does nothing when language is null', () => {
+    const before = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+    customizeArchitectureFitness(targetDir, null);
+    const after = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+    assert.equal(before, after);
+  });
+
+  it('does nothing when language has no matching section (e.g., Go)', () => {
+    const before = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+    customizeArchitectureFitness(targetDir, 'Go');
+    const after = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+    assert.equal(before, after);
+  });
+
+  it('does nothing when architecture-fitness.md does not exist', () => {
+    // Remove the file
+    fs.unlinkSync(path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'));
+    // Should not throw
+    customizeArchitectureFitness(targetDir, 'TypeScript');
+  });
+
+  it('preserves the rest of the file content', () => {
+    customizeArchitectureFitness(targetDir, 'Python');
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    // Universal rules still present
+    assert.ok(content.includes('### File Size'));
+    assert.ok(content.includes('### Secrets in Source'));
+    assert.ok(content.includes('### Test Isolation'));
+    assert.ok(content.includes('### Layer Boundaries'));
+    assert.ok(content.includes('## Enforcement'));
   });
 });
