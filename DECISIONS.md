@@ -16,6 +16,18 @@ Chose: [X] over [alternatives considered]. Why: [rationale]. Tradeoff: [what you
 
 ---
 
+### Architecture fitness: concrete defaults over blank template | 2026-03 | Status: Active
+
+Chose: Ship 4 concrete, stack-agnostic rules (file size 300-line flag, secrets in source, test isolation, layer boundaries) with commented stack-specific examples over (a) keeping the blank placeholder template or (b) dropping the feature entirely. Why: competitive analysis of 70+ repos showed 0/9 installed repos ever customized the placeholder, but cross-repo analysis confirmed 4 universal patterns survive across all stacks. Competitors that ship concrete rules (ai-rules, Spec-Flow) make them language-specific — only stack-agnostic rules work as defaults. Tradeoff: defaults may not apply to every project (e.g., single-file projects, markdown-only repos), mitigated by escape clause in enforcement section.
+
+---
+
+### Competitive analysis backlog sourcing | 2026-03 | Status: Active
+
+Chose: Populate ROADMAP.md backlog from structured competitive analysis (70+ repos, 3 parallel research agents) over ad-hoc feature ideas. Why: ensures backlog items are grounded in market reality and differentiation gaps rather than speculation. Identified 8 items across 4 themes. Key finding: AAM's unique moat is the governance *workflow* (sprint state machine + quality gates + context cycling), not rules — cross-platform tools can sync rules but can't replicate the workflow.
+
+---
+
 ### Sprint continuation counter via HTML comment in SPRINT.md | 2026-03 | Status: Active
 
 Chose: `<!-- ai-continues: N -->` HTML comment written directly into SPRINT.md at runtime over tracking via PR labels or a separate state file. Why: self-contained with no external dependencies, survives worktree removal, is invisible in rendered markdown, and resets naturally when the sprint is archived. Counter is NOT committed — it is ephemeral state that controls runaway protection within a single sprint execution. Tradeoff: if SPRINT.md is reset by hand mid-sprint, the counter resets too (acceptable — manual sprint intervention implies human oversight).
