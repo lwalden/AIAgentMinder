@@ -197,4 +197,51 @@ describe('CLI integration: init --all', () => {
     // Version stamp
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'aiagentminder-version')));
   });
+
+  it('uncomments stack-specific architecture fitness rules when language detected', () => {
+    // Simulate a TypeScript project
+    fs.writeFileSync(path.join(targetDir, 'package.json'), JSON.stringify({
+      dependencies: { react: '^18.0.0' },
+    }));
+    fs.writeFileSync(path.join(targetDir, 'tsconfig.json'), '{}');
+
+    const output = execFileSync('node', [BIN, 'init', '--all'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(output.includes('Stack-specific rules enabled for TypeScript'));
+
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    // TypeScript section should be uncommented
+    assert.ok(content.includes('### TypeScript / React'));
+    assert.ok(!content.includes('<!-- ### TypeScript / React'));
+
+    // Other sections should remain commented
+    assert.ok(content.includes('<!-- ### C# / .NET'));
+    assert.ok(content.includes('<!-- ### Python'));
+    assert.ok(content.includes('<!-- ### Java / Spring'));
+  });
+
+  it('leaves architecture fitness rules unchanged when no language detected', () => {
+    const output = execFileSync('node', [BIN, 'init', '--all'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(!output.includes('Stack-specific rules enabled'));
+
+    const content = fs.readFileSync(
+      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
+    );
+
+    // All sections should remain commented
+    assert.ok(content.includes('<!-- ### C# / .NET'));
+    assert.ok(content.includes('<!-- ### TypeScript / React'));
+    assert.ok(content.includes('<!-- ### Python'));
+    assert.ok(content.includes('<!-- ### Java / Spring'));
+  });
 });
