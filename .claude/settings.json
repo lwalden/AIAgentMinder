@@ -1,1 +1,8 @@
-{}
+{
+  "permissions": {
+    "allow": [
+      "Edit(*)",
+      "Write(*)"
+    ]
+  }
+}
