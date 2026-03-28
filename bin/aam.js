@@ -6,6 +6,7 @@ import { fileURLToPath } from 'node:url';
 import { parseArgs } from '../lib/cli.js';
 import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir } from '../lib/init.js';
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
+import { writeAgentsMd } from '../lib/agents-md.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.resolve(__dirname, '..', 'package.json');
@@ -16,14 +17,16 @@ aiagentminder v${pkg.version}
 Opinionated governance framework for Claude Code.
 
 Usage:
-  npx aiagentminder [init] [options]
+  npx aiagentminder [command] [options]
 
 Commands:
   init          Initialize AIAgentMinder in the current directory (default)
+  agents-md     Generate AGENTS.md from installed governance files
 
 Options:
-  --all         Enable all optional features (no prompts)
-  --core        Install core files only (no prompts)
+  --all         Enable all optional features (no prompts) [init]
+  --core        Install core files only (no prompts) [init]
+  --force, -f   Overwrite existing files
   --help, -h    Show this help message
   --version, -v Show version
 
@@ -31,6 +34,8 @@ Examples:
   npx aiagentminder                 Interactive setup
   npx aiagentminder init --all      Full install, no prompts
   npx aiagentminder init --core     Core only, no prompts
+  npx aiagentminder agents-md       Generate AGENTS.md
+  npx aiagentminder agents-md -f    Regenerate AGENTS.md
 `.trim();
 
 const OPTIONAL_FEATURES = {
@@ -69,7 +74,7 @@ async function runInit(options) {
   // Step 1: Copy core files
   console.log('Copying core files...');
   const coreFiles = getCoreFiles();
-  const coreResult = copyFiles(templateDir, targetDir, coreFiles);
+  const coreResult = copyFiles(templateDir, targetDir, coreFiles, { force: options.force });
 
   let totalCopied = coreResult.copied.length;
   let totalSkipped = coreResult.skipped.length;
@@ -134,7 +139,7 @@ async function runInit(options) {
   // Copy optional feature files
   for (const [key, files] of Object.entries(optionalFiles)) {
     if (selectedFeatures[key]) {
-      const result = copyFiles(templateDir, targetDir, files);
+      const result = copyFiles(templateDir, targetDir, files, { force: options.force });
       totalCopied += result.copied.length;
       totalSkipped += result.skipped.length;
       for (const file of result.copied) {
@@ -163,6 +168,21 @@ async function runInit(options) {
   console.log('  3. Run /aam-checkup to verify the installation');
 }
 
+function runAgentsMdCommand(options) {
+  const targetDir = process.cwd();
+  console.log(`\nGenerating AGENTS.md in: ${targetDir}\n`);
+
+  const result = writeAgentsMd(targetDir, { force: options.force });
+
+  if (result.status === 'skipped') {
+    console.log('AGENTS.md already exists. Use --force to overwrite.');
+  } else {
+    console.log(`Created: ${result.path}`);
+    console.log('\nAGENTS.md is a read-only export of your AIAgentMinder governance.');
+    console.log('Regenerate it after changing rules or commands: npx aiagentminder agents-md -f');
+  }
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
 
@@ -178,6 +198,8 @@ async function main() {
 
   if (options.command === 'init') {
     await runInit(options);
+  } else if (options.command === 'agents-md') {
+    runAgentsMdCommand(options);
   }
 }
 

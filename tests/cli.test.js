@@ -56,6 +56,23 @@ describe('parseArgs', () => {
     // The caller decides precedence — both flags are set truthfully
   });
 
+  it('parses agents-md command', () => {
+    const result = parseArgs(['agents-md']);
+    assert.equal(result.command, 'agents-md');
+  });
+
+  it('parses --force flag', () => {
+    const result = parseArgs(['agents-md', '--force']);
+    assert.equal(result.command, 'agents-md');
+    assert.equal(result.force, true);
+  });
+
+  it('parses -f flag', () => {
+    const result = parseArgs(['agents-md', '-f']);
+    assert.equal(result.command, 'agents-md');
+    assert.equal(result.force, true);
+  });
+
   it('ignores unknown flags', () => {
     const result = parseArgs(['init', '--unknown', '--foo']);
     assert.equal(result.command, 'init');

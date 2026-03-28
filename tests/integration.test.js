@@ -92,6 +92,75 @@ describe('CLI integration: init --core', () => {
   });
 });
 
+describe('CLI integration: agents-md', () => {
+  let targetDir;
+
+  beforeEach(() => {
+    targetDir = makeTempDir();
+
+    // Set up a minimal AAM project
+    fs.writeFileSync(path.join(targetDir, 'CLAUDE.md'), `
+**Project:** test-project
+**Description:** A test project
+**Type:** cli-tool
+**Stack:** Node.js
+`);
+    fs.mkdirSync(path.join(targetDir, '.claude', 'rules'), { recursive: true });
+    fs.writeFileSync(
+      path.join(targetDir, '.claude', 'rules', 'git-workflow.md'),
+      '# Git Workflow Rules\n'
+    );
+    fs.mkdirSync(path.join(targetDir, '.claude', 'commands'), { recursive: true });
+    fs.writeFileSync(
+      path.join(targetDir, '.claude', 'commands', 'aam-brief.md'),
+      '# /aam-brief - Product Brief\n'
+    );
+  });
+
+  afterEach(() => {
+    cleanTempDir(targetDir);
+  });
+
+  it('generates AGENTS.md', () => {
+    const output = execFileSync('node', [BIN, 'agents-md'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(output.includes('Created:'));
+    assert.ok(fs.existsSync(path.join(targetDir, 'AGENTS.md')));
+
+    const content = fs.readFileSync(path.join(targetDir, 'AGENTS.md'), 'utf-8');
+    assert.ok(content.includes('test-project'));
+    assert.ok(content.includes('/aam-brief'));
+  });
+
+  it('skips when AGENTS.md exists without --force', () => {
+    fs.writeFileSync(path.join(targetDir, 'AGENTS.md'), 'existing');
+
+    const output = execFileSync('node', [BIN, 'agents-md'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(output.includes('already exists'));
+    assert.equal(fs.readFileSync(path.join(targetDir, 'AGENTS.md'), 'utf-8'), 'existing');
+  });
+
+  it('overwrites with --force', () => {
+    fs.writeFileSync(path.join(targetDir, 'AGENTS.md'), 'old');
+
+    const output = execFileSync('node', [BIN, 'agents-md', '--force'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(output.includes('Created:'));
+    const content = fs.readFileSync(path.join(targetDir, 'AGENTS.md'), 'utf-8');
+    assert.ok(content.includes('test-project'));
+  });
+});
+
 describe('CLI integration: init --all', () => {
   let targetDir;
 
