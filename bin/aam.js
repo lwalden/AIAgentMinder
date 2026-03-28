@@ -4,7 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from '../lib/cli.js';
-import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir } from '../lib/init.js';
+import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir, customizeArchitectureFitness } from '../lib/init.js';
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
 import { writeAgentsMd } from '../lib/agents-md.js';
 import { fingerprint } from '../lib/detect.js';
@@ -93,6 +93,7 @@ async function runInit(options) {
   let selectedFeatures = {};
   let identityConfigured = false;
   const optionalFiles = getOptionalFiles();
+  const detected = fingerprint(targetDir);
 
   if (options.all) {
     selectedFeatures = Object.fromEntries(
@@ -103,7 +104,6 @@ async function runInit(options) {
     console.log('\n--core: skipping optional features');
   } else {
     // Interactive prompts with codebase detection
-    const detected = fingerprint(targetDir);
     if (detected.language) {
       console.log('\nDetected codebase:');
       if (detected.stack) console.log(`  Stack: ${detected.stack}`);
@@ -163,6 +163,12 @@ async function runInit(options) {
         console.log(`  ~ ${file} (exists, skipped)`);
       }
     }
+  }
+
+  // Customize architecture-fitness.md with stack-specific rules
+  if (selectedFeatures.architectureFitness && detected.language) {
+    customizeArchitectureFitness(targetDir, detected.language);
+    console.log(`  Stack-specific rules enabled for ${detected.language}`);
   }
 
   // Write version stamp (writeProjectIdentity already does this when called)
