@@ -4,7 +4,7 @@
     "name": "lwalden"
   },
   "metadata": {
-    "description": "AIAgentMinder plugin marketplace — project governance and planning for Claude Code."
+    "description": "AIAgentMinder — project governance and sprint planning for Claude Code."
   },
   "plugins": [
     {
@@ -13,15 +13,15 @@
         "source": "github",
         "repo": "lwalden/AIAgentMinder"
       },
-      "description": "Project governance and methodology layer for AI-assisted development. Structured planning, sprint governance, scope control, quality gates, and architectural fitness checks.",
-      "version": "1.1.0",
+      "description": "Project governance for AI-assisted development. Sprint execution, quality gates, TDD workflow, scope control, architecture fitness, and codebase fingerprinting. Also installable via npx aiagentminder init.",
+      "version": "3.2.0",
       "author": {
         "name": "lwalden"
       },
       "homepage": "https://github.com/lwalden/AIAgentMinder",
       "repository": "https://github.com/lwalden/AIAgentMinder",
       "license": "MIT",
-      "keywords": ["governance", "planning", "sprint", "quality", "methodology"],
+      "keywords": ["governance", "planning", "sprint", "quality", "methodology", "tdd", "code-review"],
       "category": "development-workflows"
     }
   ]
