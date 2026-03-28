@@ -24,7 +24,7 @@ Chose: Ship 4 concrete, stack-agnostic rules (file size 300-line flag, secrets i
 
 ### Competitive analysis backlog sourcing | 2026-03 | Status: Active
 
-Chose: Populate ROADMAP.md backlog from structured competitive analysis (70+ repos, 3 parallel research agents) over ad-hoc feature ideas. Why: ensures backlog items are grounded in market reality and differentiation gaps rather than speculation. Identified 8 items across 4 themes. Key finding: AAM's unique moat is the governance *workflow* (sprint state machine + quality gates + context cycling), not rules — cross-platform tools can sync rules but can't replicate the workflow.
+Chose: Populate roadmap backlog from structured competitive analysis (70+ repos, 3 parallel research agents) over ad-hoc feature ideas. Why: ensures backlog items are grounded in market reality and differentiation gaps rather than speculation. Identified 8 items across 4 themes. Key finding: AAM's unique moat is the governance *workflow* (sprint state machine + quality gates + context cycling), not rules — cross-platform tools can sync rules but can't replicate the workflow.
 
 ---
 
