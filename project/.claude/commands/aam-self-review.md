@@ -29,7 +29,8 @@ When invoked manually, ask the user which lens to apply (or accept all three for
 **A) Security** — injection, auth bypass, data exposure, hardcoded secrets
 **B) Performance** — N+1 queries, unbounded loops, missing indexes, blocking I/O
 **C) API Design** — consistency with existing endpoints, naming conventions, error response shapes
-**D) All three** (default)
+**D) Cost Impact** — paid API call patterns, retry/fallback designs that could cause runaway costs, unbounded batch sizes sent to paid services
+**E) All four** (default)
 
 ---
 
@@ -93,6 +94,25 @@ DIFF:
 [paste diff here]
 ```
 
+### Cost Impact Lens prompt:
+```
+You are a cost-aware code reviewer. Review the following diff for designs that could cause unexpected costs with paid external services.
+
+Focus on:
+- Retry loops or fallback chains that re-send work to a paid API (each retry costs money)
+- Fallback paths that re-process already-handled items instead of only unhandled ones
+- Unbounded batch sizes sent to paid services (no cap on items per request)
+- Missing circuit breakers or rate limits on paid API calls
+- Error handling that swallows failures silently, causing upstream retries
+- SDK or package upgrades that change API versions without updating all integration points (webhook endpoints, serialization contracts)
+
+For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
+If no issues found: state "Cost impact review: no issues found."
+
+DIFF:
+[paste diff here]
+```
+
 ---
 
 ## Step 4: Consolidate and Act
@@ -106,6 +126,7 @@ After all subagents complete:
    Security:    [X issues / no issues]
    Performance: [X issues / no issues]
    API Design:  [X issues / no issues]
+   Cost Impact: [X issues / no issues]
 
    [List all findings by severity: High → Medium → Low]
    ```

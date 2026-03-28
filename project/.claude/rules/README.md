@@ -1,6 +1,8 @@
 # .claude/rules/
 
-Rules files loaded natively by Claude Code at every session start. No hooks required.
+Rules files loaded natively by Claude Code at every session start.
+
+Context cycling is enforced by a `PreToolUse` hook (`context-cycle-hook.sh`) configured in `settings.json`, not by rules alone.
 
 All `.md` files in this directory are auto-discovered and loaded automatically. Delete a file to disable that rule.
 

@@ -19,7 +19,7 @@
 set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-PROJECT_DIR="$(cd "$SCRIPT_DIR/../../.." && pwd)"
+PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
 # Verify state files exist before killing anything
 if [ ! -f "$PROJECT_DIR/.sprint-continuation.md" ]; then
