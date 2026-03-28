@@ -12,7 +12,7 @@
     "project/"
   ],
   "scripts": {
-    "test": "node --test tests/cli.test.js tests/init.test.js tests/agents-md.test.js tests/integration.test.js"
+    "test": "node --test tests/cli.test.js tests/init.test.js tests/detect.test.js tests/agents-md.test.js tests/integration.test.js"
   },
   "keywords": [
     "claude-code",
