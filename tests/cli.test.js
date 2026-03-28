@@ -56,6 +56,11 @@ describe('parseArgs', () => {
     // The caller decides precedence — both flags are set truthfully
   });
 
+  it('parses validate command', () => {
+    const result = parseArgs(['validate']);
+    assert.equal(result.command, 'validate');
+  });
+
   it('parses agents-md command', () => {
     const result = parseArgs(['agents-md']);
     assert.equal(result.command, 'agents-md');
