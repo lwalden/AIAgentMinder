@@ -312,7 +312,7 @@ Works on **Windows, macOS, and Linux**. No Node.js dependency — pure Markdown 
 - [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
 - [Customization Guide](docs/customization-guide.md) — optional features, architecture fitness rules, context cycling
 - [Product Brief Creation Guide](docs/strategy-creation-guide.md) — using `/aam-brief` or writing `strategy-roadmap.md` manually
-- [Roadmap](ROADMAP.md) — version history and backlog
+- [Roadmap](docs/strategy-roadmap.md) — version history and backlog
 
 ---
 
