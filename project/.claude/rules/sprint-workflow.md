@@ -70,6 +70,7 @@ Write detailed spec per item before coding.
 **Post-Merge Validation:** {deploy-dependent tests, or "None"}
 **Files:** Create: {list} | Modify: {list}
 **Dependencies:** {other items, or "None"}
+**Upgrade Impact:** {if upgrading an SDK/package that changes API versions: list all integration points to verify — webhook endpoints, API clients, serialization contracts, config files. Or "N/A"}
 **Custom Instructions:** {human-provided, or "None"}
 ```
 

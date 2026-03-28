@@ -10,7 +10,7 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/scripts/context-monitor.sh`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/scripts/context-monitor.sh`, `.claude/scripts/sprint-update.sh`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
 | **Obsolete (v3.1 → v3.2)** | `.claude/hooks/compact-reorient.js`, `.claude/hooks/` directory | Delete during migration — replaced by status line context monitoring |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
@@ -38,6 +38,7 @@ I'll update AIAgentMinder files in [path].
 
 This will overwrite:
   - .claude/scripts/context-monitor.sh (status line data bridge)
+  - .claude/scripts/sprint-update.sh (zero-token-cost SPRINT.md updater)
   - .claude/settings.json
   - .claude/commands/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
   - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md, tool-first.md
@@ -157,6 +158,7 @@ Copy each file from `project/` in this repo to the target, overwriting whatever 
 ```
 project/.claude/scripts/context-monitor.sh            →  [target]/.claude/scripts/context-monitor.sh
 project/.claude/scripts/context-cycle.sh              →  [target]/.claude/scripts/context-cycle.sh
+project/.claude/scripts/sprint-update.sh              →  [target]/.claude/scripts/sprint-update.sh
 project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
 project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
 project/.claude/commands/aam-revise.md                     →  [target]/.claude/commands/aam-revise.md
@@ -319,6 +321,7 @@ AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
 
 Updated:
 - .claude/scripts/context-monitor.sh (status line data bridge)
+- .claude/scripts/sprint-update.sh (zero-token-cost SPRINT.md updater)
 - .claude/settings.json (merged — status line configured, user hooks preserved)
 - .claude/commands/aam-handoff.md
 - .claude/commands/aam-brief.md

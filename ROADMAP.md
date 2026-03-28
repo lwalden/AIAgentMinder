@@ -120,9 +120,32 @@ Replace heuristic-based context cycling with real token count monitoring via Cla
 
 ---
 
-## v3.3 — Architecture Fitness Defaults (in progress)
+## v3.3 — Architecture Fitness, CLI Distribution & Versioning (shipped)
 
-Replace the blank placeholder `architecture-fitness.md` with 4 concrete, stack-agnostic rules: file size (300-line flag), secrets in source, test isolation, and layer boundaries. Adds commented stack-specific examples (C#/.NET, TypeScript/React, Python, Java/Spring) that users can uncomment. Based on competitive analysis of 70+ repos — the only rules that survive a universality test across all stacks.
+Concrete architecture fitness defaults, npm/npx distribution, plugin marketplace, and a formal versioning policy.
+
+### Architecture Fitness Defaults
+
+- Replace the blank placeholder `architecture-fitness.md` with 4 concrete, stack-agnostic rules: file size (300-line flag), secrets in source, test isolation, and layer boundaries.
+- Commented stack-specific examples (C#/.NET, TypeScript/React, Python, Java/Spring) that users can uncomment.
+- Auto-customize rules during `/aam-setup` based on codebase fingerprinting (detected stack).
+
+### CLI Distribution
+
+- **npm/npx installer** — `npx aiagentminder init` with `--all`/`--core`/interactive modes. Zero runtime dependencies.
+- **AGENTS.md generation** — `npx aiagentminder agents-md` reads installed governance files and exports an AGENTS.md for non-Claude tools.
+- **Codebase fingerprinting** — Auto-detects language, framework, test runner, CI provider, and lint config during setup.
+- **Plugin marketplace listing** — `.claude-plugin/` manifests aligned to 3.3.0. `npx aiagentminder validate` for CI.
+
+### Efficiency
+
+- **`sprint-update.sh`** — Zero-token-cost SPRINT.md table updater. Mechanically updates status, post-merge, and sprint-status cells so the LLM doesn't burn tokens on file I/O.
+
+### Versioning & Release
+
+- **Strict semver policy** — MAJOR = breaking/migration, MINOR = new features, PATCH = bug fixes. Unified across npm, plugin, marketplace, and version stamp.
+- **GitHub Releases adoption** — Each version gets a git tag and release with auto-generated notes. Manual checklist documented in `docs/RELEASING.md`.
+- **Batching policy** — Multiple PRs land per version; bump once at release time. Sprint boundaries as natural release trigger.
 
 ---
 
@@ -136,14 +159,14 @@ The current design is stable. The backlog below was populated from a competitive
 
 ### Distribution & Visibility
 
-- **npm/npx installer** — Every major competitor (SuperClaude, cc-sdd, Spec-Flow, CCPlugins, Ruler) uses npm/npx distribution. Replace git-clone + slash command install with `npx aiagentminder init`. Keeps `project/` as source of truth; the package wraps the copy logic.
-- **Plugin marketplace listing** — Claude Code now has a native plugin marketplace (9,000+ plugins). AAM should be listed there. Also submit to awesome-claude-code (33K stars) for visibility.
-- **AGENTS.md generation** — 60K+ repos adopt AGENTS.md (Linux Foundation standard, backed by Anthropic + OpenAI + Block). AAM could generate an AGENTS.md from its governance files as a read-only export for non-Claude tools to consume — extending influence without changing architecture. Does not replace CLAUDE.md.
+- ~~**npm/npx installer**~~ — Shipped in v3.3.
+- ~~**Plugin marketplace listing**~~ — Shipped in v3.3.
+- ~~**AGENTS.md generation**~~ — Shipped in v3.3.
 
 ### Architecture Fitness Defaults
 
-- ~~**Ship concrete universal rules**~~ — Moved to v3.3.
-- **Stack-aware template selection in `/aam-setup`** — Auto-detect project stack (language, framework, test runner) during setup and pre-configure architecture-fitness rules and code-quality rules with stack-appropriate defaults. Similar to ai-rules' `extends:` template system.
+- ~~**Ship concrete universal rules**~~ — Shipped in v3.3.
+- ~~**Stack-aware template selection in `/aam-setup`**~~ — Shipped in v3.3 (codebase fingerprinting + auto-customize).
 
 ### Quality & Review
 
@@ -152,12 +175,12 @@ The current design is stable. The backlog below was populated from a competitive
 
 ### Efficiency
 
-- **Zero-token-cost tracking** — CCPM (7.8K stars) uses deterministic bash scripts for routine tracking instead of burning LLM tokens. Move rote instrumentation (sprint status table updates, context metric writes, version stamp updates) to shell scripts. Saves tokens for actual reasoning.
-- **Codebase fingerprinting in setup** — caliber-ai/ai-setup (151 stars) scans projects and generates tailored configs. `/aam-setup` and `/aam-brief` could auto-detect stack, test runner, CI provider, and existing lint configs to make smarter defaults and skip questions the codebase already answers.
+- ~~**Zero-token-cost tracking**~~ — Partially shipped in v3.3 (`sprint-update.sh`). Further rote instrumentation (context metric writes, version stamp updates) can be moved to shell scripts incrementally.
+- ~~**Codebase fingerprinting in setup**~~ — Shipped in v3.3.
 
-### Versioning & Release Identity
+### Release Automation
 
-- **Revisit versioning scheme** — With npm/npx distribution and plugin marketplace listing on the horizon, decide whether to continue the current v3.x lineage or reset to v1.0.0 with proper semver for the public release. Consider: does the internal iteration history (v0.5 through v3.3) serve external users, or does a clean v1.0.0 better signal "this is the first public release"? Also decide whether `aiagentminder-version` stamp, npm package version, and plugin manifest version should be unified or independent.
+- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`).
 
 ### Dropped
 
@@ -167,6 +190,7 @@ The current design is stable. The backlog below was populated from a competitive
 - **Quality tier selection** — Replaced with always-Comprehensive default in v3.0.
 - **`/aam-update` dry-run mode** — Git already tracks all changes, the command is idempotent, and user-owned files are never touched. The risk dry-run mitigates is already low enough.
 - **HTTP hook support** — Node.js dependency already removed in v3.2. No further work needed in this area.
+- **Versioning scheme reset to v1.0.0** — Resolved: continue v3.x with strict semver and unified versioning. See DECISIONS.md.
 
 ---
 

@@ -6,6 +6,98 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [3.3.0] - 2026-03-28
+
+### Added
+
+- **Architecture fitness defaults** — 4 concrete, stack-agnostic rules (file size, secrets, test isolation, layer boundaries) replace the blank placeholder. Commented stack-specific examples for C#/.NET, TypeScript/React, Python, Java/Spring.
+- **Stack-aware fitness customization** — `/aam-setup` auto-detects project stack via codebase fingerprinting and pre-configures architecture fitness rules with appropriate defaults.
+- **npm/npx installer** — `npx aiagentminder init` with `--all`/`--core`/interactive modes. Zero runtime dependencies. CLI commands: `init`, `agents-md`, `validate`, `--help`/`--version`.
+- **AGENTS.md generation** — `npx aiagentminder agents-md` reads installed governance files and exports an AGENTS.md for non-Claude tools.
+- **Codebase fingerprinting** — Auto-detects language, framework, test runner, CI provider, and lint config during setup.
+- **Plugin marketplace listing** — `.claude-plugin/` manifests for Claude Code marketplace distribution. `npx aiagentminder validate` for CI validation.
+- **`sprint-update.sh`** — Zero-token-cost SPRINT.md table updater. Shell script for status, post-merge, and sprint-status cell updates.
+- **Versioning policy** — Strict semver (MAJOR = breaking, MINOR = features, PATCH = fixes). Unified across npm, plugin, marketplace, and version stamp.
+- **GitHub Releases adoption** — Release checklist documented in `docs/RELEASING.md`.
+
+---
+
+## [3.2.0] - 2026-03-27
+
+### Added
+
+- **Real-time context monitoring** — `context-monitor.sh` status line data bridge replaces heuristic-based context cycling. Receives token usage after every assistant message; writes `.context-usage` with `should_cycle` boolean.
+- **`settings.json` statusLine config** — Points to `context-monitor.sh` for real-time monitoring.
+
+### Removed
+
+- **`compact-reorient.js` hook** — Replaced by status line context monitoring. Zero Node.js dependency.
+- **`.claude/hooks/` directory** — No hooks remain in the project template.
+
+---
+
+## [3.1.0] - 2026-03-26
+
+### Added
+
+- **Autonomous context cycling** — `CONTEXT_CYCLE` state in sprint state machine. Self-terminates and restarts via profile hook or sprint-runner when context pressure is detected.
+- **`context-cycle.sh`** — Traces process tree to find `claude.exe` and kills it for clean restart.
+- **`install-profile-hook.ps1` / `.sh`** — Installs shell prompt hook for automatic restart after context cycle.
+- **`sprint-runner.ps1` / `.sh`** — Loop-based wrapper for dedicated sprint sessions.
+- **`.sprint-continuation.md`** — Ephemeral state file for cross-cycle resume.
+
+---
+
+## [3.0.0] - 2026-03-26
+
+### Changed
+
+- **State machine sprint workflow** — `sprint-workflow.md` rewritten as numbered state machine (PLAN → SPEC → APPROVE → EXECUTE → TEST → REVIEW → MERGE → VALIDATE → NEXT → COMPLETE).
+- **Mandatory quality checklist** — Non-skippable per-item checklist: TDD, full test suite, quality gate, self-review, PR pipeline. "NEVER SKIP" directive overrides user requests to go faster.
+- **Default to Comprehensive** — Quality tiers removed. All quality gates run at full strength always.
+- **Self-review always runs** — No longer conditional on risk tags or tier.
+
+### Added
+
+- **Spec phase** — Each item gets a detailed implementation spec before coding begins.
+- **Post-merge validation** — New SPRINT.md column. Sprint cannot close until all validations pass.
+- **Rework cycle** — Defined path for test failures with rework tracking.
+- **Autonomous execution directive** — After spec approval, execute all items without asking permission.
+
+---
+
+## [2.1.0] - 2026-03-25
+
+### Changed
+
+- **In-session pipeline execution** — Sprint workflow invokes `/aam-pr-pipeline` directly after PR creation instead of spawning background `claude -p` process.
+
+### Removed
+
+- **`pr-pipeline-trigger.js` hook** — No longer needed; pipeline runs in-session.
+- **`autoContinueSprint` / `continueMaxIssues` config** — Obsolete; sprint continuation handled by the workflow loop.
+
+---
+
+## [2.0.0] - 2026-03-24
+
+### Added
+
+- **`/aam-pr-pipeline` skill** — Autonomous review-fix-test-merge pipeline for PRs. Reviews with full repo context, evaluates issues with developer perspective, applies fixes, runs tests, waits for CI, auto-merges when green.
+- **`.pr-pipeline.json` config** — Per-repo configuration for high-risk patterns, cycle limit, auto-merge, merge method, notification email.
+- **Sprint workflow integration** — `sprint-workflow.md` invokes `/aam-pr-pipeline` in-session after PR creation.
+
+---
+
+## [1.5.0] - 2026-03-23
+
+### Added
+
+- **`correction-capture.md` rule** (default-on) — Self-monitors for repeated wrong-first-approach patterns within a session, proposes permanent `.claude/rules/` instructions on recurrence.
+- **`default-on` update category** — Added to `/aam-update` file taxonomy for rules that are overwritten if present and prompted if absent.
+
+---
+
 ## [1.4.1] - 2026-03-22
 
 ### Added

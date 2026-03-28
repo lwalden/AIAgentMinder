@@ -8,7 +8,7 @@
 **Project:** aiagentminder
 **Description:** Claude Code project governance framework — installable template commands, rules, and hooks
 **Type:** cli-tool
-**Stack:** Markdown / Node.js (compact-reorient.js hook only)
+**Stack:** Markdown / Node.js (CLI only) / Bash (scripts)
 
 **Developer Profile:**
 
@@ -17,7 +17,7 @@
 
 ## Current State
 
-v3.0 in progress. Autonomous sprint execution rework — state machine workflow, mandatory quality checklist, spec phase, post-merge validation. See ROADMAP.md for details.
+v3.3 shipped. npm/npx installer, codebase fingerprinting, architecture fitness defaults, plugin marketplace, GitHub Releases. See ROADMAP.md for details.
 
 ## Behavioral Rules
 
