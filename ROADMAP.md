@@ -155,6 +155,10 @@ The current design is stable. The backlog below was populated from a competitive
 - **Zero-token-cost tracking** — CCPM (7.8K stars) uses deterministic bash scripts for routine tracking instead of burning LLM tokens. Move rote instrumentation (sprint status table updates, context metric writes, version stamp updates) to shell scripts. Saves tokens for actual reasoning.
 - **Codebase fingerprinting in setup** — caliber-ai/ai-setup (151 stars) scans projects and generates tailored configs. `/aam-setup` and `/aam-brief` could auto-detect stack, test runner, CI provider, and existing lint configs to make smarter defaults and skip questions the codebase already answers.
 
+### Versioning & Release Identity
+
+- **Revisit versioning scheme** — With npm/npx distribution and plugin marketplace listing on the horizon, decide whether to continue the current v3.x lineage or reset to v1.0.0 with proper semver for the public release. Consider: does the internal iteration history (v0.5 through v3.3) serve external users, or does a clean v1.0.0 better signal "this is the first public release"? Also decide whether `aiagentminder-version` stamp, npm package version, and plugin manifest version should be unified or independent.
+
 ### Dropped
 
 - **`/aam-release` command** — Release automation (changelog, version bump, GitHub release). Not needed — GitHub releases aren't part of the current workflow.
