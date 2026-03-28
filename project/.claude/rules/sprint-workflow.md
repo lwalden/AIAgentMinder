@@ -158,7 +158,9 @@ Update SPRINT.md to `blocked`. Notify human: what, why, what unblocks. Wait. →
 
 Autonomous context management at NEXT transitions. Persists state, self-terminates, fresh session resumes (requires profile hook or sprint-runner).
 
-**Cycle when ANY true:** 3+ items completed this session | compaction occurred | debug checkpoint triggered | rework executed. When in doubt, cycle — fresh state recovery > degraded session.
+**Primary signal:** Read `.context-usage` in the project root. If the file exists and `should_cycle` is `true`, cycle. Thresholds: 250k tokens Sonnet, 350k Opus, 35% unknown models.
+
+**Fallback** (`.context-usage` absent — status line not configured): Cycle when ANY true: 3+ items completed this session | debug checkpoint triggered | rework executed. When in doubt, cycle.
 
 **Steps (all required, in order):**
 

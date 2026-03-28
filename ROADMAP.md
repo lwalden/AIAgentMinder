@@ -105,17 +105,18 @@ Addresses context degradation during long sprint sessions. After 3+ items, conve
 
 ---
 
-## v3.2 — Drop compact-reorient.js (planned)
+## v3.2 — Real-Time Context Monitoring (planned)
 
-Remove the `compact-reorient.js` hook and its Node.js dependency. v3.1's CONTEXT_CYCLE proactively prevents compaction in most sprint sessions, making the reactive reorientation hook redundant. SPRINT.md is already available via the `@SPRINT.md` import in CLAUDE.md for the rare cases where compaction still occurs.
+Replace heuristic-based context cycling with real token count monitoring via Claude Code's status line system. Also removes the `compact-reorient.js` hook and its Node.js dependency — the status line detects context pressure *before* compaction, making the reactive hook redundant.
 
 ### Changes
 
-- **Remove `compact-reorient.js`** — Delete the hook script from `project/.claude/hooks/`.
-- **Remove SessionStart hook config** — Strip the `compact` matcher hook entry from `project/.claude/settings.json`.
-- **Update sprint-workflow.md** — Remove the "compaction has occurred" heuristic from the CONTEXT_CYCLE decision logic. The remaining three signals (3+ items completed, heavy debugging, complex rework) are sufficient.
-- **Zero Node.js dependency** — The project becomes pure Markdown + shell scripts.
-- **`/aam-update` migration** — Remove the hook file and settings entry from target projects during upgrade.
+- **`context-monitor.sh` status line data bridge** — New script in `project/.claude/scripts/`. Receives status line JSON (context window metrics, model info) after every assistant message. Writes `.context-usage` to project root with `should_cycle` boolean based on model-specific token thresholds (250k Sonnet, 350k Opus, 35% fallback for unknown models).
+- **`settings.json` updated** — `statusLine` config replaces the `SessionStart` compact hook. Points to `context-monitor.sh`.
+- **Remove `compact-reorient.js`** — Delete the hook script and `project/.claude/hooks/` directory.
+- **Sprint workflow CONTEXT_CYCLE** — Primary signal is now `.context-usage` file. Falls back to heuristics (3+ items, debugging, rework) when file doesn't exist (status line not configured). "Compaction occurred" heuristic removed.
+- **Zero Node.js dependency** — The project becomes pure Markdown + shell scripts. Requires `jq` for JSON parsing.
+- **`/aam-update` migration** — Removes the compact hook, adds status line config, copies `context-monitor.sh`.
 
 ---
 

@@ -47,6 +47,8 @@ temp/
 # AIAgentMinder context cycling (ephemeral state files)
 .sprint-continuation.md
 .sprint-continue-signal
+.context-usage
+.context-usage.tmp
 
 # Claude Code auto memory (project-specific, not for version control)
 # Uncomment if you use Claude Code's auto memory feature:

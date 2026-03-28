@@ -1,16 +1,6 @@
 {
-  "hooks": {
-    "SessionStart": [
-      {
-        "matcher": "compact",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "node .claude/hooks/compact-reorient.js",
-            "timeout": 10
-          }
-        ]
-      }
-    ]
+  "statusLine": {
+    "type": "command",
+    "command": "bash .claude/scripts/context-monitor.sh"
   }
 }

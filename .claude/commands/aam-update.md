@@ -10,8 +10,9 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/hooks/compact-reorient.js`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/scripts/context-monitor.sh`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
+| **Obsolete (v3.1 → v3.2)** | `.claude/hooks/compact-reorient.js`, `.claude/hooks/` directory | Delete during migration — replaced by status line context monitoring |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
 | **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md`, `.claude/commands/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v2.1 → v2.2)** | `.claude/hooks/pr-pipeline-trigger.js` | Delete during migration — pipeline now runs in-session |
@@ -36,7 +37,7 @@ Then confirm before proceeding:
 I'll update AIAgentMinder files in [path].
 
 This will overwrite:
-  - .claude/hooks/ (1 Node.js hook file: compact-reorient.js)
+  - .claude/scripts/context-monitor.sh (status line data bridge)
   - .claude/settings.json
   - .claude/commands/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
   - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md, tool-first.md
@@ -143,12 +144,18 @@ If `[target]/.claude/guidance/sprint-workflow.md` exists:
 
 If `[target]/.claude/guidance/` directory is now empty: remove it. Print: `✓ Removed (obsolete): .claude/guidance/ directory`
 
-### Copy Current Hook and Command Files
+### v3.1 → v3.2 Migration: Remove compact-reorient.js, Add Context Monitoring
+
+1. If `[target]/.claude/hooks/compact-reorient.js` exists: delete it. Print: `Removed (obsolete): .claude/hooks/compact-reorient.js`
+2. If `[target]/.claude/hooks/` directory is now empty: remove it. Print: `Removed: .claude/hooks/ (empty)`
+3. Check `jq --version`. If not found, warn: "Context monitoring requires `jq`. Install: `winget install jqlang.jq` / `brew install jq` / `apt install jq`. Sprint workflow falls back to heuristics without it."
+
+### Copy Current Script and Command Files
 
 Copy each file from `project/` in this repo to the target, overwriting whatever is there:
 
 ```
-project/.claude/hooks/compact-reorient.js              →  [target]/.claude/hooks/compact-reorient.js
+project/.claude/scripts/context-monitor.sh            →  [target]/.claude/scripts/context-monitor.sh
 project/.claude/scripts/context-cycle.sh              →  [target]/.claude/scripts/context-cycle.sh
 project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
 project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
@@ -179,14 +186,16 @@ Do **not** copy `project/.claude/settings.json` directly. Overwriting it would e
 
 Instead, perform an additive merge:
 
-1. Read `[target]/.claude/settings.json`. If it doesn't exist, create it as `{ "hooks": {} }`.
-2. Read `project/.claude/settings.json` for the AIAgentMinder-managed hook entries.
-3. **SessionStart `compact` entry:** Add or replace the entry with `matcher: "compact"` under `SessionStart`. This is always managed by AIAgentMinder.
-4. **PostToolUse `Bash` entry (cleanup):** If a `PostToolUse` entry referencing `pr-pipeline-trigger.js` exists, remove it — this hook is obsolete (the pipeline now runs in-session).
-5. Preserve all other hook entries in the target file unchanged.
-6. Write the merged JSON back to `[target]/.claude/settings.json`.
+1. Read `[target]/.claude/settings.json`. If it doesn't exist, create it as `{}`.
+2. Read `project/.claude/settings.json` for the AIAgentMinder-managed entries.
+3. **`statusLine` entry:** Add or replace the `statusLine` object. This is always managed by AIAgentMinder: `{"type": "command", "command": "bash .claude/scripts/context-monitor.sh"}`.
+4. **SessionStart `compact` entry (cleanup):** If a `SessionStart` entry with `matcher: "compact"` exists referencing `compact-reorient.js`, remove it — this hook is obsolete (replaced by status line monitoring).
+5. **PostToolUse `Bash` entry (cleanup):** If a `PostToolUse` entry referencing `pr-pipeline-trigger.js` exists, remove it — this hook is obsolete (the pipeline runs in-session).
+6. If the `hooks` object is now empty (no remaining user hooks), remove the `hooks` key entirely.
+7. Preserve all other entries in the target file unchanged.
+8. Write the merged JSON back to `[target]/.claude/settings.json`.
 
-Print: `✓ Updated: .claude/settings.json (merged — user hooks preserved)`
+Print: `Updated: .claude/settings.json (merged — user hooks preserved, status line configured)`
 
 Then handle default-on and optional rules files:
 
@@ -285,9 +294,9 @@ Write the current version to `[target]/.claude/aiagentminder-version`.
 
 ---
 
-## Step 5: Check Node.js
+## Step 5: Check jq
 
-Run `node --version` in the target project directory. Warn if not found.
+Run `jq --version` in the target project directory. Warn if not found (context monitoring requires it).
 
 ---
 
@@ -309,8 +318,8 @@ If the target project has uncommitted changes beyond what we just updated, warn 
 AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
 
 Updated:
-- .claude/hooks/ (1 file: compact-reorient.js)
-- .claude/settings.json (merged — user hooks preserved)
+- .claude/scripts/context-monitor.sh (status line data bridge)
+- .claude/settings.json (merged — status line configured, user hooks preserved)
 - .claude/commands/aam-handoff.md
 - .claude/commands/aam-brief.md
 - .claude/commands/aam-revise.md
