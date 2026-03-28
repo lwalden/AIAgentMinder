@@ -54,3 +54,42 @@ logs/
 # Cache
 .cache/
 *.tsbuildinfo
+
+# Dogfooding — AIAgentMinder self-install (not part of template source)
+# Commands (template originals live in project/.claude/commands/)
+.claude/commands/aam-brief.md
+.claude/commands/aam-checkup.md
+.claude/commands/aam-grill.md
+.claude/commands/aam-handoff.md
+.claude/commands/aam-milestone.md
+.claude/commands/aam-pr-pipeline.md
+.claude/commands/aam-quality-gate.md
+.claude/commands/aam-retrospective.md
+.claude/commands/aam-revise.md
+.claude/commands/aam-scope-check.md
+.claude/commands/aam-self-review.md
+.claude/commands/aam-sync-issues.md
+.claude/commands/aam-tdd.md
+.claude/commands/aam-triage.md
+# Rules (template originals live in project/.claude/rules/)
+.claude/rules/README.md
+.claude/rules/approach-first.md
+.claude/rules/debug-checkpoint.md
+.claude/rules/git-workflow.md
+.claude/rules/scope-guardian.md
+.claude/rules/tool-first.md
+.claude/rules/correction-capture.md
+.claude/rules/code-quality.md
+.claude/rules/sprint-workflow.md
+.claude/rules/architecture-fitness.md
+# Scripts
+.claude/scripts/
+# Version stamp
+.claude/aiagentminder-version
+# Sprint state
+SPRINT.md
+.sprint-continuation.md
+.sprint-continue-signal
+.context-usage
+# PR pipeline config
+.pr-pipeline.json
