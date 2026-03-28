@@ -219,7 +219,7 @@ Then handle default-on and optional rules files:
 
 ### architecture-fitness.md
 - If present: overwrite. Print `✓ Updated: .claude/rules/architecture-fitness.md`
-- If absent: prompt "Architecture fitness rules are available (structural constraints — customize for your project). Enable? (y/n)"
+- If absent: prompt "Architecture fitness rules are available (file size, secrets, test isolation, layer boundaries — ships with defaults, customizable). Enable? (y/n)"
 
 ### aam-sync-issues.md
 
