@@ -85,7 +85,10 @@ case "$subcmd" in
       die "Sprint status line not found in SPRINT.md"
     fi
 
-    sed -i "s/^\*\*Status:\*\* .*/**Status:** ${new_value}/" "$SPRINT_FILE"
+    awk -v val="$new_value" '
+    /^\*\*Status:\*\*/ { print "**Status:** " val; next }
+    { print }
+    ' "$SPRINT_FILE" > "${SPRINT_FILE}.tmp" && mv "${SPRINT_FILE}.tmp" "$SPRINT_FILE"
     ;;
 
   *)
