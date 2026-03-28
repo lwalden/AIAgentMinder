@@ -105,6 +105,20 @@ Addresses context degradation during long sprint sessions. After 3+ items, conve
 
 ---
 
+## v3.2 — Drop compact-reorient.js (planned)
+
+Remove the `compact-reorient.js` hook and its Node.js dependency. v3.1's CONTEXT_CYCLE proactively prevents compaction in most sprint sessions, making the reactive reorientation hook redundant. SPRINT.md is already available via the `@SPRINT.md` import in CLAUDE.md for the rare cases where compaction still occurs.
+
+### Changes
+
+- **Remove `compact-reorient.js`** — Delete the hook script from `project/.claude/hooks/`.
+- **Remove SessionStart hook config** — Strip the `compact` matcher hook entry from `project/.claude/settings.json`.
+- **Update sprint-workflow.md** — Remove the "compaction has occurred" heuristic from the CONTEXT_CYCLE decision logic. The remaining three signals (3+ items completed, heavy debugging, complex rework) are sufficient.
+- **Zero Node.js dependency** — The project becomes pure Markdown + shell scripts.
+- **`/aam-update` migration** — Remove the hook file and settings entry from target projects during upgrade.
+
+---
+
 ## Direction
 
 The current design is stable. Incremental improvements expected before any v4 rework.
@@ -113,9 +127,7 @@ The current design is stable. Incremental improvements expected before any v4 re
 
 ## Backlog (unscheduled)
 
-- **Evaluate compact-reorient.js necessity** — Claude Code's native context handling keeps improving. Test whether removing the hook degrades sprint continuity; if not, drop the Node.js dependency.
-- **`/aam-update` dry-run mode** — Show what would change before committing to the migration.
-- **HTTP hook support** — Leverage Claude Code's HTTP hooks for integrations without requiring Node.js.
+- **HTTP hook support** — Leverage Claude Code's HTTP hooks for integrations without requiring Node.js. Becomes the natural path forward now that the Node.js hook is being removed.
 
 ### Dropped
 
@@ -123,6 +135,7 @@ The current design is stable. Incremental improvements expected before any v4 re
 - **`/aam-handoff` JSON digest** — Speculative value. Nobody has asked for it.
 - **`/onboard` command** — `/aam-brief` Starting Point E (existing project audit) covers this use case.
 - **Quality tier selection** — Replaced with always-Comprehensive default in v3.0.
+- **`/aam-update` dry-run mode** — Git already tracks all changes, the command is idempotent, and user-owned files are never touched. The risk dry-run mitigates is already low enough.
 
 ---
 

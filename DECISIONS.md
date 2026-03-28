@@ -56,9 +56,23 @@ Chose: `.claude/rules/` directory name over `.claude/guidance/`. Why: Claude Cod
 
 ---
 
-### compact-reorient.js fires on compact only | 2025-10 | Status: Active
+### compact-reorient.js fires on compact only | 2025-10 | Status: Superseded
 
-Chose: compact matcher (post-compaction only) over SessionStart for the sprint reorientation hook. Why: Firing on every SessionStart added noise to sessions that didn't need reorientation. The only session where sprint context is truly lost is after context compaction. Tradeoff: sprint reorientation won't fire on fresh sessions — acceptable because fresh sessions have full history.
+Superseded by v3.2 decision to drop compact-reorient.js entirely. See below.
+
+Original: Chose compact matcher (post-compaction only) over SessionStart for the sprint reorientation hook. Why: Firing on every SessionStart added noise to sessions that didn't need reorientation. The only session where sprint context is truly lost is after context compaction. Tradeoff: sprint reorientation won't fire on fresh sessions — acceptable because fresh sessions have full history.
+
+---
+
+### Drop compact-reorient.js hook | 2026-03 | Status: Active
+
+Chose: Remove compact-reorient.js entirely over keeping it as a fallback. Why: v3.1's CONTEXT_CYCLE state proactively prevents compaction during sprints — the hook's reactive reorientation is redundant in the common case. SPRINT.md is already available via CLAUDE.md's `@SPRINT.md` import for the rare cases where compaction still occurs despite cycling. Removing it eliminates the project's only Node.js dependency. The "compaction has occurred" heuristic in CONTEXT_CYCLE is replaced by the three remaining signals (item count, debugging intensity, rework). Tradeoff: If compaction occurs in a non-sprint session, there is no automatic reorientation — Claude must re-read SPRINT.md manually. Acceptable because CLAUDE.md already imports it.
+
+---
+
+### Drop /aam-update dry-run mode from backlog | 2026-03 | Status: Active
+
+Chose: Drop the dry-run backlog item over implementing it. Why: The update command is 374 lines with three file categories and multi-version migration paths. A real dry-run adds ~40-50% code overhead and creates a parallel path that must stay in sync. Risk is already mitigated — git tracks all changes, the command is idempotent, and user-owned files are explicitly never touched. If more safety is needed later, a pre-flight summary expansion (~20 lines) gives 80% of the value. Tradeoff: Users cannot preview changes before committing — but they can `git diff` after and `git reset --hard` if unhappy.
 
 ---
 
