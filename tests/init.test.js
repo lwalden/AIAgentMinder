@@ -345,8 +345,9 @@ describe('skill frontmatter validation', () => {
       const sourceFile = SOURCE_OVERRIDES[file] || file;
       const content = fs.readFileSync(path.join(TEMPLATE_DIR, sourceFile), 'utf-8');
 
-      assert.ok(content.startsWith('---\n'), `${file} should start with YAML frontmatter delimiter`);
-      const endIdx = content.indexOf('\n---\n', 4);
+      assert.ok(content.startsWith('---\r\n') || content.startsWith('---\n'),
+        `${file} should start with YAML frontmatter delimiter`);
+      const endIdx = content.indexOf('---', 4);
       assert.ok(endIdx > 0, `${file} should have closing frontmatter delimiter`);
 
       const frontmatter = content.substring(4, endIdx);
@@ -359,7 +360,7 @@ describe('skill frontmatter validation', () => {
     const content = fs.readFileSync(
       path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-quality-gate.md'), 'utf-8'
     );
-    const endIdx = content.indexOf('\n---\n', 4);
+    const endIdx = content.indexOf('---', 4);
     const frontmatter = content.substring(4, endIdx);
     assert.ok(frontmatter.includes('context: fork'), 'quality-gate should run in forked context');
   });
@@ -368,7 +369,7 @@ describe('skill frontmatter validation', () => {
     const content = fs.readFileSync(
       path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
     );
-    const endIdx = content.indexOf('\n---\n', 4);
+    const endIdx = content.indexOf('---', 4);
     const frontmatter = content.substring(4, endIdx);
     assert.ok(!frontmatter.includes('context: fork'), 'self-review should NOT fork (it spawns subagents)');
   });
