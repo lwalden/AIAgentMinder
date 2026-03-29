@@ -22,8 +22,13 @@ Multiple PRs can land in one version. Bump once at release time, not per-PR.
 
 ## Version Bump
 
-Update all 4 version points (must match):
+Run the version bump script to update all 4 version points atomically:
 
+```bash
+bash .claude/scripts/version-bump.sh X.Y.Z
+```
+
+This updates:
 ```
 project/.claude/aiagentminder-version   (source of truth)
 package.json                             (npm)
@@ -31,7 +36,7 @@ package.json                             (npm)
 .claude-plugin/marketplace.json          (marketplace listing)
 ```
 
-Also update:
+Also update manually:
 - `README.md` version badge
 - `SKILL.md` version references
 - `CHANGELOG.md` (add new version section at top)
