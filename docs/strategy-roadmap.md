@@ -171,7 +171,7 @@ The current design is stable. The backlog below was populated from a competitive
 ### Quality & Review
 
 - **Automated correction capture** — claude-reflect (858 stars) automates what `correction-capture.md` does passively — it uses hooks to detect correction patterns and auto-queues learnings. Upgrade from passive rule guidance to active hook-based detection, making corrections discoverable without relying on Claude self-reporting.
-- **Multi-model review gate** — Flow-Next and claude-code-skills use cross-model review (Codex/Gemini as second opinion) in their quality gates. Add optional cross-model validation to `/aam-self-review` — when available, query a second model for independent review. Degrades gracefully to single-model when no second model is configured.
+- ~~**Multi-model review gate**~~ — Shipped. `/aam-self-review` Step 3b spawns a cross-model review subagent when `crossModelReview.enabled` is set in `.pr-pipeline.json`. Degrades gracefully when second model is unavailable.
 
 ### Efficiency
 
