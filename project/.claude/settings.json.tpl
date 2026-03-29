@@ -9,6 +9,12 @@
         "type": "command",
         "command": "bash .claude/scripts/context-cycle-hook.sh"
       }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "bash .claude/scripts/correction-capture-hook.sh"
+      }
     ]
   }
 }
