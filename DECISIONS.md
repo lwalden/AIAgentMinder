@@ -124,6 +124,18 @@ Chose: Start using GitHub Releases with git tags and auto-generated notes over (
 
 ---
 
+### Stop hook for sprint continuation enforcement | 2026-03 | Status: Active
+
+Chose: `Stop` hook (`sprint-stop-guard.sh`) that blocks premature turn endings during active sprints over (a) relying solely on instruction text in sprint-workflow.md (soft directive — proved insufficient, Claude stopped between items) or (b) PostToolUse context injection alone (fires at tool boundaries, not turn boundaries). Why: the Stop hook fires at exactly the failure point — when Claude tries to end its turn. Combined with `.sprint-human-checkpoint` signal file for REWORK and SPRINT.md state inspection for all other checkpoints. Tradeoff: adds a shell script execution on every turn ending; mitigated by fast-path exit (no SPRINT.md = instant exit 2). Conservative design: when in doubt, allows the stop rather than forcing continuation past a checkpoint.
+
+---
+
+### Automated correction capture via PostToolUse hook | 2026-03 | Status: Active
+
+Chose: PostToolUse hook (`correction-capture-hook.sh`) that tracks sequential tool calls and detects corrections (failed → retry with different args) over (a) keeping the passive self-reporting rule only or (b) PreToolUse hook (can't see results). Why: PostToolUse receives `tool_response` with success/failure data, enabling mechanical detection. Logs to `.corrections.jsonl` with pattern keys (e.g., `Bash:npm`) for grouping. Outputs `hookSpecificOutput.additionalContext` on 2nd occurrence so Claude sees the alert. Excludes transient errors (ETIMEDOUT, ECONNREFUSED, rate limits). Tradeoff: fires on every tool call; mitigated by fast jq-check path and fail-open without jq.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.
