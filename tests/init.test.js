@@ -47,16 +47,22 @@ describe('getCoreFiles', () => {
     assert.ok(ruleFiles.includes('.claude/rules/README.md'));
   });
 
-  it('includes all core commands', () => {
+  it('includes all core skills', () => {
+    const files = getCoreFiles();
+    const skillFiles = files.filter(f => f.startsWith('.claude/skills/'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-brief.md'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-handoff.md'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-quality-gate.md'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-self-review.md'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-tdd.md'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-triage.md'));
+    assert.ok(skillFiles.includes('.claude/skills/aam-grill.md'));
+  });
+
+  it('does NOT include .claude/commands/ paths', () => {
     const files = getCoreFiles();
     const cmdFiles = files.filter(f => f.startsWith('.claude/commands/'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-brief.md'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-handoff.md'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-quality-gate.md'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-self-review.md'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-tdd.md'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-triage.md'));
-    assert.ok(cmdFiles.includes('.claude/commands/aam-grill.md'));
+    assert.equal(cmdFiles.length, 0, 'should have no .claude/commands/ paths');
   });
 
   it('includes scripts and settings', () => {
@@ -77,8 +83,8 @@ describe('getCoreFiles', () => {
     assert.ok(!files.includes('.claude/rules/code-quality.md'));
     assert.ok(!files.includes('.claude/rules/sprint-workflow.md'));
     assert.ok(!files.includes('.claude/rules/architecture-fitness.md'));
-    assert.ok(!files.includes('.claude/commands/aam-sync-issues.md'));
-    assert.ok(!files.includes('.claude/commands/aam-pr-pipeline.md'));
+    assert.ok(!files.includes('.claude/skills/aam-sync-issues.md'));
+    assert.ok(!files.includes('.claude/skills/aam-pr-pipeline.md'));
     assert.ok(!files.includes('SPRINT.md'));
     assert.ok(!files.includes('.pr-pipeline.json'));
   });
@@ -120,14 +126,14 @@ describe('getOptionalFiles', () => {
     assert.ok(opts.architectureFitness.includes('.claude/rules/architecture-fitness.md'));
   });
 
-  it('sync issues includes aam-sync-issues.md', () => {
+  it('sync issues includes aam-sync-issues.md in skills', () => {
     const opts = getOptionalFiles();
-    assert.ok(opts.syncIssues.includes('.claude/commands/aam-sync-issues.md'));
+    assert.ok(opts.syncIssues.includes('.claude/skills/aam-sync-issues.md'));
   });
 
-  it('pr pipeline includes aam-pr-pipeline.md and .pr-pipeline.json', () => {
+  it('pr pipeline includes aam-pr-pipeline.md in skills and .pr-pipeline.json', () => {
     const opts = getOptionalFiles();
-    assert.ok(opts.prPipeline.includes('.claude/commands/aam-pr-pipeline.md'));
+    assert.ok(opts.prPipeline.includes('.claude/skills/aam-pr-pipeline.md'));
     assert.ok(opts.prPipeline.includes('.pr-pipeline.json'));
   });
 
@@ -327,6 +333,44 @@ describe('writeProjectIdentity', () => {
 
     const versionPath = path.join(targetDir, '.claude', 'aiagentminder-version');
     assert.ok(fs.existsSync(versionPath));
+  });
+});
+
+describe('skill frontmatter validation', () => {
+  it('every core skill file has valid YAML frontmatter with description', () => {
+    const files = getCoreFiles();
+    const skillFiles = files.filter(f => f.startsWith('.claude/skills/'));
+
+    for (const file of skillFiles) {
+      const sourceFile = SOURCE_OVERRIDES[file] || file;
+      const content = fs.readFileSync(path.join(TEMPLATE_DIR, sourceFile), 'utf-8');
+
+      assert.ok(content.startsWith('---\n'), `${file} should start with YAML frontmatter delimiter`);
+      const endIdx = content.indexOf('\n---\n', 4);
+      assert.ok(endIdx > 0, `${file} should have closing frontmatter delimiter`);
+
+      const frontmatter = content.substring(4, endIdx);
+      assert.ok(frontmatter.includes('description:'), `${file} frontmatter should have description field`);
+      assert.ok(frontmatter.includes('user-invocable: true'), `${file} frontmatter should have user-invocable: true`);
+    }
+  });
+
+  it('quality-gate skill has context: fork', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-quality-gate.md'), 'utf-8'
+    );
+    const endIdx = content.indexOf('\n---\n', 4);
+    const frontmatter = content.substring(4, endIdx);
+    assert.ok(frontmatter.includes('context: fork'), 'quality-gate should run in forked context');
+  });
+
+  it('self-review skill does NOT have context: fork', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
+    );
+    const endIdx = content.indexOf('\n---\n', 4);
+    const frontmatter = content.substring(4, endIdx);
+    assert.ok(!frontmatter.includes('context: fork'), 'self-review should NOT fork (it spawns subagents)');
   });
 });
 

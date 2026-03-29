@@ -1,3 +1,10 @@
+---
+description: Pre-PR quality checks — build, tests, coverage, lint, security
+user-invocable: true
+effort: high
+context: fork
+---
+
 # /aam-quality-gate - Pre-PR Quality Checks
 
 Run this before creating any pull request. Runs the full quality checklist — all checks, every time.

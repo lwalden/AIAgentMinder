@@ -1,3 +1,9 @@
+---
+description: Sprint retrospective with metrics and adaptive sizing
+user-invocable: true
+effort: medium
+---
+
 # /aam-retrospective - Sprint Retrospective
 
 Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/aam-retrospective`.

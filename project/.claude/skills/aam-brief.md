@@ -1,3 +1,9 @@
+---
+description: Product brief and roadmap creation
+user-invocable: true
+effort: high
+---
+
 # /aam-brief - Product Brief & Roadmap Creation
 
 You are helping the user create or update `docs/strategy-roadmap.md` for this project.

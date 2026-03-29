@@ -63,18 +63,18 @@ Copy these to the target unconditionally (create directories as needed).
 - `project/.claude/rules/correction-capture.md` → `[target]/.claude/rules/correction-capture.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
 - `project/.claude/scripts/context-monitor.sh` → `[target]/.claude/scripts/context-monitor.sh`
-- `project/.claude/commands/aam-brief.md` → `[target]/.claude/commands/aam-brief.md`
-- `project/.claude/commands/aam-revise.md` → `[target]/.claude/commands/aam-revise.md`
-- `project/.claude/commands/aam-checkup.md` → `[target]/.claude/commands/aam-checkup.md`
-- `project/.claude/commands/aam-handoff.md` → `[target]/.claude/commands/aam-handoff.md`
-- `project/.claude/commands/aam-quality-gate.md` → `[target]/.claude/commands/aam-quality-gate.md`
-- `project/.claude/commands/aam-scope-check.md` → `[target]/.claude/commands/aam-scope-check.md`
-- `project/.claude/commands/aam-self-review.md` → `[target]/.claude/commands/aam-self-review.md`
-- `project/.claude/commands/aam-milestone.md` → `[target]/.claude/commands/aam-milestone.md`
-- `project/.claude/commands/aam-retrospective.md` → `[target]/.claude/commands/aam-retrospective.md`
-- `project/.claude/commands/aam-tdd.md` → `[target]/.claude/commands/aam-tdd.md`
-- `project/.claude/commands/aam-triage.md` → `[target]/.claude/commands/aam-triage.md`
-- `project/.claude/commands/aam-grill.md` → `[target]/.claude/commands/aam-grill.md`
+- `project/.claude/skills/aam-brief.md` → `[target]/.claude/skills/aam-brief.md`
+- `project/.claude/skills/aam-revise.md` → `[target]/.claude/skills/aam-revise.md`
+- `project/.claude/skills/aam-checkup.md` → `[target]/.claude/skills/aam-checkup.md`
+- `project/.claude/skills/aam-handoff.md` → `[target]/.claude/skills/aam-handoff.md`
+- `project/.claude/skills/aam-quality-gate.md` → `[target]/.claude/skills/aam-quality-gate.md`
+- `project/.claude/skills/aam-scope-check.md` → `[target]/.claude/skills/aam-scope-check.md`
+- `project/.claude/skills/aam-self-review.md` → `[target]/.claude/skills/aam-self-review.md`
+- `project/.claude/skills/aam-milestone.md` → `[target]/.claude/skills/aam-milestone.md`
+- `project/.claude/skills/aam-retrospective.md` → `[target]/.claude/skills/aam-retrospective.md`
+- `project/.claude/skills/aam-tdd.md` → `[target]/.claude/skills/aam-tdd.md`
+- `project/.claude/skills/aam-triage.md` → `[target]/.claude/skills/aam-triage.md`
+- `project/.claude/skills/aam-grill.md` → `[target]/.claude/skills/aam-grill.md`
 
 ### Optional features (based on Step 2 answers)
 
@@ -90,10 +90,10 @@ Copy these to the target unconditionally (create directories as needed).
 
 **GitHub Issues sync:** If enabled:
 
-- Copy `project/.claude/commands/aam-sync-issues.md` to `[target]/.claude/commands/aam-sync-issues.md`
+- Copy `project/.claude/skills/aam-sync-issues.md` to `[target]/.claude/skills/aam-sync-issues.md`
 
 **PR pipeline automation:** If enabled:
-- Copy `project/.claude/commands/aam-pr-pipeline.md` to `[target]/.claude/commands/aam-pr-pipeline.md`
+- Copy `project/.claude/skills/aam-pr-pipeline.md` to `[target]/.claude/skills/aam-pr-pipeline.md`
 - Copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json`
 - Ask: "Email address for escalation notifications? (leave blank to use PR comments only)"
   - If provided, update `notification.email` in the copied `.pr-pipeline.json`
@@ -172,18 +172,18 @@ Created files:
 - DECISIONS.md (architectural decisions and known debt log)
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
-- .claude/commands/aam-brief.md (/aam-brief — product brief & roadmap creation)
-- .claude/commands/aam-revise.md (/aam-revise — mid-stream plan revision)
-- .claude/commands/aam-checkup.md (/aam-checkup — installation health check)
-- .claude/commands/aam-handoff.md (/aam-handoff — session checkpoint)
-- .claude/commands/aam-quality-gate.md (/aam-quality-gate — pre-PR quality checks)
-- .claude/commands/aam-scope-check.md (/aam-scope-check — active scope governance)
-- .claude/commands/aam-self-review.md (/aam-self-review — subagent code review before PR)
-- .claude/commands/aam-milestone.md (/aam-milestone — project health assessment)
-- .claude/commands/aam-retrospective.md (/aam-retrospective — sprint metrics and feedback)
-- .claude/commands/aam-tdd.md (/aam-tdd — guided TDD workflow)
-- .claude/commands/aam-triage.md (/aam-triage — structured bug triage)
-- .claude/commands/aam-grill.md (/aam-grill — plan interrogation)
+- .claude/skills/aam-brief.md (/aam-brief — product brief & roadmap creation)
+- .claude/skills/aam-revise.md (/aam-revise — mid-stream plan revision)
+- .claude/skills/aam-checkup.md (/aam-checkup — installation health check)
+- .claude/skills/aam-handoff.md (/aam-handoff — session checkpoint)
+- .claude/skills/aam-quality-gate.md (/aam-quality-gate — pre-PR quality checks, runs in forked context)
+- .claude/skills/aam-scope-check.md (/aam-scope-check — active scope governance)
+- .claude/skills/aam-self-review.md (/aam-self-review — subagent code review before PR)
+- .claude/skills/aam-milestone.md (/aam-milestone — project health assessment)
+- .claude/skills/aam-retrospective.md (/aam-retrospective — sprint metrics and feedback)
+- .claude/skills/aam-tdd.md (/aam-tdd — guided TDD workflow)
+- .claude/skills/aam-triage.md (/aam-triage — structured bug triage)
+- .claude/skills/aam-grill.md (/aam-grill — plan interrogation)
 - .claude/scripts/ (context-monitor.sh status line data bridge, context-cycle.sh self-kill script, context-cycle-hook.sh PreToolUse enforcement hook, sprint-runner and profile hook installers)
 - .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
 - .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)

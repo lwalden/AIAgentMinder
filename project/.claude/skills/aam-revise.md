@@ -1,3 +1,9 @@
+---
+description: Mid-stream plan revision — add, change, drop, or reprioritize
+user-invocable: true
+effort: medium
+---
+
 # /aam-revise - Revise the Plan
 
 You are helping the user revise their project plan (`docs/strategy-roadmap.md`) based on new information, research findings, or changed requirements. This is the "product owner feedback point" — the user brings updates, and you synthesize them directly into the planning documents.

@@ -1,3 +1,9 @@
+---
+description: Sync sprint issues to GitHub Issues
+user-invocable: true
+effort: medium
+---
+
 # /aam-sync-issues - Sync Sprint Issues to GitHub
 
 Push the current sprint's issues to GitHub Issues for visibility outside Claude Code.

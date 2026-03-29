@@ -1,3 +1,9 @@
+---
+description: Installation health check
+user-invocable: true
+effort: low
+---
+
 # /aam-checkup - Installation Health Check
 
 Validate that AIAgentMinder is correctly installed and configured in this project.

@@ -1,3 +1,9 @@
+---
+description: Autonomous PR review, fix, test, and merge pipeline
+user-invocable: true
+effort: high
+---
+
 # /aam-pr-pipeline - Autonomous PR Review Pipeline
 
 Review, fix, test, and merge a pull request autonomously. Handles the full
