@@ -167,7 +167,7 @@ Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq} blocked`. Notify hu
 
 Autonomous context management. Persists state, self-terminates, fresh session resumes (requires profile hook or sprint-runner).
 
-**Enforcement:** A `PreToolUse` hook (`context-cycle-hook.sh`) reads `.context-usage` on every tool call. When `should_cycle` is `true`, the hook **blocks all tool calls except Bash, Write, and Read** — which are the only tools needed to execute the cycle steps below. This is involuntary; the agent cannot skip or delay it. Thresholds: 250k tokens Sonnet, 350k Opus, 35% unknown models.
+**Enforcement:** A `PreToolUse` hook (`context-cycle-hook.sh`) reads `.context-usage` on every tool call. When `should_cycle` is `true`, the hook **blocks all tool calls except Bash, Write, and Read** — which are the only tools needed to execute the cycle steps below. This is involuntary; the agent cannot skip or delay it. Thresholds: 500k tokens Sonnet, 580k Opus, 35% unknown models (recalibrated for 1M context in v4.0).
 
 **Fallback** (`.context-usage` absent — status line not configured): Cycle when ANY true: 3+ items completed this session | debug checkpoint triggered | rework executed. When in doubt, cycle.
 
