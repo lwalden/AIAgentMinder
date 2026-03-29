@@ -1,3 +1,9 @@
+---
+description: Pre-PR code review using specialist subagents
+user-invocable: true
+effort: high
+---
+
 # /aam-self-review - Pre-PR Code Review
 
 Run a focused code review before creating a pull request. Spawns a review subagent with a specific lens so the review is context-efficient — it reads the diff and relevant rules, not the entire codebase.

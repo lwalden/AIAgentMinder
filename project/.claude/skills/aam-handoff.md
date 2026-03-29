@@ -1,3 +1,9 @@
+---
+description: Session checkpoint — capture state for clean resume
+user-invocable: true
+effort: medium
+---
+
 # /aam-handoff - Session Checkpoint
 
 Capture current state so work can be resumed cleanly. Run this before ending a session.

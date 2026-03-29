@@ -149,38 +149,51 @@ Concrete architecture fitness defaults, npm/npx distribution, plugin marketplace
 
 ---
 
+## v4.0 — Platform Alignment & Quality Gap Closure (planned)
+
+Driven by spike research (see `docs/spike-v4-research.md`) identifying three systemic problems — LLM amnesia (instructions ignored mid-execution), smoke test illusion (tests pass but UX is broken), and happy-path bias (no negative test coverage) — plus Claude Code platform changes (26 hook events, skills system, 1M context, custom subagents).
+
+### Tier 1 — Directly addresses identified problems
+
+- **Negative test enforcement** — Add quality-gate check verifying test files contain error-path/negative assertions, not just happy-path tests. Addresses happy-path bias.
+- **UX friction review lens** — 5th self-review lens: Playwright screenshots fed to vision-capable subagent for UX friction detection (clipped elements, invisible errors, broken flows). Addresses smoke test illusion. Skip gracefully if Playwright not configured.
+- **Commands → skills migration** — Migrate 14 `aam-*` files from `project/.claude/commands/` to `project/.claude/skills/`. Key wins: `context: fork` for quality gate and self-review (isolated context), `allowed-tools` for PR pipeline, per-skill `effort` levels.
+- **Judge agent pass** — Post-review filter in `/aam-self-review`: judge subagent evaluates each finding for actionability, accuracy, and severity before reporting. Reduces noise. Based on HubSpot Sidekick pattern.
+- **Context cycling recalibration** — Update thresholds for 1M context (current: 250k Sonnet, 350k Opus → target: ~500k Sonnet, ~580k Opus). Add `exceeds_200k_tokens` status line field as additional signal.
+- **Setup auto-detection** — In `/aam-setup` Scenario A (existing repo), read `package.json`/`pyproject.toml`/`go.mod`/`Cargo.toml`/`README.md`/directory structure to pre-populate project name, description, type, and stack. Present inferred answers for user confirmation instead of asking cold.
+
+### Tier 2 — Strategic strengthening
+
+- **New hooks integration** — Expand from 3 to ~6-8 hooks: PermissionRequest (auto-allow sprint ops, address permission prompt friction), StopFailure (trigger context cycling on rate_limit/max_output_tokens), PreCompact (proactive cycling), SessionStart (sprint state auto-detection).
+- **Custom subagents for review lenses** — Define each self-review lens as `.claude/agents/` file with `disallowedTools: [Edit, Write]` (read-only), per-lens `model`/`effort`/`maxTurns`. Makes review lenses individually configurable.
+- **Rule file compression** — Audit all rule files. Move enforcement logic from prose → hooks. Target each rule file under 30 lines. Based on Chroma context rot research showing structured prose creates distractor interference.
+- **Ephemeral task context injection** — Phase-specific rule loading via hooks. When in TEST phase, inject test-relevant rules only. When in REVIEW phase, inject review rules only. Reduces context saturation per sprint state.
+
+---
+
 ## Direction
 
-The current design is stable. The backlog below was populated from a competitive landscape analysis (March 2026) covering 70+ repos and tools. Items are grouped by theme, not priority.
+Design is stable through v3.3. v4.0 focuses on closing quality gaps exposed by production usage and aligning with Claude Code platform evolution (skills, expanded hooks, 1M context, custom subagents). See `docs/spike-v4-research.md` for full research.
 
 ---
 
 ## Backlog (unscheduled)
 
-### Distribution & Visibility
-
-- ~~**npm/npx installer**~~ — Shipped in v3.3.
-- ~~**Plugin marketplace listing**~~ — Shipped in v3.3.
-- ~~**AGENTS.md generation**~~ — Shipped in v3.3.
-
-### Architecture Fitness Defaults
-
-- ~~**Ship concrete universal rules**~~ — Shipped in v3.3.
-- ~~**Stack-aware template selection in `/aam-setup`**~~ — Shipped in v3.3 (codebase fingerprinting + auto-customize).
-
 ### Quality & Review
 
-- **Automated correction capture** — claude-reflect (858 stars) automates what `correction-capture.md` does passively — it uses hooks to detect correction patterns and auto-queues learnings. Upgrade from passive rule guidance to active hook-based detection, making corrections discoverable without relying on Claude self-reporting.
-- ~~**Multi-model review gate**~~ — Shipped. `/aam-self-review` Step 3b spawns a cross-model review subagent when `crossModelReview.enabled` is set in `.pr-pipeline.json`. Degrades gracefully when second model is unavailable.
-
-### Efficiency
-
-- ~~**Zero-token-cost tracking**~~ — Shipped in v3.3 (`sprint-update.sh`, `version-bump.sh`, `decisions-log.sh`).
-- ~~**Codebase fingerprinting in setup**~~ — Shipped in v3.3.
+- ~~**Automated correction capture**~~ — Shipped in v3.3 (S1-001). PostToolUse hook detects corrections mechanically.
+- ~~**Multi-model review gate**~~ — Shipped in v3.3 (S1-003).
 
 ### Release Automation
 
-- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`).
+- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`). Deferred from S1 (S1-006 blocked on human review of PR #84).
+
+### Future Direction (monitor)
+
+- **Agent teams governance** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. Monitor for stability.
+- **Worktree-native sprint items** — Each sprint item in `isolation: "worktree"`. Simplifies branch management, enables future parallel execution.
+- **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks.
+- **AGENTS.md standard tracking** — 60k+ repos, Linux Foundation stewardship. `npx aiagentminder agents-md` already ships; keep current.
 
 ### Dropped
 

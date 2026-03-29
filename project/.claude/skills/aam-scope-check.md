@@ -1,3 +1,9 @@
+---
+description: Active scope governance — check work against roadmap
+user-invocable: true
+effort: low
+---
+
 # /aam-scope-check - Active Scope Governance
 
 Evaluate a proposed feature, task, or change against the project roadmap before you commit to building it.

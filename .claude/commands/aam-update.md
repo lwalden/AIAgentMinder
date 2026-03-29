@@ -10,11 +10,11 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/scripts/context-monitor.sh`, `.claude/scripts/context-cycle-hook.sh`, `.claude/scripts/correction-capture-hook.sh`, `.claude/scripts/sprint-stop-guard.sh`, `.claude/scripts/sprint-update.sh`, `.claude/commands/aam-handoff.md`, `.claude/commands/aam-brief.md`, `.claude/commands/aam-revise.md`, `.claude/commands/aam-checkup.md`, `.claude/commands/aam-quality-gate.md`, `.claude/commands/aam-scope-check.md`, `.claude/commands/aam-self-review.md`, `.claude/commands/aam-milestone.md`, `.claude/commands/aam-retrospective.md`, `.claude/commands/aam-tdd.md`, `.claude/commands/aam-triage.md`, `.claude/commands/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/scripts/context-monitor.sh`, `.claude/scripts/context-cycle-hook.sh`, `.claude/scripts/correction-capture-hook.sh`, `.claude/scripts/sprint-stop-guard.sh`, `.claude/scripts/sprint-update.sh`, `.claude/skills/aam-handoff.md`, `.claude/skills/aam-brief.md`, `.claude/skills/aam-revise.md`, `.claude/skills/aam-checkup.md`, `.claude/skills/aam-quality-gate.md`, `.claude/skills/aam-scope-check.md`, `.claude/skills/aam-self-review.md`, `.claude/skills/aam-milestone.md`, `.claude/skills/aam-retrospective.md`, `.claude/skills/aam-tdd.md`, `.claude/skills/aam-triage.md`, `.claude/skills/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
 | **Obsolete (v3.1 → v3.2)** | `.claude/hooks/compact-reorient.js`, `.claude/hooks/` directory | Delete during migration — replaced by status line context monitoring |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
-| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/commands/aam-sync-issues.md`, `.claude/commands/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
+| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/skills/aam-sync-issues.md`, `.claude/skills/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
 | **Obsolete (v2.1 → v2.2)** | `.claude/hooks/pr-pipeline-trigger.js` | Delete during migration — pipeline now runs in-session |
 | **User-owned (AIAgentMinder creates initial)** | `.pr-pipeline.json` | Never overwrite — user configures high-risk patterns and notification email |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
@@ -40,7 +40,7 @@ This will overwrite:
   - .claude/scripts/context-monitor.sh (status line data bridge)
   - .claude/scripts/sprint-update.sh (zero-token-cost SPRINT.md updater)
   - .claude/settings.json
-  - .claude/commands/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
+  - .claude/skills/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
   - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md, tool-first.md
   - .claude/rules/ (existing optional rules files only — not adding new ones without asking)
   - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
@@ -151,7 +151,16 @@ If `[target]/.claude/guidance/` directory is now empty: remove it. Print: `✓ R
 2. If `[target]/.claude/hooks/` directory is now empty: remove it. Print: `Removed: .claude/hooks/ (empty)`
 3. Check `jq --version`. If not found, warn: "Context monitoring requires `jq`. Install: `winget install jqlang.jq` / `brew install jq` / `apt install jq`. Sprint workflow falls back to heuristics without it."
 
-### Copy Current Script and Command Files
+### v3.3 → v4.0 Migration: Commands → Skills
+
+If `[target]/.claude/commands/` exists and contains `aam-*.md` files:
+
+1. Create `[target]/.claude/skills/` directory if it doesn't exist.
+2. For each `aam-*.md` file in `[target]/.claude/commands/`: delete it (the updated skill version will be copied below). Print: `✓ Migrated: .claude/commands/aam-{name}.md → .claude/skills/aam-{name}.md`
+3. If `[target]/.claude/commands/` is now empty: remove the directory. Print: `✓ Removed: .claude/commands/ (replaced by .claude/skills/)`
+4. If `[target]/.claude/commands/` still has non-aam files (user-created commands): leave the directory. Print: `⊘ Kept: .claude/commands/ (contains user-created commands)`
+
+### Copy Current Script and Skill Files
 
 Copy each file from `project/` in this repo to the target, overwriting whatever is there:
 
@@ -162,18 +171,18 @@ project/.claude/scripts/context-cycle-hook.sh         →  [target]/.claude/scri
 project/.claude/scripts/correction-capture-hook.sh    →  [target]/.claude/scripts/correction-capture-hook.sh
 project/.claude/scripts/sprint-stop-guard.sh          →  [target]/.claude/scripts/sprint-stop-guard.sh
 project/.claude/scripts/sprint-update.sh              →  [target]/.claude/scripts/sprint-update.sh
-project/.claude/commands/aam-handoff.md                    →  [target]/.claude/commands/aam-handoff.md
-project/.claude/commands/aam-brief.md                      →  [target]/.claude/commands/aam-brief.md
-project/.claude/commands/aam-revise.md                     →  [target]/.claude/commands/aam-revise.md
-project/.claude/commands/aam-checkup.md                    →  [target]/.claude/commands/aam-checkup.md
-project/.claude/commands/aam-quality-gate.md               →  [target]/.claude/commands/aam-quality-gate.md
-project/.claude/commands/aam-scope-check.md                →  [target]/.claude/commands/aam-scope-check.md
-project/.claude/commands/aam-self-review.md                →  [target]/.claude/commands/aam-self-review.md
-project/.claude/commands/aam-milestone.md                  →  [target]/.claude/commands/aam-milestone.md
-project/.claude/commands/aam-retrospective.md              →  [target]/.claude/commands/aam-retrospective.md
-project/.claude/commands/aam-tdd.md                        →  [target]/.claude/commands/aam-tdd.md
-project/.claude/commands/aam-triage.md                     →  [target]/.claude/commands/aam-triage.md
-project/.claude/commands/aam-grill.md                      →  [target]/.claude/commands/aam-grill.md
+project/.claude/skills/aam-handoff.md                    →  [target]/.claude/skills/aam-handoff.md
+project/.claude/skills/aam-brief.md                      →  [target]/.claude/skills/aam-brief.md
+project/.claude/skills/aam-revise.md                     →  [target]/.claude/skills/aam-revise.md
+project/.claude/skills/aam-checkup.md                    →  [target]/.claude/skills/aam-checkup.md
+project/.claude/skills/aam-quality-gate.md               →  [target]/.claude/skills/aam-quality-gate.md
+project/.claude/skills/aam-scope-check.md                →  [target]/.claude/skills/aam-scope-check.md
+project/.claude/skills/aam-self-review.md                →  [target]/.claude/skills/aam-self-review.md
+project/.claude/skills/aam-milestone.md                  →  [target]/.claude/skills/aam-milestone.md
+project/.claude/skills/aam-retrospective.md              →  [target]/.claude/skills/aam-retrospective.md
+project/.claude/skills/aam-tdd.md                        →  [target]/.claude/skills/aam-tdd.md
+project/.claude/skills/aam-triage.md                     →  [target]/.claude/skills/aam-triage.md
+project/.claude/skills/aam-grill.md                      →  [target]/.claude/skills/aam-grill.md
 project/.claude/rules/git-workflow.md                  →  [target]/.claude/rules/git-workflow.md
 project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
 project/.claude/rules/approach-first.md                →  [target]/.claude/rules/approach-first.md
@@ -181,7 +190,7 @@ project/.claude/rules/debug-checkpoint.md              →  [target]/.claude/rul
 project/.claude/rules/tool-first.md                   →  [target]/.claude/rules/tool-first.md
 ```
 
-Print each file as it's updated: `✓ Updated: .claude/commands/aam-checkup.md`
+Print each file as it's updated: `✓ Updated: .claude/skills/aam-checkup.md`
 
 Also copy `project/.claude/rules/README.md` to `[target]/.claude/rules/README.md` if `.claude/rules/` exists in the target.
 
@@ -231,14 +240,14 @@ Then handle default-on and optional rules files:
 
 ### aam-sync-issues.md
 
-- If present: overwrite. Print `✓ Updated: .claude/commands/aam-sync-issues.md`
+- If present: overwrite. Print `✓ Updated: .claude/skills/aam-sync-issues.md`
 - If absent: prompt "GitHub Issues sync is available (/aam-sync-issues — pushes sprint issues to GitHub Issues). Enable? (y/n)"
 
 ### aam-pr-pipeline.md
 
-- If present: overwrite. Print `✓ Updated: .claude/commands/aam-pr-pipeline.md`
+- If present: overwrite. Print `✓ Updated: .claude/skills/aam-pr-pipeline.md`
 - If absent: prompt "PR pipeline automation is available (/aam-pr-pipeline — in-session review, fix, test, and merge after PR creation). Enable? (y/n)"
-  - If yes: copy `project/.claude/commands/aam-pr-pipeline.md` and copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json` (unless it already exists — never overwrite user config)
+  - If yes: copy `project/.claude/skills/aam-pr-pipeline.md` and copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json` (unless it already exists — never overwrite user config)
 
 ### v2.1 → v2.2 Migration: Remove pr-pipeline-trigger.js
 
@@ -331,18 +340,18 @@ Updated:
 - .claude/scripts/sprint-stop-guard.sh (sprint continuation enforcement)
 - .claude/scripts/sprint-update.sh (zero-token-cost SPRINT.md updater)
 - .claude/settings.json (merged — status line configured, hooks configured, user hooks preserved)
-- .claude/commands/aam-handoff.md
-- .claude/commands/aam-brief.md
-- .claude/commands/aam-revise.md
-- .claude/commands/aam-checkup.md
-- .claude/commands/aam-quality-gate.md
-- .claude/commands/aam-scope-check.md
-- .claude/commands/aam-self-review.md
-- .claude/commands/aam-milestone.md
-- .claude/commands/aam-retrospective.md
-- .claude/commands/aam-tdd.md
-- .claude/commands/aam-triage.md
-- .claude/commands/aam-grill.md
+- .claude/skills/aam-handoff.md
+- .claude/skills/aam-brief.md
+- .claude/skills/aam-revise.md
+- .claude/skills/aam-checkup.md
+- .claude/skills/aam-quality-gate.md
+- .claude/skills/aam-scope-check.md
+- .claude/skills/aam-self-review.md
+- .claude/skills/aam-milestone.md
+- .claude/skills/aam-retrospective.md
+- .claude/skills/aam-tdd.md
+- .claude/skills/aam-triage.md
+- .claude/skills/aam-grill.md
 - .claude/rules/git-workflow.md
 - .claude/rules/scope-guardian.md
 - .claude/rules/approach-first.md
@@ -361,7 +370,7 @@ Optional features:
 - .claude/rules/sprint-workflow.md
 - SPRINT.md
 - .claude/rules/architecture-fitness.md
-- .claude/commands/aam-pr-pipeline.md
+- .claude/skills/aam-pr-pipeline.md
 - .pr-pipeline.json (⊘ user-owned if present)
 
 [If migrating from v0.9.1:]
