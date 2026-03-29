@@ -175,7 +175,7 @@ The current design is stable. The backlog below was populated from a competitive
 
 ### Efficiency
 
-- ~~**Zero-token-cost tracking**~~ — Partially shipped in v3.3 (`sprint-update.sh`). Further rote instrumentation (context metric writes, version stamp updates) can be moved to shell scripts incrementally.
+- ~~**Zero-token-cost tracking**~~ — Shipped in v3.3 (`sprint-update.sh`, `version-bump.sh`, `decisions-log.sh`).
 - ~~**Codebase fingerprinting in setup**~~ — Shipped in v3.3.
 
 ### Release Automation
