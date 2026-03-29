@@ -115,6 +115,38 @@ DIFF:
 
 ---
 
+## Step 3b: Cross-Model Review (optional)
+
+Check `.pr-pipeline.json` for `crossModelReview.enabled`. If `true` (or if the field is absent, skip this step):
+
+Use the Agent tool with `model` set to `crossModelReview.model` (default: `"sonnet"`) to spawn a single consolidated review subagent. Pass it the diff and this prompt:
+
+```
+You are an independent code reviewer providing a second opinion. Review the following diff
+for bugs, security issues, and correctness problems. Focus on issues the primary reviewer
+might have missed — you are the safety net, not a duplicate.
+
+Do NOT flag: style preferences, minor naming choices, or issues that are clearly intentional
+design decisions.
+
+For each issue found: state the file, line range, severity (High/Medium/Low), and a one-line
+description with suggested fix.
+If no issues found: state "Cross-model review: no additional issues found."
+
+DIFF:
+[paste diff here]
+```
+
+If the cross-model review finds issues not caught by the primary lenses, add them to the
+consolidated report with a `[cross-model]` tag. These findings carry the same severity
+weight as primary findings.
+
+If the cross-model agent is unavailable (model not accessible, API error): log
+"Cross-model review skipped: {reason}" and continue. This is a graceful degradation —
+never block the review pipeline on cross-model availability.
+
+---
+
 ## Step 4: Consolidate and Act
 
 After all subagents complete:

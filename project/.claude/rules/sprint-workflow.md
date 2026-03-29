@@ -123,17 +123,23 @@ Present all specs together. User may: approve all, revise items, add custom inst
 
 1. Notify human: what failed, expected vs actual, diagnosis.
 2. Add row: `| S{n}-{seq}r | Rework: {title} — {failure} | fix | ⚠ | todo | n/a |`
-3. Create native Task. **Wait for human acknowledgment.**
+3. Create native Task.
+4. Write empty `.sprint-human-checkpoint` file (signals Stop hook to allow turn ending).
+5. **Wait for human acknowledgment.**
 
-→ Human acknowledges → EXECUTE rework item (full cycle). Sprint can't close with outstanding rework.
+→ Human acknowledges → Delete `.sprint-human-checkpoint`. EXECUTE rework item (full cycle). Sprint can't close with outstanding rework.
 
 ## NEXT
 
 1. Find next `todo` in SPRINT.md. 2. Complete any deferred VALIDATE steps now ready.
 
-→ Next exists → EXECUTE. All `done` + all Post-Merge `pass`/`n/a` → COMPLETE. All `done` but any `pending` → execute those validations — **do not present sprint review**.
+→ **Next exists:** Read the next item's spec. Run `sprint-update.sh status S{n}-{seq} in-progress`. Update the Task to `in_progress`. Create the feature branch. Begin writing tests (TDD RED). These are EXECUTE steps — start them immediately in this same response.
 
-Note: Context cycling is enforced by the `PreToolUse` hook — it fires on every tool call, not just at NEXT transitions. If cycling is needed, non-cycle tools will be blocked automatically.
+→ **All `done` + all Post-Merge `pass`/`n/a`:** → COMPLETE.
+
+→ **All `done` but any `pending`:** Execute those validations — do not present sprint review.
+
+**Enforcement:** A `Stop` hook (`sprint-stop-guard.sh`) blocks turn endings when the sprint has pending todo items. If you reach NEXT with remaining items, the hook ensures you continue. Context cycling and human checkpoints (BLOCKED, REWORK) are respected — the hook only blocks when autonomous continuation is expected.
 
 ## COMPLETE
 
@@ -194,5 +200,5 @@ Autonomous context management. Persists state, self-terminates, fresh session re
 - `SPRINT.md` persists via git. Tasks persist in `~/.claude/tasks/`. Resuming: read both, identify current state, continue.
 - Specs preserved in git history (committed at APPROVE) — re-read if context lost.
 - `/aam-handoff` is independent; don't modify SPRINT.md or tasks during handoff.
-- `.sprint-continuation.md` and `.sprint-continue-signal` are ephemeral, gitignored.
+- `.sprint-continuation.md`, `.sprint-continue-signal`, and `.sprint-human-checkpoint` are ephemeral, gitignored.
 - Restart requires profile hook (`install-profile-hook.ps1`) or sprint-runner. Without either, Claude tells user the command.

@@ -14,6 +14,18 @@
           }
         ]
       }
+    ],
+    "PostToolUse": [
+      {
+        "type": "command",
+        "command": "bash .claude/scripts/correction-capture-hook.sh"
+      }
+    ],
+    "Stop": [
+      {
+        "type": "command",
+        "command": "bash .claude/scripts/sprint-stop-guard.sh"
+      }
     ]
   }
 }
