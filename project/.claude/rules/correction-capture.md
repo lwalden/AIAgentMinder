@@ -1,11 +1,23 @@
 # Correction Capture
 # AIAgentMinder-managed. Delete this file to opt out of correction capture.
 
+## Automated Detection
+
+A PostToolUse hook (`correction-capture-hook.sh`) automatically tracks correction patterns.
+When a tool call fails and the next call to the same tool uses different arguments, the hook
+logs it to `.corrections.jsonl`. When the same pattern recurs (2+ occurrences), the hook
+injects an alert into your context via `hookSpecificOutput.additionalContext`.
+
+When you see a "Correction Pattern Detected" alert from the hook, follow the **Flagging Output**
+protocol below — the hook has already identified the pattern and count for you.
+
 ## The Pattern
 
 A **correction** is when you try approach A, it fails, and you switch to approach B which succeeds.
 
-When you make a correction, note it mentally. If the **same** correction pattern recurs later in the session (2nd occurrence), flag it.
+The hook detects these automatically for tool calls. For non-tool corrections (reasoning,
+approach changes), note them mentally. If the **same** correction pattern recurs later in the
+session (2nd occurrence), flag it.
 
 ## What Counts as a Correction
 
