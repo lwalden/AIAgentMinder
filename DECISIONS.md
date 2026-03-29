@@ -148,6 +148,12 @@ Chose: Invest in v4.0 (skills migration, negative test enforcement, UX friction 
 
 ---
 
+### context: fork only for quality-gate, not self-review | 2026-03-29 | Status: Active
+
+Chose: Apply `context: fork` to `aam-quality-gate.md` only, not `aam-self-review.md`, over forking both. Why: self-review spawns multiple reviewer subagents (security, performance, API design, cost lenses). Claude Code subagents cannot spawn sub-subagents — running self-review with `context: fork` would make it a subagent, breaking its ability to spawn review lenses. Quality-gate runs sequential checks with no subagent spawning, so fork is safe. Tradeoff: self-review output pollutes the main sprint context; acceptable because it produces a structured summary, not verbose tool output.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.
