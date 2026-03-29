@@ -31,5 +31,9 @@
   "mergeWait": {
     "pollIntervalSeconds": 30,
     "timeoutMinutes": 15
+  },
+  "crossModelReview": {
+    "enabled": false,
+    "model": "sonnet"
   }
 }

@@ -198,6 +198,18 @@ describe('CLI integration: init --all', () => {
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'aiagentminder-version')));
   });
 
+  it('includes crossModelReview config in .pr-pipeline.json', () => {
+    execFileSync('node', [BIN, 'init', '--all'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    const config = JSON.parse(fs.readFileSync(path.join(targetDir, '.pr-pipeline.json'), 'utf-8'));
+    assert.ok('crossModelReview' in config, '.pr-pipeline.json should contain crossModelReview field');
+    assert.equal(config.crossModelReview.enabled, false, 'crossModelReview should be disabled by default');
+    assert.equal(typeof config.crossModelReview.model, 'string', 'crossModelReview.model should be a string');
+  });
+
   it('uncomments stack-specific architecture fitness rules when language detected', () => {
     // Simulate a TypeScript project
     fs.writeFileSync(path.join(targetDir, 'package.json'), JSON.stringify({
