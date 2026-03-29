@@ -1,3 +1,9 @@
+---
+description: Guided TDD workflow — plan, tracer bullet, incremental RED-GREEN
+user-invocable: true
+effort: high
+---
+
 # /aam-tdd - Test-Driven Development
 
 Guided TDD workflow for implementing features through red-green-refactor cycles. This is the full methodology behind `code-quality.md`'s one-liner: "Write a failing test first. Implement the minimal solution. Refactor after green."

@@ -136,6 +136,18 @@ Chose: PostToolUse hook (`correction-capture-hook.sh`) that tracks sequential to
 
 ---
 
+### S1 deferred with pending items for v4.0 priority | 2026-03-29 | Status: Active
+
+Chose: Archive S1 with S1-005 (npm publish) and S1-006 (GH Actions workflow) deferred rather than completing them before starting v4.0 work. Why: spike research identified high-priority gaps (negative test enforcement, UX friction lens, commands→skills migration) that should ship before the first public release. Completing S1-005/S1-006 (release automation) after v4.0 Tier 1+2 ensures the public release includes the quality improvements. S1-006 PR #84 remains open for human review. Tradeoff: npm package stays at v3.3.0 longer; GitHub Actions publish workflow delayed. Acceptable — manual release process works for current volume.
+
+---
+
+### v4.0 spike: platform alignment and quality gaps | 2026-03-29 | Status: Active
+
+Chose: Invest in v4.0 (skills migration, negative test enforcement, UX friction lens, hooks expansion, context recalibration) before public release over shipping v3.3 as-is. Why: three production-observed quality gaps (LLM amnesia → hooks, smoke test illusion → UX lens, happy-path bias → negative test gate) directly impact user trust. Claude Code platform changes (skills system, 26 hooks, 1M context, custom subagents) create alignment debt if ignored. See `docs/spike-v4-research.md` for full research. Tradeoff: delays public npm/marketplace launch by one sprint cycle.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.

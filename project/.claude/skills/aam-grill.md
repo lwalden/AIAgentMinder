@@ -1,3 +1,9 @@
+---
+description: Plan interrogation — walk every branch of the decision tree
+user-invocable: true
+effort: high
+---
+
 # /aam-grill - Plan Interrogation
 
 Stress-test a plan or design by walking every branch of the decision tree. This is the intensive counterpart to `approach-first.md` — use it when a design is non-obvious, high-stakes, or involves multiple interdependent decisions.

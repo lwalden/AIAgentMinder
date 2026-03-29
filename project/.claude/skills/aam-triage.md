@@ -1,3 +1,9 @@
+---
+description: Structured bug triage — reproduce, diagnose, design fix
+user-invocable: true
+effort: high
+---
+
 # /aam-triage - Bug Triage
 
 Systematically investigate a bug: reproduce it, diagnose the root cause, design a durable fix plan, and create a GitHub issue with the analysis. This is the structured start to debugging — complementing `debug-checkpoint.md` which handles the structured pause when a fix stalls.

@@ -62,9 +62,14 @@ describe('CLI integration: init --core', () => {
     assert.ok(fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
     assert.ok(fs.existsSync(path.join(targetDir, 'DECISIONS.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'git-workflow.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'commands', 'aam-brief.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-brief.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'settings.json')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'context-monitor.sh')));
+
+    // Skills directory should exist, commands directory should NOT
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills')));
+    assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'commands')),
+      'should not create .claude/commands/ — skills replace commands');
 
     // Optional files should NOT exist
     assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'rules', 'code-quality.md')));
@@ -110,10 +115,10 @@ describe('CLI integration: agents-md', () => {
       path.join(targetDir, '.claude', 'rules', 'git-workflow.md'),
       '# Git Workflow Rules\n'
     );
-    fs.mkdirSync(path.join(targetDir, '.claude', 'commands'), { recursive: true });
+    fs.mkdirSync(path.join(targetDir, '.claude', 'skills'), { recursive: true });
     fs.writeFileSync(
-      path.join(targetDir, '.claude', 'commands', 'aam-brief.md'),
-      '# /aam-brief - Product Brief\n'
+      path.join(targetDir, '.claude', 'skills', 'aam-brief.md'),
+      '---\ndescription: Product brief and roadmap creation\nuser-invocable: true\n---\n\n# /aam-brief - Product Brief\n'
     );
   });
 
@@ -190,8 +195,8 @@ describe('CLI integration: init --all', () => {
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'sprint-workflow.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md')));
     assert.ok(fs.existsSync(path.join(targetDir, 'SPRINT.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'commands', 'aam-sync-issues.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'commands', 'aam-pr-pipeline.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-sync-issues.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-pr-pipeline.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.pr-pipeline.json')));
 
     // Version stamp
