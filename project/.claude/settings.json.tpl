@@ -6,8 +6,13 @@
   "hooks": {
     "PreToolUse": [
       {
-        "type": "command",
-        "command": "bash .claude/scripts/context-cycle-hook.sh"
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/context-cycle-hook.sh"
+          }
+        ]
       }
     ]
   }
