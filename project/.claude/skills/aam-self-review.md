@@ -28,7 +28,7 @@ Also read:
 
 ## Step 2: Choose Review Lens
 
-During autonomous sprint execution: always run all three lenses — do not ask.
+During autonomous sprint execution: always run all five lenses — do not ask.
 
 When invoked manually, ask the user which lens to apply (or accept all three for a full review):
 
@@ -36,7 +36,8 @@ When invoked manually, ask the user which lens to apply (or accept all three for
 **B) Performance** — N+1 queries, unbounded loops, missing indexes, blocking I/O
 **C) API Design** — consistency with existing endpoints, naming conventions, error response shapes
 **D) Cost Impact** — paid API call patterns, retry/fallback designs that could cause runaway costs, unbounded batch sizes sent to paid services
-**E) All four** (default)
+**E) UX Friction** — confusing error messages, inconsistent CLI output, missing feedback, poor discoverability
+**F) All five** (default)
 
 ---
 
@@ -114,6 +115,25 @@ Focus on:
 
 For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
 If no issues found: state "Cost impact review: no issues found."
+
+DIFF:
+[paste diff here]
+```
+
+### UX Friction Lens prompt:
+```
+You are a UX friction reviewer. Review the following diff for user experience issues only.
+
+Focus on:
+- Error messages that are unclear, overly technical, or missing actionable guidance
+- CLI output that lacks context (e.g., silent success with no confirmation, missing --help hints)
+- Inconsistent output formatting (mixed casing, inconsistent punctuation, varying emoji usage)
+- Missing user feedback for long-running operations (no progress indicator, no "done" message)
+- Poor discoverability (features that exist but are hard to find or invoke)
+- Breaking changes to user-facing behavior without migration guidance
+
+For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
+If no issues found: state "UX friction review: no issues found."
 
 DIFF:
 [paste diff here]

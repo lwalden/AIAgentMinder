@@ -373,6 +373,14 @@ describe('skill frontmatter validation', () => {
     assert.ok(content.includes('negativeTestEnforcement'), 'quality-gate should reference .pr-pipeline.json config');
   });
 
+  it('self-review skill includes UX friction review lens', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
+    );
+    assert.ok(content.includes('UX Friction'), 'self-review should include UX friction lens');
+    assert.ok(content.includes('All five'), 'self-review should reference all five lenses');
+  });
+
   it('self-review skill does NOT have context: fork', () => {
     const content = fs.readFileSync(
       path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
