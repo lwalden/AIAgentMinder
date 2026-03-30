@@ -30,11 +30,9 @@ Ask all of these in one grouped prompt:
 5. **Developer profile:** Experience level, autonomy preference (conservative / medium / aggressive)
 6. **Project scale:** Personal tool, small team tool, or public-facing product?
 7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
-8. **Code quality guidance:** Enable? (TDD, review-before-commit, build-before-commit — loaded via `.claude/rules/` natively, ~18 lines per session) (y/n)
-9. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
-10. **Architecture fitness rules:** Enable? (Customizable structural constraints — layer boundaries, external API rules, etc.) (y/n — recommended)
-11. **GitHub Issues sync:** Enable `/aam-sync-issues` command? Syncs current sprint issues to GitHub Issues for visibility outside Claude Code. (y/n — recommended for team projects with a GitHub remote)
-12. **PR pipeline automation:** Enable `/aam-pr-pipeline`? Automatically reviews, fixes, tests, and merges PRs after creation. Requires Node.js and `gh` CLI. (y/n — recommended for any project where you create PRs from Claude Code)
+8. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
+9. **GitHub Issues sync:** Enable `/aam-sync-issues` command? Syncs current sprint issues to GitHub Issues for visibility outside Claude Code. (y/n — recommended for team projects with a GitHub remote)
+10. **PR pipeline automation:** Enable `/aam-pr-pipeline`? Automatically reviews, fixes, tests, and merges PRs after creation. Requires Node.js and `gh` CLI. (y/n — recommended for any project where you create PRs from Claude Code)
 
 ---
 
@@ -53,40 +51,32 @@ If no git repo exists, run `git init`. Then copy all files from this repo's `pro
 
 ### Core files (always copy)
 
-Copy these to the target unconditionally (create directories as needed).
+Copy these to the target unconditionally (create directories as needed). Use `npx aiagentminder init` for automated installation.
 
+**Universal rules:**
 - `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
-- `project/.claude/rules/scope-guardian.md` → `[target]/.claude/rules/scope-guardian.md`
-- `project/.claude/rules/approach-first.md` → `[target]/.claude/rules/approach-first.md`
-- `project/.claude/rules/debug-checkpoint.md` → `[target]/.claude/rules/debug-checkpoint.md`
 - `project/.claude/rules/tool-first.md` → `[target]/.claude/rules/tool-first.md`
 - `project/.claude/rules/correction-capture.md` → `[target]/.claude/rules/correction-capture.md`
+- `project/.claude/rules/context-cycling.md` → `[target]/.claude/rules/context-cycling.md`
 - `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
-- `project/.claude/scripts/context-monitor.sh` → `[target]/.claude/scripts/context-monitor.sh`
-- `project/.claude/skills/aam-brief.md` → `[target]/.claude/skills/aam-brief.md`
-- `project/.claude/skills/aam-revise.md` → `[target]/.claude/skills/aam-revise.md`
-- `project/.claude/skills/aam-checkup.md` → `[target]/.claude/skills/aam-checkup.md`
-- `project/.claude/skills/aam-handoff.md` → `[target]/.claude/skills/aam-handoff.md`
-- `project/.claude/skills/aam-quality-gate.md` → `[target]/.claude/skills/aam-quality-gate.md`
-- `project/.claude/skills/aam-scope-check.md` → `[target]/.claude/skills/aam-scope-check.md`
-- `project/.claude/skills/aam-self-review.md` → `[target]/.claude/skills/aam-self-review.md`
-- `project/.claude/skills/aam-milestone.md` → `[target]/.claude/skills/aam-milestone.md`
-- `project/.claude/skills/aam-retrospective.md` → `[target]/.claude/skills/aam-retrospective.md`
-- `project/.claude/skills/aam-tdd.md` → `[target]/.claude/skills/aam-tdd.md`
-- `project/.claude/skills/aam-triage.md` → `[target]/.claude/skills/aam-triage.md`
-- `project/.claude/skills/aam-grill.md` → `[target]/.claude/skills/aam-grill.md`
+
+**Session profile agents:**
+- `project/.claude/agents/sprint-executor.md` → `[target]/.claude/agents/sprint-executor.md`
+- `project/.claude/agents/dev.md` → `[target]/.claude/agents/dev.md`
+- `project/.claude/agents/debug.md` → `[target]/.claude/agents/debug.md`
+- `project/.claude/agents/hotfix.md` → `[target]/.claude/agents/hotfix.md`
+- `project/.claude/agents/qa.md` → `[target]/.claude/agents/qa.md`
+
+**Scripts:** all files in `project/.claude/scripts/` → `[target]/.claude/scripts/`
+
+**Skills:** all `project/.claude/skills/aam-*.md` → `[target]/.claude/skills/`
+
+**Root files:** CLAUDE.md, DECISIONS.md, BACKLOG.md, docs/strategy-roadmap.md, .gitignore
 
 ### Optional features (based on Step 2 answers)
 
-**Code quality guidance:** If enabled, copy `project/.claude/rules/code-quality.md` to `[target]/.claude/rules/code-quality.md`.
-
 **Sprint planning:** If enabled:
-- Copy `project/.claude/rules/sprint-workflow.md` to `[target]/.claude/rules/sprint-workflow.md`
 - Copy `project/SPRINT.md` to `[target]/SPRINT.md`
-
-**Architecture fitness rules:** If enabled:
-- Copy `project/.claude/rules/architecture-fitness.md` to `[target]/.claude/rules/architecture-fitness.md`
-- Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder examples with constraints that match your project's architecture."
 
 **GitHub Issues sync:** If enabled:
 
@@ -170,36 +160,17 @@ Project initialized successfully!
 Created files:
 - CLAUDE.md (project instructions — ~50 lines)
 - DECISIONS.md (architectural decisions and known debt log)
+- BACKLOG.md (work inbox — managed by backlog-capture.sh)
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
-- .claude/skills/aam-brief.md (/aam-brief — product brief & roadmap creation)
-- .claude/skills/aam-revise.md (/aam-revise — mid-stream plan revision)
-- .claude/skills/aam-checkup.md (/aam-checkup — installation health check)
-- .claude/skills/aam-handoff.md (/aam-handoff — session checkpoint)
-- .claude/skills/aam-quality-gate.md (/aam-quality-gate — pre-PR quality checks, runs in forked context)
-- .claude/skills/aam-scope-check.md (/aam-scope-check — active scope governance)
-- .claude/skills/aam-self-review.md (/aam-self-review — subagent code review before PR)
-- .claude/skills/aam-milestone.md (/aam-milestone — project health assessment)
-- .claude/skills/aam-retrospective.md (/aam-retrospective — sprint metrics and feedback)
-- .claude/skills/aam-tdd.md (/aam-tdd — guided TDD workflow)
-- .claude/skills/aam-triage.md (/aam-triage — structured bug triage)
-- .claude/skills/aam-grill.md (/aam-grill — plan interrogation)
-- .claude/scripts/ (context-monitor.sh status line data bridge, context-cycle.sh self-kill script, context-cycle-hook.sh PreToolUse enforcement hook, sprint-runner and profile hook installers)
-- .claude/rules/git-workflow.md (git discipline — commit, branch, PR workflow)
-- .claude/rules/scope-guardian.md (scope governance — checks work against roadmap)
-- .claude/rules/approach-first.md (approach-first protocol — state intent before executing)
-- .claude/rules/debug-checkpoint.md (debug checkpoint — prevents debugging spirals)
-- .claude/rules/tool-first.md (tool-first autonomy — use CLI/API tools instead of asking the user)
-- .claude/rules/correction-capture.md (correction capture — flags repeated wrong-first-approach patterns)
+- .claude/agents/ (session profiles: sprint-executor, dev, debug, hotfix, qa)
+- .claude/skills/ (13 aam-* skills — brief, revise, checkup, handoff, quality-gate, scope-check, self-review, milestone, retrospective, tdd, triage, grill, backlog)
+- .claude/scripts/ (context-monitor, context-cycle, backlog-capture, sprint-runner, and hook scripts)
+- .claude/rules/ (universal rules: git-workflow, tool-first, correction-capture, context-cycling)
 - .claude/aiagentminder-version (version stamp for /aam-update)
 - .gitignore (core + [stack] entries)
-[if code quality enabled:]
-- .claude/rules/code-quality.md (code quality guidance — TDD, review-before-commit)
 [if sprint planning enabled:]
-- .claude/rules/sprint-workflow.md (sprint planning workflow)
 - SPRINT.md (sprint state tracking)
-[if architecture fitness enabled:]
-- .claude/rules/architecture-fitness.md (structural constraints — customize for your architecture)
 
 Next steps:
 1. Open Claude Code in your project directory

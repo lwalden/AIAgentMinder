@@ -10,11 +10,12 @@ Before touching anything, understand what each file is:
 
 | Category | Files | Action |
 |---|---|---|
-| **AIAgentMinder-owned** | `.claude/scripts/context-monitor.sh`, `.claude/scripts/context-cycle-hook.sh`, `.claude/scripts/correction-capture-hook.sh`, `.claude/scripts/sprint-stop-guard.sh`, `.claude/scripts/sprint-update.sh`, `.claude/skills/aam-handoff.md`, `.claude/skills/aam-brief.md`, `.claude/skills/aam-revise.md`, `.claude/skills/aam-checkup.md`, `.claude/skills/aam-quality-gate.md`, `.claude/skills/aam-scope-check.md`, `.claude/skills/aam-self-review.md`, `.claude/skills/aam-milestone.md`, `.claude/skills/aam-retrospective.md`, `.claude/skills/aam-tdd.md`, `.claude/skills/aam-triage.md`, `.claude/skills/aam-grill.md`, `.claude/rules/git-workflow.md`, `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/tool-first.md` | Overwrite unconditionally |
+| **AIAgentMinder-owned** | `.claude/scripts/*` (all scripts), `.claude/skills/aam-*.md` (all skills), `.claude/agents/*.md` (all session profiles), `.claude/rules/git-workflow.md`, `.claude/rules/tool-first.md`, `.claude/rules/context-cycling.md`, `.claude/rules/README.md` | Overwrite unconditionally |
 | **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
 | **Obsolete (v3.1 → v3.2)** | `.claude/hooks/compact-reorient.js`, `.claude/hooks/` directory | Delete during migration — replaced by status line context monitoring |
 | **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
-| **AIAgentMinder-owned (optional)** | `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md`, `.claude/skills/aam-sync-issues.md`, `.claude/skills/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
+| **AIAgentMinder-owned (optional)** | `.claude/skills/aam-sync-issues.md`, `.claude/skills/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
+| **Obsolete (v4.0 → v4.1)** | `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md` | Delete during migration — content moved to `.claude/agents/` session profiles |
 | **Obsolete (v2.1 → v2.2)** | `.claude/hooks/pr-pipeline-trigger.js` | Delete during migration — pipeline now runs in-session |
 | **User-owned (AIAgentMinder creates initial)** | `.pr-pipeline.json` | Never overwrite — user configures high-risk patterns and notification email |
 | **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
