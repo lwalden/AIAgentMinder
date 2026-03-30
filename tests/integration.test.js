@@ -71,9 +71,11 @@ describe('CLI integration: init --core', () => {
     assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'commands')),
       'should not create .claude/commands/ — skills replace commands');
 
+    // Agents directory should exist with session profiles
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
+
     // Optional files should NOT exist
-    assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'rules', 'code-quality.md')));
-    assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'rules', 'sprint-workflow.md')));
     assert.ok(!fs.existsSync(path.join(targetDir, 'SPRINT.md')));
 
     // Version stamp should exist
@@ -191,13 +193,14 @@ describe('CLI integration: init --all', () => {
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'git-workflow.md')));
 
     // Optional files
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'code-quality.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'sprint-workflow.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md')));
     assert.ok(fs.existsSync(path.join(targetDir, 'SPRINT.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-sync-issues.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-pr-pipeline.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.pr-pipeline.json')));
+
+    // Session profile agents (core, not optional)
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
 
     // Version stamp
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'aiagentminder-version')));
@@ -228,51 +231,15 @@ describe('CLI integration: init --all', () => {
     assert.ok(config.negativeTestEnforcement.patterns.length > 0, 'negativeTestEnforcement.patterns should have default patterns');
   });
 
-  it('uncomments stack-specific architecture fitness rules when language detected', () => {
-    // Simulate a TypeScript project
-    fs.writeFileSync(path.join(targetDir, 'package.json'), JSON.stringify({
-      dependencies: { react: '^18.0.0' },
-    }));
-    fs.writeFileSync(path.join(targetDir, 'tsconfig.json'), '{}');
-
-    const output = execFileSync('node', [BIN, 'init', '--all'], {
+  it('installs BACKLOG.md and backlog-capture.sh as core files', () => {
+    execFileSync('node', [BIN, 'init', '--core'], {
       encoding: 'utf-8',
       cwd: targetDir,
     });
 
-    assert.ok(output.includes('Stack-specific rules enabled for TypeScript'));
-
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    // TypeScript section should be uncommented
-    assert.ok(content.includes('### TypeScript / React'));
-    assert.ok(!content.includes('<!-- ### TypeScript / React'));
-
-    // Other sections should remain commented
-    assert.ok(content.includes('<!-- ### C# / .NET'));
-    assert.ok(content.includes('<!-- ### Python'));
-    assert.ok(content.includes('<!-- ### Java / Spring'));
-  });
-
-  it('leaves architecture fitness rules unchanged when no language detected', () => {
-    const output = execFileSync('node', [BIN, 'init', '--all'], {
-      encoding: 'utf-8',
-      cwd: targetDir,
-    });
-
-    assert.ok(!output.includes('Stack-specific rules enabled'));
-
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    // All sections should remain commented
-    assert.ok(content.includes('<!-- ### C# / .NET'));
-    assert.ok(content.includes('<!-- ### TypeScript / React'));
-    assert.ok(content.includes('<!-- ### Python'));
-    assert.ok(content.includes('<!-- ### Java / Spring'));
+    assert.ok(fs.existsSync(path.join(targetDir, 'BACKLOG.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'backlog-capture.sh')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-backlog.md')));
   });
 });
 
