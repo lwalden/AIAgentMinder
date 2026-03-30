@@ -35,16 +35,28 @@ describe('getCoreFiles', () => {
     assert.ok(files.length > 0, 'should have core files');
   });
 
-  it('includes always-active rules', () => {
+  it('includes universal rules (not mode-specific)', () => {
     const files = getCoreFiles();
     const ruleFiles = files.filter(f => f.startsWith('.claude/rules/'));
     assert.ok(ruleFiles.includes('.claude/rules/git-workflow.md'));
-    assert.ok(ruleFiles.includes('.claude/rules/scope-guardian.md'));
-    assert.ok(ruleFiles.includes('.claude/rules/approach-first.md'));
-    assert.ok(ruleFiles.includes('.claude/rules/debug-checkpoint.md'));
     assert.ok(ruleFiles.includes('.claude/rules/tool-first.md'));
     assert.ok(ruleFiles.includes('.claude/rules/correction-capture.md'));
+    assert.ok(ruleFiles.includes('.claude/rules/context-cycling.md'));
     assert.ok(ruleFiles.includes('.claude/rules/README.md'));
+    // Mode-specific rules moved to agents
+    assert.ok(!ruleFiles.includes('.claude/rules/scope-guardian.md'));
+    assert.ok(!ruleFiles.includes('.claude/rules/approach-first.md'));
+    assert.ok(!ruleFiles.includes('.claude/rules/debug-checkpoint.md'));
+  });
+
+  it('includes session profile agents', () => {
+    const files = getCoreFiles();
+    const agentFiles = files.filter(f => f.startsWith('.claude/agents/'));
+    assert.ok(agentFiles.includes('.claude/agents/sprint-executor.md'));
+    assert.ok(agentFiles.includes('.claude/agents/dev.md'));
+    assert.ok(agentFiles.includes('.claude/agents/debug.md'));
+    assert.ok(agentFiles.includes('.claude/agents/hotfix.md'));
+    assert.ok(agentFiles.includes('.claude/agents/qa.md'));
   });
 
   it('includes all core skills', () => {
@@ -80,9 +92,6 @@ describe('getCoreFiles', () => {
 
   it('does NOT include optional files', () => {
     const files = getCoreFiles();
-    assert.ok(!files.includes('.claude/rules/code-quality.md'));
-    assert.ok(!files.includes('.claude/rules/sprint-workflow.md'));
-    assert.ok(!files.includes('.claude/rules/architecture-fitness.md'));
     assert.ok(!files.includes('.claude/skills/aam-sync-issues.md'));
     assert.ok(!files.includes('.claude/skills/aam-pr-pipeline.md'));
     assert.ok(!files.includes('SPRINT.md'));
@@ -103,27 +112,17 @@ describe('getOptionalFiles', () => {
   it('returns a map of feature name to file arrays', () => {
     const opts = getOptionalFiles();
     assert.ok(typeof opts === 'object');
-    assert.ok('codeQuality' in opts);
     assert.ok('sprint' in opts);
-    assert.ok('architectureFitness' in opts);
     assert.ok('syncIssues' in opts);
     assert.ok('prPipeline' in opts);
+    // codeQuality and architectureFitness moved to agents (no longer optional)
+    assert.ok(!('codeQuality' in opts));
+    assert.ok(!('architectureFitness' in opts));
   });
 
-  it('code quality feature includes code-quality.md', () => {
+  it('sprint feature includes SPRINT.md', () => {
     const opts = getOptionalFiles();
-    assert.ok(opts.codeQuality.includes('.claude/rules/code-quality.md'));
-  });
-
-  it('sprint feature includes sprint-workflow.md and SPRINT.md', () => {
-    const opts = getOptionalFiles();
-    assert.ok(opts.sprint.includes('.claude/rules/sprint-workflow.md'));
     assert.ok(opts.sprint.includes('SPRINT.md'));
-  });
-
-  it('architecture fitness includes architecture-fitness.md', () => {
-    const opts = getOptionalFiles();
-    assert.ok(opts.architectureFitness.includes('.claude/rules/architecture-fitness.md'));
   });
 
   it('sync issues includes aam-sync-issues.md in skills', () => {
@@ -400,134 +399,10 @@ describe('skill frontmatter validation', () => {
 });
 
 describe('customizeArchitectureFitness', () => {
-  let targetDir;
-
-  beforeEach(() => {
-    targetDir = makeTempDir();
-    // Copy the template architecture-fitness.md so there's something to customize
-    const rulesDir = path.join(targetDir, '.claude', 'rules');
-    fs.mkdirSync(rulesDir, { recursive: true });
-    fs.copyFileSync(
-      path.join(TEMPLATE_DIR, '.claude', 'rules', 'architecture-fitness.md'),
-      path.join(rulesDir, 'architecture-fitness.md')
-    );
-  });
-
-  afterEach(() => {
-    cleanTempDir(targetDir);
-  });
-
-  it('uncomments the C# / .NET section when language is C#', () => {
-    customizeArchitectureFitness(targetDir, 'C#');
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    // C# section should be uncommented
-    assert.ok(content.includes('### C# / .NET'));
-    assert.ok(content.includes('- Controllers must not inject repositories directly'));
-    // Should NOT still be wrapped in HTML comments
-    assert.ok(!content.includes('<!-- ### C# / .NET'));
-
-    // Other sections should remain commented
-    assert.ok(content.includes('<!-- ### TypeScript / React'));
-    assert.ok(content.includes('<!-- ### Python'));
-    assert.ok(content.includes('<!-- ### Java / Spring'));
-  });
-
-  it('uncomments the TypeScript / React section when language is TypeScript', () => {
-    customizeArchitectureFitness(targetDir, 'TypeScript');
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    assert.ok(content.includes('### TypeScript / React'));
-    assert.ok(content.includes('- No `any` type annotations'));
-    assert.ok(!content.includes('<!-- ### TypeScript / React'));
-
-    // Others stay commented
-    assert.ok(content.includes('<!-- ### C# / .NET'));
-    assert.ok(content.includes('<!-- ### Python'));
-  });
-
-  it('uncomments the TypeScript / React section when language is JavaScript', () => {
-    customizeArchitectureFitness(targetDir, 'JavaScript');
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    assert.ok(content.includes('### TypeScript / React'));
-    assert.ok(!content.includes('<!-- ### TypeScript / React'));
-  });
-
-  it('uncomments the Python section when language is Python', () => {
-    customizeArchitectureFitness(targetDir, 'Python');
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    assert.ok(content.includes('### Python'));
-    assert.ok(content.includes('- No raw SQL string concatenation'));
-    assert.ok(!content.includes('<!-- ### Python'));
-
-    assert.ok(content.includes('<!-- ### C# / .NET'));
-    assert.ok(content.includes('<!-- ### Java / Spring'));
-  });
-
-  it('uncomments the Java / Spring section when language is Java', () => {
-    customizeArchitectureFitness(targetDir, 'Java');
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    assert.ok(content.includes('### Java / Spring'));
-    assert.ok(content.includes('- @RequestBody parameters must have @Valid annotation'));
-    assert.ok(!content.includes('<!-- ### Java / Spring'));
-
-    assert.ok(content.includes('<!-- ### C# / .NET'));
-    assert.ok(content.includes('<!-- ### TypeScript / React'));
-  });
-
-  it('does nothing when language is null', () => {
-    const before = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-    customizeArchitectureFitness(targetDir, null);
-    const after = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-    assert.equal(before, after);
-  });
-
-  it('does nothing when language has no matching section (e.g., Go)', () => {
-    const before = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-    customizeArchitectureFitness(targetDir, 'Go');
-    const after = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-    assert.equal(before, after);
-  });
-
-  it('does nothing when architecture-fitness.md does not exist', () => {
-    // Remove the file
-    fs.unlinkSync(path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'));
-    // Should not throw
-    customizeArchitectureFitness(targetDir, 'TypeScript');
-  });
-
-  it('preserves the rest of the file content', () => {
-    customizeArchitectureFitness(targetDir, 'Python');
-    const content = fs.readFileSync(
-      path.join(targetDir, '.claude', 'rules', 'architecture-fitness.md'), 'utf-8'
-    );
-
-    // Universal rules still present
-    assert.ok(content.includes('### File Size'));
-    assert.ok(content.includes('### Secrets in Source'));
-    assert.ok(content.includes('### Test Isolation'));
-    assert.ok(content.includes('### Layer Boundaries'));
-    assert.ok(content.includes('## Enforcement'));
+  it('is a no-op in v4.1+ (architecture fitness moved to agents)', () => {
+    // Should not throw regardless of input
+    customizeArchitectureFitness(makeTempDir(), 'TypeScript');
+    customizeArchitectureFitness(makeTempDir(), null);
+    customizeArchitectureFitness(makeTempDir(), 'Go');
   });
 });
