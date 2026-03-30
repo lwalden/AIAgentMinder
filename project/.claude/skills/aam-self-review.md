@@ -173,6 +173,42 @@ never block the review pipeline on cross-model availability.
 
 ---
 
+## Step 3c: Judge Agent Pass
+
+After all lens subagents (and optional cross-model review) complete, spawn a judge agent to evaluate the collective review quality. The judge does NOT re-review the code — it reviews the reviews.
+
+Use the Agent tool to spawn a judge subagent. Pass it the diff AND all lens findings:
+
+```
+You are a review quality judge. You have received a code diff and the findings from
+multiple specialist reviewers (security, performance, API design, cost impact, UX friction).
+
+Your job is NOT to re-review the code. Instead, evaluate whether the specialist reviews
+were thorough:
+
+1. Did any lens miss an obvious issue in its own domain? (e.g., security lens missed
+   a hardcoded token, performance lens missed an unbounded loop)
+2. Are there cross-cutting concerns that fall between lenses? (e.g., a security issue
+   that also has cost implications, a UX issue that is also an API design inconsistency)
+3. Did any lens flag something that is clearly a false positive given the full diff context?
+
+For each gap found: state which lens should have caught it, the file and line range,
+severity (High/Medium/Low), and a one-line description.
+If the reviews were thorough: state "Judge pass: all lenses covered their domains adequately."
+
+DIFF:
+[paste diff here]
+
+LENS FINDINGS:
+[paste all lens results here]
+```
+
+If the judge finds gaps, add them to the consolidated report with a `[judge]` tag.
+These findings carry the same severity weight as primary findings — High severity
+judge findings block PR creation just like any other High finding.
+
+---
+
 ## Step 4: Consolidate and Act
 
 After all subagents complete:
