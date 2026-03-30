@@ -149,25 +149,26 @@ Concrete architecture fitness defaults, npm/npx distribution, plugin marketplace
 
 ---
 
-## v4.0 — Platform Alignment & Quality Gap Closure (planned)
+## v4.0 — Platform Alignment & Quality Gap Closure (in progress)
 
 Driven by spike research (see `docs/spike-v4-research.md`) identifying three systemic problems — LLM amnesia (instructions ignored mid-execution), smoke test illusion (tests pass but UX is broken), and happy-path bias (no negative test coverage) — plus Claude Code platform changes (26 hook events, skills system, 1M context, custom subagents).
 
-### Tier 1 — Directly addresses identified problems
+### Tier 1 — Directly addresses identified problems (shipped)
 
-- **Negative test enforcement** — Add quality-gate check verifying test files contain error-path/negative assertions, not just happy-path tests. Addresses happy-path bias.
-- **UX friction review lens** — 5th self-review lens: Playwright screenshots fed to vision-capable subagent for UX friction detection (clipped elements, invisible errors, broken flows). Addresses smoke test illusion. Skip gracefully if Playwright not configured.
-- **Commands → skills migration** — Migrate 14 `aam-*` files from `project/.claude/commands/` to `project/.claude/skills/`. Key wins: `context: fork` for quality gate and self-review (isolated context), `allowed-tools` for PR pipeline, per-skill `effort` levels.
-- **Judge agent pass** — Post-review filter in `/aam-self-review`: judge subagent evaluates each finding for actionability, accuracy, and severity before reporting. Reduces noise. Based on HubSpot Sidekick pattern.
-- **Context cycling recalibration** — Update thresholds for 1M context (current: 250k Sonnet, 350k Opus → target: ~500k Sonnet, ~580k Opus). Add `exceeds_200k_tokens` status line field as additional signal.
-- **Setup auto-detection** — In `/aam-setup` Scenario A (existing repo), read `package.json`/`pyproject.toml`/`go.mod`/`Cargo.toml`/`README.md`/directory structure to pre-populate project name, description, type, and stack. Present inferred answers for user confirmation instead of asking cold.
+- **Commands → skills migration** — Migrated 14 `aam-*` files from `project/.claude/commands/` to `project/.claude/skills/`. Key wins: `context: fork` for quality gate (isolated context), per-skill `effort` levels. (S2-001)
+- **Context cycling recalibration** — Updated thresholds for 1M context: 500k Sonnet, 580k Opus (was 250k/350k). (S2-002)
+- **Negative test enforcement** — Quality-gate check verifying test files contain error-path/negative assertions. Configurable via `negativeTestEnforcement` in `.pr-pipeline.json`. (S2-003)
+- **UX friction review lens** — 5th self-review lens covering error messages, feedback, output consistency, and discoverability. (S2-004)
+- **Judge agent pass** — Post-review filter in `/aam-self-review`: judge subagent evaluates collective review quality for missed issues and cross-cutting concerns. (S2-005)
+- **Setup auto-detection** — `detectExistingInstall()` detects version stamp, aam- skills, and managed rules. Init warns on existing installation. (S2-006)
 
-### Tier 2 — Strategic strengthening
+### Tier 2 — Strategic strengthening (partial)
 
-- **New hooks integration** — Expand from 3 to ~6-8 hooks: PermissionRequest (auto-allow sprint ops, address permission prompt friction), StopFailure (trigger context cycling on rate_limit/max_output_tokens), PreCompact (proactive cycling), SessionStart (sprint state auto-detection).
-- **Custom subagents for review lenses** — Define each self-review lens as `.claude/agents/` file with `disallowedTools: [Edit, Write]` (read-only), per-lens `model`/`effort`/`maxTurns`. Makes review lenses individually configurable.
-- **Rule file compression** — Audit all rule files. Move enforcement logic from prose → hooks. Target each rule file under 30 lines. Based on Chroma context rot research showing structured prose creates distractor interference.
-- **Ephemeral task context injection** — Phase-specific rule loading via hooks. When in TEST phase, inject test-relevant rules only. When in REVIEW phase, inject review rules only. Reduces context saturation per sprint state.
+- **New hooks integration** — Added SessionStart (sprint continuation auto-detection) and StopFailure (API error logging, sprint state preservation). PermissionRequest deferred — needs design for auto-approval policies. (S2-007)
+- **Hooks schema fix** — PostToolUse and Stop hooks in settings template corrected to `{ matcher, hooks: [...] }` format. (S2-009)
+- **Custom subagents for review lenses** — Define each self-review lens as `.claude/agents/` file with `disallowedTools: [Edit, Write]` (read-only), per-lens `model`/`effort`/`maxTurns`. Makes review lenses individually configurable. (planned)
+- **Rule file compression** — Audit all rule files. Move enforcement logic from prose → hooks. Target each rule file under 30 lines. Based on Chroma context rot research showing structured prose creates distractor interference. (planned)
+- **Ephemeral task context injection** — Phase-specific rule loading via hooks. When in TEST phase, inject test-relevant rules only. When in REVIEW phase, inject review rules only. Reduces context saturation per sprint state. (planned)
 
 ---
 

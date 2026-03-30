@@ -93,7 +93,7 @@ AIAgentMinder addresses three gaps in Claude Code:
 | `/aam-scope-check` | Compare proposed work against the roadmap |
 | `/aam-handoff` | Session-end checkpoint — decisions, priorities, commit |
 | `/aam-quality-gate` | Pre-PR quality checklist (build, tests, coverage, lint, security) |
-| `/aam-self-review` | Pre-PR code review via specialist subagents (security, performance, API design, cost) |
+| `/aam-self-review` | Pre-PR code review via specialist subagents (security, performance, API design, cost, UX friction) + judge pass |
 | `/aam-pr-pipeline` | Autonomous PR review-fix-test-merge pipeline |
 | `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor |
 | `/aam-triage` | Structured bug triage — reproduce, diagnose, fix plan, GitHub issue |
@@ -111,6 +111,8 @@ AIAgentMinder addresses three gaps in Claude Code:
 | `context-cycle.sh` | Self-termination for context cycling (cross-platform) |
 | `correction-capture-hook.sh` | PostToolUse hook — detects correction patterns, logs to `.corrections.jsonl` |
 | `sprint-stop-guard.sh` | Stop hook — blocks premature turn endings during sprint execution |
+| `session-start-hook.sh` | SessionStart hook — detects continuation signals and active sprints |
+| `stop-failure-hook.sh` | StopFailure hook — logs API errors and preserves sprint state |
 | `sprint-update.sh` | Zero-token-cost SPRINT.md status updates (no LLM file I/O) |
 | `version-bump.sh` | Zero-token-cost version bump across all version points |
 | `decisions-log.sh` | Zero-token-cost DECISIONS.md entry appender |
@@ -121,7 +123,7 @@ AIAgentMinder addresses three gaps in Claude Code:
 
 Claude's output quality degrades as context fills up. AIAgentMinder detects this and handles it:
 
-1. **Monitoring:** `context-monitor.sh` receives token metrics after every assistant message. Model-specific thresholds: 250k tokens for Sonnet, 350k for Opus.
+1. **Monitoring:** `context-monitor.sh` receives token metrics after every assistant message. Model-specific thresholds: 500k tokens for Sonnet, 580k for Opus (recalibrated for 1M context).
 2. **Enforcement:** `context-cycle-hook.sh` (PreToolUse) blocks non-essential tools when the threshold is hit, forcing Claude to save state and cycle.
 3. **Recovery:** Claude commits work, writes a continuation file, self-terminates. A fresh session starts automatically via profile hook or sprint-runner.
 
