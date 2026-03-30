@@ -275,3 +275,42 @@ describe('CLI integration: init --all', () => {
     assert.ok(content.includes('<!-- ### Java / Spring'));
   });
 });
+
+describe('CLI integration: existing install detection', () => {
+  let targetDir;
+
+  beforeEach(() => {
+    targetDir = makeTempDir();
+  });
+
+  afterEach(() => {
+    cleanTempDir(targetDir);
+  });
+
+  it('warns when existing AIAgentMinder version stamp is found', () => {
+    // Pre-seed a version stamp
+    fs.mkdirSync(path.join(targetDir, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(targetDir, '.claude', 'aiagentminder-version'), '3.2.0');
+
+    const output = execFileSync('node', [BIN, 'init', '--all'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(output.includes('Existing AIAgentMinder installation detected'), 'should warn about existing install');
+    assert.ok(output.includes('3.2.0'), 'should show existing version');
+  });
+
+  it('still copies files when existing install detected with --all', () => {
+    fs.mkdirSync(path.join(targetDir, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(targetDir, '.claude', 'aiagentminder-version'), '3.2.0');
+
+    execFileSync('node', [BIN, 'init', '--all'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    // Should still install (--all proceeds)
+    assert.ok(fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
+  });
+});

@@ -11,6 +11,7 @@ import {
   detectCI,
   detectLintConfig,
   fingerprint,
+  detectExistingInstall,
 } from '../lib/detect.js';
 
 function makeTempDir() {
@@ -303,6 +304,50 @@ describe('detectLintConfig', () => {
   it('returns empty array when no lint config found', () => {
     const result = detectLintConfig(dir);
     assert.deepEqual(result, []);
+  });
+});
+
+describe('detectExistingInstall', () => {
+  let dir;
+  beforeEach(() => { dir = makeTempDir(); });
+  afterEach(() => { cleanTempDir(dir); });
+
+  it('detects installation from version stamp', () => {
+    fs.mkdirSync(path.join(dir, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.claude', 'aiagentminder-version'), '3.3.0');
+    const result = detectExistingInstall(dir);
+    assert.equal(result.installed, true);
+    assert.equal(result.version, '3.3.0');
+  });
+
+  it('detects installation from aam- rules files', () => {
+    fs.mkdirSync(path.join(dir, '.claude', 'rules'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.claude', 'rules', 'git-workflow.md'), '# AIAgentMinder-managed');
+    const result = detectExistingInstall(dir);
+    assert.equal(result.installed, true);
+    assert.equal(result.version, null);
+  });
+
+  it('detects installation from aam- skills', () => {
+    fs.mkdirSync(path.join(dir, '.claude', 'skills'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.claude', 'skills', 'aam-brief.md'), '---\ndescription: test\n---');
+    const result = detectExistingInstall(dir);
+    assert.equal(result.installed, true);
+    assert.equal(result.version, null);
+  });
+
+  it('returns not installed for empty directory', () => {
+    const result = detectExistingInstall(dir);
+    assert.equal(result.installed, false);
+    assert.equal(result.version, null);
+  });
+
+  it('returns not installed for non-aam .claude directory', () => {
+    fs.mkdirSync(path.join(dir, '.claude', 'rules'), { recursive: true });
+    fs.writeFileSync(path.join(dir, '.claude', 'rules', 'my-custom-rule.md'), '# Custom');
+    const result = detectExistingInstall(dir);
+    assert.equal(result.installed, false);
+    assert.equal(result.version, null);
   });
 });
 
