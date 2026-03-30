@@ -7,7 +7,7 @@ import { parseArgs } from '../lib/cli.js';
 import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir, customizeArchitectureFitness } from '../lib/init.js';
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
 import { writeAgentsMd } from '../lib/agents-md.js';
-import { fingerprint } from '../lib/detect.js';
+import { fingerprint, detectExistingInstall } from '../lib/detect.js';
 import { validateAll } from '../lib/validate.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -73,6 +73,14 @@ async function runInit(options) {
 
   console.log(`\nAIAgentMinder v${pkg.version}`);
   console.log(`Installing to: ${targetDir}\n`);
+
+  // Check for existing installation
+  const existing = detectExistingInstall(targetDir);
+  if (existing.installed) {
+    const versionNote = existing.version ? ` (v${existing.version})` : '';
+    console.log(`Existing AIAgentMinder installation detected${versionNote}.`);
+    console.log(`Files that already exist will be skipped (use --force to overwrite).\n`);
+  }
 
   // Step 1: Copy core files
   console.log('Copying core files...');
