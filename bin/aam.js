@@ -42,17 +42,9 @@ Examples:
 `.trim();
 
 const OPTIONAL_FEATURES = {
-  codeQuality: {
-    label: 'Code quality guidance',
-    description: 'TDD cycle, review-before-commit, build-before-commit',
-  },
   sprint: {
     label: 'Sprint planning',
     description: 'Structured issue decomposition with per-issue PRs',
-  },
-  architectureFitness: {
-    label: 'Architecture fitness rules',
-    description: 'File size, secrets, test isolation, layer boundaries',
   },
   syncIssues: {
     label: 'GitHub Issues sync',
@@ -125,10 +117,8 @@ async function runInit(options) {
       console.log('\nOptional features:');
 
       for (const [key, meta] of Object.entries(OPTIONAL_FEATURES)) {
-        // Auto-suggest code quality when a test runner is detected
-        const defaultYes = key === 'codeQuality' ? !!detected.testRunner : true;
         selectedFeatures[key] = await askYesNo(
-          rl, `  Enable ${meta.label}? (${meta.description})`, defaultYes
+          rl, `  Enable ${meta.label}? (${meta.description})`, true
         );
       }
 
@@ -173,11 +163,8 @@ async function runInit(options) {
     }
   }
 
-  // Customize architecture-fitness.md with stack-specific rules
-  if (selectedFeatures.architectureFitness && detected.language) {
-    customizeArchitectureFitness(targetDir, detected.language);
-    console.log(`  Stack-specific rules enabled for ${detected.language}`);
-  }
+  // Architecture fitness is now in agent files (v4.1+) — no stack-specific customization
+  customizeArchitectureFitness(targetDir, detected.language);
 
   // Write version stamp (writeProjectIdentity already does this when called)
   if (!identityConfigured) {
