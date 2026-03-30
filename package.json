@@ -12,7 +12,7 @@
     "project/"
   ],
   "scripts": {
-    "test": "node --test tests/cli.test.js tests/init.test.js tests/detect.test.js tests/agents-md.test.js tests/validate.test.js tests/integration.test.js tests/version-bump.test.js tests/decisions-log.test.js"
+    "test": "node --test tests/cli.test.js tests/init.test.js tests/detect.test.js tests/agents-md.test.js tests/validate.test.js tests/integration.test.js tests/version-bump.test.js tests/decisions-log.test.js tests/backlog-capture.test.js tests/session-profiles.test.js"
   },
   "keywords": [
     "claude-code",
