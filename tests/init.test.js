@@ -381,6 +381,14 @@ describe('skill frontmatter validation', () => {
     assert.ok(content.includes('All five'), 'self-review should reference all five lenses');
   });
 
+  it('self-review skill includes judge agent pass', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
+    );
+    assert.ok(content.includes('Judge'), 'self-review should include judge agent pass');
+    assert.ok(content.includes('Step 3c'), 'self-review should have Step 3c for judge pass');
+  });
+
   it('self-review skill does NOT have context: fork', () => {
     const content = fs.readFileSync(
       path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
