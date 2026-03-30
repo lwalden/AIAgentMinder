@@ -35,5 +35,20 @@
   "crossModelReview": {
     "enabled": false,
     "model": "sonnet"
+  },
+  "negativeTestEnforcement": {
+    "enabled": true,
+    "patterns": [
+      "throw",
+      "reject",
+      "error",
+      "fail",
+      "invalid",
+      "unauthorized",
+      "not found",
+      "missing",
+      "empty"
+    ],
+    "minNegativeTests": 1
   }
 }

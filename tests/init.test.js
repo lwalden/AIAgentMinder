@@ -365,6 +365,14 @@ describe('skill frontmatter validation', () => {
     assert.ok(frontmatter.includes('context: fork'), 'quality-gate should run in forked context');
   });
 
+  it('quality-gate skill includes negative test enforcement check', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-quality-gate.md'), 'utf-8'
+    );
+    assert.ok(content.includes('Negative test'), 'quality-gate should include negative test enforcement check');
+    assert.ok(content.includes('negativeTestEnforcement'), 'quality-gate should reference .pr-pipeline.json config');
+  });
+
   it('self-review skill does NOT have context: fork', () => {
     const content = fs.readFileSync(
       path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-self-review.md'), 'utf-8'
