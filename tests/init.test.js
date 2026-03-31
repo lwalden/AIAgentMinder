@@ -218,6 +218,45 @@ describe('copyFiles', () => {
     assert.equal(content, sourceContent);
   });
 
+  it('force option merges settings.json instead of overwriting', () => {
+    // Pre-create a settings.json with user-added hooks
+    const settingsDir = path.join(targetDir, '.claude');
+    fs.mkdirSync(settingsDir, { recursive: true });
+    const settingsPath = path.join(settingsDir, 'settings.json');
+    const userSettings = {
+      statusLine: { type: 'command', command: 'echo old' },
+      hooks: {
+        PreToolUse: [
+          {
+            matcher: 'Bash',
+            hooks: [{ type: 'command', command: 'bash my-custom-hook.sh' }],
+          },
+        ],
+      },
+    };
+    fs.writeFileSync(settingsPath, JSON.stringify(userSettings, null, 2));
+
+    const result = copyFiles(TEMPLATE_DIR, targetDir, ['.claude/settings.json'], { force: true });
+
+    assert.equal(result.copied.length, 1);
+
+    const merged = JSON.parse(fs.readFileSync(settingsPath, 'utf-8'));
+
+    // Template statusLine should replace old one
+    assert.equal(merged.statusLine.command, 'bash .claude/scripts/context-monitor.sh');
+
+    // User custom hook should be preserved
+    const preToolHooks = merged.hooks.PreToolUse;
+    const userHook = preToolHooks.find(e =>
+      e.hooks.some(h => h.command === 'bash my-custom-hook.sh'));
+    assert.ok(userHook, 'user-added PreToolUse hook should be preserved after force');
+
+    // AAM hook should also be present
+    const aamHook = preToolHooks.find(e =>
+      e.hooks.some(h => h.command.includes('.claude/scripts/')));
+    assert.ok(aamHook, 'AAM PreToolUse hook should be present after force');
+  });
+
   it('applies SOURCE_OVERRIDES to rename files during copy', () => {
     const files = ['.claude/settings.json'];
     const result = copyFiles(TEMPLATE_DIR, targetDir, files);
