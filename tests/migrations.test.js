@@ -44,12 +44,13 @@ describe('getMigrations', () => {
     assert.deepEqual(result, [], 'fresh install needs no migrations');
   });
 
-  it('returns migrations between v3.3.0 and v4.1.0', () => {
-    const result = getMigrations('3.3.0', '4.1.0');
-    // Should include v4.0 (commands→skills) and v4.1 (rules→agents)
-    assert.ok(result.length >= 2, 'should have at least 2 migrations');
+  it('returns migrations between v3.3.0 and v4.2.0', () => {
+    const result = getMigrations('3.3.0', '4.2.0');
+    // Should include v4.0 (commands→skills), v4.1 (rules→agents), v4.2
+    assert.ok(result.length >= 3, 'should have at least 3 migrations');
     assert.ok(result.some(m => m.version === '4.0.0'), 'should include v4.0 migration');
     assert.ok(result.some(m => m.version === '4.1.0'), 'should include v4.1 migration');
+    assert.ok(result.some(m => m.version === '4.2.0'), 'should include v4.2 migration');
   });
 
   it('returns only later migrations', () => {
