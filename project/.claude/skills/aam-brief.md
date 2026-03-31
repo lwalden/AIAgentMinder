@@ -69,7 +69,7 @@ Ask in a single grouped message:
 
 Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
 
-1. **Write a filled-in `PROGRESS.md`** reflecting actual current state:
+1. **Capture current state in `docs/strategy-roadmap.md`** reflecting actual project status:
    - Phase based on what you learned
    - Active Tasks = what's in progress right now
    - Current State = what's working / partial / broken
