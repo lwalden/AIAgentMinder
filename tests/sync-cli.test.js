@@ -171,6 +171,33 @@ describe('CLI: sync --apply', () => {
   });
 });
 
+describe('CLI: sync jq dependency check', () => {
+  let targetDir;
+
+  beforeEach(() => {
+    targetDir = makeTempDir();
+  });
+
+  afterEach(() => {
+    cleanTempDir(targetDir);
+  });
+
+  it('sync --dry-run output mentions jq dependency', () => {
+    // Set up a minimal installation so sync has something to analyze
+    fs.mkdirSync(path.join(targetDir, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(targetDir, '.claude', 'aiagentminder-version'), '3.3.0\n');
+    const output = run(['sync', targetDir, '--dry-run']);
+    assert.ok(output.includes('jq'), 'sync output should mention jq dependency');
+  });
+
+  it('sync --apply output mentions jq dependency', () => {
+    fs.mkdirSync(path.join(targetDir, '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(targetDir, '.claude', 'aiagentminder-version'), '3.3.0\n');
+    const output = run(['sync', targetDir, '--apply']);
+    assert.ok(output.includes('jq'), 'sync apply output should mention jq dependency');
+  });
+});
+
 describe('CLI: sync parse args', () => {
   it('recognizes sync command', () => {
     // Just check that help mentions sync

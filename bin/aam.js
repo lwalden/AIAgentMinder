@@ -2,6 +2,7 @@
 
 import fs from 'node:fs';
 import path from 'node:path';
+import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from '../lib/cli.js';
 import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir, customizeArchitectureFitness, SOURCE_OVERRIDES } from '../lib/init.js';
@@ -48,6 +49,16 @@ Examples:
   npx aiagentminder agents-md                Generate AGENTS.md
   npx aiagentminder agents-md -f             Regenerate AGENTS.md
 `.trim();
+
+function checkJq() {
+  try {
+    execFileSync('jq', ['--version'], { stdio: 'pipe', timeout: 5000 });
+    console.log('\njq: installed (required by hooks)');
+  } catch {
+    console.log('\n⚠ jq is not installed. AIAgentMinder hooks require jq for JSON parsing.');
+    console.log('  Install: https://jqlang.github.io/jq/download/');
+  }
+}
 
 const OPTIONAL_FEATURES = {
   sprint: {
@@ -178,6 +189,8 @@ async function runInit(options) {
   if (!identityConfigured) {
     writeVersionStamp(targetDir);
   }
+
+  checkJq();
 
   console.log(`\nDone! ${totalCopied} files installed, ${totalSkipped} skipped (already existed).`);
 
@@ -314,6 +327,8 @@ function runSyncCommand(options) {
     }
   }
 
+  checkJq();
+
   if (!apply) {
     console.log('\nDry run — no files modified. Use --apply to execute.');
     return;
@@ -395,6 +410,8 @@ function runSyncCommand(options) {
   for (const f of plan.hybrid) {
     console.log(`  ⚠ Skipped (manual merge needed): ${f.file}`);
   }
+
+  checkJq();
 
   console.log('\nSync complete.');
 }
