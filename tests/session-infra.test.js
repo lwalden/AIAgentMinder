@@ -64,17 +64,18 @@ describe('/aam-setup: installs session profile agents', () => {
   });
 });
 
-describe('/aam-update: handles agent migration', () => {
+describe('/aam-update: delegates to CLI sync', () => {
   const filePath = path.join(COMMANDS_DIR, 'aam-update.md');
 
-  it('lists agents as AIAgentMinder-owned files', () => {
+  it('references the sync CLI command', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('.claude/agents/'), 'must reference agents directory');
+    assert.ok(content.includes('bin/aam.js sync') || content.includes('aiagentminder sync'),
+      'must reference the sync CLI command');
   });
 
-  it('lists relocated rules as obsolete', () => {
+  it('handles CLAUDE.md as a hybrid manual merge', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('scope-guardian') || content.includes('sprint-workflow'),
-      'must list relocated rules for removal');
+    assert.ok(content.includes('CLAUDE.md') && content.includes('Surgical Merge'),
+      'must handle CLAUDE.md surgical merge');
   });
 });
