@@ -39,6 +39,6 @@ S6 archived (2026-03-30): 5 planned, 5 completed, 0 rework. 0 scope changes, 0 b
 | S7-001 | Remove `/aam-checkup` skill + update references | chore |  | done | n/a |
 | S7-002 | Fix `init --force` to merge settings.json instead of overwriting | fix | ⚠ | done | n/a |
 | S7-003 | Fix stale references in template skills (triage, correction-capture, brief) | fix |  | done | n/a |
-| S7-004 | Add jq check to sync output | fix |  | in-progress | n/a |
-| S7-005 | Delete 72 stale remote branches | chore |  | todo | n/a |
-| S7-006 | Roadmap + README polish for v4.2 completion | docs |  | todo | n/a |
+| S7-004 | Add jq check to sync output | fix |  | done | n/a |
+| S7-005 | Delete 72 stale remote branches | chore |  | done | n/a |
+| S7-006 | Roadmap + README polish for v4.2 completion | docs |  | in-progress | n/a |
