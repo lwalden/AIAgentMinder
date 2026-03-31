@@ -6,7 +6,7 @@ effort: high
 
 # /aam-self-review - Pre-PR Code Review
 
-Run a focused code review before creating a pull request. Spawns a review subagent with a specific lens so the review is context-efficient — it reads the diff and relevant rules, not the entire codebase.
+Run a focused code review before creating a pull request. Spawns dedicated reviewer agents — each with a specific lens, read-only permissions, and its own context window.
 
 ---
 
@@ -20,192 +20,69 @@ git diff main...HEAD
 
 If the diff is empty: tell the user "No changes vs main — nothing to review."
 
-Also read:
-- `.claude/rules/architecture-fitness.md` if it exists (structural constraints to enforce)
-- `.claude/rules/code-quality.md` if it exists (quality standards for this project)
-
 ---
 
 ## Step 2: Choose Review Lens
 
 During autonomous sprint execution: always run all five lenses — do not ask.
 
-When invoked manually, ask the user which lens to apply (or accept all three for a full review):
+When invoked manually, ask the user which lens to apply:
 
 **A) Security** — injection, auth bypass, data exposure, hardcoded secrets
 **B) Performance** — N+1 queries, unbounded loops, missing indexes, blocking I/O
 **C) API Design** — consistency with existing endpoints, naming conventions, error response shapes
-**D) Cost Impact** — paid API call patterns, retry/fallback designs that could cause runaway costs, unbounded batch sizes sent to paid services
-**E) UX Friction** — confusing error messages, inconsistent CLI output, missing feedback, poor discoverability
+**D) Cost Impact** — paid API call patterns, retry/fallback designs, unbounded batch sizes
+**E) UX Friction** — error messages, CLI output, feedback, discoverability
 **F) All five** (default)
 
 ---
 
 ## Step 3: Run the Review
 
-For each selected lens, use the Agent tool to spawn a review subagent. Pass the diff and the lens-specific prompt. Do not pass the entire codebase — the subagent works from the diff only.
+For each selected lens, use the Agent tool to spawn the corresponding reviewer agent. Pass the diff as the prompt — the agent's own instructions define its focus areas and output format.
 
-### Security Lens prompt:
+| Lens | Agent | Notes |
+|---|---|---|
+| Security | `security-reviewer` | `disallowedTools: [Edit, Write, Bash]`, model: sonnet, effort: high |
+| Performance | `performance-reviewer` | `disallowedTools: [Edit, Write, Bash]`, model: sonnet, effort: high |
+| API Design | `api-reviewer` | `disallowedTools: [Edit, Write, Bash]`, model: sonnet, effort: medium |
+| Cost Impact | `cost-reviewer` | `disallowedTools: [Edit, Write, Bash]`, model: sonnet, effort: medium |
+| UX Friction | `ux-reviewer` | `disallowedTools: [Edit, Write, Bash]`, model: sonnet, effort: medium |
+
+Spawn each agent with a prompt like:
 ```
-You are a security code reviewer. Review the following diff for security issues only.
+Review this diff for [lens] issues. The diff is:
 
-Focus on:
-- Injection vulnerabilities (SQL, command, path traversal, template injection)
-- Authentication and authorization gaps (missing auth checks, IDOR, privilege escalation)
-- Sensitive data exposure (secrets in code, PII in logs, unencrypted storage)
-- Input validation gaps (missing validation on user-supplied data)
-- Dependency vulnerabilities (new packages added — flag any known risky ones)
-
-For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
-If no issues found: state "Security review: no issues found."
-
-DIFF:
-[paste diff here]
+{diff content}
 ```
 
-### Performance Lens prompt:
-```
-You are a performance code reviewer. Review the following diff for performance issues only.
+The agent's own instructions (in `.claude/agents/{name}.md`) define the focus areas and output format. Do not duplicate the lens-specific instructions in the prompt.
 
-Focus on:
-- N+1 query patterns (loops that trigger database calls)
-- Unbounded operations (loops or queries with no limit on result size)
-- Synchronous blocking calls in async contexts
-- Missing database indexes implied by new query patterns
-- Memory leaks (event listeners not removed, large objects held in scope)
-- Repeated expensive computations that could be cached
-
-For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
-If no issues found: state "Performance review: no issues found."
-
-DIFF:
-[paste diff here]
-```
-
-### API Design Lens prompt:
-```
-You are an API design code reviewer. Review the following diff for API design consistency only.
-
-Focus on:
-- Endpoint naming consistency (matches the project's existing conventions)
-- HTTP method correctness (GET for reads, POST for creates, PUT/PATCH for updates, DELETE for deletes)
-- Error response shape consistency (matches existing error format)
-- Status code correctness (201 for creates, 404 for not found, 422 for validation errors, etc.)
-- Request/response field naming (camelCase vs snake_case — consistent with existing API)
-- Breaking changes (removed fields, changed types, renamed endpoints)
-
-For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
-If no issues found: state "API design review: no issues found."
-
-DIFF:
-[paste diff here]
-```
-
-### Cost Impact Lens prompt:
-```
-You are a cost-aware code reviewer. Review the following diff for designs that could cause unexpected costs with paid external services.
-
-Focus on:
-- Retry loops or fallback chains that re-send work to a paid API (each retry costs money)
-- Fallback paths that re-process already-handled items instead of only unhandled ones
-- Unbounded batch sizes sent to paid services (no cap on items per request)
-- Missing circuit breakers or rate limits on paid API calls
-- Error handling that swallows failures silently, causing upstream retries
-- SDK or package upgrades that change API versions without updating all integration points (webhook endpoints, serialization contracts)
-
-For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
-If no issues found: state "Cost impact review: no issues found."
-
-DIFF:
-[paste diff here]
-```
-
-### UX Friction Lens prompt:
-```
-You are a UX friction reviewer. Review the following diff for user experience issues only.
-
-Focus on:
-- Error messages that are unclear, overly technical, or missing actionable guidance
-- CLI output that lacks context (e.g., silent success with no confirmation, missing --help hints)
-- Inconsistent output formatting (mixed casing, inconsistent punctuation, varying emoji usage)
-- Missing user feedback for long-running operations (no progress indicator, no "done" message)
-- Poor discoverability (features that exist but are hard to find or invoke)
-- Breaking changes to user-facing behavior without migration guidance
-
-For each issue found: state the file, line range, issue type, severity (High/Medium/Low), and a one-line fix recommendation.
-If no issues found: state "UX friction review: no issues found."
-
-DIFF:
-[paste diff here]
-```
+Run all selected lenses in parallel when possible — they are independent.
 
 ---
 
 ## Step 3b: Cross-Model Review (optional)
 
-Check `.pr-pipeline.json` for `crossModelReview.enabled`. If `true` (or if the field is absent, skip this step):
+Check `.pr-pipeline.json` for `crossModelReview.enabled`. If `true`:
 
-Use the Agent tool with `model` set to `crossModelReview.model` (default: `"sonnet"`) to spawn a single consolidated review subagent. Pass it the diff and this prompt:
+Use the Agent tool with `model` set to `crossModelReview.model` (default: `"sonnet"`) to spawn a consolidated review subagent with this prompt:
 
-```
-You are an independent code reviewer providing a second opinion. Review the following diff
-for bugs, security issues, and correctness problems. Focus on issues the primary reviewer
-might have missed — you are the safety net, not a duplicate.
+"You are an independent code reviewer providing a second opinion. Review the diff for bugs, security issues, and correctness problems. Focus on issues the primary reviewer might have missed. Do NOT flag style preferences or intentional design decisions. For each issue: file, line range, severity, one-line description with fix. If none: 'Cross-model review: no additional issues found.'"
 
-Do NOT flag: style preferences, minor naming choices, or issues that are clearly intentional
-design decisions.
-
-For each issue found: state the file, line range, severity (High/Medium/Low), and a one-line
-description with suggested fix.
-If no issues found: state "Cross-model review: no additional issues found."
-
-DIFF:
-[paste diff here]
-```
-
-If the cross-model review finds issues not caught by the primary lenses, add them to the
-consolidated report with a `[cross-model]` tag. These findings carry the same severity
-weight as primary findings.
-
-If the cross-model agent is unavailable (model not accessible, API error): log
-"Cross-model review skipped: {reason}" and continue. This is a graceful degradation —
-never block the review pipeline on cross-model availability.
+Pass the diff. If cross-model finds issues not caught by primary lenses, add them with a `[cross-model]` tag. If unavailable, log and continue — never block on cross-model availability.
 
 ---
 
 ## Step 3c: Judge Agent Pass
 
-After all lens subagents (and optional cross-model review) complete, spawn a judge agent to evaluate the collective review quality. The judge does NOT re-review the code — it reviews the reviews.
+After all lens subagents complete, spawn a judge agent to evaluate the collective review quality. The judge does NOT re-review the code — it reviews the reviews.
 
-Use the Agent tool to spawn a judge subagent. Pass it the diff AND all lens findings:
+Spawn a judge subagent with the diff AND all lens findings:
 
-```
-You are a review quality judge. You have received a code diff and the findings from
-multiple specialist reviewers (security, performance, API design, cost impact, UX friction).
+"You are a review quality judge. Evaluate whether the specialist reviews (security, performance, API design, cost impact, UX friction) were thorough: (1) Did any lens miss an obvious issue in its domain? (2) Are there cross-cutting concerns between lenses? (3) Did any lens flag a clear false positive? For each gap: which lens, file, line, severity, description. If thorough: 'Judge pass: all lenses covered their domains adequately.'"
 
-Your job is NOT to re-review the code. Instead, evaluate whether the specialist reviews
-were thorough:
-
-1. Did any lens miss an obvious issue in its own domain? (e.g., security lens missed
-   a hardcoded token, performance lens missed an unbounded loop)
-2. Are there cross-cutting concerns that fall between lenses? (e.g., a security issue
-   that also has cost implications, a UX issue that is also an API design inconsistency)
-3. Did any lens flag something that is clearly a false positive given the full diff context?
-
-For each gap found: state which lens should have caught it, the file and line range,
-severity (High/Medium/Low), and a one-line description.
-If the reviews were thorough: state "Judge pass: all lenses covered their domains adequately."
-
-DIFF:
-[paste diff here]
-
-LENS FINDINGS:
-[paste all lens results here]
-```
-
-If the judge finds gaps, add them to the consolidated report with a `[judge]` tag.
-These findings carry the same severity weight as primary findings — High severity
-judge findings block PR creation just like any other High finding.
+Judge findings get a `[judge]` tag. High severity judge findings block PR creation.
 
 ---
 
@@ -221,6 +98,7 @@ After all subagents complete:
    Performance: [X issues / no issues]
    API Design:  [X issues / no issues]
    Cost Impact: [X issues / no issues]
+   UX Friction: [X issues / no issues]
 
    [List all findings by severity: High → Medium → Low]
    ```
