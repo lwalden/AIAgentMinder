@@ -2,7 +2,7 @@
 
 **Date:** 2026-03-31
 **Scope:** AIAgentMinder v4.2 (shipped) through v5.0 (planned) compared to free/open-source tools serving similar functions
-**Method:** Codebase analysis + web research across 15+ competing tools and frameworks
+**Method:** Codebase analysis + web research across 30+ competing tools and frameworks
 
 ---
 
@@ -26,6 +26,29 @@ AAM occupies a unique position: it's the only tool that combines **context engin
 | **Aider** | 30K+ stars | `CONVENTIONS.md` + `.aider.conf.yml`. Model-agnostic. Repo-map for large codebases. | Aider's conventions are thin (coding style only). No governance workflow, no quality gates. But its model-agnostic approach means conventions survive tool switches. AAM is Claude Code-only. |
 | **Cline** | 5M+ installs, open source | `.clinerules` + custom instructions + Plan/Act mode separation | Cline's Plan/Act is a simpler version of AAM's PLAN→SPEC→APPROVE→EXECUTE state machine. No sprint continuity, no context cycling, no quality enforcement. |
 
+### Category 1b: Cross-Tool Rules Sync (Emerging Crowded Space)
+
+A wave of 15+ tools appeared in late 2025/early 2026 solving "write rules once, generate for all agents." This space is commoditizing fast:
+
+| Tool | Stars | What It Does | Relevance to AAM |
+|---|---|---|---|
+| **block/ai-rules** (Block/Square) | Active, corporate-backed | Go CLI. Single-source markdown generates configs for 11 AI agents (Claude, Cursor, Copilot, Codex, Gemini, etc.) | Strongest corporate backing in the sync space. Rules sync only — no governance, no quality gates, no workflows. |
+| **Goldziher/ai-rulez** | 96 stars | Go CLI. YAML-based rules, generates for 18+ tools. | Clean approach, broad support. Config generation only. |
+| **dyoshikawa/rulesync** | npm + Homebrew | Node.js CLI. `.rulesync/` directory. Can import from existing CLAUDE.md/.cursorrules. 21+ tools. | Import capability is notable — AAM could learn from this pattern. |
+| **caliber-ai-org/ai-setup** | 223 stars | Auto-generates CLAUDE.md, .cursor/rules/, AGENTS.md from codebase analysis. Keeps files updated as code evolves. | Auto-generation from codebase analysis overlaps with AAM's fingerprinting, but applied to rules content, not just configuration. |
+| **awesome-cursorrules** | 38,779 stars | Community-curated .cursorrules collection. VS Code extension for browsing/installing. | The dominant discovery mechanism. Dwarfs everything else by community size. |
+
+**Key Insight:** These tools solve a problem AAM doesn't need to solve (AAM is Claude Code-only), but their existence validates that *rules portability* is a first-class concern for the market. If AAM ever expands beyond Claude Code, this space is already crowded.
+
+### Category 1c: Skill/Plugin Libraries (Ecosystem Scale)
+
+| Tool | Stars | What It Does | Relevance to AAM |
+|---|---|---|---|
+| **antigravity-awesome-skills** | 28,954 stars | 1,340+ installable agentic skills for Claude Code, Cursor, Codex CLI, Gemini CLI. `npx` installer. Cross-tool bundles. | The "npm for AI skills" pattern. AAM's 14 governance skills are deep but this has breadth. Not competitive (different layer) but shows ecosystem expectations. |
+| **buildwithclaude** | 2,663 stars | Hub for Claude skills, agents, commands, hooks, plugins. Lists 2,300+ skills, 770+ MCP servers, 95+ curated marketplaces. | AAM should be listed here. Low-effort discoverability win. |
+| **awesome-claude-code-toolkit** | 961 stars | 135 agents, 35 curated skills, 42 commands, 150+ plugins. #1 trending on GitHub Feb 2026. | Another directory AAM should be present in. |
+| **OpenAI Codex Plugin System** | Enterprise (Mar 2026) | Installable bundles (skills + MCP + integrations). JSON policy layer. 2M weekly active users. | Enterprise governance via plugin policies (INSTALLED_BY_DEFAULT / AVAILABLE / NOT_AVAILABLE per repo). Different approach than AAM — top-down vs. bottom-up. |
+
 ### Category 2: Execution Governance / SDLC Frameworks
 
 | Tool | What It Does | How It Compares to AAM |
@@ -33,6 +56,7 @@ AAM occupies a unique position: it's the only tool that combines **context engin
 | **TinySDLC** | 8-role SDLC orchestrator with structured handoffs, separation of duties. Tool-agnostic. Zero deps. | Closest philosophical peer. But TinySDLC governs *roles* (PM, architect, developer, tester, reviewer). AAM governs *phases* (plan, spec, execute, test, review, merge, validate). TinySDLC doesn't enforce — it structures. AAM enforces via hooks + stop guards. |
 | **Spec Kit** (GitHub Blog) | Spec-driven development: write specs first, AI generates/tests/validates against them. | Overlaps with AAM's SPEC phase. But Spec Kit is a methodology, not a runtime. AAM's spec phase is one step in a larger state machine. |
 | **GitHub Copilot Agent Skills** | `.github/skills/` folders with `SKILL.md` + resources. On-demand loading. | Direct analog to AAM's `.claude/skills/`. Copilot's version loads skills conditionally by path matching. AAM's skills are invoked explicitly. Different model, similar outcome. |
+| **ramuks22/ai-agent-governance** | Config-driven quality gates, git hooks, tracker validation, merge-by-command protocol. Agent-agnostic. | Closest concept to AAM outside TinySDLC. Brand new (Mar 2026, 1 star). Very early stage but validates that others see the same gap. |
 
 ### Category 3: Architecture Fitness / Quality Governance
 
@@ -102,6 +126,11 @@ AAM is Claude Code-only. The market is moving toward tool-agnostic approaches:
 
 **Risk:** Network effects. As rule libraries grow on other platforms, AAM's manually-curated approach becomes a bottleneck.
 
+**Quick wins (no code required):**
+- List AAM on [buildwithclaude](https://github.com/davepoon/buildwithclaude) (2,663 stars, 95+ marketplaces)
+- List AAM on [awesome-claude-code-toolkit](https://github.com/rohitg00/awesome-claude-code-toolkit) (961 stars, #1 trending Feb 2026)
+- These are the two primary discovery hubs for Claude Code extensions
+
 **Recommendation:** v5 or post-v5 should consider a community rules/fitness-function contribution model. Even a simple `npx aiagentminder import-rules <source>` that ingests from cursor.directory or awesome-copilot repos would help.
 
 ### 3. Marketplace / Plugin Ecosystem
@@ -109,7 +138,9 @@ Cursor launched a full marketplace (Feb 2026) with verified partners (Amplitude,
 
 **Risk:** Developers expect "install in one click" experiences. AAM's `npx aiagentminder init` is good but there's no ecosystem around it.
 
-**Recommendation:** Monitor whether Claude Code develops a native marketplace. If so, AAM should be a first-mover there. If not, the CLI installer is the right distribution channel.
+**Context:** The Claude Code plugin ecosystem is maturing fast. `buildwithclaude` lists 2,300+ skills, 770+ MCP servers. `antigravity-awesome-skills` (29K stars) provides cross-tool skill bundles. The `claude-code-plugin-template` repo provides scaffolding for new marketplace entries.
+
+**Recommendation:** Monitor whether Claude Code develops a native marketplace. If so, AAM should be a first-mover there. In the meantime, AAM's `.claude-plugin/` manifest (already shipping) positions it for any future directory. The CLI installer is the right primary distribution channel.
 
 ### 4. Path-Scoped Rules
 Copilot supports `.instructions.md` files scoped to specific paths (e.g., different rules for `src/api/` vs. `src/ui/`). Cursor supports glob-scoped rules. AAM's rules are project-global.
@@ -200,5 +231,7 @@ Sprint-master routing to phase-specific agents. This aligns with the broader ind
 | Multi-agent review | **Far ahead** — unique 5-lens + judge pattern |
 | Discoverability/marketplace | **Behind** — no presence in emerging marketplaces |
 | Innovation (uncharted territory) | **Leading** — sprint state machine, context cycling, mechanical enforcement |
+
+**Market context:** Gartner predicts 40%+ of agentic AI projects will be canceled by end of 2027 due to rising costs, unclear value, and weak risk control. Only 20% of organizations have mature AI governance (Deloitte 2026). This validates AAM's thesis — governance is undersupplied relative to demand.
 
 **Bottom line:** AAM is building a cathedral in a world of bazaars. The depth is real and valuable, but the reach is limited. v5's orchestrator deepens the moat. The next strategic question after v5 is whether to widen the moat (more depth) or build bridges (portability, community, ecosystem presence).
