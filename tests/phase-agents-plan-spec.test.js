@@ -20,7 +20,7 @@ describe('sprint-planner agent', () => {
 
   it('has valid YAML frontmatter with name and description', () => {
     const content = readAgent(AGENT);
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
     assert.ok(fmMatch, 'must have YAML frontmatter');
     const fm = fmMatch[1];
     assert.ok(fm.includes('name:'), 'must have name');
@@ -74,7 +74,7 @@ describe('sprint-speccer agent', () => {
 
   it('has valid YAML frontmatter with name and description', () => {
     const content = readAgent(AGENT);
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
     assert.ok(fmMatch, 'must have YAML frontmatter');
     const fm = fmMatch[1];
     assert.ok(fm.includes('name:'), 'must have name');
