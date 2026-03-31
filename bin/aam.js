@@ -188,7 +188,7 @@ async function runInit(options) {
   } else {
     console.log('  2. Run /aam-brief to configure your project and create a roadmap');
   }
-  console.log('  3. Run /aam-checkup to verify the installation');
+  console.log('  3. Run `npx aiagentminder sync . --dry-run` to verify the installation');
 }
 
 function runAgentsMdCommand(options) {

@@ -28,7 +28,7 @@ function createV33Installation(dir) {
   fs.writeFileSync(path.join(dir, '.claude', 'aiagentminder-version'), '3.3.0\n');
 
   // Commands (pre-v4.0, before skills migration)
-  const commands = ['aam-handoff', 'aam-brief', 'aam-checkup', 'aam-quality-gate',
+  const commands = ['aam-handoff', 'aam-brief', 'aam-quality-gate',
     'aam-self-review', 'aam-milestone', 'aam-retrospective', 'aam-revise',
     'aam-scope-check', 'aam-tdd', 'aam-triage', 'aam-grill'];
   fs.mkdirSync(path.join(dir, '.claude', 'commands'), { recursive: true });

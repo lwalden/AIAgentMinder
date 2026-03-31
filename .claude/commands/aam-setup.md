@@ -133,7 +133,6 @@ Created files:
 Next steps:
 1. Open Claude Code in your project directory
 2. Run /aam-brief to create your product brief & roadmap
-3. Run /aam-checkup to verify the installation
 [if sprint planning enabled:]
-4. When ready to build, say "start a sprint" — I'll propose issues for review
+3. When ready to build, say "start a sprint" — I'll propose issues for review
 ```
