@@ -39,7 +39,7 @@ All v1.0 features have been implemented and merged. See [CHANGELOG.md](CHANGELOG
 Three new skills adapted from [mattpocock/skills](https://github.com/mattpocock/skills) (MIT), reshaped for AIAgentMinder conventions:
 
 - **`/aam-tdd`** — Guided TDD workflow (plan, tracer bullet, incremental RED-GREEN loop, refactor). Complements `code-quality.md`'s one-liner with the full methodology.
-- **`/aam-triage`** — Structured bug triage: reproduce, diagnose root cause, design durable fix plan, create GitHub issue. Complements `debug-checkpoint.md` (triage = structured start, checkpoint = structured pause).
+- **`/aam-triage`** — Structured bug triage: reproduce, diagnose root cause, design durable fix plan, create GitHub issue. Complements the debug checkpoint pattern (triage = structured start, checkpoint = structured pause).
 - **`/aam-grill`** — Plan interrogation: walk every branch of the decision tree before implementation. Intensive counterpart to `approach-first.md`.
 
 ---
@@ -271,5 +271,6 @@ Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, revi
 | 2026-03-30 | Changed: `/aam-update` dry-run → Dropped (superseded) | Dry-run is now a CLI flag on `npx aiagentminder sync`, not a prompt behavior. |
 | 2026-03-30 | Added: Plugin skill removal (v4.2) | Plugin skills duplicate project-local skills — ~600 tokens dead weight per session. Plugin provides CLI only; discoverability is a future concern. |
 | 2026-03-30 | Changed: Release Automation note | PR #84 closed — npm infrastructure not yet configured. |
+| 2026-03-30 | Post-v4.2 hardening (S7) | Fix `init --force` settings merge, stale skill references, jq check in sync, branch cleanup, README rules table update for v4.1 session profiles. |
 
-*Last revised by /aam-revise 2026-03-30*
+*Last revised 2026-03-30 (S7 hardening)*

@@ -64,24 +64,37 @@ AIAgentMinder addresses three gaps in Claude Code:
 
 ### Rules
 
-**Always active** (every session):
+**Universal rules** (loaded every session, all modes):
 
 | Rule | What it does |
 |------|-------------|
 | `git-workflow.md` | Branch naming, commit discipline, PR-only workflow |
-| `scope-guardian.md` | Checks new work against the roadmap before implementing |
-| `approach-first.md` | States intended approach before multi-file or architecture changes |
-| `debug-checkpoint.md` | Stops debugging spirals after 3 failed attempts at the same error |
 | `tool-first.md` | Use CLI/API tools instead of asking the user to do things manually |
-
-**Governance** (enabled by default):
-
-| Rule | What it does |
-|------|-------------|
-| `code-quality.md` | TDD cycle, build-before-commit, small focused functions |
-| `sprint-workflow.md` | State machine sprint execution with mandatory quality checklist |
 | `correction-capture.md` | Detects repeated wrong-first-approach patterns and proposes permanent rules |
-| `architecture-fitness.md` | Structural constraints — file size limits, secrets detection, layer boundaries |
+| `context-cycling.md` | Procedure for context cycling when the PreToolUse hook fires |
+
+**Mode-specific rules** (loaded via session profile agents):
+
+| Rule | Loaded by | What it does |
+|------|-----------|-------------|
+| Sprint workflow | `sprint-executor` | State machine sprint execution with mandatory quality checklist |
+| Code quality | `sprint-executor`, `dev`, `qa` | TDD cycle, build-before-commit, small focused functions |
+| Scope guardian | `sprint-executor`, `dev` | Checks new work against the roadmap before implementing |
+| Approach-first | `sprint-executor`, `dev` | States intended approach before multi-file or architecture changes |
+| Debug checkpoint | `sprint-executor`, `dev`, `debug`, `hotfix` | Stops debugging spirals after 3 failed attempts at the same error |
+| Architecture fitness | `sprint-executor`, `dev`, `qa` | Structural constraints — file size limits, secrets detection, layer boundaries |
+
+### Session profiles
+
+Use `claude --agent <name>` to load the right context for your task:
+
+| Profile | Purpose |
+|---------|---------|
+| `sprint-executor` | Full sprint state machine — all rules loaded |
+| `dev` | General development — TDD, architecture fitness, approach-first |
+| `debug` | Debugging — checkpoint pattern, triage |
+| `hotfix` | Minimal ceremony — debug checkpoint only |
+| `qa` | Quality review — code quality, architecture fitness |
 
 ### Commands
 
