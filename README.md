@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-3.3.0-blue)
+![Version](https://img.shields.io/badge/version-4.1.0-blue)
 [![npm](https://img.shields.io/npm/v/aiagentminder)](https://www.npmjs.com/package/aiagentminder)
 
 A governance framework for Claude Code. Slash commands, rules files, hooks, and shell scripts that add sprint execution, quality enforcement, and context management to Claude Code projects.
@@ -58,8 +58,9 @@ AIAgentMinder addresses three gaps in Claude Code:
 | `CLAUDE.md` | Project identity, behavioral rules (auto-loaded every session) |
 | `DECISIONS.md` | Architectural decisions, rationale, known debt log |
 | `docs/strategy-roadmap.md` | Product brief — features, phases, out-of-scope items |
-| `.claude/rules/*.md` | Development discipline rules (auto-loaded by Claude Code) |
+| `.claude/rules/*.md` | Universal rules (auto-loaded every session) |
 | `SPRINT.md` | Active sprint header and issue table (optional) |
+| `BACKLOG.md` | Work inbox — capture future work via `/aam-backlog` |
 | `.pr-pipeline.json` | PR pipeline config — high-risk patterns, merge method, cross-model review |
 
 ### Rules
@@ -100,6 +101,7 @@ AIAgentMinder addresses three gaps in Claude Code:
 | `/aam-grill` | Plan interrogation — walk every decision branch before implementing |
 | `/aam-milestone` | Project health assessment across phase progress, timeline, scope drift |
 | `/aam-retrospective` | Sprint metrics and adaptive sizing guidance |
+| `/aam-backlog` | Capture, review, and promote backlog items (all I/O via `backlog-capture.sh`) |
 | `/aam-sync-issues` | Push sprint issues to GitHub Issues (optional) |
 
 ### Hooks and scripts
@@ -116,6 +118,7 @@ AIAgentMinder addresses three gaps in Claude Code:
 | `sprint-update.sh` | Zero-token-cost SPRINT.md status updates (no LLM file I/O) |
 | `version-bump.sh` | Zero-token-cost version bump across all version points |
 | `decisions-log.sh` | Zero-token-cost DECISIONS.md entry appender |
+| `backlog-capture.sh` | Zero-token-cost BACKLOG.md management (add, list, promote, detail, count) |
 | `sprint-runner.ps1/.sh` | Wrapper that auto-restarts Claude on context cycle |
 | `install-profile-hook.ps1/.sh` | One-time setup for automatic context cycling |
 
@@ -170,7 +173,7 @@ Works on **Windows, macOS, and Linux**.
 ## Non-Goals
 
 - **Not a ticket tracker.** Keeps a living plan in `docs/strategy-roadmap.md` and decomposes it into sprints on demand. Use `/aam-revise` to update. Layer GitHub Issues or Linear on top if you need persistent epics.
-- **Not a multi-agent orchestrator.** Governs a single Claude Code session. Does not coordinate parallel instances.
+- **Not a multi-agent orchestrator.** Session profiles select the right context per mode. Does not coordinate parallel agent instances (v5.0 plans orchestrator pattern).
 - **Not a memory system replacement.** Complements Claude Code's native Session Memory, auto-memory, and `--continue`. Adds real-time context monitoring and autonomous cycling.
 
 ---
