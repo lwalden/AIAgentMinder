@@ -192,9 +192,46 @@ Based on session architecture spike (see `docs/spike-session-architecture.md`, A
 
 ---
 
+## v4.2 — Deterministic Sync
+
+Replace `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync command. File operations are derived from the filesystem at runtime — no hardcoded file lists that drift from `project/`. The prompt shrinks to ~100 lines handling only judgment calls (CLAUDE.md merge, optional feature prompts, edge cases). Also removes plugin skill packages to eliminate context duplication in target projects.
+
+### Plugin Skill Removal
+
+- **Remove `skills/` directory** — 13 plugin skill packages deleted. Skills are project-local only (copied by `/aam-setup`), not loaded via plugin.
+- **Update `plugin.json`** — Remove `"skills": "./skills/"` reference. Plugin provides CLI only.
+- **Update `npx aiagentminder validate`** — Stop validating skill packages (they no longer exist).
+- **Context savings** — Eliminates ~400-600 tokens of duplicate skill index loaded per session in every target project that also has the plugin installed.
+
+### Deterministic CLI (`lib/`)
+
+- **`lib/sync.js`** — Reads `project/` template and target installation, computes a structured diff (files to add, update, delete). No hardcoded manifest — walks the filesystem. Outputs a plan object consumed by both CLI and `/aam-update`.
+- **`lib/migrations.js`** — Version-chained migration registry. Each version bump registers: files made obsolete, renames, structural changes (e.g., `commands/ → skills/`, `rules/ → agents/`). `sync` walks the chain from installed version → current and accumulates operations. New migrations = add a data entry, not edit a prompt.
+- **`lib/settings-merge.js`** — Additive merge of `settings.json.tpl` into target's `settings.json`. Adds/updates AIAgentMinder-managed hooks, preserves user-added hooks. Deterministic JSON operation.
+- **CLI `sync` command** — `npx aiagentminder sync [target-path]`. `--dry-run` (default) shows the plan. `--apply` executes. `--force` overwrites user-owned files.
+
+### Prompt Rewrite
+
+- **`/aam-update` rewrite** — Thin orchestration (~100 lines). Calls `npx aiagentminder sync --dry-run` for the plan, presents it to the user, handles optional feature prompts and CLAUDE.md surgical merge, then calls `sync --apply`.
+- **Manifest unification** — `getCoreFiles()` and `getOptionalFiles()` in `lib/init.js` become the single source of truth for both `init` and `sync`. Or replaced entirely by filesystem walking in `sync.js`.
+
+### Acceptance Criteria
+
+- `npx aiagentminder sync D:\Source\accessi-shield --dry-run` produces correct add/update/delete plan for v3.3→v4.2 upgrade
+- `npx aiagentminder sync --apply` executes all file operations deterministically (copy, delete, merge settings)
+- Migration registry correctly chains v3.3→v4.0→v4.1→v4.2 operations
+- `/aam-update` prompt is ≤120 lines and delegates all file operations to CLI
+- Settings merge preserves user-added hooks while adding/updating AIAgentMinder hooks
+- No hardcoded file lists in `/aam-update` prompt — all derived from template or migration registry
+- Tests cover: sync diff computation, migration chaining, settings merge (additive, idempotent), CLI flags
+- `skills/` directory removed; `plugin.json` has no `skills` key; `validate` passes without skill packages
+- Target projects with plugin installed show no duplicate skill entries in `/` menu
+
+---
+
 ## Direction
 
-v4.0 closes quality gaps. v4.1 implements session profiles (Approach B from spike) and backlog management. v5.0 is the orchestrator layer (Approach C from spike) — sprint-master coordinates specialist sub-agents for each sprint phase. See `docs/spike-session-architecture.md`.
+v4.0 closes quality gaps. v4.1 implements session profiles and backlog management. v4.2 makes installation/upgrade deterministic. v5.0 is the orchestrator layer (Approach C from spike) — sprint-master coordinates specialist sub-agents for each sprint phase. See `docs/spike-session-architecture.md`.
 
 Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, review, or promote items.
 
@@ -202,7 +239,7 @@ Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, revi
 
 ### Release Automation
 
-- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`). Deferred from S1 (S1-006 blocked on human review of PR #84).
+- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`). Deferred from S1 (PR #84 closed — npm infrastructure not yet configured).
 
 ### Future Direction (monitor)
 
@@ -218,6 +255,19 @@ Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, revi
 - **`/aam-handoff` JSON digest** — Speculative value. Nobody has asked for it.
 - **`/onboard` command** — `/aam-brief` Starting Point E (existing project audit) covers this use case.
 - **Quality tier selection** — Replaced with always-Comprehensive default in v3.0.
-- **`/aam-update` dry-run mode** — Git already tracks all changes, the command is idempotent, and user-owned files are never touched.
+- **`/aam-update` dry-run mode (as a prompt feature)** — Superseded by v4.2 deterministic sync. Dry-run is now a CLI flag (`npx aiagentminder sync --dry-run`), not a prompt behavior.
 - **HTTP hook support** — Node.js dependency already removed in v3.2.
 - **Versioning scheme reset to v1.0.0** — Resolved: continue v3.x with strict semver. See DECISIONS.md.
+
+---
+
+## Roadmap History
+
+| Date | Change | Reason |
+|---|---|---|
+| 2026-03-30 | Added: v4.2 Deterministic Sync | `/aam-update` prompt drifted from template — 6 obsolete rules still copied, 10 agent files missing, 5 scripts missing. Two sources of truth (prompt vs `lib/init.js`) always out of sync. |
+| 2026-03-30 | Changed: `/aam-update` dry-run → Dropped (superseded) | Dry-run is now a CLI flag on `npx aiagentminder sync`, not a prompt behavior. |
+| 2026-03-30 | Added: Plugin skill removal (v4.2) | Plugin skills duplicate project-local skills — ~600 tokens dead weight per session. Plugin provides CLI only; discoverability is a future concern. |
+| 2026-03-30 | Changed: Release Automation note | PR #84 closed — npm infrastructure not yet configured. |
+
+*Last revised by /aam-revise 2026-03-30*

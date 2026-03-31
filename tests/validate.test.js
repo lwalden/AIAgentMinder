@@ -7,7 +7,6 @@ import { fileURLToPath } from 'node:url';
 
 import {
   validatePluginJson,
-  validateSkillPackages,
   validateVersionConsistency,
   validateAll,
 } from '../lib/validate.js';
@@ -71,58 +70,6 @@ describe('validatePluginJson', () => {
     const result = validatePluginJson(dir);
     assert.equal(result.valid, false);
     assert.ok(result.errors.some(e => e.includes('parse')));
-    cleanTempDir(dir);
-  });
-});
-
-describe('validateSkillPackages', () => {
-  it('passes when all skill directories have SKILL.md', () => {
-    const dir = makeTempDir();
-    const skillsDir = path.join(dir, 'skills');
-    fs.mkdirSync(path.join(skillsDir, 'aam-brief'), { recursive: true });
-    fs.writeFileSync(path.join(skillsDir, 'aam-brief', 'SKILL.md'), '---\nname: aam-brief\n---\n');
-    fs.mkdirSync(path.join(skillsDir, 'aam-tdd'), { recursive: true });
-    fs.writeFileSync(path.join(skillsDir, 'aam-tdd', 'SKILL.md'), '---\nname: aam-tdd\n---\n');
-
-    const result = validateSkillPackages(dir);
-    assert.equal(result.valid, true);
-    assert.equal(result.skillCount, 2);
-    assert.equal(result.errors.length, 0);
-
-    cleanTempDir(dir);
-  });
-
-  it('fails when a skill directory is missing SKILL.md', () => {
-    const dir = makeTempDir();
-    const skillsDir = path.join(dir, 'skills');
-    fs.mkdirSync(path.join(skillsDir, 'aam-brief'), { recursive: true });
-    // No SKILL.md
-
-    const result = validateSkillPackages(dir);
-    assert.equal(result.valid, false);
-    assert.ok(result.errors.some(e => e.includes('aam-brief') && e.includes('SKILL.md')));
-
-    cleanTempDir(dir);
-  });
-
-  it('fails when skills directory does not exist', () => {
-    const dir = makeTempDir();
-    const result = validateSkillPackages(dir);
-    assert.equal(result.valid, false);
-    assert.ok(result.errors.some(e => e.includes('skills/')));
-    cleanTempDir(dir);
-  });
-
-  it('reports correct skill count', () => {
-    const dir = makeTempDir();
-    const skillsDir = path.join(dir, 'skills');
-    for (const name of ['aam-a', 'aam-b', 'aam-c']) {
-      fs.mkdirSync(path.join(skillsDir, name), { recursive: true });
-      fs.writeFileSync(path.join(skillsDir, name, 'SKILL.md'), `---\nname: ${name}\n---\n`);
-    }
-
-    const result = validateSkillPackages(dir);
-    assert.equal(result.skillCount, 3);
     cleanTempDir(dir);
   });
 });
@@ -191,8 +138,17 @@ describe('validateAll', () => {
     const result = validateAll(REPO_ROOT);
     // This test validates the real repo — all checks should pass
     assert.equal(result.pluginJson.valid, true, `plugin.json errors: ${result.pluginJson.errors.join(', ')}`);
-    assert.equal(result.skills.valid, true, `skills errors: ${result.skills.errors.join(', ')}`);
     assert.equal(result.versions.valid, true, `version errors: ${result.versions.errors.join(', ')}`);
-    assert.equal(result.skills.skillCount, 13, 'should have 13 skill packages');
+  });
+
+  it('does not include skills validation', () => {
+    const result = validateAll(REPO_ROOT);
+    assert.equal(result.skills, undefined, 'validateAll should not include skills key');
+  });
+
+  it('plugin.json should not reference skills directory', () => {
+    const pluginPath = path.join(REPO_ROOT, '.claude-plugin', 'plugin.json');
+    const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
+    assert.equal(plugin.skills, undefined, 'plugin.json should not have a skills field');
   });
 });

@@ -8,7 +8,7 @@ import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeV
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
 import { writeAgentsMd } from '../lib/agents-md.js';
 import { fingerprint, detectExistingInstall } from '../lib/detect.js';
-import { validateAll } from '../lib/validate.js';
+import { validatePluginJson, validateVersionConsistency } from '../lib/validate.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.resolve(__dirname, '..', 'package.json');
@@ -202,36 +202,27 @@ function runValidateCommand() {
   const repoDir = process.cwd();
   console.log(`\nValidating AIAgentMinder plugin structure in: ${repoDir}\n`);
 
-  const result = validateAll(repoDir);
+  const pluginResult = validatePluginJson(repoDir);
+  const versionResult = validateVersionConsistency(repoDir);
   let hasErrors = false;
 
   // Plugin.json
-  if (result.pluginJson.valid) {
-    console.log(`  plugin.json: OK (v${result.pluginJson.data.version})`);
+  if (pluginResult.valid) {
+    console.log(`  plugin.json: OK (v${pluginResult.data.version})`);
   } else {
     hasErrors = true;
-    for (const err of result.pluginJson.errors) {
+    for (const err of pluginResult.errors) {
       console.log(`  plugin.json: FAIL — ${err}`);
     }
   }
 
-  // Skills
-  if (result.skills.valid) {
-    console.log(`  skills/: OK (${result.skills.skillCount} packages)`);
-  } else {
-    hasErrors = true;
-    for (const err of result.skills.errors) {
-      console.log(`  skills/: FAIL — ${err}`);
-    }
-  }
-
   // Version consistency
-  if (result.versions.valid) {
-    const v = result.versions.versions;
+  if (versionResult.valid) {
+    const v = versionResult.versions;
     console.log(`  versions: OK (${v.template || 'unknown'})`);
   } else {
     hasErrors = true;
-    for (const err of result.versions.errors) {
+    for (const err of versionResult.errors) {
       console.log(`  versions: FAIL — ${err}`);
     }
   }

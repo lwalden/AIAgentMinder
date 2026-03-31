@@ -82,9 +82,11 @@ Chose: Remove compact-reorient.js entirely over keeping it as a fallback. Why: v
 
 ---
 
-### Drop /aam-update dry-run mode from backlog | 2026-03 | Status: Active
+### Drop /aam-update dry-run mode from backlog | 2026-03 | Status: Superseded
 
-Chose: Drop the dry-run backlog item over implementing it. Why: The update command is 374 lines with three file categories and multi-version migration paths. A real dry-run adds ~40-50% code overhead and creates a parallel path that must stay in sync. Risk is already mitigated — git tracks all changes, the command is idempotent, and user-owned files are explicitly never touched. If more safety is needed later, a pre-flight summary expansion (~20 lines) gives 80% of the value. Tradeoff: Users cannot preview changes before committing — but they can `git diff` after and `git reset --hard` if unhappy.
+Superseded by v4.2 deterministic sync decision (2026-03-30). Dry-run is now a CLI flag.
+
+Original: Chose: Drop the dry-run backlog item over implementing it. Why: The update command is 374 lines with three file categories and multi-version migration paths. A real dry-run adds ~40-50% code overhead.
 
 ---
 
@@ -151,6 +153,26 @@ Chose: Invest in v4.0 (skills migration, negative test enforcement, UX friction 
 ### context: fork only for quality-gate, not self-review | 2026-03-29 | Status: Active
 
 Chose: Apply `context: fork` to `aam-quality-gate.md` only, not `aam-self-review.md`, over forking both. Why: self-review spawns multiple reviewer subagents (security, performance, API design, cost lenses). Claude Code subagents cannot spawn sub-subagents — running self-review with `context: fork` would make it a subagent, breaking its ability to spawn review lenses. Quality-gate runs sequential checks with no subagent spawning, so fork is safe. Tradeoff: self-review output pollutes the main sprint context; acceptable because it produces a structured summary, not verbose tool output.
+
+---
+
+### Drop plugin skill packages — project-local only | 2026-03-30 | Status: Active
+
+Chose: Remove `skills/` directory (13 plugin packages) and make all skills project-local only over (a) keeping both and deduplicating at setup time, (b) making plugin skills authoritative and dropping project-local, or (c) making plugin skills stubs pointing to project-local. Why: Plugin skills had already drifted from project-local versions (still referenced PROGRESS.md, had different frontmatter). Duplication costs ~400-600 tokens per session in every target project. Plugin marketplace discoverability is not a current concern — the product has only been installed locally. Project-local skills are the maintained versions. Tradeoff: If plugin marketplace becomes relevant later, skill packages would need to be re-added or a new discovery mechanism created.
+
+---
+
+### Deterministic sync over prompt-driven update | 2026-03-30 | Status: Active
+
+Chose: CLI `sync` command (`lib/sync.js`, `lib/migrations.js`, `lib/settings-merge.js`) that derives file operations from the filesystem at runtime over maintaining hardcoded file lists in the `/aam-update` prompt. Why: The 404-line prompt drifted from `project/` — audit found 6 obsolete rules still being copied, 10 agent files never mentioned, 5 new scripts missing, and contradictory instructions (marking files as obsolete then copying them). Root cause: two sources of truth (`lib/init.js` manifest vs prompt prose). The prompt retains judgment-heavy work (CLAUDE.md merge, optional feature prompts, edge cases) while the CLI handles deterministic operations (copy, delete, settings merge, migration chaining). Tradeoff: adds CLI complexity; mitigated by existing test infrastructure (160+ tests) and the `init` command pattern already proven.
+
+---
+
+### Drop /aam-update dry-run mode from backlog | 2026-03 | Status: Superseded
+
+Superseded by v4.2 deterministic sync. Dry-run is now a first-class CLI flag (`npx aiagentminder sync --dry-run`), not a prompt behavior. The original rationale (too much code overhead for a prompt-based dry-run) no longer applies — the CLI naturally supports it.
+
+Original: Chose: Drop the dry-run backlog item over implementing it. Why: The update command is 374 lines with three file categories and multi-version migration paths. A real dry-run adds ~40-50% code overhead.
 
 ---
 
