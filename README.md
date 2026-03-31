@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-4.1.0-blue)
+![Version](https://img.shields.io/badge/version-4.2.0-blue)
 [![npm](https://img.shields.io/npm/v/aiagentminder)](https://www.npmjs.com/package/aiagentminder)
 
 A governance framework for Claude Code. Slash commands, rules files, hooks, and shell scripts that add sprint execution, quality enforcement, and context management to Claude Code projects.
@@ -191,7 +191,7 @@ Run `/aam-checkup` first — it validates files, settings, status line, and jq.
 | Claude asks you to do things manually | Verify `tool-first.md` is installed via `/aam-checkup` |
 | Quality degrades late in session | Verify `jq` is installed and status line is in `.claude/settings.json` |
 | Context cycle doesn't restart | Verify profile hook is installed or use `sprint-runner.ps1` |
-| Upgrading | Run `/aam-update` from the AIAgentMinder repo or `npx aiagentminder init --force` |
+| Upgrading | Run `npx aiagentminder sync [path] --apply` or `/aam-update` from the AIAgentMinder repo |
 
 ---
 
