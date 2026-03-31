@@ -14,14 +14,15 @@ Generate a brief retrospective for the completed sprint. Called automatically at
 
 Read the following:
 
-1. `SPRINT.md` — sprint goal, issue list, final statuses (including Post-Merge column)
-2. Use TaskList to get final task states and any notes
-3. `DECISIONS.md` — identify entries added during this sprint (by date or sprint reference)
-4. Recent git log for this sprint's branches:
+1. `.sprint-metrics.json` — if present, use as primary metrics source (timestamps, cycle counts, rework). Fall back to git log parsing when the metrics file is absent (backward compatible with sprints that ran before metrics collection was added).
+2. `SPRINT.md` — sprint goal, issue list, final statuses (including Post-Merge column)
+3. Use TaskList to get final task states and any notes
+4. `DECISIONS.md` — identify entries added during this sprint (by date or sprint reference)
+5. Recent git log for this sprint's branches:
    ```bash
    git log --oneline --merges --since="sprint start date"
    ```
-5. Check for any issues that were added or removed after approval (scope changes)
+6. Check for any issues that were added or removed after approval (scope changes)
 
 ---
 

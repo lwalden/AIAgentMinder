@@ -52,6 +52,7 @@ temp/
 .context-usage
 .context-usage.tmp
 .corrections.jsonl
+.sprint-metrics.json
 
 # Claude Code auto memory (project-specific, not for version control)
 # Uncomment if you use Claude Code's auto memory feature:
