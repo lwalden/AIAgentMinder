@@ -1,21 +1,16 @@
 # /aam-setup - Project Initialization
 
-You are running this command from the **AIAgentMinder template repository**. Your job is to help the user set up AIAgentMinder in a target project by copying and customizing the template files from the `project/` directory in this repo.
+You are running this command from the **AIAgentMinder template repository**. Your job is to help the user set up AIAgentMinder in a target project using the CLI installer.
 
 Follow these steps in order. Ask questions in grouped batches, not one at a time.
 
 ---
 
-## Step 1: Determine Scenario
+## Step 1: Determine Target
 
-Ask the user which applies:
+Ask the user for the **full path** to the target directory.
 
-**A) Add to an existing repository** -- The user has a repo with code already. You'll add template files without overwriting their existing work.
-**B) Initialize in a directory** -- The user has a blank or near-blank directory (with or without `git init`). You'll set up files here.
-
-For both: ask the user for the **full path** to the target directory.
-
-For scenario B in the current directory: confirm with the user -- "This will set up AIAgentMinder files in this template repository's directory. Is that what you want, or did you mean to target a different project?"
+If they want to set up in the current directory (this template repo), confirm: "This will set up AIAgentMinder files in this template repository's directory. Is that what you want, or did you mean to target a different project?"
 
 ---
 
@@ -28,102 +23,62 @@ Ask all of these in one grouped prompt:
 3. **Project type:** web-app | api | cli-tool | library | mobile-app | other
 4. **Primary tech stack:** Language, Framework, Database, other key dependencies
 5. **Developer profile:** Experience level, autonomy preference (conservative / medium / aggressive)
-6. **Project scale:** Personal tool, small team tool, or public-facing product?
-7. **MCP servers:** Any MCP servers? (database, browser automation, etc. -- or "none")
-8. **Sprint planning:** Enable? (Structured issue decomposition with per-issue PRs — recommended for multi-phase projects) (y/n)
-9. **GitHub Issues sync:** Enable `/aam-sync-issues` command? Syncs current sprint issues to GitHub Issues for visibility outside Claude Code. (y/n — recommended for team projects with a GitHub remote)
-10. **PR pipeline automation:** Enable `/aam-pr-pipeline`? Automatically reviews, fixes, tests, and merges PRs after creation. Requires Node.js and `gh` CLI. (y/n — recommended for any project where you create PRs from Claude Code)
+6. **Sprint planning:** Enable? (y/n — recommended for multi-phase projects)
+7. **GitHub Issues sync:** Enable `/aam-sync-issues`? (y/n — recommended for team projects)
+8. **PR pipeline automation:** Enable `/aam-pr-pipeline`? (y/n — recommended for any project with PRs)
 
 ---
 
-## Step 3: Set Up Repository
+## Step 3: Run CLI Installer
 
-The template files are in the `project/` directory of this repository. Copy them to the target location based on the scenario.
+Run the CLI installer with the appropriate flags based on Step 2 answers:
 
-### Scenario A: Existing Repo
-Copy template files into the user's repo. Before copying each file, check if it already exists:
-- If it exists, ask: "You already have [file]. Should I merge, replace, or skip it?"
-- Never overwrite without asking
-- Always copy `.claude/` directory (commands, settings, scripts)
+```bash
+cd [target-path]
+node [path-to-aiagentminder]/bin/aam.js init --force
+```
 
-### Scenario B: New/Blank Directory
-If no git repo exists, run `git init`. Then copy all files from this repo's `project/` directory.
+If the user wants all optional features: add `--all`.
+If core only (no optional features): add `--core`.
 
-### Core files (always copy)
-
-Copy these to the target unconditionally (create directories as needed). Use `npx aiagentminder init` for automated installation.
-
-**Universal rules:**
-- `project/.claude/rules/git-workflow.md` → `[target]/.claude/rules/git-workflow.md`
-- `project/.claude/rules/tool-first.md` → `[target]/.claude/rules/tool-first.md`
-- `project/.claude/rules/correction-capture.md` → `[target]/.claude/rules/correction-capture.md`
-- `project/.claude/rules/context-cycling.md` → `[target]/.claude/rules/context-cycling.md`
-- `project/.claude/rules/README.md` → `[target]/.claude/rules/README.md`
-
-**Session profile agents:**
-- `project/.claude/agents/sprint-executor.md` → `[target]/.claude/agents/sprint-executor.md`
-- `project/.claude/agents/dev.md` → `[target]/.claude/agents/dev.md`
-- `project/.claude/agents/debug.md` → `[target]/.claude/agents/debug.md`
-- `project/.claude/agents/hotfix.md` → `[target]/.claude/agents/hotfix.md`
-- `project/.claude/agents/qa.md` → `[target]/.claude/agents/qa.md`
-
-**Scripts:** all files in `project/.claude/scripts/` → `[target]/.claude/scripts/`
-
-**Skills:** all `project/.claude/skills/aam-*.md` → `[target]/.claude/skills/`
-
-**Root files:** CLAUDE.md, DECISIONS.md, BACKLOG.md, docs/strategy-roadmap.md, .gitignore
-
-### Optional features (based on Step 2 answers)
-
-**Sprint planning:** If enabled:
-- Copy `project/SPRINT.md` to `[target]/SPRINT.md`
-
-**GitHub Issues sync:** If enabled:
-
-- Copy `project/.claude/skills/aam-sync-issues.md` to `[target]/.claude/skills/aam-sync-issues.md`
-
-**PR pipeline automation:** If enabled:
-- Copy `project/.claude/skills/aam-pr-pipeline.md` to `[target]/.claude/skills/aam-pr-pipeline.md`
-- Copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json`
-- Ask: "Email address for escalation notifications? (leave blank to use PR comments only)"
-  - If provided, update `notification.email` in the copied `.pr-pipeline.json`
-- Tell the user: "PR pipeline installed. The sprint workflow will run `/aam-pr-pipeline` in-session after creating a PR to review, test, and merge automatically. You can also invoke `/aam-pr-pipeline` manually. Check `.pr-pipeline.json` to configure high-risk patterns, cycle limit, and auto-merge."
+The CLI handles:
+- Copying all core files (scripts, agents, rules, skills, settings, root files)
+- Copying optional feature files based on flags
+- Codebase fingerprinting (auto-detects language, framework, test runner)
+- Writing the version stamp
 
 ---
 
-## Step 4: Check Prerequisites
+## Step 4: Customize Project Identity
 
-Check `jq --version`. If not found, warn: "Context monitoring requires `jq`. Install: `winget install jqlang.jq` / `brew install jq` / `apt install jq`. The status line script will be copied but won't run without it. Sprint workflow falls back to heuristics."
+After the CLI finishes, customize these files **in the target project**:
 
----
+### CLAUDE.md — Project Identity Section
 
-## Step 5: Customize Files
+Replace the placeholder block with actual values from Step 2:
 
-Using the project identity from Step 2, update these files **in the target project** (not in this template repo):
-
-### CLAUDE.md -- Project Identity Section
-Replace the placeholder block with actual values:
 ```markdown
 **Project:** [actual name]
 **Description:** [actual description]
 **Type:** [actual type]
 **Stack:** [actual stack details]
-**MCP Servers:** [list MCP servers, or omit line if none]
 
 **Developer Profile:**
+
 - [actual experience info]
-- [actual risk tolerance]
+- [actual autonomy preference]
 ```
 
-### CLAUDE.md -- Sprint import (if sprint planning enabled)
-Add `@SPRINT.md` after the Context Budget section in CLAUDE.md. This uses Claude Code's native `@import` syntax — it loads SPRINT.md into every session automatically when the file exists.
+### CLAUDE.md — Sprint import (if sprint planning enabled)
 
-Also add to the Context Budget:
+Add `@SPRINT.md` after the Context Budget section. Also add:
+
 ```
 **Sprint tracking:** SPRINT.md — auto-loaded via @import; archived when sprint completes
 ```
 
-### .gitignore -- Append Stack-Specific Entries
+### .gitignore — Append Stack-Specific Entries
+
 The template `.gitignore` covers secrets, IDE files, OS artifacts. Append stack-specific entries:
 - **Node.js**: `node_modules/`, `dist/`, `build/`, `.next/`, `*.tsbuildinfo`
 - **Python**: `__pycache__/`, `*.py[cod]`, `.venv/`, `.pytest_cache/`
@@ -131,43 +86,46 @@ The template `.gitignore` covers secrets, IDE files, OS artifacts. Append stack-
 - **Rust**: `target/`, `*.rs.bk`
 - **Go**: `*.exe`, `*.test`, `*.out`
 
-### docs/strategy-roadmap.md -- Set Testing Strategy
+### docs/strategy-roadmap.md — Set Testing Strategy
+
 Based on project scope, fill in the Testing Strategy section with appropriate testing approach.
 
 ---
 
-## Step 6: Write Version Stamp and Initial Commit
+## Step 5: Check Prerequisites
 
-Write the current AIAgentMinder version to the target project:
-- Read the version from `project/.claude/aiagentminder-version` in this repo
-- Write that version to `[target]/.claude/aiagentminder-version`
+Run `jq --version`. Warn if not found — context monitoring requires it.
 
-Then in the **target project directory**:
+---
+
+## Step 6: Initial Commit
+
+In the **target project directory**:
+
 ```bash
+cd [target]
 git add -A
-git commit -m "chore: initialize project with AIAgentMinder"
+git commit -m "chore: initialize project with AIAgentMinder v4.2"
 ```
 
 ---
 
 ## Step 7: Summary
 
-Print based on what was enabled:
-
 ```
 Project initialized successfully!
 
 Created files:
-- CLAUDE.md (project instructions — ~50 lines)
+- CLAUDE.md (project instructions)
 - DECISIONS.md (architectural decisions and known debt log)
-- BACKLOG.md (work inbox — managed by backlog-capture.sh)
+- BACKLOG.md (work inbox)
 - docs/strategy-roadmap.md (product brief template)
 - .claude/settings.json (hook configuration)
-- .claude/agents/ (session profiles: sprint-executor, dev, debug, hotfix, qa)
-- .claude/skills/ (13 aam-* skills — brief, revise, checkup, handoff, quality-gate, scope-check, self-review, milestone, retrospective, tdd, triage, grill, backlog)
-- .claude/scripts/ (context-monitor, context-cycle, backlog-capture, sprint-runner, and hook scripts)
-- .claude/rules/ (universal rules: git-workflow, tool-first, correction-capture, context-cycling)
-- .claude/aiagentminder-version (version stamp for /aam-update)
+- .claude/agents/ (session profiles)
+- .claude/skills/ (aam-* skills)
+- .claude/scripts/ (hooks and utilities)
+- .claude/rules/ (universal rules)
+- .claude/aiagentminder-version (version stamp)
 - .gitignore (core + [stack] entries)
 [if sprint planning enabled:]
 - SPRINT.md (sprint state tracking)
@@ -175,9 +133,7 @@ Created files:
 Next steps:
 1. Open Claude Code in your project directory
 2. Run /aam-brief to create your product brief & roadmap
-3. Run /aam-checkup to verify the installation is healthy
+3. Run /aam-checkup to verify the installation
 [if sprint planning enabled:]
-4. When ready to build, say "start a sprint" or "begin Phase 1" — I'll propose issues for your review
-[else:]
-4. Or tell Claude "start Phase 1" if you already have a plan
+4. When ready to build, say "start a sprint" — I'll propose issues for review
 ```
