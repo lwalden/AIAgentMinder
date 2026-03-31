@@ -281,3 +281,93 @@ describe('CLI integration: existing install detection', () => {
     assert.ok(fs.existsSync(path.join(targetDir, 'CLAUDE.md')));
   });
 });
+
+describe('CLI integration: v3.x to v4.1 migration', () => {
+  let targetDir;
+
+  beforeEach(() => {
+    targetDir = makeTempDir();
+    // Simulate a v3.3 installation with old rule files
+    const rulesDir = path.join(targetDir, '.claude', 'rules');
+    fs.mkdirSync(rulesDir, { recursive: true });
+    fs.writeFileSync(path.join(targetDir, '.claude', 'aiagentminder-version'), '3.3.0');
+    // Old rules that should NOT be re-created by v4.1 init
+    fs.writeFileSync(path.join(rulesDir, 'scope-guardian.md'), '# old scope guardian');
+    fs.writeFileSync(path.join(rulesDir, 'approach-first.md'), '# old approach-first');
+    fs.writeFileSync(path.join(rulesDir, 'debug-checkpoint.md'), '# old debug-checkpoint');
+    fs.writeFileSync(path.join(rulesDir, 'code-quality.md'), '# old code-quality');
+    fs.writeFileSync(path.join(rulesDir, 'sprint-workflow.md'), '# old sprint-workflow');
+    fs.writeFileSync(path.join(rulesDir, 'architecture-fitness.md'), '# old architecture-fitness');
+    // Existing universal rules
+    fs.writeFileSync(path.join(rulesDir, 'git-workflow.md'), '# old git-workflow');
+    fs.writeFileSync(path.join(rulesDir, 'tool-first.md'), '# old tool-first');
+  });
+
+  afterEach(() => {
+    cleanTempDir(targetDir);
+  });
+
+  it('installs agents when upgrading from v3.3 with --force', () => {
+    execFileSync('node', [BIN, 'init', '--core', '--force'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    // New agent files should exist
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'debug.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'hotfix.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'qa.md')));
+  });
+
+  it('does not re-create old relocated rules', () => {
+    execFileSync('node', [BIN, 'init', '--core', '--force'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    // getCoreFiles() should NOT include these — init should not copy them
+    // The old files still exist (init doesn't delete), but no NEW copies from template
+    // Verify by checking that template does NOT have these files (so init can't copy them)
+    const templateDir = path.resolve(__dirname, '..', 'project');
+    assert.ok(!fs.existsSync(path.join(templateDir, '.claude', 'rules', 'scope-guardian.md')));
+    assert.ok(!fs.existsSync(path.join(templateDir, '.claude', 'rules', 'approach-first.md')));
+    assert.ok(!fs.existsSync(path.join(templateDir, '.claude', 'rules', 'sprint-workflow.md')));
+    assert.ok(!fs.existsSync(path.join(templateDir, '.claude', 'rules', 'code-quality.md')));
+    assert.ok(!fs.existsSync(path.join(templateDir, '.claude', 'rules', 'architecture-fitness.md')));
+    assert.ok(!fs.existsSync(path.join(templateDir, '.claude', 'rules', 'debug-checkpoint.md')));
+  });
+
+  it('installs context-cycling.md as new universal rule', () => {
+    execFileSync('node', [BIN, 'init', '--core', '--force'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'rules', 'context-cycling.md')));
+  });
+
+  it('installs BACKLOG.md and backlog-capture.sh', () => {
+    execFileSync('node', [BIN, 'init', '--core', '--force'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    assert.ok(fs.existsSync(path.join(targetDir, 'BACKLOG.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'backlog-capture.sh')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-backlog.md')));
+  });
+
+  it('updates version stamp to 4.1.0', () => {
+    execFileSync('node', [BIN, 'init', '--core', '--force'], {
+      encoding: 'utf-8',
+      cwd: targetDir,
+    });
+
+    const version = fs.readFileSync(
+      path.join(targetDir, '.claude', 'aiagentminder-version'), 'utf-8'
+    ).trim();
+    assert.equal(version, '4.1.0');
+  });
+});
