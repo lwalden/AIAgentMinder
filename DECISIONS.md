@@ -176,6 +176,12 @@ Original: Chose: Drop the dry-run backlog item over implementing it. Why: The up
 
 ---
 
+### Orchestrator spike: rules auto-load, sub-sub-agents blocked | 2026-03-30 | Status: Active
+
+Chose: Proceed with orchestrator architecture (Approach C from spike doc) based on spike validation of all 6 prerequisites. Key findings: (a) `.claude/rules/` auto-load for sub-agents — eliminates base instructions problem entirely, (b) sub-agent spawning latency ~21s avg (acceptable), (c) parallel agent spawning works, (d) structured prompts/output contracts survive agent boundary, (e) sub-sub-agent spawning is NOT possible (Agent tool unavailable to sub-agents). Why: All prerequisites met or have clean workarounds. The sub-sub-agent constraint affects quality-reviewer (S8-006) — sprint-master must dispatch review lenses directly as first-level sub-agents. Tradeoff: orchestrator grows slightly for quality review orchestration; mitigated by parallel lens execution.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.
