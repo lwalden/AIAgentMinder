@@ -108,5 +108,5 @@ Not touched (user-owned):
 - DECISIONS.md, docs/strategy-roadmap.md, .gitignore, .pr-pipeline.json
 
 Next: open Claude Code in [target] — your project governance is now current.
-Run /aam-checkup to verify the installation is healthy.
+Run `npx aiagentminder sync . --dry-run` to verify everything is current.
 ```

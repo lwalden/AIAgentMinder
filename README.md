@@ -31,9 +31,8 @@ Alternative: clone the repo and run `/aam-setup` from Claude Code.
 
 ### After install
 
-1. Run `/aam-checkup` in your project to verify the installation.
-2. Run `/aam-brief` to create your product brief and strategy roadmap.
-3. Start building: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
+1. Run `/aam-brief` to create your product brief and strategy roadmap.
+2. Start building: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
 
 With sprint planning enabled: "Start a sprint for Phase 1."
 
@@ -89,7 +88,6 @@ AIAgentMinder addresses three gaps in Claude Code:
 | Command | Purpose |
 |---------|---------|
 | `/aam-brief` | Interview-driven product brief and strategy roadmap |
-| `/aam-checkup` | Installation health check — files, settings, version, jq |
 | `/aam-revise` | Update the plan — add, drop, or reprioritize features with decision logging |
 | `/aam-scope-check` | Compare proposed work against the roadmap |
 | `/aam-handoff` | Session-end checkpoint — decisions, priorities, commit |
@@ -180,15 +178,15 @@ Works on **Windows, macOS, and Linux**.
 
 ## Troubleshooting
 
-Run `/aam-checkup` first — it validates files, settings, status line, and jq.
+Run `npx aiagentminder sync . --dry-run` to verify your installation is current.
 
 | Symptom | Fix |
 |---------|-----|
 | Commands not showing (VS Code) | Close and reopen the Claude Code panel |
-| Hooks not firing | Run `/aam-checkup` |
+| Hooks not firing | Run `npx aiagentminder sync . --dry-run` to check settings.json |
 | Claude re-debates a past decision | Add it to DECISIONS.md; add `@DECISIONS.md` to CLAUDE.md to auto-load |
 | Claude builds something out of scope | Run `/aam-scope-check`; `scope-guardian.md` also catches this passively |
-| Claude asks you to do things manually | Verify `tool-first.md` is installed via `/aam-checkup` |
+| Claude asks you to do things manually | Verify `tool-first.md` exists in `.claude/rules/` |
 | Quality degrades late in session | Verify `jq` is installed and status line is in `.claude/settings.json` |
 | Context cycle doesn't restart | Verify profile hook is installed or use `sprint-runner.ps1` |
 | Upgrading | Run `npx aiagentminder sync [path] --apply` or `/aam-update` from the AIAgentMinder repo |
