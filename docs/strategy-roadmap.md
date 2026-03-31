@@ -192,9 +192,11 @@ Based on session architecture spike (see `docs/spike-session-architecture.md`, A
 
 ---
 
-## v4.2 — Deterministic Sync
+## v4.2 — Deterministic Sync (shipped)
 
-Replace `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync command. File operations are derived from the filesystem at runtime — no hardcoded file lists that drift from `project/`. The prompt shrinks to ~100 lines handling only judgment calls (CLAUDE.md merge, optional feature prompts, edge cases). Also removes plugin skill packages to eliminate context duplication in target projects.
+Replaced `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync command. File operations derived from the filesystem at runtime — no hardcoded file lists. Also removed plugin skill packages to eliminate context duplication in target projects.
+
+**Shipped:** `lib/sync.js` (diff engine), `lib/migrations.js` (version-chained registry, 7 migrations v0.7–v4.1), `lib/settings-merge.js` (additive merge), CLI `sync` command (`--dry-run`/`--apply`/`--force`), `/aam-update` rewrite (404→112 lines), `/aam-setup` rewrite (183→139 lines), plugin skill removal (13 packages, ~600 tokens/session saved), manifest consistency tests. 60 new tests. PRs #107-116.
 
 ### Plugin Skill Removal
 
@@ -231,7 +233,7 @@ Replace `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync command
 
 ## Direction
 
-v4.0 closes quality gaps. v4.1 implements session profiles and backlog management. v4.2 makes installation/upgrade deterministic. v5.0 is the orchestrator layer (Approach C from spike) — sprint-master coordinates specialist sub-agents for each sprint phase. See `docs/spike-session-architecture.md`.
+v4.0 closes quality gaps. v4.1 implements session profiles and backlog management. v4.2 makes installation/upgrade deterministic (shipped). v5.0 is the orchestrator layer (Approach C from spike) — sprint-master coordinates specialist sub-agents for each sprint phase. See `docs/spike-session-architecture.md`.
 
 Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, review, or promote items.
 
