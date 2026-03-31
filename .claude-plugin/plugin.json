@@ -1,6 +1,6 @@
 {
   "name": "aiagentminder",
-  "version": "3.3.0",
+  "version": "4.1.0",
   "description": "Project governance framework for Claude Code — sprint execution, quality gates, codebase fingerprinting, and structured planning for solo developers.",
   "author": {
     "name": "lwalden",
@@ -9,6 +9,14 @@
   "homepage": "https://github.com/lwalden/AIAgentMinder",
   "repository": "https://github.com/lwalden/AIAgentMinder",
   "license": "MIT",
-  "keywords": ["governance", "planning", "sprint", "quality", "methodology", "tdd", "code-review"],
+  "keywords": [
+    "governance",
+    "planning",
+    "sprint",
+    "quality",
+    "methodology",
+    "tdd",
+    "code-review"
+  ],
   "skills": "./skills/"
 }

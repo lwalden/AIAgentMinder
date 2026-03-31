@@ -82,7 +82,8 @@ describe('backlog-capture.sh: add subcommand', () => {
     fs.writeFileSync(path.join(dir, 'BACKLOG.md'), EMPTY_BACKLOG);
     run(['add', 'defect', 'Something broken', 'session'], dir);
     const content = fs.readFileSync(path.join(dir, 'BACKLOG.md'), 'utf-8');
-    const today = new Date().toISOString().slice(0, 10);
+    const now = new Date();
+    const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
     assert.ok(content.includes(`| ${today} |`));
   });
 
