@@ -1,30 +1,6 @@
 # /aam-update - Upgrade AIAgentMinder in a Target Project
 
-You are running this command from the **AIAgentMinder template repository**. Your job is to upgrade an existing AIAgentMinder installation in a target project to match the current version of the template files in `project/`.
-
----
-
-## File Taxonomy
-
-Before touching anything, understand what each file is:
-
-| Category | Files | Action |
-|---|---|---|
-| **AIAgentMinder-owned** | `.claude/scripts/*` (all scripts), `.claude/skills/aam-*.md` (all skills), `.claude/agents/*.md` (all session profiles), `.claude/rules/git-workflow.md`, `.claude/rules/tool-first.md`, `.claude/rules/context-cycling.md`, `.claude/rules/README.md` | Overwrite unconditionally |
-| **AIAgentMinder-owned (settings)** | `.claude/settings.json` | Additive merge — see Step 2 |
-| **Obsolete (v3.1 → v3.2)** | `.claude/hooks/compact-reorient.js`, `.claude/hooks/` directory | Delete during migration — replaced by status line context monitoring |
-| **AIAgentMinder-owned (default-on)** | `.claude/rules/correction-capture.md` | Overwrite if present; prompt to add if absent |
-| **AIAgentMinder-owned (optional)** | `.claude/skills/aam-sync-issues.md`, `.claude/skills/aam-pr-pipeline.md` | Overwrite if present; prompt to add if absent |
-| **Obsolete (v4.0 → v4.1)** | `.claude/rules/scope-guardian.md`, `.claude/rules/approach-first.md`, `.claude/rules/debug-checkpoint.md`, `.claude/rules/code-quality.md`, `.claude/rules/sprint-workflow.md`, `.claude/rules/architecture-fitness.md` | Delete during migration — content moved to `.claude/agents/` session profiles |
-| **Obsolete (v2.1 → v2.2)** | `.claude/hooks/pr-pipeline-trigger.js` | Delete during migration — pipeline now runs in-session |
-| **User-owned (AIAgentMinder creates initial)** | `.pr-pipeline.json` | Never overwrite — user configures high-risk patterns and notification email |
-| **Obsolete (v0.9.1 → v1.0)** | `PROGRESS.md` (if AIAgentMinder-scaffolded) | Offer to delete — see migration notes below |
-| **Obsolete (v0.7.0 → v0.8.0)** | `.claude/hooks/session-end-commit.js`, `.claude/commands/plan.md` | Delete during migration |
-| **Obsolete (v0.6.0 → v0.7.0)** | `.claude/hooks/session-start-context.js`, `.claude/hooks/session-end-timestamp.js`, `.claude/hooks/pre-compact-save.js`, `.claude/guidance/` directory | Delete during migration |
-| **Hybrid** | `CLAUDE.md` | Surgical merge — update structural sections, preserve user content |
-| **User-owned (AIAgentMinder creates initial)** | `SPRINT.md` | Never overwrite if active sprint; create from template if missing and sprint planning is enabled |
-| **User-owned** | `DECISIONS.md`, `docs/strategy-roadmap.md`, `.gitignore` | Never touch |
-| **Version stamp** | `.claude/aiagentminder-version` | Write current version at the end |
+You are running this command from the **AIAgentMinder template repository**. Your job is to upgrade an existing AIAgentMinder installation in a target project using the CLI sync command.
 
 ---
 
@@ -32,293 +8,79 @@ Before touching anything, understand what each file is:
 
 Ask the user: "What is the full path to the project you want to update?"
 
-Then confirm before proceeding:
+---
 
+## Step 1: Dry Run
+
+Run the sync command in dry-run mode to see the upgrade plan:
+
+```bash
+node bin/aam.js sync [target-path] --dry-run
 ```
-I'll update AIAgentMinder files in [path].
 
-This will overwrite:
-  - .claude/scripts/context-monitor.sh (status line data bridge)
-  - .claude/scripts/sprint-update.sh (zero-token-cost SPRINT.md updater)
-  - .claude/settings.json
-  - .claude/skills/aam-handoff.md, aam-brief.md, aam-revise.md, aam-checkup.md, aam-quality-gate.md, aam-scope-check.md
-  - .claude/rules/git-workflow.md, scope-guardian.md, approach-first.md, debug-checkpoint.md, tool-first.md
-  - .claude/rules/ (existing optional rules files only — not adding new ones without asking)
-  - CLAUDE.md (structural sections only — Project Identity and MVP Goals preserved)
+Present the output to the user. This shows:
+- Installed version → template version
+- Migrations that will be applied (file deletions, renames)
+- Files to add, update, merge, and skip
+- Hybrid files (CLAUDE.md) that need manual merge
 
-[If upgrading from v0.9.1, also:]
-  - PROGRESS.md — no longer scaffolded by AIAgentMinder (see migration note below)
-
-[If upgrading from v0.7.0, these will also be removed:]
-  - .claude/hooks/session-end-commit.js (replaced by .claude/rules/git-workflow.md)
-  - .claude/commands/plan.md (renamed to aam-brief.md)
-
-[If upgrading from v0.6.0, these will also be removed:]
-  - .claude/hooks/session-start-context.js
-  - .claude/hooks/session-end-timestamp.js
-  - .claude/hooks/pre-compact-save.js
-  - .claude/guidance/ directory
-
-You'll be prompted about:
-  - Default-on rules not yet present (correction-capture)
-  - New optional features not yet enabled (code quality, sprint planning, architecture fitness)
-  - New always-active rules not yet present (approach-first, debug-checkpoint, tool-first)
-
-These will NOT be touched:
-  - DECISIONS.md, docs/strategy-roadmap.md, .gitignore
-  - SPRINT.md (if active sprint exists)
-
-Proceed? (y/n)
-```
+Ask: "Proceed with this upgrade? (y/n)"
 
 Stop if the user says no.
 
 ---
 
-## Step 1: Check Installed Version
+## Step 2: Apply
 
-Read `[target]/.claude/aiagentminder-version`.
+Run the sync command in apply mode:
 
-Read the current version from `project/.claude/aiagentminder-version` in this repo.
+```bash
+node bin/aam.js sync [target-path] --apply
+```
 
-- **Version file found:** Display "Installed version: X.Y.Z → updating to A.B.C"
-  - If versions match: tell the user "Already at vA.B.C — no update needed. Run anyway? (y/n)" and stop if they say no.
-- **Version file not found:** Warn the user:
-  > "No version stamp found. This project was installed before versioning was added (pre-0.5.2). Treating as outdated and proceeding carefully. A version stamp will be written at the end."
+This deterministically:
+- Executes migration deletions and renames
+- Copies all aam-owned files (scripts, agents, rules, skills, version stamp)
+- Creates missing user-owned files (DECISIONS.md, BACKLOG.md, etc.) without overwriting existing ones
+- Merges settings.json (adds AAM hooks, preserves user hooks, removes obsolete entries)
+- Skips CLAUDE.md (hybrid — handled in Step 3)
 
 ---
 
-## Step 2: Handle Migrations and Overwrite AIAgentMinder-Owned Files
+## Step 3: CLAUDE.md Surgical Merge
 
-### v0.9.1 → v1.0 Migration: PROGRESS.md
-
-Check if `[target]/PROGRESS.md` exists. If so:
-
-> "PROGRESS.md is no longer scaffolded by AIAgentMinder in v1.0. Session continuity is handled by native Session Memory and `--continue`. You can keep PROGRESS.md as your own file, or delete it. Delete it? (y/n)"
-
-- If yes: delete `[target]/PROGRESS.md`. Print: `✓ Removed: PROGRESS.md (no longer AIAgentMinder-managed — session continuity is native)`
-- If no: Print: `⊘ Kept: PROGRESS.md (user-owned — AIAgentMinder will not manage it going forward)`
-
-### v0.9.1 → v1.0 Migration: CLAUDE.md Context Budget
-
-During the CLAUDE.md merge (Step 3), simplify the Context Budget section if it contains a detailed table. The new format is two plain lines:
-
-```
-**Always loaded:** CLAUDE.md — keep under ~50 lines; don't add without removing something
-
-**On-demand:** DECISIONS.md — add `@DECISIONS.md` here to auto-load; delete superseded entries
-```
-
-Add the tip line above the budget: `> Use \`/context\` for real-time context usage and optimization tips.`
-
-### v0.7.0 → v0.8.0 Migration: Remove Stop Hook and Rename /plan to /aam-brief
-
-Check if any of these exist in the target. If so, handle them:
-
-```
-[target]/.claude/hooks/session-end-commit.js   → DELETE (replaced by .claude/rules/git-workflow.md)
-[target]/.claude/commands/plan.md              → DELETE (renamed to aam-brief.md)
-```
-
-For each deleted file, print: `✓ Removed (obsolete): .claude/hooks/session-end-commit.js`
-
-### v0.6.0 → v0.7.0 Migration: Remove Obsolete Files
-
-Check if any of these exist in the target. If so, delete them:
-
-```
-[target]/.claude/hooks/session-start-context.js   → DELETE
-[target]/.claude/hooks/session-end-timestamp.js   → DELETE
-[target]/.claude/hooks/pre-compact-save.js         → DELETE
-```
-
-### v0.6.0 → v0.7.0 Migration: Migrate guidance/ → rules/
-
-If `[target]/.claude/guidance/code-quality.md` exists:
-- Copy `project/.claude/rules/code-quality.md` to `[target]/.claude/rules/code-quality.md`
-- Delete `[target]/.claude/guidance/code-quality.md`
-- Print: `✓ Migrated: .claude/guidance/code-quality.md → .claude/rules/code-quality.md`
-
-If `[target]/.claude/guidance/sprint-workflow.md` exists:
-- Copy `project/.claude/rules/sprint-workflow.md` to `[target]/.claude/rules/sprint-workflow.md`
-- Delete `[target]/.claude/guidance/sprint-workflow.md`
-- Print: `✓ Migrated: .claude/guidance/sprint-workflow.md → .claude/rules/sprint-workflow.md`
-
-If `[target]/.claude/guidance/` directory is now empty: remove it. Print: `✓ Removed (obsolete): .claude/guidance/ directory`
-
-### v3.1 → v3.2 Migration: Remove compact-reorient.js, Add Context Monitoring
-
-1. If `[target]/.claude/hooks/compact-reorient.js` exists: delete it. Print: `Removed (obsolete): .claude/hooks/compact-reorient.js`
-2. If `[target]/.claude/hooks/` directory is now empty: remove it. Print: `Removed: .claude/hooks/ (empty)`
-3. Check `jq --version`. If not found, warn: "Context monitoring requires `jq`. Install: `winget install jqlang.jq` / `brew install jq` / `apt install jq`. Sprint workflow falls back to heuristics without it."
-
-### v3.3 → v4.0 Migration: Commands → Skills
-
-If `[target]/.claude/commands/` exists and contains `aam-*.md` files:
-
-1. Create `[target]/.claude/skills/` directory if it doesn't exist.
-2. For each `aam-*.md` file in `[target]/.claude/commands/`: delete it (the updated skill version will be copied below). Print: `✓ Migrated: .claude/commands/aam-{name}.md → .claude/skills/aam-{name}.md`
-3. If `[target]/.claude/commands/` is now empty: remove the directory. Print: `✓ Removed: .claude/commands/ (replaced by .claude/skills/)`
-4. If `[target]/.claude/commands/` still has non-aam files (user-created commands): leave the directory. Print: `⊘ Kept: .claude/commands/ (contains user-created commands)`
-
-### Copy Current Script and Skill Files
-
-Copy each file from `project/` in this repo to the target, overwriting whatever is there:
-
-```
-project/.claude/scripts/context-monitor.sh            →  [target]/.claude/scripts/context-monitor.sh
-project/.claude/scripts/context-cycle.sh              →  [target]/.claude/scripts/context-cycle.sh
-project/.claude/scripts/context-cycle-hook.sh         →  [target]/.claude/scripts/context-cycle-hook.sh
-project/.claude/scripts/correction-capture-hook.sh    →  [target]/.claude/scripts/correction-capture-hook.sh
-project/.claude/scripts/sprint-stop-guard.sh          →  [target]/.claude/scripts/sprint-stop-guard.sh
-project/.claude/scripts/sprint-update.sh              →  [target]/.claude/scripts/sprint-update.sh
-project/.claude/skills/aam-handoff.md                    →  [target]/.claude/skills/aam-handoff.md
-project/.claude/skills/aam-brief.md                      →  [target]/.claude/skills/aam-brief.md
-project/.claude/skills/aam-revise.md                     →  [target]/.claude/skills/aam-revise.md
-project/.claude/skills/aam-checkup.md                    →  [target]/.claude/skills/aam-checkup.md
-project/.claude/skills/aam-quality-gate.md               →  [target]/.claude/skills/aam-quality-gate.md
-project/.claude/skills/aam-scope-check.md                →  [target]/.claude/skills/aam-scope-check.md
-project/.claude/skills/aam-self-review.md                →  [target]/.claude/skills/aam-self-review.md
-project/.claude/skills/aam-milestone.md                  →  [target]/.claude/skills/aam-milestone.md
-project/.claude/skills/aam-retrospective.md              →  [target]/.claude/skills/aam-retrospective.md
-project/.claude/skills/aam-tdd.md                        →  [target]/.claude/skills/aam-tdd.md
-project/.claude/skills/aam-triage.md                     →  [target]/.claude/skills/aam-triage.md
-project/.claude/skills/aam-grill.md                      →  [target]/.claude/skills/aam-grill.md
-project/.claude/rules/git-workflow.md                  →  [target]/.claude/rules/git-workflow.md
-project/.claude/rules/scope-guardian.md                →  [target]/.claude/rules/scope-guardian.md
-project/.claude/rules/approach-first.md                →  [target]/.claude/rules/approach-first.md
-project/.claude/rules/debug-checkpoint.md              →  [target]/.claude/rules/debug-checkpoint.md
-project/.claude/rules/tool-first.md                   →  [target]/.claude/rules/tool-first.md
-```
-
-Print each file as it's updated: `✓ Updated: .claude/skills/aam-checkup.md`
-
-Also copy `project/.claude/rules/README.md` to `[target]/.claude/rules/README.md` if `.claude/rules/` exists in the target.
-
-### settings.json — Additive Merge
-
-Do **not** copy `project/.claude/settings.json` directly. Overwriting it would erase any hooks the user has added (e.g., accessibility hooks, custom PostToolUse handlers).
-
-Instead, perform an additive merge:
-
-1. Read `[target]/.claude/settings.json`. If it doesn't exist, create it as `{}`.
-2. Read `project/.claude/settings.json.tpl` for the AIAgentMinder-managed entries.
-3. **`statusLine` entry:** Add or replace the `statusLine` object. This is always managed by AIAgentMinder: `{"type": "command", "command": "bash .claude/scripts/context-monitor.sh"}`.
-4. **`PreToolUse` hook — context cycle enforcement:** Ensure the `hooks.PreToolUse` array contains an entry matching the context-cycle-hook. Each entry in the array uses the `{matcher, hooks[]}` schema: `{"matcher": "", "hooks": [{"type": "command", "command": "bash .claude/scripts/context-cycle-hook.sh"}]}`. If a matching entry already exists, update it. If the array has other user-added entries, preserve them. If the array doesn't exist, create it. **Important:** Do NOT use the flat `{type, command}` format at the array level — that causes a validation error.
-5. **`PostToolUse` hook — correction capture:** Ensure the `hooks.PostToolUse` array contains an entry with `"command": "bash .claude/scripts/correction-capture-hook.sh"`. Same `{matcher, hooks[]}` schema as PreToolUse: add if missing, update if present, preserve user-added entries.
-6. **`Stop` hook — sprint continuation enforcement:** Ensure the `hooks.Stop` array contains an entry with `"command": "bash .claude/scripts/sprint-stop-guard.sh"`. Same `{matcher, hooks[]}` schema: add if missing, update if present, preserve user-added entries.
-7. **SessionStart `compact` entry (cleanup):** If a `SessionStart` entry with `matcher: "compact"` exists referencing `compact-reorient.js`, remove it — this hook is obsolete (replaced by status line monitoring).
-8. **PostToolUse `Bash` entry (cleanup):** If a `PostToolUse` entry referencing `pr-pipeline-trigger.js` exists, remove it — this hook is obsolete (the pipeline runs in-session).
-9. If the `hooks` object is now empty (no remaining user hooks and no AIAgentMinder hooks), remove the `hooks` key entirely.
-10. Preserve all other entries in the target file unchanged.
-11. Write the merged JSON back to `[target]/.claude/settings.json`.
-
-Print: `Updated: .claude/settings.json (merged — user hooks preserved, status line + context cycle hook configured)`
-
-Then handle default-on and optional rules files:
-
-### correction-capture.md
-- If present: overwrite. Print `✓ Updated: .claude/rules/correction-capture.md`
-- If absent: prompt "Correction capture is available (flags repeated wrong-first-approach patterns and proposes permanent instructions). Enable? (y/n)"
-
-### code-quality.md
-- If present: overwrite. Print `✓ Updated: .claude/rules/code-quality.md`
-- If absent: prompt "Code quality guidance is available (TDD, review-before-commit, ~18 lines). Enable? (y/n)"
-
-### sprint-workflow.md
-- If present: overwrite. Print `✓ Updated: .claude/rules/sprint-workflow.md`
-  - Then check SPRINT.md (see below).
-- If absent: prompt "Sprint planning is available. Structured issue decomposition with per-issue PRs. Enable? (y/n)"
-
-### SPRINT.md
-- If sprint-workflow.md was updated or added AND `[target]/SPRINT.md` does **not** exist: create from `project/SPRINT.md`. Print `✓ Created: SPRINT.md`
-- If `[target]/SPRINT.md` exists with an active sprint (`**Status:** in-progress`): do **not** overwrite. Print `⚠ SPRINT.md has an active sprint — not modified`
-- If `[target]/SPRINT.md` exists with placeholder or archived content: leave it alone
-
-### architecture-fitness.md
-- If present: overwrite. Print `✓ Updated: .claude/rules/architecture-fitness.md`
-- If absent: prompt "Architecture fitness rules are available (file size, secrets, test isolation, layer boundaries — ships with defaults, customizable). Enable? (y/n)"
-
-### aam-sync-issues.md
-
-- If present: overwrite. Print `✓ Updated: .claude/skills/aam-sync-issues.md`
-- If absent: prompt "GitHub Issues sync is available (/aam-sync-issues — pushes sprint issues to GitHub Issues). Enable? (y/n)"
-
-### aam-pr-pipeline.md
-
-- If present: overwrite. Print `✓ Updated: .claude/skills/aam-pr-pipeline.md`
-- If absent: prompt "PR pipeline automation is available (/aam-pr-pipeline — in-session review, fix, test, and merge after PR creation). Enable? (y/n)"
-  - If yes: copy `project/.claude/skills/aam-pr-pipeline.md` and copy `project/.pr-pipeline.json` to `[target]/.pr-pipeline.json` (unless it already exists — never overwrite user config)
-
-### v2.1 → v2.2 Migration: Remove pr-pipeline-trigger.js
-
-If `[target]/.claude/hooks/pr-pipeline-trigger.js` exists: delete it. The pipeline now runs in-session via the sprint workflow instead of spawning a background process.
-
-Print: `✓ Removed (obsolete): .claude/hooks/pr-pipeline-trigger.js — pipeline now runs in-session`
-
-### .pr-pipeline.json
-
-- **Never overwrite.** This is user-configured per-project.
-- If absent and `aam-pr-pipeline.md` is being added: copy from `project/.pr-pipeline.json`
-- If present: print `⊘ Kept: .pr-pipeline.json (user-owned — edit manually to update settings)`
-- **v2.2 cleanup:** If `autoContinueSprint` or `continueMaxIssues` keys are present, **remove them** from the JSON. These were AIAgentMinder-introduced fields, now obsolete — sprint continuation is handled by the sprint workflow loop in-session. Print: `✓ Cleaned: .pr-pipeline.json — removed obsolete autoContinueSprint/continueMaxIssues`
-
----
-
-## Step 3: Surgical Merge of CLAUDE.md
+This is the one step that requires judgment — the CLI skips it.
 
 Read both files:
 - **Template:** `project/CLAUDE.md` from this repo
 - **Installed:** `[target]/CLAUDE.md`
 
-The structural sections **owned by AIAgentMinder** (safe to update):
+**AIAgentMinder-owned sections** (safe to update):
 - `## Behavioral Rules` and all its subsections
 - `## Context Budget`
 
-The user-owned sections **never to touch**:
+**User-owned sections** (never touch):
 - `## Project Identity` block
 - `## MVP Goals` block
-- Any `##` section in the installed file that doesn't exist in the template (user additions)
+- Any `##` section in the installed file that doesn't exist in the template
 
-### v0.9.1 → v1.0 CLAUDE.md Migration
-
-In addition to the standard section merge, apply these one-time updates:
-
-1. **Simplify `## Context Budget`** — Replace the existing table with the new plain-text format (see migration note in Step 2). Add the `/context` tip line above.
-
-2. **Add Decision Recording subsection** if not already present in `## Behavioral Rules`:
-   ```
-   ### Decision Recording
-   - Record significant architectural decisions in DECISIONS.md
-   - Include alternatives considered — a decision without alternatives is an assertion, not a record
-   - To auto-load DECISIONS.md every session, add `@DECISIONS.md` to this file
-   ```
-
-### Standard Merge Procedure
-
-For each structural section (`## Behavioral Rules`, `## Context Budget`):
-1. Extract the section content from both template and installed file
-2. If identical: skip, note "unchanged"
-3. If different: show a brief plain-English summary of what changed, then confirm: "Apply this update to `## [Section Name]`? (y/n)"
+For each structural section:
+1. Compare template vs installed
+2. If identical: skip
+3. If different: show a brief summary of what changed, confirm with user
 4. Apply only confirmed changes
 
-After all sections: "CLAUDE.md: updated N section(s), preserved Project Identity and MVP Goals."
+After: "CLAUDE.md: updated N section(s), preserved Project Identity and MVP Goals."
 
 ---
 
-## Step 4: Write Version Stamp
+## Step 4: Check jq
 
-Write the current version to `[target]/.claude/aiagentminder-version`.
-
----
-
-## Step 5: Check jq
-
-Run `jq --version` in the target project directory. Warn if not found (context monitoring requires it).
+Run `jq --version`. Warn if not found — context monitoring requires it.
 
 ---
 
-## Step 6: Commit in Target Project
+## Step 5: Commit
 
 ```bash
 cd [target]
@@ -326,79 +88,25 @@ git add .claude/ CLAUDE.md
 git commit -m "chore: update AIAgentMinder to v[new version]"
 ```
 
-If the target project has uncommitted changes beyond what we just updated, warn before committing.
+Warn if the target has uncommitted changes beyond what was just updated.
 
 ---
 
-## Step 7: Print Summary
+## Step 6: Summary
+
+Print a concise summary based on the sync output:
 
 ```
-AIAgentMinder updated: v[old] → v[new]  (or: unknown → v[new])
+AIAgentMinder updated: v[old] → v[new]
 
-Updated:
-- .claude/scripts/context-monitor.sh (status line data bridge)
-- .claude/scripts/correction-capture-hook.sh (automated correction detection)
-- .claude/scripts/sprint-stop-guard.sh (sprint continuation enforcement)
-- .claude/scripts/sprint-update.sh (zero-token-cost SPRINT.md updater)
-- .claude/settings.json (merged — status line configured, hooks configured, user hooks preserved)
-- .claude/skills/aam-handoff.md
-- .claude/skills/aam-brief.md
-- .claude/skills/aam-revise.md
-- .claude/skills/aam-checkup.md
-- .claude/skills/aam-quality-gate.md
-- .claude/skills/aam-scope-check.md
-- .claude/skills/aam-self-review.md
-- .claude/skills/aam-milestone.md
-- .claude/skills/aam-retrospective.md
-- .claude/skills/aam-tdd.md
-- .claude/skills/aam-triage.md
-- .claude/skills/aam-grill.md
-- .claude/rules/git-workflow.md
-- .claude/rules/scope-guardian.md
-- .claude/rules/approach-first.md
-- .claude/rules/debug-checkpoint.md
-- .claude/rules/tool-first.md
-- CLAUDE.md ([N] section(s) updated, Project Identity preserved)
-- .claude/aiagentminder-version
+The sync command handled all file operations. See the output above for details.
 
-Default-on features:
-[list each of: ✓ Updated / ✓ Added / ⊘ Skipped]
-- .claude/rules/correction-capture.md
-
-Optional features:
-[list each of: ✓ Updated / ✓ Added / ⊘ Skipped / ⚠ Active sprint preserved]
-- .claude/rules/code-quality.md
-- .claude/rules/sprint-workflow.md
-- SPRINT.md
-- .claude/rules/architecture-fitness.md
-- .claude/skills/aam-pr-pipeline.md
-- .pr-pipeline.json (⊘ user-owned if present)
-
-[If migrating from v0.9.1:]
-Migration actions:
-- PROGRESS.md: [✓ Removed / ⊘ Kept as user-owned]
-- CLAUDE.md Context Budget: simplified to plain-text format
-
-[If migrating from v0.7.0:]
-Migration actions:
-[list each: ✓ Removed / ✓ Renamed]
-- .claude/hooks/session-end-commit.js
-- .claude/commands/plan.md → aam-brief.md
-
-[If migrating from v0.6.0:]
-Migration actions:
-[list each: ✓ Removed / ✓ Migrated]
-- .claude/hooks/session-start-context.js
-- .claude/hooks/session-end-timestamp.js
-- .claude/hooks/pre-compact-save.js
-- .claude/guidance/ directory
+Hybrid (manually merged):
+- CLAUDE.md: [N section(s) updated / no changes needed]
 
 Not touched (user-owned):
-- DECISIONS.md
-- docs/strategy-roadmap.md
-- .gitignore
+- DECISIONS.md, docs/strategy-roadmap.md, .gitignore, .pr-pipeline.json
 
 Next: open Claude Code in [target] — your project governance is now current.
-Use `claude --continue` to restore your previous session, or start a new one.
 Run /aam-checkup to verify the installation is healthy.
 ```
