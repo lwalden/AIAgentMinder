@@ -6,7 +6,7 @@ effort: high
 
 # /aam-triage - Bug Triage
 
-Systematically investigate a bug: reproduce it, diagnose the root cause, design a durable fix plan, and create a GitHub issue with the analysis. This is the structured start to debugging — complementing `debug-checkpoint.md` which handles the structured pause when a fix stalls.
+Systematically investigate a bug: reproduce it, diagnose the root cause, design a durable fix plan, and create a GitHub issue with the analysis. This is the structured start to debugging — complementing the debug checkpoint pattern (embedded in agent profiles) which handles the structured pause when a fix stalls.
 
 ---
 
@@ -46,7 +46,7 @@ Attempt to confirm the root cause hypothesis:
 - Reproduce the bug if possible (run the failing path)
 - Check whether the hypothesis explains all symptoms
 
-If the hypothesis doesn't hold after 2 iterations, trigger the `debug-checkpoint.md` pattern: stop and present a structured checkpoint to the user with what's been tried, the current hypothesis, and what information would unblock progress.
+If the hypothesis doesn't hold after 2 iterations, trigger the debug checkpoint pattern: stop and present a structured checkpoint to the user with what's been tried, the current hypothesis, and what information would unblock progress.
 
 ---
 
@@ -102,7 +102,7 @@ If yes, append to DECISIONS.md in the project's existing format.
 ## When to Use This
 
 - **Use `/aam-triage`** when a bug needs structured investigation — not a quick fix, but root cause analysis.
-- **Use `debug-checkpoint.md`** (triggers automatically) when you're mid-fix and stuck after 3 attempts on the same error.
+- **Use the debug checkpoint pattern** (triggers automatically via agent profile) when you're mid-fix and stuck after 3 attempts on the same error.
 - Created issues can be pulled into the next sprint via `/aam-sync-issues`.
 - Fix plans produce RED-GREEN cycles that `/aam-tdd` can execute.
 
