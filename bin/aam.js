@@ -4,11 +4,14 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { parseArgs } from '../lib/cli.js';
-import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir, customizeArchitectureFitness } from '../lib/init.js';
+import { getCoreFiles, getOptionalFiles, copyFiles, writeProjectIdentity, writeVersionStamp, getTemplateDir, customizeArchitectureFitness, SOURCE_OVERRIDES } from '../lib/init.js';
 import { createInterface, askYesNo, askText, askChoice } from '../lib/prompt.js';
 import { writeAgentsMd } from '../lib/agents-md.js';
 import { fingerprint, detectExistingInstall } from '../lib/detect.js';
 import { validatePluginJson, validateVersionConsistency } from '../lib/validate.js';
+import { computeSyncPlan } from '../lib/sync.js';
+import { getMigrations } from '../lib/migrations.js';
+import { mergeSettings } from '../lib/settings-merge.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const pkgPath = path.resolve(__dirname, '..', 'package.json');
@@ -23,22 +26,27 @@ Usage:
 
 Commands:
   init          Initialize AIAgentMinder in the current directory (default)
+  sync [path]   Sync template files to a target project (dry-run by default)
   agents-md     Generate AGENTS.md from installed governance files
-  validate      Validate plugin manifest and skill packages (repo dev tool)
+  validate      Validate plugin manifest and version consistency (repo dev tool)
 
 Options:
   --all         Enable all optional features (no prompts) [init]
   --core        Install core files only (no prompts) [init]
   --force, -f   Overwrite existing files
+  --dry-run     Show sync plan without applying (default for sync)
+  --apply       Apply sync plan (copy, delete, merge)
   --help, -h    Show this help message
   --version, -v Show version
 
 Examples:
-  npx aiagentminder                 Interactive setup
-  npx aiagentminder init --all      Full install, no prompts
-  npx aiagentminder init --core     Core only, no prompts
-  npx aiagentminder agents-md       Generate AGENTS.md
-  npx aiagentminder agents-md -f    Regenerate AGENTS.md
+  npx aiagentminder                          Interactive setup
+  npx aiagentminder init --all               Full install, no prompts
+  npx aiagentminder init --core              Core only, no prompts
+  npx aiagentminder sync /path/to/project    Show upgrade plan
+  npx aiagentminder sync /path --apply       Apply upgrade
+  npx aiagentminder agents-md                Generate AGENTS.md
+  npx aiagentminder agents-md -f             Regenerate AGENTS.md
 `.trim();
 
 const OPTIONAL_FEATURES = {
@@ -236,6 +244,161 @@ function runValidateCommand() {
   }
 }
 
+function runSyncCommand(options) {
+  const templateDir = getTemplateDir();
+  const targetDir = options.positional[1] || options.positional[0] || process.cwd();
+  const apply = options.apply;
+
+  console.log(`\nAIAgentMinder sync`);
+  console.log(`Template: ${templateDir}`);
+  console.log(`Target:   ${targetDir}\n`);
+
+  // Compute sync plan
+  const plan = computeSyncPlan(templateDir, targetDir);
+
+  const versionLabel = plan.installedVersion
+    ? `${plan.installedVersion} → ${plan.templateVersion}`
+    : `(none) → ${plan.templateVersion}`;
+  console.log(`Sync plan: ${versionLabel}`);
+
+  // Get migrations
+  const migrations = getMigrations(plan.installedVersion, plan.templateVersion);
+
+  // Print migrations
+  if (migrations.length > 0) {
+    console.log(`\nMigrations (${migrations.length}):`);
+    for (const m of migrations) {
+      console.log(`  v${m.version}: ${m.description}`);
+      for (const f of m.delete) {
+        console.log(`    Delete: ${f}`);
+      }
+      for (const r of m.rename) {
+        console.log(`    Rename: ${r.from} → ${r.to}`);
+      }
+    }
+  }
+
+  // Print plan
+  if (plan.adds.length > 0) {
+    console.log(`\nAdd: ${plan.adds.length} files`);
+    for (const f of plan.adds) {
+      console.log(`  + ${f.file} (${f.classification})`);
+    }
+  }
+
+  if (plan.updates.length > 0) {
+    console.log(`\nUpdate: ${plan.updates.length} files`);
+    for (const f of plan.updates) {
+      console.log(`  ~ ${f.file}`);
+    }
+  }
+
+  if (plan.merge.length > 0) {
+    console.log(`\nMerge: ${plan.merge.length} files`);
+    for (const f of plan.merge) {
+      console.log(`  ⊕ ${f.file}`);
+    }
+  }
+
+  if (plan.hybrid.length > 0) {
+    console.log(`\nHybrid (manual merge needed): ${plan.hybrid.length} files`);
+    for (const f of plan.hybrid) {
+      console.log(`  ⚠ ${f.file}`);
+    }
+  }
+
+  if (plan.skipped.length > 0) {
+    console.log(`\nSkipped: ${plan.skipped.length} files`);
+    for (const f of plan.skipped) {
+      console.log(`  - ${f.file} (${f.reason})`);
+    }
+  }
+
+  if (!apply) {
+    console.log('\nDry run — no files modified. Use --apply to execute.');
+    return;
+  }
+
+  // === APPLY MODE ===
+  console.log('\nApplying...');
+
+  // Step 1: Execute migration deletions and renames
+  for (const m of migrations) {
+    for (const f of m.delete) {
+      const fullPath = path.join(targetDir, f);
+      if (fs.existsSync(fullPath)) {
+        fs.rmSync(fullPath);
+        console.log(`  ✓ Deleted: ${f}`);
+      }
+    }
+    for (const r of m.rename) {
+      const fromPath = path.join(targetDir, r.from);
+      if (fs.existsSync(fromPath)) {
+        fs.rmSync(fromPath);
+        console.log(`  ✓ Removed (migrated): ${r.from}`);
+      }
+    }
+  }
+
+  // Clean up empty directories left by migrations
+  const dirsToCheck = ['.claude/hooks', '.claude/commands', '.claude/guidance'];
+  for (const d of dirsToCheck) {
+    const dirPath = path.join(targetDir, d);
+    if (fs.existsSync(dirPath)) {
+      const entries = fs.readdirSync(dirPath);
+      if (entries.length === 0) {
+        fs.rmdirSync(dirPath);
+        console.log(`  ✓ Removed empty: ${d}/`);
+      }
+    }
+  }
+
+  // Step 2: Copy adds and updates (aam-owned files)
+  for (const f of [...plan.adds, ...plan.updates]) {
+    if (f.classification === 'aam-owned') {
+      const sourceFile = SOURCE_OVERRIDES[f.file] || f.file;
+      const sourcePath = path.join(templateDir, sourceFile);
+      const targetPath = path.join(targetDir, f.file);
+      fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+      fs.copyFileSync(sourcePath, targetPath);
+      console.log(`  ✓ ${plan.adds.includes(f) ? 'Added' : 'Updated'}: ${f.file}`);
+    } else if (f.classification === 'user-owned') {
+      // Only add user-owned files if they don't exist
+      const sourceFile = SOURCE_OVERRIDES[f.file] || f.file;
+      const sourcePath = path.join(templateDir, sourceFile);
+      const targetPath = path.join(targetDir, f.file);
+      if (!fs.existsSync(targetPath)) {
+        fs.mkdirSync(path.dirname(targetPath), { recursive: true });
+        fs.copyFileSync(sourcePath, targetPath);
+        console.log(`  ✓ Created: ${f.file}`);
+      }
+    }
+  }
+
+  // Step 3: Merge settings.json
+  for (const f of plan.merge) {
+    if (f.file === '.claude/settings.json') {
+      const sourceFile = SOURCE_OVERRIDES[f.file] || f.file;
+      const templateContent = JSON.parse(fs.readFileSync(
+        path.join(templateDir, sourceFile), 'utf-8'));
+      const targetPath = path.join(targetDir, f.file);
+      const targetContent = fs.existsSync(targetPath)
+        ? JSON.parse(fs.readFileSync(targetPath, 'utf-8'))
+        : {};
+      const merged = mergeSettings(templateContent, targetContent);
+      fs.writeFileSync(targetPath, JSON.stringify(merged, null, 2) + '\n');
+      console.log(`  ✓ Merged: ${f.file}`);
+    }
+  }
+
+  // Step 4: Hybrid files (CLAUDE.md) — skip, needs manual/LLM merge
+  for (const f of plan.hybrid) {
+    console.log(`  ⚠ Skipped (manual merge needed): ${f.file}`);
+  }
+
+  console.log('\nSync complete.');
+}
+
 async function main() {
   const options = parseArgs(process.argv.slice(2));
 
@@ -251,6 +414,8 @@ async function main() {
 
   if (options.command === 'init') {
     await runInit(options);
+  } else if (options.command === 'sync') {
+    runSyncCommand(options);
   } else if (options.command === 'agents-md') {
     runAgentsMdCommand(options);
   } else if (options.command === 'validate') {
