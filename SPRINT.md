@@ -27,18 +27,5 @@ S5 archived (2026-03-30): 7 planned, 7 completed, 0 rework. 0 scope changes, 0 b
 S6 archived (2026-03-30): 5 planned, 5 completed, 0 rework. 0 scope changes, 0 blocked. Shipped v4.2.0 release, /aam-setup CLI delegation (183→139 lines), roadmap/README update, v4.2 migration entry, e2e sync test (v3.3→v4.2 full upgrade path). 12 new tests (345→357). PRs #115-119.
 <!-- sizing: 5-7 -->
 
----
-
-**Sprint:** S7 — Post-v4.2 Hardening
-**Status:** in-progress
-**Phase:** v4.2 (patch)
-**Issues:** 6 proposed
-
-| ID | Title | Type | Risk | Status | Post-Merge |
-|---|---|---|---|---|---|
-| S7-001 | Remove `/aam-checkup` skill + update references | chore |  | done | n/a |
-| S7-002 | Fix `init --force` to merge settings.json instead of overwriting | fix | ⚠ | done | n/a |
-| S7-003 | Fix stale references in template skills (triage, correction-capture, brief) | fix |  | done | n/a |
-| S7-004 | Add jq check to sync output | fix |  | done | n/a |
-| S7-005 | Delete 72 stale remote branches | chore |  | done | n/a |
-| S7-006 | Roadmap + README polish for v4.2 completion | docs |  | in-progress | n/a |
+S7 archived (2026-03-30): 6 planned, 6 completed, 0 rework. 0 scope changes, 0 blocked. Fixed init --force data-loss bug (settings.json merge), stale debug-checkpoint/PROGRESS.md references, added jq dependency check to sync/init, pruned 82 remote + 51 local stale branches, updated README rules table for v4.1 session profiles. 63 new tests (357→420). PRs #122, #124–127.
+<!-- sizing: 5-7 -->
