@@ -19,7 +19,7 @@ describe('sprint-master orchestrator agent', () => {
 
   it('has valid YAML frontmatter with name and description', () => {
     const content = readAgent();
-    const fmMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
     assert.ok(fmMatch, 'must have YAML frontmatter delimiters');
 
     const fm = fmMatch[1];
