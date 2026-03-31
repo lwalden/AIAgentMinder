@@ -29,7 +29,7 @@ session (2nd occurrence), flag it.
 
 - Transient failures (network timeouts, flaky tests, race conditions)
 - Environment issues (service down, missing credentials)
-- Expected trial-and-error during debugging (`debug-checkpoint.md` governs that)
+- Expected trial-and-error during debugging (the debug checkpoint pattern governs that)
 - Exploratory work where multiple approaches are being evaluated intentionally
 
 ## Flagging Output
@@ -64,4 +64,4 @@ If the user declines, drop it — do not ask again for the same pattern.
 ## When This Does NOT Apply
 
 - The user has explicitly said "keep trying" or "figure it out"
-- You are in an active debugging spiral (defer to `debug-checkpoint.md`)
+- You are in an active debugging spiral (defer to the debug checkpoint pattern)

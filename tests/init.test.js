@@ -437,6 +437,34 @@ describe('skill frontmatter validation', () => {
   });
 });
 
+describe('stale reference checks', () => {
+  it('aam-triage does not reference debug-checkpoint.md as a file path', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-triage.md'), 'utf-8'
+    );
+    assert.ok(!content.includes('`debug-checkpoint.md`'),
+      'aam-triage should not reference debug-checkpoint.md as a file (moved to agent profiles)');
+  });
+
+  it('correction-capture rule does not reference debug-checkpoint.md as a file path', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'rules', 'correction-capture.md'), 'utf-8'
+    );
+    assert.ok(!content.includes('`debug-checkpoint.md`'),
+      'correction-capture should not reference debug-checkpoint.md as a file (moved to agent profiles)');
+  });
+
+  it('aam-brief does not reference PROGRESS.md (file does not exist)', () => {
+    const content = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'skills', 'aam-brief.md'), 'utf-8'
+    );
+    assert.ok(!content.includes('`PROGRESS.md`'),
+      'aam-brief should not reference PROGRESS.md (does not exist in template)');
+    assert.ok(!content.includes('PROGRESS.md`'),
+      'aam-brief should not reference PROGRESS.md in any backtick form');
+  });
+});
+
 describe('customizeArchitectureFitness', () => {
   it('is a no-op in v4.1+ (architecture fitness moved to agents)', () => {
     // Should not throw regardless of input
