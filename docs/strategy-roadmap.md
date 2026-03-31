@@ -149,7 +149,7 @@ Concrete architecture fitness defaults, npm/npx distribution, plugin marketplace
 
 ---
 
-## v4.0 — Platform Alignment & Quality Gap Closure (in progress)
+## v4.0 — Platform Alignment & Quality Gap Closure (shipped)
 
 Driven by spike research (see `docs/spike-v4-research.md`) identifying three systemic problems — LLM amnesia (instructions ignored mid-execution), smoke test illusion (tests pass but UX is broken), and happy-path bias (no negative test coverage) — plus Claude Code platform changes (26 hook events, skills system, 1M context, custom subagents).
 
@@ -162,28 +162,43 @@ Driven by spike research (see `docs/spike-v4-research.md`) identifying three sys
 - **Judge agent pass** — Post-review filter in `/aam-self-review`: judge subagent evaluates collective review quality for missed issues and cross-cutting concerns. (S2-005)
 - **Setup auto-detection** — `detectExistingInstall()` detects version stamp, aam- skills, and managed rules. Init warns on existing installation. (S2-006)
 
-### Tier 2 — Strategic strengthening (partial)
+### Tier 2 — Strategic strengthening (shipped)
 
 - **New hooks integration** — Added SessionStart (sprint continuation auto-detection) and StopFailure (API error logging, sprint state preservation). PermissionRequest deferred — needs design for auto-approval policies. (S2-007)
 - **Hooks schema fix** — PostToolUse and Stop hooks in settings template corrected to `{ matcher, hooks: [...] }` format. (S2-009)
-- **Custom subagents for review lenses** — Define each self-review lens as `.claude/agents/` file with `disallowedTools: [Edit, Write]` (read-only), per-lens `model`/`effort`/`maxTurns`. Makes review lenses individually configurable. (planned)
-- **Rule file compression** — Audit all rule files. Move enforcement logic from prose → hooks. Target each rule file under 30 lines. Based on Chroma context rot research showing structured prose creates distractor interference. (planned)
-- **Ephemeral task context injection** — Phase-specific rule loading via hooks. When in TEST phase, inject test-relevant rules only. When in REVIEW phase, inject review rules only. Reduces context saturation per sprint state. (planned)
+- **Custom subagents for review lenses** — 5 reviewer agents (`security-reviewer`, `performance-reviewer`, `api-reviewer`, `cost-reviewer`, `ux-reviewer`) with `disallowedTools: [Edit, Write, Bash]` (read-only), per-lens `model`/`effort`. `/aam-self-review` spawns agents by name instead of inline prompts. (S4-003, S4-005)
+- ~~**Rule file compression**~~ — Subsumed by session profiles (v4.1). Mode-specific rules load only in relevant agent profiles, eliminating the need to compress individual files.
+- ~~**Ephemeral task context injection**~~ — Subsumed by session profiles (v4.1). Agent definitions ARE the phase-specific rule loading mechanism.
+
+---
+
+## v4.1 — Session Profiles & Backlog Management (shipped)
+
+Based on session architecture spike (see `docs/spike-session-architecture.md`, Approach B). Reduces context loading by 75% for non-sprint sessions and formalizes backlog capture.
+
+### Session Profiles
+
+- **5 session profile agents** — `sprint-executor` (full sprint state machine), `dev` (TDD + architecture fitness), `debug` (checkpoint + triage), `hotfix` (minimal ceremony), `qa` (quality review). Use via `claude --agent <name>`. (S3-001)
+- **Rule reorganization** — Mode-specific rules moved from `.claude/rules/` to agent definitions. Universal rules only: `git-workflow`, `tool-first`, `correction-capture`, `context-cycling` (new, decoupled from sprint). (S3-002)
+- **Sprint-runner `--agent` flag** — Defaults to `sprint-executor`. Both PS1 and bash versions. (S3-003)
+- **Updated setup/update** — `/aam-setup` installs agents as core files. `/aam-update` handles v3.x→v4.1 migration (adds agents, marks old rules as obsolete). (S3-003)
+
+### Backlog Capture System
+
+- **`backlog-capture.sh`** — Zero-token-cost script with 5 subcommands: `add`, `list`, `promote`, `detail`, `count`. B-NNN auto-incrementing IDs, input validation, atomic file updates. (S3-004)
+- **`BACKLOG.md`** — Work inbox template managed by the script. (S3-005)
+- **`/aam-backlog`** — Capture/review/promote skill. All file I/O through the script. (S3-005)
+- **Integration touchpoints** — Scope guardian offers "capture to backlog" option. Sprint PLAN reads backlog. `/aam-revise` gains "defer to backlog" option. (S3-006)
 
 ---
 
 ## Direction
 
-Design is stable through v3.3. v4.0 focuses on closing quality gaps exposed by production usage and aligning with Claude Code platform evolution (skills, expanded hooks, 1M context, custom subagents). See `docs/spike-v4-research.md` for full research.
+v4.0 closes quality gaps. v4.1 implements session profiles (Approach B from spike) and backlog management. v5.0 is the orchestrator layer (Approach C from spike) — sprint-master coordinates specialist sub-agents for each sprint phase. See `docs/spike-session-architecture.md`.
+
+Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, review, or promote items.
 
 ---
-
-## Backlog (unscheduled)
-
-### Quality & Review
-
-- ~~**Automated correction capture**~~ — Shipped in v3.3 (S1-001). PostToolUse hook detects corrections mechanically.
-- ~~**Multi-model review gate**~~ — Shipped in v3.3 (S1-003).
 
 ### Release Automation
 
@@ -191,6 +206,7 @@ Design is stable through v3.3. v4.0 focuses on closing quality gaps exposed by p
 
 ### Future Direction (monitor)
 
+- **Orchestrator + specialist sub-agents (v5.0)** — Sprint-master routes to phase-specific agents. See `docs/spike-session-architecture.md` Approach C.
 - **Agent teams governance** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. Monitor for stability.
 - **Worktree-native sprint items** — Each sprint item in `isolation: "worktree"`. Simplifies branch management, enables future parallel execution.
 - **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks.
@@ -202,10 +218,6 @@ Design is stable through v3.3. v4.0 focuses on closing quality gaps exposed by p
 - **`/aam-handoff` JSON digest** — Speculative value. Nobody has asked for it.
 - **`/onboard` command** — `/aam-brief` Starting Point E (existing project audit) covers this use case.
 - **Quality tier selection** — Replaced with always-Comprehensive default in v3.0.
-- **`/aam-update` dry-run mode** — Git already tracks all changes, the command is idempotent, and user-owned files are never touched. The risk dry-run mitigates is already low enough.
-- **HTTP hook support** — Node.js dependency already removed in v3.2. No further work needed in this area.
-- **Versioning scheme reset to v1.0.0** — Resolved: continue v3.x with strict semver and unified versioning. See DECISIONS.md.
-
----
-
-*Items move from backlog → versioned milestone when they have acceptance criteria and are ready to implement.*
+- **`/aam-update` dry-run mode** — Git already tracks all changes, the command is idempotent, and user-owned files are never touched.
+- **HTTP hook support** — Node.js dependency already removed in v3.2.
+- **Versioning scheme reset to v1.0.0** — Resolved: continue v3.x with strict semver. See DECISIONS.md.
