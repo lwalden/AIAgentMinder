@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const BIN = path.resolve(__dirname, '..', 'bin', 'aam.js');
+const TEMPLATE_DIR = path.resolve(__dirname, '..', 'project');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'aam-integ-'));
@@ -359,7 +360,7 @@ describe('CLI integration: v3.x to v4.1 migration', () => {
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'skills', 'aam-backlog.md')));
   });
 
-  it('updates version stamp to 4.1.0', () => {
+  it('updates version stamp to current template version', () => {
     execFileSync('node', [BIN, 'init', '--core', '--force'], {
       encoding: 'utf-8',
       cwd: targetDir,
@@ -368,6 +369,9 @@ describe('CLI integration: v3.x to v4.1 migration', () => {
     const version = fs.readFileSync(
       path.join(targetDir, '.claude', 'aiagentminder-version'), 'utf-8'
     ).trim();
-    assert.equal(version, '4.1.0');
+    const templateVersion = fs.readFileSync(
+      path.join(TEMPLATE_DIR, '.claude', 'aiagentminder-version'), 'utf-8'
+    ).trim();
+    assert.equal(version, templateVersion);
   });
 });
