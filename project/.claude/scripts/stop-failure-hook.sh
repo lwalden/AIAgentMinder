@@ -2,6 +2,9 @@
 # StopFailure hook — logs API errors and preserves sprint state for recovery.
 # Non-blocking (observation only). Creates continuation signal if sprint is active.
 set -euo pipefail
+# Fail open: any unexpected error exits cleanly rather than crashing into
+# a hook error. This hook is observation-only; silent failure is safe.
+trap 'exit 0' ERR
 
 # Read hook input from stdin
 INPUT=$(cat)
@@ -15,7 +18,8 @@ fi
 # Check for active sprint
 SPRINT_ACTIVE=false
 if [[ -f "SPRINT.md" ]]; then
-  STATUS=$(sed -n 's/.*\*\*Status:\*\* \([^ ]*\).*/\1/p' SPRINT.md 2>/dev/null | head -1)
+  # Strip \r to handle CRLF line endings (Windows git checkout).
+  STATUS=$(sed -n 's/.*\*\*Status:\*\* \([^ ]*\).*/\1/p' SPRINT.md 2>/dev/null | tr -d '\r' | head -1)
   if [[ "$STATUS" == "in-progress" ]]; then
     SPRINT_ACTIVE=true
   fi

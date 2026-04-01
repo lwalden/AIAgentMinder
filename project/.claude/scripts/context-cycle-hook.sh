@@ -20,6 +20,9 @@
 # Output: stdout message shown to Claude. Exit 0 = allow, exit 2 = block.
 
 set -euo pipefail
+# Fail open: any unexpected error allows the tool call rather than crashing
+# into an exit-1 error code that blocks the tool unexpectedly.
+trap 'exit 0' ERR
 
 # Read hook input from stdin
 input=$(cat)

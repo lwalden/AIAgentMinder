@@ -22,6 +22,9 @@
 # Output: JSON with hookSpecificOutput.additionalContext when a recurring pattern is detected.
 
 set -euo pipefail
+# Fail open: any unexpected error silently exits rather than crashing into
+# a hook error that disrupts the tool call flow.
+trap 'exit 0' ERR
 
 STATE_FILE=".correction-state"
 LOG_FILE=".corrections.jsonl"
