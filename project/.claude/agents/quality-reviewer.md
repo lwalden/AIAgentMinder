@@ -14,7 +14,6 @@ The sprint-master dispatches review lens agents separately and passes their find
 - Git diff of the changes under review
 - Review lens findings from: security-reviewer, performance-reviewer, api-reviewer,
   cost-reviewer, ux-reviewer (passed as text by the sprint-master)
-- Quality tier from project config (Lightweight/Standard/Rigorous/Comprehensive)
 
 ## Quality Gate Checklist
 

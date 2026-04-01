@@ -120,6 +120,31 @@ describe('sprint-metrics.sh', () => {
     assert.equal(item.reworkCount, 1);
   });
 
+  it('item-complete on nonexistent item does not corrupt totals', () => {
+    run('init S8', tmpDir);
+    run('item-start S8-001', tmpDir);
+    run('item-complete NONEXISTENT', tmpDir);
+    const metrics = readMetrics(tmpDir);
+    assert.equal(metrics.totals.completed, 0, 'completed count must not increment for nonexistent item');
+    assert.equal(metrics.totals.planned, 1, 'planned count must be unchanged');
+  });
+
+  it('cycle on nonexistent item does not corrupt totals', () => {
+    run('init S8', tmpDir);
+    run('item-start S8-001', tmpDir);
+    run('cycle NONEXISTENT', tmpDir);
+    const metrics = readMetrics(tmpDir);
+    assert.equal(metrics.totals.contextCycles, 0, 'cycle count must not increment for nonexistent item');
+  });
+
+  it('rework on nonexistent item does not corrupt totals', () => {
+    run('init S8', tmpDir);
+    run('item-start S8-001', tmpDir);
+    run('rework NONEXISTENT', tmpDir);
+    const metrics = readMetrics(tmpDir);
+    assert.equal(metrics.totals.rework, 0, 'rework count must not increment for nonexistent item');
+  });
+
   it('errors on missing metrics file for non-init commands', () => {
     assert.throws(
       () => run('item-start S8-001', tmpDir),
