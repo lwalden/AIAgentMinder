@@ -26,8 +26,22 @@
 # Exit 0 = block the stop. Exit 2 = allow the stop.
 
 set -euo pipefail
+# Fail open: any unexpected error allows the stop rather than crashing into
+# an exit-1 error code that causes Claude Code to loop indefinitely.
+trap 'exit 2' ERR
 
 SPRINT_FILE="SPRINT.md"
+
+# --- Check 0: stop_hook_active → allow stop (break recursion) ---
+# When Claude Code sends stop_hook_active=true it means a Stop hook is already
+# blocking this session. We must allow the stop here to prevent an infinite loop.
+input=$(cat 2>/dev/null || true)
+if [ -n "$input" ]; then
+  stop_hook_active=$(printf '%s' "$input" | jq -r '.stop_hook_active // false' 2>/dev/null || echo "false")
+  if [ "$stop_hook_active" = "true" ]; then
+    exit 2
+  fi
+fi
 
 # --- Check 1: No SPRINT.md → allow stop ---
 if [ ! -f "$SPRINT_FILE" ]; then
@@ -40,7 +54,8 @@ if ! command -v jq >/dev/null 2>&1; then
 fi
 
 # --- Check 2: Sprint status must be "in-progress" → otherwise allow stop ---
-sprint_status=$(sed -n 's/^\*\*Status:\*\* //p' "$SPRINT_FILE" 2>/dev/null || echo "")
+# Strip \r to handle CRLF line endings (Windows git checkout).
+sprint_status=$(sed -n 's/^\*\*Status:\*\* //p' "$SPRINT_FILE" 2>/dev/null | tr -d '\r' || echo "")
 if [ "$sprint_status" != "in-progress" ]; then
   exit 2
 fi
@@ -78,15 +93,18 @@ fi
 
 # --- Sprint is in-progress with todo items and no legitimate stop reason. Block. ---
 
-# Find the first todo item ID to direct Claude.
+# Find the first todo item ID and the current sprint number to direct Claude.
 next_item=$(grep -E '\| *todo *\|' "$SPRINT_FILE" | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}')
+sprint_id=$(sed -n 's/^\*\*Sprint:\*\* \(S[0-9]*\).*/\1/p' "$SPRINT_FILE" 2>/dev/null | tr -d '\r' | head -1 || echo "")
+[ -z "$sprint_id" ] && sprint_id="sprint"
 
 jq -n \
   --arg item "$next_item" \
+  --arg sprint "$sprint_id" \
   --argjson count "$todo_count" \
   '{
     decision: "block",
-    reason: ("Sprint S1 is in-progress with " + ($count | tostring) + " pending item(s). Execute " + $item + " now. Read the spec for this item, update the task to in_progress, create the feature branch, and begin implementation.")
+    reason: ("Sprint " + $sprint + " is in-progress with " + ($count | tostring) + " pending item(s). Execute " + $item + " now. Read the spec for this item, update the task to in_progress, create the feature branch, and begin implementation.")
   }'
 
 exit 0
