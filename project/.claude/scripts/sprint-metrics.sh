@@ -20,9 +20,10 @@ die() { echo "Error: $1" >&2; exit 1; }
 subcmd="$1"
 shift
 
-# All commands except init require the metrics file to exist
-if [ "$subcmd" != "init" ] && [ ! -f "$METRICS_FILE" ]; then
-  die ".sprint-metrics.json not found — run 'sprint-metrics.sh init <sprint-id>' first"
+# All commands except init require jq and the metrics file
+if [ "$subcmd" != "init" ]; then
+  command -v jq >/dev/null 2>&1 || die "jq is required for sprint-metrics.sh"
+  [ -f "$METRICS_FILE" ] || die ".sprint-metrics.json not found — run 'sprint-metrics.sh init <sprint-id>' first"
 fi
 
 case "$subcmd" in
@@ -73,8 +74,10 @@ ENDJSON
     item_id="$1"
 
     jq --arg id "$item_id" --arg ts "$NOW" '
-      .items = [.items[] | if .id == $id then .completedAt = $ts else . end]
-      | .totals.completed += 1
+      if (.items | any(.id == $id)) then
+        .items = [.items[] | if .id == $id then .completedAt = $ts else . end]
+        | .totals.completed += 1
+      else . end
     ' "$METRICS_FILE" > "${METRICS_FILE}.tmp" && mv "${METRICS_FILE}.tmp" "$METRICS_FILE"
     ;;
 
@@ -83,8 +86,10 @@ ENDJSON
     item_id="$1"
 
     jq --arg id "$item_id" '
-      .items = [.items[] | if .id == $id then .contextCycles += 1 else . end]
-      | .totals.contextCycles += 1
+      if (.items | any(.id == $id)) then
+        .items = [.items[] | if .id == $id then .contextCycles += 1 else . end]
+        | .totals.contextCycles += 1
+      else . end
     ' "$METRICS_FILE" > "${METRICS_FILE}.tmp" && mv "${METRICS_FILE}.tmp" "$METRICS_FILE"
     ;;
 
@@ -93,8 +98,10 @@ ENDJSON
     item_id="$1"
 
     jq --arg id "$item_id" '
-      .items = [.items[] | if .id == $id then .reworkCount += 1 else . end]
-      | .totals.rework += 1
+      if (.items | any(.id == $id)) then
+        .items = [.items[] | if .id == $id then .reworkCount += 1 else . end]
+        | .totals.rework += 1
+      else . end
     ' "$METRICS_FILE" > "${METRICS_FILE}.tmp" && mv "${METRICS_FILE}.tmp" "$METRICS_FILE"
     ;;
 

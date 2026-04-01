@@ -11,7 +11,7 @@ sprint-master after a PR is created. Universal rules load from `.claude/rules/` 
 ## Inputs (provided by sprint-master)
 
 - PR number and branch name
-- `.pr-pipeline.json` config (cycle limits, high-risk gates, auto-merge settings)
+- `.pr-pipeline.json` config — if absent, use defaults: `{ "maxCycles": 3, "autoMerge": true }`
 - Item risk tag (if `[risk]`, apply stricter review)
 
 ## Process
