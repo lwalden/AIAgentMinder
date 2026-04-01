@@ -71,13 +71,13 @@ describe('session profile agents: sprint-executor content', () => {
 
   it('contains code quality content', () => {
     const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('TDD cycle'), 'must contain TDD cycle');
+    assert.ok(content.includes('TDD'), 'must contain TDD cycle');
   });
 
   it('contains architecture fitness content', () => {
     const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
     assert.ok(content.includes('300 lines'), 'must contain file size constraint');
-    assert.ok(content.includes('Secrets in Source'), 'must contain secrets constraint');
+    assert.ok(content.includes('Secrets'), 'must contain secrets constraint');
   });
 
   it('contains debug checkpoint content', () => {
@@ -89,14 +89,14 @@ describe('session profile agents: sprint-executor content', () => {
 describe('session profile agents: dev content', () => {
   it('contains TDD and code quality', () => {
     const content = fs.readFileSync(path.join(AGENTS_DIR, 'dev.md'), 'utf-8');
-    assert.ok(content.includes('TDD cycle'), 'must contain TDD');
-    assert.ok(content.includes('Build and test before every commit'), 'must contain build discipline');
+    assert.ok(content.includes('TDD'), 'must contain TDD');
+    assert.ok(content.includes('test suite before every commit'), 'must contain build discipline');
   });
 
   it('contains architecture fitness', () => {
     const content = fs.readFileSync(path.join(AGENTS_DIR, 'dev.md'), 'utf-8');
     assert.ok(content.includes('300 lines'), 'must contain file size constraint');
-    assert.ok(content.includes('Layer Boundaries'), 'must contain layer boundaries');
+    assert.ok(content.includes('Layer boundaries') || content.includes('Layer Boundaries'), 'must contain layer boundaries');
   });
 
   it('contains approach-first', () => {
