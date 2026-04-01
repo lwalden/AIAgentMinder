@@ -124,4 +124,28 @@ describe('sprint-master orchestrator agent', () => {
       'must reference sprint-update.sh for status tracking'
     );
   });
+
+  it('includes autonomy rules (never skip quality)', () => {
+    const content = readAgent();
+    assert.ok(
+      content.includes('Never skip') || content.includes('never skip'),
+      'must include autonomy rules preventing quality skipping'
+    );
+  });
+
+  it('includes REWORK procedure', () => {
+    const content = readAgent();
+    assert.ok(
+      content.includes('REWORK') && content.includes('rework row'),
+      'must include REWORK state handling with rework row creation'
+    );
+  });
+
+  it('includes cross-session resumption', () => {
+    const content = readAgent();
+    assert.ok(
+      content.includes('Cross-Session') || content.includes('Resumption'),
+      'must include cross-session resumption instructions'
+    );
+  });
 });

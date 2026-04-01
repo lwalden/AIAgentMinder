@@ -50,6 +50,18 @@ describe('sprint-planner agent', () => {
     );
   });
 
+  it('includes scope guardian logic', () => {
+    const content = readAgent(AGENT);
+    assert.ok(
+      content.includes('Scope Guardian') || content.includes('scope'),
+      'must include scope guardian logic'
+    );
+    assert.ok(
+      content.includes('Out of Scope') || content.includes('out-of-scope') || content.includes('out of scope'),
+      'must handle out-of-scope items'
+    );
+  });
+
   it('references archive sizing hints', () => {
     const content = readAgent(AGENT);
     assert.ok(

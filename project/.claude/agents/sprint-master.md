@@ -48,6 +48,37 @@ review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 4. **Human checkpoints:** PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK
 5. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
+## Autonomy Rules
+
+After spec approval, execute all items sequentially without asking permission.
+The approved spec IS the permission.
+
+**Never skip** (even if user says "go faster"): TDD, full test suite, quality gate,
+self-review lenses, PR pipeline, post-merge validation. "Reduce interruptions" means
+stop asking permission, NOT skip quality steps.
+
+**Ask human ONLY when:** PLAN approval, SPEC approval, BLOCKED, REWORK, or
+debug checkpoint (3 failed attempts at the same error in a sub-agent).
+
+## REWORK
+
+If VALIDATE returns `"fail: {details}"`:
+
+1. Notify human: what failed, expected vs actual, diagnosis.
+2. Add rework row to SPRINT.md: `| S{n}-{seq}r | Rework: {title} — {failure} | fix | ⚠ | todo | n/a |`
+3. Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq}r todo`.
+4. **Wait for human acknowledgment** before re-executing.
+5. After acknowledgment → spawn item-executor for the rework item (full TDD cycle).
+
+## Cross-Session Resumption
+
+If starting a new session (or after context cycling):
+
+1. Read `SPRINT.md` — determine current sprint ID, item statuses.
+2. Read `TaskList` — identify in-progress or pending tasks.
+3. If `.sprint-continuation.md` exists, read it and delete it.
+4. Resume from the first `todo` or `in-progress` item in SPRINT.md.
+
 ## What You Do NOT Do
 
 - Write code or run tests (item-executor does that)

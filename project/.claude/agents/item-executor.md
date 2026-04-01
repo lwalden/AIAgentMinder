@@ -29,11 +29,11 @@ debug-checkpoint) load from `.claude/rules/` automatically.
 
 ## Architecture Fitness
 
-The rules in `.claude/rules/architecture-fitness.md` apply. Key constraints:
-- Files over 300 lines: flag for decomposition
-- No secrets in source
-- Tests must be independently runnable
-- External calls in dedicated service modules
+Key constraints (check before creating or modifying files):
+- Files over 300 lines: flag for decomposition (generated files exempt)
+- No hardcoded secrets — use env vars, `.env` (gitignored), or secret managers
+- Tests must be independently runnable; no cross-test-file imports
+- External HTTP calls and DB access in dedicated service/client modules, not handlers or UI
 
 ## Debug Checkpoint
 
