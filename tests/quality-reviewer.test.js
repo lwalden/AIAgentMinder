@@ -28,12 +28,24 @@ describe('quality-reviewer agent', () => {
     assert.equal(nameMatch[1].trim(), 'quality-reviewer');
   });
 
-  it('covers quality gate checklist (build, tests, lint, security)', () => {
+  it('has disallowedTools blocking Edit, Write, Bash', () => {
     const content = readAgent();
-    assert.ok(content.includes('build') || content.includes('Build'), 'must reference build');
-    assert.ok(content.includes('test') || content.includes('Test'), 'must reference tests');
-    assert.ok(content.includes('lint') || content.includes('Lint'), 'must reference lint');
-    assert.ok(content.includes('security') || content.includes('Security'), 'must reference security');
+    const fmMatch = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
+    assert.ok(fmMatch, 'must have frontmatter');
+    const fm = fmMatch[1];
+    assert.ok(fm.includes('disallowedTools'), 'must have disallowedTools');
+    assert.ok(fm.includes('Edit'), 'Edit must be disallowed');
+    assert.ok(fm.includes('Write'), 'Write must be disallowed');
+    assert.ok(fm.includes('Bash'), 'Bash must be disallowed');
+  });
+
+  it('does not run build or lint (execution gate is pr-pipeliner)', () => {
+    const content = readAgent();
+    // Must explicitly state it does not run builds/tests
+    assert.ok(
+      content.includes('pr-pipeliner') || content.includes('does not run'),
+      'must document that build/lint is pr-pipeliner responsibility'
+    );
   });
 
   it('covers judge pass criteria and severity classification', () => {
