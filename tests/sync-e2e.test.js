@@ -123,7 +123,7 @@ describe('E2E: sync --apply on v3.3 installation', () => {
       path.join(targetDir, '.claude', 'rules', 'git-workflow.md'), 'utf-8'
     );
     assert.ok(!gitWorkflow.includes('old content'), 'should be overwritten with current content');
-    assert.ok(gitWorkflow.includes('Git Workflow'), 'should have current git-workflow content');
+    assert.ok(gitWorkflow.includes('type(scope)'), 'should have current git-workflow content');
   });
 
   it('creates agents directory (new in v4.1)', () => {

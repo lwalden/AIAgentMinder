@@ -233,23 +233,68 @@ Replaced `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync comman
 
 ## Direction
 
-v4.0 closes quality gaps. v4.1 implements session profiles and backlog management. v4.2 makes installation/upgrade deterministic (shipped). v5.0 is the orchestrator layer (Approach C from spike) — sprint-master coordinates specialist sub-agents for each sprint phase. See `docs/spike-session-architecture.md`.
+v4.2 shipped deterministic sync. The roadmap is informed by the March 2026 architecture assessment (`docs/architecture-assessment-2026-03.md`), which mapped AAM against 30+ competing tools. Key finding: AAM's moat is execution governance (sprint state machine + quality gates + context cycling), not rules — the market is converging on rules sync, but nobody else is attempting enforcement at this depth.
 
 Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, review, or promote items.
 
 ---
 
+## v5.0 — Orchestrator + Instrumentation (planned)
+
+Sprint-master routes to phase-specific specialist sub-agents (Approach C from `docs/spike-session-architecture.md`). Also instruments sprint execution for benchmarking — the assessment identified metrics as the missing evidence base for AAM's value claims.
+
+### Orchestrator Layer
+
+- **Sprint-master agent** — Coordinates specialist sub-agents for each sprint phase (spec, execute, test, review). Routes context to the right agent instead of loading everything into one session.
+- **Phase-specific agent routing** — Each sprint state gets a purpose-built agent with only the rules and context it needs. Extends the v4.1 session profile pattern into the sprint state machine.
+- **Constraint:** Subagents cannot spawn sub-subagents. The orchestrator design must account for this (e.g., self-review's 5 reviewer lenses need to be orchestrator-dispatched, not nested).
+
+### Sprint Metrics Collection
+
+- **Lightweight telemetry** — Instrument sprint execution to capture: items completed per sprint, context cycles triggered, review findings count, defect escape rate (bugs found post-merge), tokens consumed per item.
+- **`.sprint-metrics.json`** — Per-sprint metrics file, written by `sprint-update.sh` at COMPLETE. Enables benchmarking AAM-governed sprints vs. unstructured development.
+- **Retrospective integration** — `/aam-retrospective` reads metrics for data-driven adaptive sizing instead of heuristic-only.
+
+### Community Presence (no code)
+
+- **List on buildwithclaude** — 2,663 stars, 95+ curated marketplaces. Primary Claude Code extension discovery hub.
+- **List on awesome-claude-code-toolkit** — 961 stars, #1 trending Feb 2026. Secondary discovery hub.
+- **Maintain `.claude-plugin/` manifest** — Already shipping. Positions AAM for any future Claude Code native marketplace.
+
+---
+
+## v5.1 — Portability & Ecosystem (planned)
+
+The assessment found AAM "behind" on cross-platform portability and ecosystem presence. These features don't chase multi-tool support (AAM's governance workflow is legitimately Claude Code-specific) but ensure AAM's *rules and conventions* are portable to teams using mixed tooling.
+
+### AGENTS.md Bidirectional Sync
+
+- **Import** — `npx aiagentminder agents-md --import` reads an existing AGENTS.md and merges compatible sections into AAM's rules. Enables adoption in repos that already have AGENTS.md conventions.
+- **Export** — Already shipping (`npx aiagentminder agents-md`). Keep current with AGENTS.md spec evolution (60K+ repos, Linux Foundation stewardship).
+
+### Cross-Tool Rule Export
+
+- **`npx aiagentminder export`** — Generates tool-specific instruction files from AAM's universal rules. `--format cursorrules|copilot|agents-md`. One-way export — AAM remains the source of truth; generated files are disposable.
+- **Scope:** Rules and conventions only. The governance workflow (hooks, stop guards, context cycling) is not portable and won't be exported. This is a feature, not a limitation.
+
+### Publish "Mechanical Enforcement" Insight
+
+- **Blog post / documentation** — Articulate the core insight from `docs/spike-v4-research.md`: transformer attention is probabilistic, so AI governance must be mechanical (hooks), not instructional (prompts). This is the conceptual foundation that justifies AAM's hook-heavy architecture over the "just write better instructions" approach used by competitors.
+- **Positioning:** Establishes AAM as the thought leader in AI development governance, not just a tool.
+
+---
+
 ### Release Automation
 
-- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`). Deferred from S1 (PR #84 closed — npm infrastructure not yet configured).
+- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`). Deferred from S1 (PR #84 closed — npm infrastructure not yet configured). Lower priority than v5.0/v5.1 work.
 
 ### Future Direction (monitor)
 
-- **Orchestrator + specialist sub-agents (v5.0)** — Sprint-master routes to phase-specific agents. See `docs/spike-session-architecture.md` Approach C.
-- **Agent teams governance** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. Monitor for stability.
-- **Worktree-native sprint items** — Each sprint item in `isolation: "worktree"`. Simplifies branch management, enables future parallel execution.
-- **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks.
-- **AGENTS.md standard tracking** — 60k+ repos, Linux Foundation stewardship. `npx aiagentminder agents-md` already ships; keep current.
+- **Claude Code native marketplace** — If Anthropic launches one, be a first-mover. `.claude-plugin/` manifest already positions AAM.
+- **Agent Teams stability** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. When it exits experimental, multi-agent sprint execution becomes possible.
+- **Path-scoped rules** — Copilot supports `.instructions.md` per path; Cursor supports glob-scoped rules. If Claude Code adds native path-scoped rule support, adopt immediately. Relevant for monorepos with mixed stacks.
+- **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks and stop guards.
+- **AGENTS.md spec evolution** — Track spec changes. Bidirectional sync (v5.1) depends on spec stability.
 
 ### Dropped
 
@@ -260,6 +305,8 @@ Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, revi
 - **`/aam-update` dry-run mode (as a prompt feature)** — Superseded by v4.2 deterministic sync. Dry-run is now a CLI flag (`npx aiagentminder sync --dry-run`), not a prompt behavior.
 - **HTTP hook support** — Node.js dependency already removed in v3.2.
 - **Versioning scheme reset to v1.0.0** — Resolved: continue v3.x with strict semver. See DECISIONS.md.
+- **Cross-platform portability as a major initiative** — Assessment: "own the Claude Code positioning rather than trying to be everything." The governance workflow (hooks, stop guards, context cycling) is inherently Claude Code-specific. Rules portability is addressed by v5.1 export, not by rebuilding the framework for other tools.
+- **Worktree-native sprint items** — Each sprint item in `isolation: "worktree"`. Removed from monitor — not identified as a priority by the competitive assessment, and context cycling already handles multi-item session management.
 
 ---
 
@@ -272,5 +319,6 @@ Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, revi
 | 2026-03-30 | Added: Plugin skill removal (v4.2) | Plugin skills duplicate project-local skills — ~600 tokens dead weight per session. Plugin provides CLI only; discoverability is a future concern. |
 | 2026-03-30 | Changed: Release Automation note | PR #84 closed — npm infrastructure not yet configured. |
 | 2026-03-30 | Post-v4.2 hardening (S7) | Fix `init --force` settings merge, stale skill references, jq check in sync, branch cleanup, README rules table update for v4.1 session profiles. |
+| 2026-03-30 | Roadmap refinement from architecture assessment | Assessment (`docs/architecture-assessment-2026-03.md`) mapped AAM vs. 30+ tools. Refined v5.0 (added metrics collection, community listings), added v5.1 (AGENTS.md bidirectional sync, cross-tool export, mechanical enforcement publication), restructured Future Direction into monitor/dropped tiers, dropped cross-platform portability initiative and worktree-native items. |
 
-*Last revised 2026-03-30 (S7 hardening)*
+*Last revised 2026-03-30 (architecture assessment refinement)*

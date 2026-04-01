@@ -33,12 +33,14 @@ PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE �
 
 ## TEST State: Review Lens Dispatch
 
-The quality-reviewer agent runs quality gate checks inline. For the 5-lens review, spawn
-review lens agents directly (sub-agents cannot spawn sub-sub-agents):
+TEST is code review only — no builds or tests run here. Build + lint + test execution
+happens in pr-pipeliner (REVIEW state) after all review cycles complete.
+
+Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 
 1. Spawn in parallel: security-reviewer, performance-reviewer, api-reviewer, cost-reviewer, ux-reviewer
 2. Collect findings from all lenses
-3. Pass combined findings to quality-reviewer for judge pass
+3. Pass combined findings to quality-reviewer for judge pass (read-only — classify only, no fixes)
 
 ## Your Responsibilities
 

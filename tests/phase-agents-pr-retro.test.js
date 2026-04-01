@@ -53,6 +53,12 @@ describe('pr-pipeliner agent', () => {
     assert.ok(content.includes('test') || content.includes('Test'), 'must include test');
     assert.ok(content.includes('merge') || content.includes('Merge'), 'must include merge');
   });
+
+  it('is the execution gate — includes build and lint steps', () => {
+    const content = readAgent(AGENT);
+    assert.ok(content.includes('Build') || content.includes('build'), 'must include build step');
+    assert.ok(content.includes('Lint') || content.includes('lint'), 'must include lint step');
+  });
 });
 
 describe('sprint-retro agent', () => {

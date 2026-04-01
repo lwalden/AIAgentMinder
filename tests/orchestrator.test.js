@@ -152,9 +152,9 @@ describe('orchestrator integration: input/output contracts', () => {
     assert.ok(content.includes('done') && content.includes('blocked'));
   });
 
-  it('quality-reviewer defines gate/review output', () => {
+  it('quality-reviewer defines review/findings output', () => {
     const content = readAgent('quality-reviewer');
-    assert.ok(content.includes('gate') && content.includes('review'));
+    assert.ok(content.includes('review') && content.includes('findings'));
   });
 
   it('pr-pipeliner defines merged/escalated output', () => {

@@ -41,15 +41,15 @@ S7 archived (2026-03-30): 6 planned, 6 completed, 0 rework. 0 scope changes, 0 b
 | ID | Title | Type | Risk | Status | Post-Merge |
 |---|---|---|---|---|---|
 | S8-001 | Spike: validate orchestrator prerequisites | spike | ⚠ | done | n/a |
-| S8-002 | Update specs based on spike findings | chore | | in-progress | n/a |
-| S8-003 | Sprint-master orchestrator agent | feature | ⚠ | todo | n/a |
-| S8-004 | Phase agents: sprint-planner + sprint-speccer | feature | | todo | n/a |
-| S8-005 | Phase agent: item-executor | feature | | todo | n/a |
-| S8-006 | Phase agent: quality-reviewer [risk] | feature | ⚠ | todo | n/a |
-| S8-007 | Phase agents: pr-pipeliner + sprint-retro | feature | | todo | n/a |
-| S8-008 | Sprint metrics collection | feature | | todo | n/a |
-| S8-009 | Orchestrator integration testing [risk] | test | ⚠ | todo | n/a |
-| S8-010 | Sync/init + v4.2→v5.0 migration | feature | | todo | n/a |
+| S8-002 | Update specs based on spike findings | chore | | done | n/a |
+| S8-003 | Sprint-master orchestrator agent | feature | ⚠ | done | n/a |
+| S8-004 | Phase agents: sprint-planner + sprint-speccer | feature | | done | n/a |
+| S8-005 | Phase agent: item-executor | feature | | done | n/a |
+| S8-006 | Phase agent: quality-reviewer [risk] | feature | ⚠ | done | n/a |
+| S8-007 | Phase agents: pr-pipeliner + sprint-retro | feature | | done | n/a |
+| S8-008 | Sprint metrics collection | feature | | done | n/a |
+| S8-009 | Orchestrator integration testing [risk] | test | ⚠ | done | n/a |
+| S8-010 | Sync/init + v4.2→v5.0 migration | feature | | done | n/a |
 
 ---
 

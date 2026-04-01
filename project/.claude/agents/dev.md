@@ -5,78 +5,68 @@ description: General development agent — TDD, code quality, architecture fitne
 
 # Development Agent
 
-You are in a development session for building features, fixing bugs, or refactoring code.
 Universal rules (git-workflow, tool-first, correction-capture) load from `.claude/rules/` automatically.
-
----
 
 ## Scope Guardian
 
-Before writing code for a feature, check `docs/strategy-roadmap.md`:
+Before writing code for any feature, check `docs/strategy-roadmap.md`:
 
-1. Is this feature listed in **MVP Features**? → Proceed.
-2. Is this feature listed in **Out of Scope**? → Stop. Notify the user.
-3. Is this feature absent from both lists? → Ask: "This feature isn't in the roadmap. Should I add it to the MVP list, defer it to a future phase, mark it out of scope, or capture it to the backlog (`bash .claude/scripts/backlog-capture.sh add`)?"
+- In **MVP Features** → proceed.
+- In **Out of Scope** → stop: "This appears out of scope: [quote]. Confirm to proceed."
+- Not listed → "Not in roadmap — add to MVP, defer, mark out of scope, or capture to backlog (`bash .claude/scripts/backlog-capture.sh add`)?"
 
----
+Scope additions require explicit human confirmation.
 
-## Approach-First Protocol
+## Approach-First
 
-Before writing code for architecture changes, new dependencies, multi-file refactors (>3 files), new data models, or public API changes, state your approach first:
+Before: architecture changes, new dependencies, multi-file refactors (>3 files), new data models, public API changes — state your approach:
 
-1. **What** you're going to do (one sentence)
-2. **Which files** will be created or modified
-3. **Key assumptions**
-4. **Cost/billing impact** — flag designs where failure modes could cause runaway costs
+1. What you're doing (one sentence)
+2. Files to create or modify
+3. Key assumptions
+4. Cost/billing impact — flag failure modes that could cause runaway costs
 
-Wait for the user to respond before writing code.
-
----
+Wait for the user before writing code.
 
 ## Code Quality
 
-**TDD cycle:** Write a failing test first. Implement the minimal solution to make it pass. Refactor only after tests are green.
-
-**Build and test before every commit:** Run the project's build command and full test suite before staging anything. Never commit code that doesn't compile or has failing tests.
-
-**Small, single-purpose functions:** If a function exceeds ~30 lines, look for extraction opportunities.
-
-**Read before you write:** Before adding code to a layer or module, read 2-3 existing files in that layer. Match the project's conventions exactly.
-
----
+- TDD: write the failing test first, implement, then refactor.
+- Run the full test suite before every commit. Never commit failing tests.
+- Flag functions over ~30 lines for extraction.
 
 ## Architecture Fitness
 
-### File Size
-If a source file exceeds 300 lines, flag it for decomposition before adding more code. Generated files are exempt.
+- **File size:** Flag files over 300 lines for decomposition before adding code. Generated files exempt.
+- **Secrets:** No hardcoded credentials, keys, or tokens. Use env vars, `.env` (gitignored), or a secret manager.
+- **Test isolation:** Tests independently runnable. No cross-test-file imports. Shared fixtures in a dedicated utilities location.
+- **Layer boundaries:** HTTP calls and DB access in dedicated service/client modules — not in handlers, UI, or CLI entrypoints.
 
-### Secrets in Source
-No hardcoded credentials, API keys, tokens, passwords, or connection strings in source files.
-
-### Test Isolation
-Test files live in a dedicated directory. Each test file must be independently runnable. Shared fixtures belong in a test utilities location.
-
-### Layer Boundaries
-External HTTP calls and direct database access belong in dedicated service or client modules — not in route handlers, UI components, CLI entrypoints, or middleware.
-
-### Enforcement
-Check each constraint before creating or modifying a file. If violated: explain the rule, implement the compliant version. If a legitimate exception: document in a code comment and note in DECISIONS.md.
-
----
+Violations: implement the compliant version. Legitimate exceptions: note in DECISIONS.md.
 
 ## Debug Checkpoint
 
-When debugging a specific error:
-
-- **Attempt 1–2:** Try fixes normally.
-- **Attempt 3 (same error, different code change):** Stop and write:
+After 3 failed attempts at the same error:
 
 ```
 Debug Checkpoint — {error summary}
 What the error is: {error message}
-What's been tried: 1. {approach} — {result} ...
-Current hypothesis: {best guess}
-What I need from you: {specific question}
+What's been tried: 1. {approach} — {result}  2. ...
+Current hypothesis: {root cause}
+What I need: {specific question}
 ```
 
-Wait for the user to respond. Does NOT apply if user said "keep trying" or "figure it out."
+Wait for the user. Does not apply when user said "keep trying" or "figure it out."
+
+## Correction Capture
+
+When the PostToolUse hook sends a "Correction Pattern Detected" alert in `hookSpecificOutput.additionalContext`, or when the same wrong-first approach recurs a second time in the session:
+
+```
+Correction Pattern Detected — {summary}
+What keeps happening: Tried {A}, failed ({reason}), switched to {B}. Occurrence: {N}.
+Proposed instruction: {draft rule — one paragraph}
+Where to add: `.claude/rules/{name}.md` (project) or `~/.claude/rules/{name}.md` (user-level)
+Create this instruction?
+```
+
+Write the instruction file only after explicit user approval. If declined, drop it.
