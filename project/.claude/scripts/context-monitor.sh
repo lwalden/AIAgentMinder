@@ -24,7 +24,8 @@ if [ "$window_size" = "0" ] || [ "$window_size" = "null" ]; then
   exit 0
 fi
 
-# Model-specific absolute token thresholds (recalibrated for 1M context, v4.0)
+# Model-specific absolute token thresholds (sized for 1M context windows).
+# These are capped below if the actual window is smaller (e.g. 200k).
 case "$model_id" in
   *opus*)   threshold=580000 ;;
   *sonnet*) threshold=500000 ;;
@@ -33,6 +34,16 @@ esac
 
 # Calculate tokens currently in context window
 used_tokens=$(echo "$used_pct $window_size" | awk '{printf "%d", ($1 / 100) * $2}')
+
+# Cap threshold to 70% of actual window_size so cycling works on both
+# 200k (standard) and 1M context windows. Without this cap the hardcoded
+# thresholds above are unreachable on 200k contexts.
+if [ "$threshold" -gt 0 ] && [ "$window_size" -gt 0 ]; then
+  max_threshold=$(echo "$window_size" | awk '{printf "%d", $1 * 0.70}')
+  if [ "$threshold" -gt "$max_threshold" ]; then
+    threshold=$max_threshold
+  fi
+fi
 
 # Determine if cycling is warranted
 should_cycle=false

@@ -21,6 +21,9 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
 
+# Reset the tool-call counter fallback so the next session starts clean.
+rm -f "$PROJECT_DIR/.sprint-tool-count" 2>/dev/null || true
+
 # Verify state files exist before killing anything
 if [ ! -f "$PROJECT_DIR/.sprint-continuation.md" ]; then
     echo "ERROR: .sprint-continuation.md not found in $PROJECT_DIR" >&2

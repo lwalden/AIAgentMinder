@@ -108,7 +108,11 @@ After spec approval, execute all items without asking permission.
 4. Check `SPRINT.md` archives for `<!-- sizing: {min}-{max} -->`. Default 4-5. Max 7.
 5. Scope 4-7 issues covering a coherent phase subset. Prefer whole features over hitting a count.
 6. Tag `[risk]` if touching: auth/session, payments/billing, data migration/schema, public API, security/secrets.
-7. Write sprint header to `SPRINT.md`. Present issues with AC. **Wait for approval.**
+7. Write sprint header to `SPRINT.md`. Present issues with AC.
+8. **Write empty `.sprint-human-checkpoint`:** `bash -c 'touch .sprint-human-checkpoint'`
+9. End your turn and wait. The Stop hook allows the stop while this file exists.
+
+→ User approves: `bash -c 'rm -f .sprint-human-checkpoint'` then proceed to SPEC.
 
 ## SPEC
 
@@ -124,7 +128,11 @@ After spec approval, execute all items without asking permission.
 **Custom Instructions:** {human-provided, or "None"}
 ```
 
-Present all specs together. **Wait for approval.**
+Present all specs together.
+**Write empty `.sprint-human-checkpoint`:** `bash -c 'touch .sprint-human-checkpoint'`
+End your turn and wait. The Stop hook allows the stop while this file exists.
+
+→ User approves: `bash -c 'rm -f .sprint-human-checkpoint'` then proceed to APPROVE.
 
 ## APPROVE
 
@@ -190,9 +198,39 @@ A `Stop` hook (`sprint-stop-guard.sh`) blocks turn endings when pending todo ite
 
 **Precondition:** All SPRINT.md Post-Merge rows must be `pass` or `n/a`.
 
-1. Sprint review: completed issues + PR links, decisions, risk items, rework.
-2. `/aam-retrospective`.
-3. **Wait for human acceptance.** Archive sprint.
+1. Run `/aam-retrospective` — this produces the retrospective report and a ready-to-paste archive entry.
+2. Present the full sprint review to the user:
+   - Completed items with PR links
+   - Decisions logged
+   - Risk items and outcomes
+   - Rework items and resolution
+   - Retrospective metrics and sizing recommendation
+3. **Write empty `.sprint-human-checkpoint`:** `bash -c 'touch .sprint-human-checkpoint'`
+4. End your turn and wait. The Stop hook allows the stop while this file exists.
+
+→ User accepts:
+5. `bash -c 'rm -f .sprint-human-checkpoint'`
+6. Create the archive PR — fully automated, no human action required:
+   ```
+   git checkout -b chore/sprint-S{n}-archive
+   # Apply archive entry from retro output to SPRINT.md
+   git add SPRINT.md
+   git commit -m "chore(sprint): archive S{n} — {goal}"
+   git push -u origin chore/sprint-S{n}-archive
+   gh pr create --title "chore(sprint): archive S{n} — {goal}" \
+     --body "Sprint metadata update only — no code changes."
+   ```
+7. Attempt immediate merge:
+   ```
+   gh pr merge --squash
+   ```
+   If that fails (review required), enable auto-merge:
+   ```
+   gh pr merge --squash --auto
+   ```
+   If both fail: note the PR number and continue — do not wait or block the sprint.
+8. `git checkout main && git pull`
+9. Confirm: "Sprint S{n} complete. Archive PR #N [merged / will auto-merge when checks pass / ready to merge — no code changes]. Ready for next sprint when you are."
 
 ## BLOCKED
 
@@ -200,9 +238,9 @@ A `Stop` hook (`sprint-stop-guard.sh`) blocks turn endings when pending todo ite
 
 ## CONTEXT_CYCLE
 
-A `PreToolUse` hook (`context-cycle-hook.sh`) reads `.context-usage` on every tool call. When `should_cycle` is `true`, all tools except Bash, Write, and Read are blocked. Thresholds: 500k Sonnet, 580k Opus, 35% unknown models.
+A `PreToolUse` hook (`context-cycle-hook.sh`) reads `.context-usage` on every tool call. When `should_cycle` is `true`, all tools except Bash, Write, and Read are blocked. Thresholds are computed dynamically by `context-monitor.sh` based on the actual context window size.
 
-Fallback when `.context-usage` absent — cycle when any true: 3+ items completed this session | debug checkpoint triggered | rework executed.
+Fallback when `.context-usage` absent — the hook maintains a `.sprint-tool-count` counter and blocks at 150 tool calls. Do not try to manually enforce cycling; the hook handles it.
 
 Steps:
 1. Commit all work.

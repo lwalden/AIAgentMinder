@@ -28,6 +28,12 @@ Chose: Populate roadmap backlog from structured competitive analysis (70+ repos,
 
 ---
 
+### Stop hook exit code semantics: exit 0 = allow, non-zero = error | 2026-04 | Status: Active
+
+Chose: `exit 0` (no stdout JSON) to allow stop, and `exit 0` + `{"decision":"block"}` JSON on stdout to block stop in `sprint-stop-guard.sh`, over using `exit 2` for "allow" (as was done from v3.3 through early S8 fix attempts). Why: for Stop hooks, Claude Code treats any non-zero exit code as an error and injects "Stop hook error: No stderr output" into the conversation UI as feedback text. Claude responds to this injected text, which triggers another stop hook execution — an infinite loop. The `exit 2` convention applies only to PreToolUse hooks (where exit 2 = block the tool call). Stop hooks use stdout JSON for the block/allow decision, not exit codes. Tradeoff: since exit 0 is the only valid non-error exit, the distinction between allow and block is entirely in stdout content (JSON present = block, no JSON = allow). Applied to template and accessishield (PR #277).
+
+---
+
 ### Sprint continuation counter via HTML comment in SPRINT.md | 2026-03 | Status: Active
 
 Chose: `<!-- ai-continues: N -->` HTML comment written directly into SPRINT.md at runtime over tracking via PR labels or a separate state file. Why: self-contained with no external dependencies, survives worktree removal, is invisible in rendered markdown, and resets naturally when the sprint is archived. Counter is NOT committed — it is ephemeral state that controls runaway protection within a single sprint execution. Tradeoff: if SPRINT.md is reset by hand mid-sprint, the counter resets too (acceptable — manual sprint intervention implies human oversight).
