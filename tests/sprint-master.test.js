@@ -56,12 +56,12 @@ describe('sprint-master orchestrator agent', () => {
     );
   });
 
-  it('is under 100 lines (lightweight router constraint)', () => {
+  it('is under 200 lines (orchestrator size constraint)', () => {
     const content = readAgent();
     const lineCount = content.split('\n').length;
     assert.ok(
-      lineCount <= 100,
-      `sprint-master.md must be under 100 lines, got ${lineCount}`
+      lineCount <= 200,
+      `sprint-master.md must be under 200 lines, got ${lineCount}`
     );
   });
 

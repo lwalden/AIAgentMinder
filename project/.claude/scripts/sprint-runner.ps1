@@ -24,7 +24,7 @@
 #>
 
 param(
-    [string]$Agent = "sprint-executor",
+    [string]$Agent = "sprint-master",
     [string]$Prompt = "",
     [string]$PermissionMode = ""
 )

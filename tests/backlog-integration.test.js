@@ -7,8 +7,8 @@ import { fileURLToPath } from 'node:url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_DIR = path.resolve(__dirname, '..', 'project');
 
-describe('backlog integration: sprint-executor agent', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'agents', 'sprint-executor.md');
+describe('backlog integration: sprint-planner agent', () => {
+  const filePath = path.join(PROJECT_DIR, '.claude', 'agents', 'sprint-planner.md');
 
   it('PLAN phase references backlog-capture.sh list', () => {
     const content = fs.readFileSync(filePath, 'utf-8');

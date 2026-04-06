@@ -22,7 +22,7 @@ Before proposing issues, validate each candidate against `docs/strategy-roadmap.
 
 1. Feature is in **MVP Features** for the current phase → include it.
 2. Feature is in **Out of Scope** → exclude it. Note why in the plan output.
-3. Feature is absent from both lists → flag it: "Not in roadmap — confirm before including."
+3. Feature is absent from both lists → flag it: "Not in roadmap — confirm before including, defer to backlog (`bash .claude/scripts/backlog-capture.sh add`), or mark out of scope."
 
 Do not propose out-of-scope work without flagging it. Mid-sprint scope additions require human confirmation.
 

@@ -77,12 +77,12 @@ AIAgentMinder addresses three gaps in Claude Code:
 
 | Rule | Loaded by | What it does |
 |------|-----------|-------------|
-| Sprint workflow | `sprint-executor` | State machine sprint execution with mandatory quality checklist |
-| Code quality | `sprint-executor`, `dev`, `qa` | TDD cycle, build-before-commit, small focused functions |
-| Scope guardian | `sprint-executor`, `dev` | Checks new work against the roadmap before implementing |
-| Approach-first | `sprint-executor`, `dev` | States intended approach before multi-file or architecture changes |
-| Debug checkpoint | `sprint-executor`, `dev`, `debug`, `hotfix` | Stops debugging spirals after 3 failed attempts at the same error |
-| Architecture fitness | `sprint-executor`, `dev`, `qa` | Structural constraints — file size limits, secrets detection, layer boundaries |
+| Sprint workflow | `sprint-master` | Orchestrated sprint execution via specialist sub-agents |
+| Code quality | `dev`, `qa` | TDD cycle, build-before-commit, small focused functions |
+| Scope guardian | `dev` | Checks new work against the roadmap before implementing |
+| Approach-first | `dev` | States intended approach before multi-file or architecture changes |
+| Debug checkpoint | `dev`, `debug`, `hotfix` | Stops debugging spirals after 3 failed attempts at the same error |
+| Architecture fitness | `dev`, `qa` | Structural constraints — file size limits, secrets detection, layer boundaries |
 
 ### Session profiles
 
@@ -90,7 +90,7 @@ Use `claude --agent <name>` to load the right context for your task:
 
 | Profile | Purpose |
 |---------|---------|
-| `sprint-executor` | Full sprint state machine — all rules loaded |
+| `sprint-master` | Orchestrated sprint execution — coordinates specialist sub-agents per phase |
 | `dev` | General development — TDD, architecture fitness, approach-first |
 | `debug` | Debugging — checkpoint pattern, triage |
 | `hotfix` | Minimal ceremony — debug checkpoint only |

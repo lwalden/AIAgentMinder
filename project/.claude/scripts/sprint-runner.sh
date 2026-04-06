@@ -15,7 +15,7 @@ set -euo pipefail
 
 CONT_FILE=".sprint-continuation.md"
 SIGNAL_FILE=".sprint-continue-signal"
-AGENT="sprint-executor"
+AGENT="sprint-master"
 INITIAL_PROMPT="${1:-}"
 shift 2>/dev/null || true
 
@@ -24,7 +24,7 @@ EXTRA_ARGS=()
 while [ $# -gt 0 ]; do
     case "$1" in
         --agent)
-            AGENT="${2:-sprint-executor}"
+            AGENT="${2:-sprint-master}"
             shift 2
             ;;
         *)

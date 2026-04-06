@@ -16,9 +16,9 @@ describe('sprint-runner.ps1: --agent parameter', () => {
     assert.ok(content.includes('[string]$Agent'), 'must have $Agent parameter');
   });
 
-  it('defaults Agent to sprint-executor', () => {
+  it('defaults Agent to sprint-master', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('"sprint-executor"'), 'Agent default must be sprint-executor');
+    assert.ok(content.includes('"sprint-master"'), 'Agent default must be sprint-master');
   });
 
   it('passes --agent to claude invocations', () => {
@@ -35,9 +35,9 @@ describe('sprint-runner.sh: --agent parameter', () => {
     assert.ok(content.includes('--agent'), 'must document --agent flag');
   });
 
-  it('defaults agent to sprint-executor', () => {
+  it('defaults agent to sprint-master', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('sprint-executor'), 'must default to sprint-executor');
+    assert.ok(content.includes('sprint-master'), 'must default to sprint-master');
   });
 });
 

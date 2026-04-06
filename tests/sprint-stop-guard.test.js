@@ -41,7 +41,7 @@ function runHook(hookInput, cwd) {
 function stopInput(lastMessage = '') {
   return {
     hook_event_name: 'Stop',
-    stop_hook_active: true,
+    stop_hook_active: false,
     last_assistant_message: lastMessage,
   };
 }
@@ -96,7 +96,7 @@ describe('sprint-stop-guard', () => {
     ]);
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop (exit 2)');
+    assert.equal(result.exitCode, 0, 'should allow stop (exit 0, no block JSON)');
   });
 
   it('allows stop when an item is blocked', () => {
@@ -107,12 +107,12 @@ describe('sprint-stop-guard', () => {
     ]);
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop when item is blocked');
+    assert.equal(result.exitCode, 0, 'should allow stop when item is blocked');
   });
 
   it('allows stop when no SPRINT.md exists', () => {
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop with no sprint file');
+    assert.equal(result.exitCode, 0, 'should allow stop with no sprint file');
   });
 
   it('allows stop when sprint status is proposed (PLAN/SPEC phase)', () => {
@@ -121,7 +121,7 @@ describe('sprint-stop-guard', () => {
     ]);
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop during planning');
+    assert.equal(result.exitCode, 0, 'should allow stop during planning');
   });
 
   it('allows stop when .sprint-human-checkpoint exists', () => {
@@ -132,7 +132,7 @@ describe('sprint-stop-guard', () => {
     fs.writeFileSync(path.join(tmpDir, '.sprint-human-checkpoint'), '');
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop at human checkpoint');
+    assert.equal(result.exitCode, 0, 'should allow stop at human checkpoint');
   });
 
   it('allows stop when context cycling is needed', () => {
@@ -146,7 +146,7 @@ describe('sprint-stop-guard', () => {
     );
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop for context cycling');
+    assert.equal(result.exitCode, 0, 'should allow stop for context cycling');
   });
 
   it('blocks stop and includes next item ID in reason', () => {
@@ -170,7 +170,7 @@ describe('sprint-stop-guard', () => {
     ]);
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop when sprint is completed');
+    assert.equal(result.exitCode, 0, 'should allow stop when sprint is completed');
   });
 
   it('does not block when context-usage file has should_cycle false', () => {
@@ -195,6 +195,6 @@ describe('sprint-stop-guard', () => {
     fs.writeFileSync(path.join(tmpDir, '.sprint-continue-signal'), '');
 
     const result = runHook(stopInput(), tmpDir);
-    assert.equal(result.exitCode, 2, 'should allow stop when cycling is in progress');
+    assert.equal(result.exitCode, 0, 'should allow stop when cycling is in progress');
   });
 });

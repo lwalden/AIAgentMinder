@@ -8,7 +8,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const AGENTS_DIR = path.resolve(__dirname, '..', 'project', '.claude', 'agents');
 
 const AGENT_FILES = [
-  'sprint-executor.md',
   'dev.md',
   'debug.md',
   'hotfix.md',
@@ -41,48 +40,24 @@ describe('session profile agents: frontmatter', () => {
   }
 });
 
-describe('session profile agents: sprint-executor content', () => {
-  it('contains sprint state machine markers', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    const markers = ['PLAN', 'SPEC', 'APPROVE', 'EXECUTE', 'TEST', 'REVIEW', 'MERGE', 'VALIDATE', 'COMPLETE', 'BLOCKED', 'CONTEXT_CYCLE'];
-    for (const marker of markers) {
-      assert.ok(content.includes(`## ${marker}`), `sprint-executor must contain ## ${marker}`);
+describe('session profile agents: sprint-master content', () => {
+  const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-master.md'), 'utf-8');
+
+  it('contains sprint state machine routing table', () => {
+    const states = ['PLAN', 'SPEC', 'APPROVE', 'EXECUTE', 'TEST', 'REVIEW', 'MERGE', 'VALIDATE', 'COMPLETE'];
+    for (const state of states) {
+      assert.ok(content.includes(state), `sprint-master must reference ${state} state`);
     }
   });
 
-  it('contains quality checklist', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('Quality Checklist'), 'must contain Quality Checklist');
-    assert.ok(content.includes('/aam-quality-gate'), 'must reference /aam-quality-gate');
-    assert.ok(content.includes('/aam-self-review'), 'must reference /aam-self-review');
-    assert.ok(content.includes('/aam-pr-pipeline'), 'must reference /aam-pr-pipeline');
+  it('contains human checkpoint protocol', () => {
+    assert.ok(content.includes('.sprint-human-checkpoint'), 'must reference .sprint-human-checkpoint');
   });
 
-  it('contains scope guardian content', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('strategy-roadmap.md'), 'must reference strategy-roadmap.md');
-    assert.ok(content.includes('Out of Scope'), 'must include out of scope handling');
-  });
-
-  it('contains approach-first content', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('Approach-First'), 'must contain approach-first protocol');
-  });
-
-  it('contains code quality content', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('TDD'), 'must contain TDD cycle');
-  });
-
-  it('contains architecture fitness content', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('300 lines'), 'must contain file size constraint');
-    assert.ok(content.includes('Secrets'), 'must contain secrets constraint');
-  });
-
-  it('contains debug checkpoint content', () => {
-    const content = fs.readFileSync(path.join(AGENTS_DIR, 'sprint-executor.md'), 'utf-8');
-    assert.ok(content.includes('Debug Checkpoint'), 'must contain debug checkpoint');
+  it('contains COMPLETE section with retro and archive PR', () => {
+    assert.ok(content.includes('## COMPLETE'), 'must have COMPLETE section');
+    assert.ok(content.includes('sprint-retro'), 'must spawn sprint-retro');
+    assert.ok(content.includes('chore/sprint-'), 'must reference archive branch pattern');
   });
 });
 

@@ -129,7 +129,7 @@ describe('E2E: sync --apply on v3.3 installation', () => {
   it('creates agents directory (new in v4.1)', () => {
     execFileSync('node', [BIN, 'sync', targetDir, '--apply'], { encoding: 'utf-8' });
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-master.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'debug.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'hotfix.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'qa.md')));
