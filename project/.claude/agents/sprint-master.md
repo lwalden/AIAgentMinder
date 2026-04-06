@@ -93,12 +93,27 @@ debug checkpoint (3 failed attempts at the same error in a sub-agent).
 
 → User accepts:
 5. `bash -c 'rm -f .sprint-human-checkpoint'`
-6. Apply the archive entry from the retro output to `SPRINT.md`.
-7. Commit directly to main — **no branch, no PR** (sprint metadata, not code):
+6. Create the archive PR — fully automated, no human action required:
    ```
-   git add SPRINT.md && git commit -m "chore(sprint): archive S{n} — {goal}"
+   git checkout -b chore/sprint-S{n}-archive
+   # Apply archive entry from retro output to SPRINT.md
+   git add SPRINT.md
+   git commit -m "chore(sprint): archive S{n} — {goal}"
+   git push -u origin chore/sprint-S{n}-archive
+   gh pr create --title "chore(sprint): archive S{n} — {goal}" \
+     --body "Sprint metadata update only — no code changes."
    ```
-8. Confirm: "Sprint S{n} archived. Ready for next sprint when you are."
+7. Attempt immediate merge:
+   ```
+   gh pr merge --squash
+   ```
+   If that fails (review required), enable auto-merge:
+   ```
+   gh pr merge --squash --auto
+   ```
+   If both fail: note the PR number and continue — do not wait or block the sprint.
+8. `git checkout main && git pull`
+9. Confirm: "Sprint S{n} complete. Archive PR #N [merged / will auto-merge when checks pass / ready to merge — no code changes]. Ready for next sprint when you are."
 
 ## REWORK
 
