@@ -113,7 +113,7 @@ describe('CLI: sync --apply', () => {
     run(['sync', targetDir, '--apply']);
     // Agent files should now exist
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-master.md')));
   });
 
   it('updates version stamp', () => {

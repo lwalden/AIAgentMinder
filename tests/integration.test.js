@@ -73,7 +73,7 @@ describe('CLI integration: init --core', () => {
       'should not create .claude/commands/ — skills replace commands');
 
     // Agents directory should exist with session profiles
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-master.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
 
     // Optional files should NOT exist
@@ -200,7 +200,7 @@ describe('CLI integration: init --all', () => {
     assert.ok(fs.existsSync(path.join(targetDir, '.pr-pipeline.json')));
 
     // Session profile agents (core, not optional)
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-master.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
 
     // Version stamp
@@ -315,7 +315,7 @@ describe('CLI integration: v3.x to v4.1 migration', () => {
     });
 
     // New agent files should exist
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-executor.md')));
+    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'sprint-master.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'dev.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'debug.md')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'agents', 'hotfix.md')));

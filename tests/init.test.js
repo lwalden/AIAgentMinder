@@ -52,7 +52,7 @@ describe('getCoreFiles', () => {
   it('includes session profile agents', () => {
     const files = getCoreFiles();
     const agentFiles = files.filter(f => f.startsWith('.claude/agents/'));
-    assert.ok(agentFiles.includes('.claude/agents/sprint-executor.md'));
+    assert.ok(agentFiles.includes('.claude/agents/sprint-master.md'));
     assert.ok(agentFiles.includes('.claude/agents/dev.md'));
     assert.ok(agentFiles.includes('.claude/agents/debug.md'));
     assert.ok(agentFiles.includes('.claude/agents/hotfix.md'));

@@ -33,10 +33,10 @@ describe('v4.2→v5.0 migration', () => {
     assert.ok(v5, 'v5.0.0 migration must exist');
   });
 
-  it('migration does NOT delete sprint-executor.md', () => {
+  it('migration deletes sprint-executor.md', () => {
     const v5 = MIGRATIONS.find(m => m.version === '5.0.0');
     const deletesExecutor = v5.delete.some(f => f.includes('sprint-executor'));
-    assert.ok(!deletesExecutor, 'must NOT delete sprint-executor.md (still valid standalone)');
+    assert.ok(deletesExecutor, 'must delete sprint-executor.md (replaced by sprint-master)');
   });
 
   it('getMigrations from 4.2.0 to 5.0.0 includes v5 migration', () => {
@@ -78,9 +78,9 @@ describe('sync includes new v5.0 files', () => {
     }
   });
 
-  it('sprint-executor.md still exists (standalone use)', () => {
+  it('sprint-executor.md does not exist (replaced by sprint-master)', () => {
     const fullPath = path.join(TEMPLATE_DIR, '.claude/agents/sprint-executor.md');
-    assert.ok(fs.existsSync(fullPath), 'sprint-executor.md must still exist');
+    assert.ok(!fs.existsSync(fullPath), 'sprint-executor.md must not exist — use sprint-master');
   });
 
   it('init includes new agents in fresh installation', () => {
@@ -111,7 +111,7 @@ describe('sync --dry-run shows new v5.0 files', () => {
 <!-- aam-version: 4.2.0 -->
 `);
     // Copy existing v4.2 agents (not new v5 ones)
-    const v42Agents = ['sprint-executor.md', 'dev.md', 'debug.md', 'hotfix.md', 'qa.md',
+    const v42Agents = ['dev.md', 'debug.md', 'hotfix.md', 'qa.md',
       'security-reviewer.md', 'performance-reviewer.md', 'api-reviewer.md',
       'cost-reviewer.md', 'ux-reviewer.md'];
     for (const a of v42Agents) {
