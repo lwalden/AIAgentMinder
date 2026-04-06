@@ -29,7 +29,7 @@ PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE �
 | REVIEW | pr-pipeliner | PR number, config | "merged" or "escalated: {reason}" |
 | MERGE | *(inline)* | — | checkout main, update status |
 | VALIDATE | item-executor | Post-merge spec | "pass" or "fail: {details}" |
-| COMPLETE | sprint-retro | SPRINT.md, git log, metrics | Retrospective report |
+| COMPLETE | sprint-retro → *(human checkpoint)* | SPRINT.md, git log, metrics | Retrospective report → archive |
 
 ## TEST State: Review Lens Dispatch
 
@@ -50,6 +50,23 @@ Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 4. **Human checkpoints:** PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK
 5. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
+## Human Checkpoint Protocol (mechanical enforcement)
+
+At PLAN and SPEC checkpoints, use this procedure — do NOT rely on text reminders alone:
+
+**After sprint-planner returns (PLAN checkpoint):**
+1. Write empty `.sprint-human-checkpoint` file: `bash -c 'touch .sprint-human-checkpoint'`
+2. Present the proposed issue list to the user and wait.
+3. The Stop hook allows the turn to end because `.sprint-human-checkpoint` exists.
+4. When the user approves: delete the file (`bash -c 'rm -f .sprint-human-checkpoint'`), then spawn sprint-speccer.
+
+**After sprint-speccer returns (SPEC → APPROVE checkpoint):**
+1. Write empty `.sprint-human-checkpoint` file: `bash -c 'touch .sprint-human-checkpoint'`
+2. Present all specs to the user and wait.
+3. When the user approves: delete the file (`bash -c 'rm -f .sprint-human-checkpoint'`), then proceed to APPROVE.
+
+Never proceed to the next state in the same turn as writing the checkpoint file.
+
 ## Autonomy Rules
 
 After spec approval, execute all items sequentially without asking permission.
@@ -61,6 +78,27 @@ stop asking permission, NOT skip quality steps.
 
 **Ask human ONLY when:** PLAN approval, SPEC approval, BLOCKED, REWORK, or
 debug checkpoint (3 failed attempts at the same error in a sub-agent).
+
+## COMPLETE
+
+**Precondition:** Every SPRINT.md Post-Merge row must be `pass` or `n/a`.
+
+1. Spawn sprint-retro. Pass: SPRINT.md, DECISIONS.md, .sprint-metrics.json (if present), relevant git log.
+2. Present the full sprint review to the user:
+   - Completed items with PR links
+   - Decisions logged, risk items and outcomes, rework and resolution
+   - Retrospective metrics and sizing recommendation (from sprint-retro output)
+3. **Write empty `.sprint-human-checkpoint`:** `bash -c 'touch .sprint-human-checkpoint'`
+4. End your turn and wait. The Stop hook allows the stop while this file exists.
+
+→ User accepts:
+5. `bash -c 'rm -f .sprint-human-checkpoint'`
+6. Apply the archive entry from the retro output to `SPRINT.md`.
+7. Commit directly to main — **no branch, no PR** (sprint metadata, not code):
+   ```
+   git add SPRINT.md && git commit -m "chore(sprint): archive S{n} — {goal}"
+   ```
+8. Confirm: "Sprint S{n} archived. Ready for next sprint when you are."
 
 ## REWORK
 

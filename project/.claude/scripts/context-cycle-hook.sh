@@ -31,8 +31,45 @@ input=$(cat)
 # The hook runs from the project root (cwd), so look there first.
 USAGE_FILE=".context-usage"
 
-# If .context-usage doesn't exist, nothing to enforce — allow everything.
+# If .context-usage doesn't exist, use a tool-call counter as a fallback.
+# This covers projects where the status line isn't producing .context-usage
+# (e.g. older installs, misconfigured shell, or non-CLI environments).
 if [ ! -f "$USAGE_FILE" ]; then
+  # Only apply fallback when a sprint is actively in-progress.
+  SPRINT_FILE="SPRINT.md"
+  if [ -f "$SPRINT_FILE" ] && command -v jq >/dev/null 2>&1; then
+    sprint_status=$(sed -n 's/^\*\*Status:\*\* //p' "$SPRINT_FILE" 2>/dev/null | tr -d '\r' | head -1)
+    if [ "$sprint_status" = "in-progress" ]; then
+      COUNTER_FILE=".sprint-tool-count"
+      count=0
+      [ -f "$COUNTER_FILE" ] && count=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
+      count=$((count + 1))
+      echo "$count" > "$COUNTER_FILE"
+      if [ "$count" -gt 150 ]; then
+        # Extract tool_name (already parsed below, but we need it here too)
+        tool_name=$(echo "$input" | jq -r '.tool_name // "unknown"' 2>/dev/null)
+        case "$tool_name" in
+          Bash|Write|Read)
+            echo "CONTEXT CYCLE OVERDUE — $count tool calls logged (no status line data; fallback threshold: 150). Execute CONTEXT_CYCLE protocol now. Only Bash, Write, and Read are allowed."
+            exit 0
+            ;;
+        esac
+        cat <<EOF
+BLOCKED — CONTEXT CYCLE REQUIRED (fallback: $count tool calls, no status line data)
+
+No .context-usage file found. The status line hook may not be running.
+This tool call ($tool_name) is blocked. Execute the CONTEXT_CYCLE protocol now
+(only Bash, Write, and Read are allowed):
+
+1. Commit all uncommitted work (Bash: git add + git commit)
+2. Write .sprint-continuation.md with resume state (Write)
+3. Write .sprint-continue-signal as empty file (Write)
+4. Run: bash .claude/scripts/context-cycle.sh (Bash)
+EOF
+        exit 2
+      fi
+    fi
+  fi
   exit 0
 fi
 
