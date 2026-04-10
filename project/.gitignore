@@ -55,6 +55,11 @@ temp/
 .sprint-metrics.json
 .sprint-tool-count
 
+# Quality gate marker files (written by hooks, never committed)
+.quality-gate-pass
+.quality-review-result.json
+.tests-passed
+
 # Claude Code auto memory (project-specific, not for version control)
 # Uncomment if you use Claude Code's auto memory feature:
 # .claude/memory/

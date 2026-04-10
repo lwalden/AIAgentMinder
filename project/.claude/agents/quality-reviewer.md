@@ -48,3 +48,14 @@ action_needed: {list of items that need fixing, or "none"}
 ```
 
 The sprint-master routes fix work to item-executor. You do not apply fixes.
+
+## Machine-Readable Gate Signal
+
+After producing the text output above, write a structured result file for hook enforcement:
+
+```bash
+echo '{"decision": "<pass|block>", "critical": <N>, "high": <N>, "medium": <N>, "low": <N>, "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' > .quality-review-result.json
+```
+
+This file is read by the PreToolUse PR gate hook to mechanically enforce review decisions.
+The hook blocks PR creation when `decision` is `"block"`.
