@@ -188,6 +188,12 @@ Chose: Proceed with orchestrator architecture (Approach C from spike doc) based 
 
 ---
 
+### settings-merge supports N AAM hooks per hook type | 2026-04-11 | Status: Active
+
+Chose: Rewrite `mergeHookType` in `lib/settings-merge.js` to treat all template entries as authoritative and prepend them after stripping any existing AAM-managed entries from the target, over the v4.2 logic that assumed exactly one AAM entry per hook type and updated it in place. Why: v4.3's hook-based quality gate adds a second PreToolUse entry (`pre-pr-gate-hook.sh`, matcher `Bash`) and a second PostToolUse entry (`post-write-lint-hook.sh`, matcher `Write|Edit`). The old single-entry logic would have silently dropped the second AAM hook during `/aam-update` on existing installations, breaking the feature for every downstream repo. Alternatives considered: (a) keep one entry and bundle both hooks under a single matcher — rejected because Claude Code matchers are not multi-value and the hooks target different tools, (b) ship a migration that rewrites `settings.json` — rejected because the deterministic merge path is the correct place for authoritative template→target reconciliation. Tradeoff: user-added hook entries that happen to reference `.claude/scripts/` paths get treated as AAM-managed and replaced on merge; mitigated by the convention that user hooks live outside `.claude/scripts/`. Shipped in v4.3.0 alongside the quality gate hardening backport (PR #143).
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.
