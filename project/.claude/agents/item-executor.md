@@ -17,13 +17,14 @@ Universal rules (git-workflow, tool-first, correction-capture) load from `.claud
 ## Process
 
 1. Read the spec and relevant source files.
-2. Create the feature branch.
-3. **TDD RED:** Write failing tests from the spec's test plan.
-4. **TDD GREEN:** Implement the minimal solution to pass all tests.
-5. **Refactor:** Clean up while tests stay green.
-6. Run Integration/E2E tests if the spec defines them.
-7. Run the full test suite — zero failures. Investigate unrelated failures as regressions.
-8. Commit.
+2. **Save before switching:** Run `git status`. If there are uncommitted changes from prior work, commit them with a `wip:` prefix or stash before creating the new branch. Never `git checkout` with a dirty working tree.
+3. Create the feature branch.
+4. **TDD RED:** Write failing tests from the spec's test plan.
+5. **TDD GREEN:** Implement the minimal solution to pass all tests.
+6. **Refactor:** Clean up while tests stay green.
+7. Run Integration/E2E tests if the spec defines them.
+8. Run the full test suite — zero failures. Investigate unrelated failures as regressions.
+9. Commit.
 
 ## Architecture Fitness
 

@@ -83,6 +83,7 @@ debug checkpoint (3 failed attempts at the same error in a sub-agent).
 
 **Precondition:** Every SPRINT.md Post-Merge row must be `pass` or `n/a`.
 
+0. Update sprint header status: `bash .claude/scripts/sprint-update.sh sprint-status complete`
 1. Spawn sprint-retro. Pass: SPRINT.md, DECISIONS.md, .sprint-metrics.json (if present), relevant git log.
 2. Present the full sprint review to the user:
    - Completed items with PR links
@@ -105,11 +106,11 @@ debug checkpoint (3 failed attempts at the same error in a sub-agent).
    ```
 7. Attempt immediate merge:
    ```
-   gh pr merge --squash
+   gh pr merge --rebase
    ```
    If that fails (review required), enable auto-merge:
    ```
-   gh pr merge --squash --auto
+   gh pr merge --rebase --auto
    ```
    If both fail: note the PR number and continue — do not wait or block the sprint.
 8. `git checkout main && git pull`
