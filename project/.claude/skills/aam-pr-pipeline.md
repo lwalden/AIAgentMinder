@@ -57,9 +57,6 @@ gh pr view {number} --json number,title,body,headRefName,baseRefName,files,label
 **Initialize cycle counter:** Check PR labels for a label matching `ai-cycle-N`.
 Set `cycleNumber` to N, or 1 if no such label exists.
 
-**Detect worktree:** Check if the current working directory path contains
-`.pr-pipeline-worktrees/`. If yes, `isWorktree = true`.
-
 ---
 
 ## Step 1: High-Risk File Gate
@@ -530,16 +527,6 @@ Remove the `ai-pipeline-active` label (n8n sets it before spawning; the pipeline
 gh pr edit {number} --remove-label "ai-pipeline-active" 2>/dev/null || true
 ```
 
-If `isWorktree` is true (running in a pipeline worktree):
-```bash
-# Get the repo root (parent of the worktree's parent .pr-pipeline-worktrees dir)
-REPO_ROOT=$(git worktree list | head -1 | awk '{print $1}')
-WORKTREE_PATH=$(pwd)
-cd "$REPO_ROOT"
-git worktree remove "$WORKTREE_PATH" --force
-```
-
-If `isWorktree` is false (manual invocation in the user's working copy): skip worktree cleanup.
 
 ---
 

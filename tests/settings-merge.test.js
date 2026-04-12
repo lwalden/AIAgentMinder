@@ -12,11 +12,9 @@ describe('mergeSettings', () => {
     hooks: {
       PreToolUse: [
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/context-cycle-hook.sh' }] },
-        { matcher: 'Bash', hooks: [{ type: 'command', command: 'bash .claude/scripts/pre-pr-gate-hook.sh' }] },
       ],
       PostToolUse: [
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/correction-capture-hook.sh' }] },
-        { matcher: 'Write|Edit', hooks: [{ type: 'command', command: 'bash .claude/scripts/post-write-lint-hook.sh' }] },
       ],
       Stop: [
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/sprint-stop-guard.sh' }] },
@@ -33,8 +31,8 @@ describe('mergeSettings', () => {
   it('creates settings from empty target', () => {
     const result = mergeSettings(template, {});
     assert.deepEqual(result.statusLine, template.statusLine);
-    assert.equal(result.hooks.PreToolUse.length, 2);
-    assert.equal(result.hooks.PostToolUse.length, 2);
+    assert.equal(result.hooks.PreToolUse.length, 1);
+    assert.equal(result.hooks.PostToolUse.length, 1);
     assert.equal(result.hooks.Stop.length, 1);
     assert.equal(result.hooks.SessionStart.length, 1);
     assert.equal(result.hooks.StopFailure.length, 1);
@@ -56,12 +54,10 @@ describe('mergeSettings', () => {
       },
     };
     const result = mergeSettings(template, target);
-    // Should have both AAM hooks + user hook
-    assert.equal(result.hooks.PreToolUse.length, 3);
+    // Should have AAM hook + user hook
+    assert.equal(result.hooks.PreToolUse.length, 2);
     assert.ok(result.hooks.PreToolUse.some(e =>
       e.hooks.some(h => h.command.includes('context-cycle-hook'))));
-    assert.ok(result.hooks.PreToolUse.some(e =>
-      e.hooks.some(h => h.command.includes('pre-pr-gate-hook'))));
     assert.ok(result.hooks.PreToolUse.some(e =>
       e.hooks.some(h => h.command.includes('user-hook'))));
   });
@@ -75,12 +71,10 @@ describe('mergeSettings', () => {
       },
     };
     const result = mergeSettings(template, target);
-    // Both AAM hooks from template, no duplication of existing AAM entry
-    assert.equal(result.hooks.PreToolUse.length, 2, 'should not duplicate AAM hook');
+    // AAM hook from template, no duplication of existing entry
+    assert.equal(result.hooks.PreToolUse.length, 1, 'should not duplicate AAM hook');
     assert.ok(result.hooks.PreToolUse.some(e =>
       e.hooks.some(h => h.command.includes('context-cycle-hook'))));
-    assert.ok(result.hooks.PreToolUse.some(e =>
-      e.hooks.some(h => h.command.includes('pre-pr-gate-hook'))));
   });
 
   it('adds missing hook types', () => {

@@ -44,6 +44,12 @@ temp/
 *.tmp
 *.bak
 
+# MCP server config (may contain API keys — user-specific runtime state)
+.mcp.json
+
+# Local-only Claude Code settings (per-machine permissions / overrides)
+.claude/settings.local.json
+
 # AIAgentMinder context cycling (ephemeral state files)
 .sprint-continuation.md
 .sprint-continue-signal
@@ -52,13 +58,24 @@ temp/
 .context-usage
 .context-usage.tmp
 .corrections.jsonl
+.correction-state
 .sprint-metrics.json
 .sprint-tool-count
+
+# AIAgentMinder agent worktrees (PR pipeline scratch dirs — leak on crash)
+.claude/worktrees/
+
+# Executive dispatch state (ephemeral, written by dispatch contract)
+.exec/
 
 # Quality gate marker files (written by hooks, never committed)
 .quality-gate-pass
 .quality-review-result.json
 .tests-passed
+
+# Python cache
+__pycache__/
+*.pyc
 
 # Claude Code auto memory (project-specific, not for version control)
 # Uncomment if you use Claude Code's auto memory feature:
