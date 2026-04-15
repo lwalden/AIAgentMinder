@@ -14,7 +14,7 @@
         "repo": "lwalden/AIAgentMinder"
       },
       "description": "Project governance for AI-assisted development. Sprint execution, quality gates, TDD workflow, scope control, architecture fitness, and codebase fingerprinting. Also installable via npx aiagentminder init.",
-      "version": "4.3.0",
+      "version": "4.4.0",
       "author": {
         "name": "lwalden"
       },

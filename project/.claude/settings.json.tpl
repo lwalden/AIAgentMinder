@@ -37,7 +37,27 @@
         ]
       }
     ],
+    "SessionEnd": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/session-end-cycle.sh"
+          }
+        ]
+      }
+    ],
     "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/session-start-continuation.sh"
+          }
+        ]
+      },
       {
         "matcher": "",
         "hooks": [

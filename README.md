@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-4.2.0-blue)
+![Version](https://img.shields.io/badge/version-4.4.0-blue)
 [![npm](https://img.shields.io/npm/v/aiagentminder)](https://www.npmjs.com/package/aiagentminder)
 
 A governance framework for Claude Code. Slash commands, rules files, hooks, and shell scripts that add sprint execution, quality enforcement, and context management to Claude Code projects.

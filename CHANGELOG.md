@@ -6,6 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [4.4.0] - 2026-04-14
+
+### Added
+
+- **ADR-004 context cycling — full hook chain** — `session-end-cycle.sh` (SessionEnd hook) and `session-start-continuation.sh` (SessionStart hook, `startup` matcher) are now part of the standard template. On context pressure, the SessionEnd hook builds a continuation file from external state (git, SPRINT.md, task store). The SessionStart hook injects it into the new session with consume-once semantics. Claude's only job on cycle is `/exit`; everything else is automated.
+- **`SessionEnd` hook in settings.json template** — wires `session-end-cycle.sh` unconditionally.
+- **`SessionStart` dual-entry in settings.json template** — `startup` matcher for continuation injection + default matcher for active-sprint detection. Both entries are now shipped by the template, fixing the sync clobber bug (B-005).
+- **Dispatch mode in `sprint-master`** (Phase 1) — reads `.exec/directive.md` at session start and executes the scope autonomously without human checkpoints. Writes status updates to `.exec/status.md` and audit trail to `.exec/history.md` at each phase transition.
+- **`exec-history-append.sh`** — zero-token-cost audit trail script for the dispatch contract.
+
+### Fixed
+
+- **Phase 0 dispatch-readiness (5 bugs)** — sprint status drift (squash→rebase, sprint-update.sh at COMPLETE), gitignore gaps (`.correction-state`, `.exec/`, `.mcp.json`, and others), save-before-switch enforcement in item-executor, dead worktree references in pr-pipeliner, removed placeholder hooks with no implementation.
+- **B-005: sync clobbered repo-specific SessionStart hooks** — the v4.3.0 template shipped only one SessionStart entry; the merge logic stripped all AAM-managed consumer entries and replaced with the single template entry, losing the `startup`-matcher continuation hook in repos that had already wired ADR-004. Fixed by shipping both entries in the template. The merge is now idempotent on correctly-configured consumers.
+
+---
+
 ## [3.3.0] - 2026-03-28
 
 ### Added
