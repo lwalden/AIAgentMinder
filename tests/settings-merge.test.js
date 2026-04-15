@@ -19,7 +19,11 @@ describe('mergeSettings', () => {
       Stop: [
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/sprint-stop-guard.sh' }] },
       ],
+      SessionEnd: [
+        { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/session-end-cycle.sh' }] },
+      ],
       SessionStart: [
+        { matcher: 'startup', hooks: [{ type: 'command', command: 'bash .claude/scripts/session-start-continuation.sh' }] },
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/session-start-hook.sh' }] },
       ],
       StopFailure: [
@@ -34,7 +38,8 @@ describe('mergeSettings', () => {
     assert.equal(result.hooks.PreToolUse.length, 1);
     assert.equal(result.hooks.PostToolUse.length, 1);
     assert.equal(result.hooks.Stop.length, 1);
-    assert.equal(result.hooks.SessionStart.length, 1);
+    assert.equal(result.hooks.SessionEnd.length, 1);
+    assert.equal(result.hooks.SessionStart.length, 2, 'SessionStart should have startup + default entries');
     assert.equal(result.hooks.StopFailure.length, 1);
   });
 
@@ -88,8 +93,31 @@ describe('mergeSettings', () => {
     const result = mergeSettings(template, target);
     assert.ok(result.hooks.PostToolUse, 'should add PostToolUse');
     assert.ok(result.hooks.Stop, 'should add Stop');
+    assert.ok(result.hooks.SessionEnd, 'should add SessionEnd');
     assert.ok(result.hooks.SessionStart, 'should add SessionStart');
     assert.ok(result.hooks.StopFailure, 'should add StopFailure');
+  });
+
+  it('B-005: sync preserves both SessionStart entries (startup + default) on re-sync', () => {
+    // Regression: v4.3.0 sync clobbered the startup-matcher continuation entry
+    // because the template only shipped one SessionStart entry. Now the template
+    // ships both; re-sync should be idempotent on a correctly-configured consumer.
+    const target = {
+      hooks: {
+        SessionStart: [
+          { matcher: 'startup', hooks: [{ type: 'command', command: 'bash .claude/scripts/session-start-continuation.sh' }] },
+          { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/session-start-hook.sh' }] },
+        ],
+      },
+    };
+    const result = mergeSettings(template, target);
+    assert.equal(result.hooks.SessionStart.length, 2, 'both entries should survive re-sync');
+    assert.ok(result.hooks.SessionStart.some(e =>
+      e.matcher === 'startup' && e.hooks.some(h => h.command.includes('session-start-continuation'))),
+    'startup entry must survive');
+    assert.ok(result.hooks.SessionStart.some(e =>
+      e.matcher === '' && e.hooks.some(h => h.command.includes('session-start-hook'))),
+    'default entry must survive');
   });
 
   it('removes obsolete compact-reorient SessionStart entry', () => {
@@ -101,9 +129,13 @@ describe('mergeSettings', () => {
       },
     };
     const result = mergeSettings(template, target);
-    // Should have the new SessionStart hook, not the compact one
+    // compact-reorient is an obsolete non-AAM hook — it is stripped (no .claude/scripts/ path)
+    // and replaced with the two template entries
+    assert.equal(result.hooks.SessionStart.length, 2, 'should have startup + default entries, not the obsolete compact one');
     assert.ok(!result.hooks.SessionStart.some(e =>
       e.hooks.some(h => h.command.includes('compact-reorient'))));
+    assert.ok(result.hooks.SessionStart.some(e =>
+      e.hooks.some(h => h.command.includes('session-start-continuation'))));
     assert.ok(result.hooks.SessionStart.some(e =>
       e.hooks.some(h => h.command.includes('session-start-hook'))));
   });
