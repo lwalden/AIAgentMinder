@@ -62,9 +62,10 @@ This tool call ($tool_name) is blocked. Execute the CONTEXT_CYCLE protocol now
 (only Bash, Write, and Read are allowed):
 
 1. Commit all uncommitted work (Bash: git add + git commit)
-2. Write .sprint-continuation.md with resume state (Write)
-3. Write .sprint-continue-signal as empty file (Write)
-4. Run: bash .claude/scripts/context-cycle.sh (Bash)
+2. Type /exit to end the session cleanly
+
+The SessionEnd hook will build the continuation file automatically.
+Do NOT manually write .sprint-continuation.md or run context-cycle.sh.
 EOF
         exit 2
       fi
@@ -116,12 +117,12 @@ BLOCKED — CONTEXT CYCLE REQUIRED
 Context usage: $used_tokens tokens ($used_pct%) — threshold was $threshold tokens.
 This tool call ($tool_name) is blocked until you complete the CONTEXT_CYCLE protocol.
 
-You MUST do the following NOW (only Bash, Write, and Read are allowed):
+You MUST do the following NOW (only Bash and Read are allowed):
 1. Commit all uncommitted work (Bash: git add + git commit)
-2. Write .sprint-continuation.md with resume state (Write)
-3. Write .sprint-continue-signal as empty file (Write)
-4. Run: bash .claude/scripts/context-cycle.sh (Bash)
+2. Type /exit to end the session cleanly
 
+The SessionEnd hook will build the continuation file automatically.
+Do NOT manually write .sprint-continuation.md or run context-cycle.sh.
 Do NOT attempt to continue sprint work. Every non-cycle tool call will be blocked.
 EOF
 exit 2
