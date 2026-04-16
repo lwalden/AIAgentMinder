@@ -87,28 +87,31 @@ if grep -qE '\| *blocked *\|' "$SPRINT_FILE" 2>/dev/null; then
   exit 0
 fi
 
-# --- Check 7: Count todo items ---
+# --- Check 7: Count unfinished items (todo + in-progress) ---
 todo_count="$(grep -cE '\| *todo *\|' "$SPRINT_FILE" || true)"
+inprog_count="$(grep -cE '\| *in-progress *\|' "$SPRINT_FILE" || true)"
+unfinished=$((todo_count + inprog_count))
 
-if [ "$todo_count" -eq 0 ]; then
+if [ "$unfinished" -eq 0 ]; then
   # All items done — COMPLETE phase, human reviews before archive.
   exit 0
 fi
 
-# --- Sprint is in-progress with todo items and no legitimate stop reason. Block. ---
+# --- Sprint is in-progress with unfinished items and no legitimate stop reason. Block. ---
 
-# Find the first todo item ID and the current sprint number to direct Claude.
-next_item=$(grep -E '\| *todo *\|' "$SPRINT_FILE" | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}')
 sprint_id=$(sed -n 's/^\*\*Sprint:\*\* \(S[0-9]*\).*/\1/p' "$SPRINT_FILE" 2>/dev/null | tr -d '\r' | head -1 || echo "")
 [ -z "$sprint_id" ] && sprint_id="sprint"
+current_phase=$(sed -n 's/^\*\*Phase:\*\* //p' "$SPRINT_FILE" 2>/dev/null | tr -d '\r' | head -1 || echo "")
 
-jq -n \
-  --arg item "$next_item" \
-  --arg sprint "$sprint_id" \
-  --argjson count "$todo_count" \
-  '{
-    decision: "block",
-    reason: ("Sprint " + $sprint + " is in-progress with " + ($count | tostring) + " pending item(s). Execute " + $item + " now. Read the spec for this item, update the task to in_progress, create the feature branch, and begin implementation.")
-  }'
+# Build a specific message based on what's unfinished
+if [ "$inprog_count" -gt 0 ]; then
+  current_item=$(grep -E '\| *in-progress *\|' "$SPRINT_FILE" | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}')
+  reason="Sprint $sprint_id${current_phase:+ ($current_phase phase)} has $current_item in-progress. Complete it or mark as blocked before stopping."
+else
+  next_item=$(grep -E '\| *todo *\|' "$SPRINT_FILE" | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}')
+  reason="Sprint $sprint_id${current_phase:+ ($current_phase phase)} has $todo_count pending item(s). Execute $next_item now. Read the spec, update status to in_progress, create the branch, and begin."
+fi
+
+jq -n --arg reason "$reason" '{ decision: "block", reason: $reason }'
 
 exit 0
