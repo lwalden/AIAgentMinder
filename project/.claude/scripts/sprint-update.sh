@@ -91,7 +91,25 @@ case "$subcmd" in
     ' "$SPRINT_FILE" > "${SPRINT_FILE}.tmp" && mv "${SPRINT_FILE}.tmp" "$SPRINT_FILE"
     ;;
 
+  phase)
+    [ $# -eq 1 ] || die "Usage: sprint-update.sh phase <value>"
+    new_value="$1"
+
+    if grep -q '^\*\*Phase:\*\*' "$SPRINT_FILE"; then
+      awk -v val="$new_value" '
+      /^\*\*Phase:\*\*/ { print "**Phase:** " val; next }
+      { print }
+      ' "$SPRINT_FILE" > "${SPRINT_FILE}.tmp" && mv "${SPRINT_FILE}.tmp" "$SPRINT_FILE"
+    else
+      # Insert Phase line after Status line (first occurrence)
+      awk -v val="$new_value" '
+      /^\*\*Status:\*\*/ && !done { print; print "**Phase:** " val; done=1; next }
+      { print }
+      ' "$SPRINT_FILE" > "${SPRINT_FILE}.tmp" && mv "${SPRINT_FILE}.tmp" "$SPRINT_FILE"
+    fi
+    ;;
+
   *)
-    die "Unknown subcommand '${subcmd}'. Usage: sprint-update.sh <status|postmerge|sprint-status> [issue-id] <value>"
+    die "Unknown subcommand '${subcmd}'. Usage: sprint-update.sh <status|postmerge|sprint-status|phase> [issue-id] <value>"
     ;;
 esac

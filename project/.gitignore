@@ -61,6 +61,7 @@ temp/
 .correction-state
 .sprint-metrics.json
 .sprint-tool-count
+.sprint-phase-guard-count
 
 # AIAgentMinder agent worktrees (PR pipeline scratch dirs — leak on crash)
 .claude/worktrees/

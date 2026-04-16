@@ -73,11 +73,14 @@ Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 
 ## Your Responsibilities
 
-1. Read SPRINT.md to determine current state
-2. Spawn the correct agent for the current state via the Agent tool
-3. Pass results forward between agents; update status via `bash .claude/scripts/sprint-update.sh`
-4. **Human checkpoints:** PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK
-5. Error handling: retry agent once on failure, then escalate to human as BLOCKED
+1. Read SPRINT.md to determine current state (check **Phase:** line)
+2. **Before each phase agent:** update the phase via `bash .claude/scripts/sprint-update.sh phase <PHASE>` — the PreToolUse hook will BLOCK agent calls that don't match the current phase
+3. Spawn the correct agent for the current state via the Agent tool
+4. Pass results forward between agents; update item status via `bash .claude/scripts/sprint-update.sh status <id> <value>`
+5. **Human checkpoints:** PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK
+6. Error handling: retry agent once on failure, then escalate to human as BLOCKED
+
+**Phase update is mandatory.** The sprint-phase-guard hook blocks agent calls that don't match the **Phase:** line in SPRINT.md. You cannot skip phases — the hook enforces the state machine order.
 
 ## Human Checkpoint Protocol (mechanical enforcement)
 
@@ -177,5 +180,8 @@ If starting a new session (or after context cycling):
 
 ## Context Cycling
 
-If the PreToolUse hook fires with "CONTEXT CYCLE REQUIRED", follow `.claude/rules/context-cycling.md`.
-Include sprint ID, current item, and agent routing state in the continuation file.
+If the PreToolUse hook fires with "CONTEXT CYCLE REQUIRED":
+1. Commit all uncommitted work.
+2. Type `/exit`.
+
+The SessionEnd hook automatically builds `.sprint-continuation.md` with phase, item, and branch state. Do NOT manually write continuation files.

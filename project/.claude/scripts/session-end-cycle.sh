@@ -56,12 +56,32 @@ git_status=$(git status --short 2>/dev/null || echo "(no git)")
 recent_commits=$(git log --oneline -10 2>/dev/null || echo "(no history)")
 
 sprint_block="(no SPRINT.md)"
+sprint_phase=""
+sprint_id=""
+current_item=""
+current_item_title=""
 if [ -f "SPRINT.md" ]; then
   sprint_block=$(cat SPRINT.md)
+  sprint_phase=$(sed -n 's/^\*\*Phase:\*\* //p' SPRINT.md 2>/dev/null | tr -d '\r' | head -1)
+  sprint_id=$(sed -n 's/^\*\*Sprint:\*\* \(S[0-9]*\).*/\1/p' SPRINT.md 2>/dev/null | tr -d '\r' | head -1)
+  # Find the current item: first in-progress, or first todo
+  current_item=$(grep -E '\| *in-progress *\|' SPRINT.md 2>/dev/null | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}' || true)
+  current_item_title=$(grep -E '\| *in-progress *\|' SPRINT.md 2>/dev/null | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $3); print $3}' || true)
+  if [ -z "$current_item" ]; then
+    current_item=$(grep -E '\| *todo *\|' SPRINT.md 2>/dev/null | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}' || true)
+    current_item_title=$(grep -E '\| *todo *\|' SPRINT.md 2>/dev/null | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $3); print $3}' || true)
+  fi
 fi
 
-# Task state (native Claude Code tasks live under ~/.claude/tasks/<project>)
-# We don't know the exact path here, so just note its existence.
+# Dispatch state
+dispatch_id=""
+dispatch_scope=""
+if [ -f ".exec/directive.md" ]; then
+  dispatch_id=$(sed -n 's/^directive_id: *//p' ".exec/directive.md" 2>/dev/null | tr -d '\r' | head -1)
+  dispatch_scope=$(sed -n '/^# Scope/,/^# /{ /^# Scope/d; /^# /d; p; }' ".exec/directive.md" 2>/dev/null | head -3)
+fi
+
+# Task state
 task_note="(task store not inspected by this hook — TaskList in the next session will show them)"
 
 cat > "$CONT_FILE" <<EOF
@@ -71,6 +91,32 @@ cat > "$CONT_FILE" <<EOF
 **Reason:** context cycle ($used_tokens tokens used at $used_pct%, threshold $threshold, model $model)
 **Branch:** $branch
 **HEAD:** $head_sha
+
+## Quick Resume
+
+- **Sprint:** ${sprint_id:-"(none)"}
+- **Phase:** ${sprint_phase:-"(unknown)"}
+- **Current item:** ${current_item:-"(none)"}${current_item_title:+ — $current_item_title}
+- **Item status:** $([ -n "$current_item" ] && grep -E "\\| *${current_item} *\\|" SPRINT.md 2>/dev/null | awk -F'|' '{gsub(/^ +| +$/, "", $6); print $6}' || echo "(none)")
+- **Dispatch:** ${dispatch_id:-"(not dispatched)"}
+
+## Next Action
+
+$(if [ -n "$sprint_phase" ] && [ -n "$current_item" ]; then
+  case "$sprint_phase" in
+    PLAN)     echo "Resume PLAN phase. Complete sprint-planner, then present plan for approval." ;;
+    SPEC)     echo "Resume SPEC phase for $current_item. Write implementation spec, then present for approval." ;;
+    EXECUTE)  echo "Resume EXECUTE phase for $current_item ($current_item_title). Check HEAD commit to see how far implementation got. Continue TDD cycle." ;;
+    TEST)     echo "Resume TEST phase for $current_item. Run review lenses (read-only), then quality-reviewer judge pass." ;;
+    REVIEW)   echo "Resume REVIEW phase for $current_item. Run pr-pipeliner: build, lint, test, merge." ;;
+    COMPLETE) echo "Resume COMPLETE phase. Run sprint-retro and present results." ;;
+    *)        echo "Resume from $sprint_phase phase, item $current_item." ;;
+  esac
+elif [ -n "$sprint_phase" ]; then
+  echo "Resume from $sprint_phase phase. Check SPRINT.md for item statuses."
+else
+  echo "Check SPRINT.md and TaskList to determine resume point."
+fi)
 
 ## Working tree status at cycle time
 
@@ -91,14 +137,6 @@ $sprint_block
 ## Tasks
 
 $task_note
-
-## Resume instructions
-
-1. Read this file for the outside view of where work left off.
-2. Run \`TaskList\` to see native task state — that is the authoritative in-progress list.
-3. If mid-sprint (SPRINT.md shows \`in-progress\`), continue from the first \`todo\` item per the sprint-workflow rule.
-4. If the prior session committed mid-step, inspect the HEAD commit to see how far that step got before deciding whether to advance or rework.
-5. Delete \`$CONT_FILE\` and \`$SIGNAL_FILE\` once resumption is complete (the SessionStart hook already does this — this is a backup instruction for manual recovery).
 EOF
 
 # Drop the signal file. Its mere existence tells sprint-runner / profile hook
