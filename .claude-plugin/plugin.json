@@ -1,6 +1,6 @@
 {
   "name": "aiagentminder",
-  "version": "4.4.0",
+  "version": "4.5.0",
   "description": "Project governance framework for Claude Code — sprint execution, quality gates, codebase fingerprinting, and structured planning for solo developers.",
   "author": {
     "name": "lwalden",
