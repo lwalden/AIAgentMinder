@@ -6,6 +6,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [4.5.0] - 2026-04-18
+
+### Added
+
+- **ADR-006 HLPM ping hook** -- `project/.claude/scripts/hlpm-ping.sh` now ships in the template. Wired into SessionStart (`startup` matcher) and SessionEnd. Writes a JSONL event (`ts`, `repo`, `event`, `branch`) to `D:/Source/highest-level-project-management/events.jsonl` on every session boundary. Feeds HLPM's SessionStart summarizer (portfolio drift defense).
+- **Self-protecting ping script** -- silent exit if (a) HLPM is not present on the machine, (b) `HLPM_PING_DISABLED=1` is set in the environment, or (c) the script is executing inside HLPM itself (HLPM has its own `hlpm-log-session-end.sh`, so the template ping would double-write). Inline trim-on-append caps the shared log at 10,000 lines.
+
+### Changed
+
+- **`getCoreFiles()` manifest** -- added `hlpm-ping.sh`.
+
+---
+
 ## [4.4.0] - 2026-04-14
 
 ### Added
