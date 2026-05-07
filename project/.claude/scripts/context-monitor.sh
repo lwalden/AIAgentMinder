@@ -6,6 +6,18 @@
 #
 # Configured in .claude/settings.json:
 #   "statusLine": { "type": "command", "command": "bash .claude/scripts/context-monitor.sh" }
+#
+# Warmup hysteresis (S9-003, F2 fix): on the first invocation in a fresh
+# session (no .context-usage present), we record the current used_tokens
+# value as session_floor. The should_cycle decision is then based on
+# (used_tokens - session_floor) — i.e. *growth within this session* — rather
+# than absolute conversation-cumulative tokens. This prevents resumed
+# sessions (where conversation totals already exceed threshold at start)
+# from immediately cycling on the first status-line tick.
+#
+# Backward compatibility: a legacy .context-usage without session_floor is
+# treated as session_floor=0, preserving pre-S9-003 behavior on installations
+# that haven't refreshed the file yet.
 
 input=$(cat)
 
@@ -45,14 +57,35 @@ if [ "$threshold" -gt 0 ] && [ "$window_size" -gt 0 ]; then
   fi
 fi
 
+# Determine session_floor (warmup hysteresis).
+#   - File absent           → first run; floor = current used_tokens
+#   - File present + field  → carry forward
+#   - File present, no field → legacy; treat as 0 (matches old behavior)
+outfile="$cwd/.context-usage"
+session_floor=""
+if [ -f "$outfile" ]; then
+  session_floor=$(jq -r '.session_floor // empty' "$outfile" 2>/dev/null)
+  if [ -z "$session_floor" ] || [ "$session_floor" = "null" ]; then
+    session_floor=0
+  fi
+else
+  session_floor=$used_tokens
+fi
+
+# Delta — growth since the floor was recorded.
+delta=$((used_tokens - session_floor))
+[ "$delta" -lt 0 ] && delta=0
+
 # Determine if cycling is warranted
 should_cycle=false
 if [ "$threshold" -gt 0 ]; then
-  if [ "$used_tokens" -ge "$threshold" ]; then
+  if [ "$delta" -ge "$threshold" ]; then
     should_cycle=true
   fi
 else
-  # Fallback: 35% for unrecognized models
+  # Fallback for unrecognized models: 35% of absolute used_pct.
+  # Keeping this on absolute (not delta) because we don't have a known
+  # threshold to apply hysteresis against — the percentage IS the threshold.
   used_int=$(echo "$used_pct" | cut -d. -f1)
   if [ "$used_int" -ge 35 ]; then
     should_cycle=true
@@ -67,10 +100,9 @@ fi
 
 # Write to project root (atomic via temp file)
 tmpfile="$cwd/.context-usage.tmp"
-outfile="$cwd/.context-usage"
 
 cat > "$tmpfile" << EOF
-{"should_cycle":$should_cycle,"model":"$model_id","used_tokens":$used_tokens,"threshold":$threshold,"used_pct":$used_pct,"window_size":$window_size,"total_input":$total_input,"total_output":$total_output,"exceeds_200k":$exceeds_200k}
+{"should_cycle":$should_cycle,"model":"$model_id","used_tokens":$used_tokens,"threshold":$threshold,"used_pct":$used_pct,"window_size":$window_size,"total_input":$total_input,"total_output":$total_output,"exceeds_200k":$exceeds_200k,"session_floor":$session_floor}
 EOF
 
 mv "$tmpfile" "$outfile" 2>/dev/null || cp "$tmpfile" "$outfile" 2>/dev/null
