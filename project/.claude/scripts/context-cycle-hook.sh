@@ -87,37 +87,55 @@ if [ "$should_cycle" != "true" ]; then
   exit 0
 fi
 
-# --- Cycling IS needed. Determine whether to block this tool call. ---
+# --- Cycling IS needed. ---
 
-# Extract the tool name from hook input.
+# F4: sprint-state gating. The cycle protocol is sprint-orchestration
+# machinery — it is only meaningful while a sprint is actively running. For
+# non-sprint sessions (no SPRINT.md, archive-only SPRINT.md, or status !=
+# in-progress) we emit a soft advisory and exit 0 instead of blocking. This
+# mirrors the fallback path's behavior and prevents the hook from firing
+# during creative/dev work in template-consuming downstream repos.
+sprint_active=false
+if [ -f "SPRINT.md" ]; then
+  sprint_status=$(sed -n 's/^\*\*Status:\*\* //p' "SPRINT.md" 2>/dev/null | tr -d '\r' | head -1)
+  if [ "$sprint_status" = "in-progress" ]; then
+    sprint_active=true
+  fi
+fi
+
+used_tokens=$(jq -r '.used_tokens // "unknown"' "$USAGE_FILE" 2>/dev/null)
+threshold=$(jq -r '.threshold // "unknown"' "$USAGE_FILE" 2>/dev/null)
+used_pct=$(jq -r '.used_pct // "unknown"' "$USAGE_FILE" 2>/dev/null)
+
+if [ "$sprint_active" != "true" ]; then
+  echo "Context approaching threshold — $used_tokens tokens used ($used_pct%, threshold $threshold). No active sprint detected; cycle protocol does not apply. Consider /exit when convenient to start a fresh session."
+  exit 0
+fi
+
+# --- Sprint IS active. Determine whether to block this tool call. ---
+
 tool_name=$(echo "$input" | jq -r '.tool_name // "unknown"' 2>/dev/null)
 
-# Allow tools needed for the CONTEXT_CYCLE procedure itself:
-#   Bash  — git commit, running context-cycle.sh
-#   Write — .sprint-continuation.md, .sprint-continue-signal
-#   Read  — reading SPRINT.md/specs to write the continuation file
+# F5: allow Edit alongside Bash/Write/Read. Edit is functionally equivalent
+# to Write for in-flight files; blocking it forces Bash-via-script
+# workarounds (e.g. python file rewrites) that are riskier than the cycle
+# protocol they bypass. The cycle protocol's purpose is preventing *new
+# exploration* — finalization edits to already-known files are safe.
 case "$tool_name" in
-  Bash|Write|Read)
-    # Allow through, but still warn.
-    used_tokens=$(jq -r '.used_tokens // "unknown"' "$USAGE_FILE" 2>/dev/null)
-    threshold=$(jq -r '.threshold // "unknown"' "$USAGE_FILE" 2>/dev/null)
-    echo "CONTEXT CYCLE OVERDUE — $used_tokens tokens used (threshold: $threshold). Execute CONTEXT_CYCLE protocol now. These tool calls are only allowed for cycle steps (commit, write continuation, terminate)."
+  Bash|Write|Read|Edit)
+    echo "CONTEXT CYCLE OVERDUE — $used_tokens tokens used (threshold: $threshold). Execute CONTEXT_CYCLE protocol now. These tool calls are only allowed for cycle steps (commit, finalize edits, write continuation, terminate)."
     exit 0
     ;;
 esac
 
 # Block all other tools with a clear directive.
-used_tokens=$(jq -r '.used_tokens // "unknown"' "$USAGE_FILE" 2>/dev/null)
-threshold=$(jq -r '.threshold // "unknown"' "$USAGE_FILE" 2>/dev/null)
-used_pct=$(jq -r '.used_pct // "unknown"' "$USAGE_FILE" 2>/dev/null)
-
 cat <<EOF
 BLOCKED — CONTEXT CYCLE REQUIRED
 
 Context usage: $used_tokens tokens ($used_pct%) — threshold was $threshold tokens.
 This tool call ($tool_name) is blocked until you complete the CONTEXT_CYCLE protocol.
 
-You MUST do the following NOW (only Bash and Read are allowed):
+You MUST do the following NOW (only Bash, Write, Read, and Edit are allowed):
 1. Commit all uncommitted work (Bash: git add + git commit)
 2. Type /exit to end the session cleanly
 
