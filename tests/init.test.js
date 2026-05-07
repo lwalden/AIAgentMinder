@@ -81,6 +81,7 @@ describe('getCoreFiles', () => {
     const files = getCoreFiles();
     assert.ok(files.includes('.claude/scripts/context-monitor.sh'));
     assert.ok(files.includes('.claude/scripts/context-cycle-hook.sh'));
+    assert.ok(files.includes('.claude/scripts/sprint-phase-guard.sh'));
     assert.ok(files.includes('.claude/settings.json'));
   });
 

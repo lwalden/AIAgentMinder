@@ -80,6 +80,10 @@
         "hooks": [
           {
             "type": "command",
+            "command": "bash .claude/scripts/session-start-cycle-reset.sh"
+          },
+          {
+            "type": "command",
             "command": "bash .claude/scripts/session-start-hook.sh"
           }
         ]
