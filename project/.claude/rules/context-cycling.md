@@ -1,21 +1,29 @@
 ---
-description: Generic context cycling procedure — applies to all session types
+description: Context cycling procedure — applies only when a sprint is in-progress
 ---
 
 # Context Cycling
 
-When the PreToolUse hook blocks tools with "CONTEXT CYCLE REQUIRED":
+Cycling fires only when **both** are true: `.context-usage` says
+`should_cycle=true` AND `SPRINT.md` Status is `in-progress`. Non-sprint
+sessions get a soft advisory; cycle hook does not block.
 
-1. **Commit all uncommitted work** (git add + git commit).
+When you see "BLOCKED — CONTEXT CYCLE REQUIRED":
+
+1. **Commit all uncommitted work** (`git add` + `git commit`).
 2. **Type `/exit`** to end the session cleanly.
 
-That's it. The SessionEnd hook (`session-end-cycle.sh`) automatically builds
-`.sprint-continuation.md` from external state (git branch, git log, SPRINT.md,
-`.exec/directive.md` if present) and writes `.sprint-continue-signal`. The
-SessionStart hook injects the continuation into the next session.
+That's it. Do NOT manually write `.sprint-continuation.md` or
+`.sprint-continue-signal`. Do NOT run `context-cycle.sh` (obsolete).
 
-Do NOT manually write `.sprint-continuation.md` or `.sprint-continue-signal`.
-Do NOT run `context-cycle.sh`. Those are obsolete steps from before ADR-004.
+Tools allowed during an active cycle: **Bash, Write, Read, Edit**. All
+others are blocked. The cycle protocol's purpose is preventing *new
+exploration* while permitting *finalization* of work in motion.
 
-The `.context-usage` file (written by status line hook) tracks token usage.
-When `should_cycle` is `true`, the PreToolUse hook enforces cycling.
+Status line uses session-relative thresholds (delta from session start)
+so resumed sessions don't auto-cycle. SessionStart cycle reset wipes
+stale `.context-usage`; continuation injection fires on both `claude`
+(startup) and `claude --continue` (resume).
+
+See DECISIONS.md → "Context cycling: sprint-gated with session-relative
+thresholds" for full rationale.

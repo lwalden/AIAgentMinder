@@ -194,6 +194,12 @@ Chose: Rewrite `mergeHookType` in `lib/settings-merge.js` to treat all template 
 
 ---
 
+### Context cycling: sprint-gated with session-relative thresholds | 2026-05-07 | Status: Active
+
+Chose: Re-scope the context-cycling system to fire only when (a) `SPRINT.md` Status is `in-progress` AND (b) the **current session** has used delta tokens above threshold from a recorded session_floor, over the prior design that fired whenever `.context-usage` said `should_cycle=true` regardless of sprint state or whether tokens were session-cumulative or conversation-cumulative. Also: expanded the allowed-tool list during an active cycle from `Bash|Write|Read` to `Bash|Write|Read|Edit`, and registered the continuation hook under both `startup` AND `resume` SessionStart matchers (was `startup` only). Why: the dungeon-game 2026-05-06 incident exposed six failure modes (F1–F6) where the old design caused work-loss instead of preventing it — non-sprint sessions in template-consuming repos got blocked during creative work; resumed sessions hit `should_cycle=true` immediately because conversation totals already exceeded threshold; mid-edit cycles forced agents into Bash-via-Python file rewrites; `claude --continue` resumes silently skipped continuation injection. Alternatives considered: (a) always-on cycling (rejected — punishes non-sprint work), (b) opt-in flag per repo (rejected — friction; users won't remember to enable for sprints), (c) keep absolute-token threshold and rely on SessionStart reset alone (rejected — F2 would still re-trigger on next status-line tick), (d) block ALL tools during cycle including Bash/Write/Read (rejected — cycle protocol requires git commit). Tradeoff: non-sprint sessions no longer get auto-cycle protection — users must manage their own context for design/research work. Mitigated by the soft advisory the hook still emits at threshold, which is enough signal for a human to /exit when convenient. Shipped in S9 (PRs #154, #155, #156, #157, #158).
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.
