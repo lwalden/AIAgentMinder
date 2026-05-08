@@ -6,13 +6,12 @@
 # Consume-once semantics: after reading, delete the continuation file and
 # signal file so a subsequent session doesn't see stale state.
 #
-# Configured in .claude/settings.json with matcher "startup":
-#   "hooks": { "SessionStart": [{ "matcher": "startup", "hooks": [{
-#              "type": "command",
-#              "command": "bash .claude/scripts/session-start-continuation.sh" }] }] }
-#
-# Matcher MUST be "startup", not "resume" — "resume" is for restoring a prior
-# conversation's message history, which is the opposite of a context cycle.
+# Configured in .claude/settings.json under TWO matcher entries — "startup"
+# AND "resume" — so this hook fires on both `claude` (fresh) and `claude
+# --continue` (resume) invocations. F3 fix (S9-005): a prior version was
+# registered only under "startup", so resume-mode launches silently skipped
+# the auto-injection. Consume-once semantics (delete-after-read) make it
+# safe to register under multiple matchers.
 
 set -euo pipefail
 

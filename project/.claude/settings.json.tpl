@@ -76,6 +76,19 @@
         ]
       },
       {
+        "matcher": "resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/session-start-continuation.sh"
+          },
+          {
+            "type": "command",
+            "command": "bash .claude/scripts/hlpm-ping.sh session_start"
+          }
+        ]
+      },
+      {
         "matcher": "",
         "hooks": [
           {
