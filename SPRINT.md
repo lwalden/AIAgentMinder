@@ -47,8 +47,8 @@ S8 archived (2026-05-06): 10 planned, 10 completed, 0 rework. 0 scope changes, 0
 | S9-002 | F1 — SessionStart clears stale `.context-usage` | fix | | done | n/a |
 | S9-003 | F2 — status-line warmup hysteresis | fix | | done | n/a |
 | S9-004 | F4+F5 — sprint-state gating + Edit allowed during cycle | fix | | done | n/a |
-| S9-005 | F3 — verify+fix SessionEnd→SessionStart resume chain [risk] | fix | ⚠ | in-progress | n/a |
-| S9-006 | Docs — update `context-cycling.md` + ADR for revised policy | docs | | todo | n/a |
+| S9-005 | F3 — verify+fix SessionEnd→SessionStart resume chain [risk] | fix | ⚠ | done | n/a |
+| S9-006 | Docs — update `context-cycling.md` + ADR for revised policy | docs | | in-progress | n/a |
 
 ---
 
