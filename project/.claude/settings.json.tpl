@@ -24,17 +24,6 @@
         ]
       }
     ],
-    "PostToolUse": [
-      {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash .claude/scripts/correction-capture-hook.sh"
-          }
-        ]
-      }
-    ],
     "Stop": [
       {
         "matcher": "",

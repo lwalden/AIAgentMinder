@@ -13,9 +13,6 @@ describe('mergeSettings', () => {
       PreToolUse: [
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/context-cycle-hook.sh' }] },
       ],
-      PostToolUse: [
-        { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/correction-capture-hook.sh' }] },
-      ],
       Stop: [
         { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/sprint-stop-guard.sh' }] },
       ],
@@ -36,7 +33,7 @@ describe('mergeSettings', () => {
     const result = mergeSettings(template, {});
     assert.deepEqual(result.statusLine, template.statusLine);
     assert.equal(result.hooks.PreToolUse.length, 1);
-    assert.equal(result.hooks.PostToolUse.length, 1);
+    assert.ok(!result.hooks.PostToolUse, 'PostToolUse should not be created — template no longer ships any');
     assert.equal(result.hooks.Stop.length, 1);
     assert.equal(result.hooks.SessionEnd.length, 1);
     assert.equal(result.hooks.SessionStart.length, 2, 'SessionStart should have startup + default entries');
@@ -91,7 +88,6 @@ describe('mergeSettings', () => {
       },
     };
     const result = mergeSettings(template, target);
-    assert.ok(result.hooks.PostToolUse, 'should add PostToolUse');
     assert.ok(result.hooks.Stop, 'should add Stop');
     assert.ok(result.hooks.SessionEnd, 'should add SessionEnd');
     assert.ok(result.hooks.SessionStart, 'should add SessionStart');
@@ -140,7 +136,7 @@ describe('mergeSettings', () => {
       e.hooks.some(h => h.command.includes('session-start-hook'))));
   });
 
-  it('removes obsolete pr-pipeline-trigger PostToolUse entry', () => {
+  it('removes obsolete pr-pipeline-trigger PostToolUse entry but preserves user hooks', () => {
     const target = {
       hooks: {
         PostToolUse: [
@@ -151,12 +147,41 @@ describe('mergeSettings', () => {
     };
     const result = mergeSettings(template, target);
     assert.ok(!result.hooks.PostToolUse.some(e =>
-      e.hooks.some(h => h.command.includes('pr-pipeline-trigger'))));
-    // Should still have the user hook and the AAM correction-capture hook
+      e.hooks.some(h => h.command.includes('pr-pipeline-trigger'))),
+    'obsolete pr-pipeline-trigger must be stripped');
+    // Template no longer ships any PostToolUse hooks; only the user entry should remain.
+    assert.equal(result.hooks.PostToolUse.length, 1, 'only the user hook should survive');
     assert.ok(result.hooks.PostToolUse.some(e =>
       e.hooks.some(h => h.command.includes('user-post-tool'))));
-    assert.ok(result.hooks.PostToolUse.some(e =>
+  });
+
+  it('strips retired correction-capture PostToolUse entry and drops empty hook type', () => {
+    const target = {
+      hooks: {
+        PostToolUse: [
+          { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/correction-capture-hook.sh' }] },
+        ],
+      },
+    };
+    const result = mergeSettings(template, target);
+    assert.ok(!result.hooks.PostToolUse, 'PostToolUse should be dropped entirely once the retired hook is the only entry');
+  });
+
+  it('strips retired correction-capture but preserves user PostToolUse hooks', () => {
+    const target = {
+      hooks: {
+        PostToolUse: [
+          { matcher: '', hooks: [{ type: 'command', command: 'bash .claude/scripts/correction-capture-hook.sh' }] },
+          { matcher: 'Edit', hooks: [{ type: 'command', command: 'bash user-post-tool.sh' }] },
+        ],
+      },
+    };
+    const result = mergeSettings(template, target);
+    assert.equal(result.hooks.PostToolUse.length, 1, 'only the user hook should survive');
+    assert.ok(!result.hooks.PostToolUse.some(e =>
       e.hooks.some(h => h.command.includes('correction-capture'))));
+    assert.ok(result.hooks.PostToolUse.some(e =>
+      e.hooks.some(h => h.command.includes('user-post-tool'))));
   });
 
   it('is idempotent — running twice produces same result', () => {

@@ -6,7 +6,7 @@ description: Minimal-ceremony hotfix agent — branch, fix, test, PR with no spr
 # Hotfix Agent
 
 You are in a hotfix session. Minimal ceremony — get the fix in fast, but safely.
-Universal rules (git-workflow, tool-first, correction-capture) load from `.claude/rules/` automatically.
+Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatically.
 
 ---
 

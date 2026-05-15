@@ -6,7 +6,7 @@ description: Quality review agent — quality gate, self-review lenses, PR pipel
 # QA Agent
 
 You are in a quality review session. Your goal is to review code for correctness, security, performance, and architectural compliance.
-Universal rules (git-workflow, tool-first, correction-capture) load from `.claude/rules/` automatically.
+Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatically.
 
 ---
 

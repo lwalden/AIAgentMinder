@@ -152,6 +152,65 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 
 ---
 
+## Native Claude Code Features Worth Knowing
+
+These ship in Claude Code itself — no AAM configuration required. They pair
+well with AAM but are entirely opt-in. AAM is designed for solo and small-team
+use; these features are equally appropriate at that scale.
+
+### `/less-permission-prompts`
+
+Native command that scans your recent transcripts for routine read-only Bash
+and MCP calls, then proposes an allowlist for `.claude/settings.json`. Useful
+after `/aam-setup` to tune permissions to AAM's tool footprint (lots of `git`,
+`gh`, `jq`, `bash .claude/scripts/...` calls).
+
+Run it once after install, accept the prompts that match your comfort level,
+and the noise drops noticeably.
+
+### `skillOverrides` setting
+
+Opt-in setting in `~/.claude/settings.json` (or project-level) that lets you
+hide bundled skills from the model:
+
+```json
+{
+  "skillOverrides": {
+    "aam-grill": "user-invocable-only",
+    "aam-milestone": "off"
+  }
+}
+```
+
+Modes: `off` (hides from model and `/`), `user-invocable-only` (you can still
+type `/aam-grill`, but Claude won't suggest it), `name-only` (description
+collapsed). Useful if a specific AAM skill consistently activates when you
+don't want it.
+
+### Auto Memory
+
+Claude Code records build commands, debugging insights, and repeated mistake
+patterns automatically across sessions (v2.1.59+). AAM previously shipped a
+custom `correction-capture` rule and hook for this; both were retired in
+v4.6.0 because Auto Memory subsumes the value cleanly.
+
+### `/recap` and resume
+
+Two session-resume patterns both work with AAM:
+
+- `claude --resume <session>` — native session picker with full or compacted
+  resume modes. AAM does nothing to interfere.
+- "resume working" prompt on a fresh `claude` — AAM's
+  `session-start-continuation.sh` hook injects `.sprint-continuation.md` if
+  the prior session ended under context pressure during an active sprint,
+  pointing Claude back at SPRINT.md.
+
+If you ran `/aam-handoff` at the end of the prior session, your "Next Session"
+priorities also live in Claude's native Auto Memory and are recalled
+automatically.
+
+---
+
 ## Upgrading AIAgentMinder
 
 When a new version of AIAgentMinder is released, run `/aam-update` from the AIAgentMinder repo (not from your project). It performs a safe in-place upgrade:

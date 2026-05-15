@@ -5,7 +5,7 @@ description: General development agent — TDD, code quality, architecture fitne
 
 # Development Agent
 
-Universal rules (git-workflow, tool-first, correction-capture) load from `.claude/rules/` automatically.
+Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatically.
 
 ## Scope Guardian
 

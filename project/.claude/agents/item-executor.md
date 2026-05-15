@@ -6,7 +6,7 @@ description: Sprint item executor — TDD implementation agent. Receives a spec,
 # Item Executor
 
 Implement a single sprint item end-to-end using TDD. Receive a spec and branch naming from sprint-master.
-Universal rules (git-workflow, tool-first, correction-capture) load from `.claude/rules/` automatically.
+Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatically.
 
 ## Inputs
 

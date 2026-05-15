@@ -70,8 +70,9 @@ AIAgentMinder addresses three gaps in Claude Code:
 |------|-------------|
 | `git-workflow.md` | Branch naming, commit discipline, PR-only workflow |
 | `tool-first.md` | Use CLI/API tools instead of asking the user to do things manually |
-| `correction-capture.md` | Detects repeated wrong-first-approach patterns and proposes permanent rules |
 | `context-cycling.md` | Procedure for context cycling when the PreToolUse hook fires |
+
+Repeated-mistake capture used to ship as an AAM rule + hook; it was retired in favor of Claude Code's native **Auto Memory**.
 
 **Mode-specific rules** (loaded via session profile agents):
 
@@ -122,7 +123,6 @@ Use `claude --agent <name>` to load the right context for your task:
 | `context-monitor.sh` | Status line data bridge — writes `.context-usage` with token thresholds |
 | `context-cycle-hook.sh` | PreToolUse hook — blocks non-cycle tools when context threshold is hit |
 | `context-cycle.sh` | Self-termination for context cycling (cross-platform) |
-| `correction-capture-hook.sh` | PostToolUse hook — detects correction patterns, logs to `.corrections.jsonl` |
 | `sprint-stop-guard.sh` | Stop hook — blocks premature turn endings during sprint execution |
 | `session-start-hook.sh` | SessionStart hook — detects continuation signals and active sprints |
 | `stop-failure-hook.sh` | StopFailure hook — logs API errors and preserves sprint state |

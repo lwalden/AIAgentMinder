@@ -40,8 +40,9 @@ describe('getCoreFiles', () => {
     const ruleFiles = files.filter(f => f.startsWith('.claude/rules/'));
     assert.ok(ruleFiles.includes('.claude/rules/git-workflow.md'));
     assert.ok(ruleFiles.includes('.claude/rules/tool-first.md'));
-    assert.ok(ruleFiles.includes('.claude/rules/correction-capture.md'));
     assert.ok(ruleFiles.includes('.claude/rules/context-cycling.md'));
+    assert.ok(!ruleFiles.includes('.claude/rules/correction-capture.md'),
+      'correction-capture retired — Claude Code Auto Memory supersedes it');
     assert.ok(ruleFiles.includes('.claude/rules/README.md'));
     // Mode-specific rules moved to agents
     assert.ok(!ruleFiles.includes('.claude/rules/scope-guardian.md'));
@@ -445,14 +446,6 @@ describe('stale reference checks', () => {
     );
     assert.ok(!content.includes('`debug-checkpoint.md`'),
       'aam-triage should not reference debug-checkpoint.md as a file (moved to agent profiles)');
-  });
-
-  it('correction-capture rule does not reference debug-checkpoint.md as a file path', () => {
-    const content = fs.readFileSync(
-      path.join(TEMPLATE_DIR, '.claude', 'rules', 'correction-capture.md'), 'utf-8'
-    );
-    assert.ok(!content.includes('`debug-checkpoint.md`'),
-      'correction-capture should not reference debug-checkpoint.md as a file (moved to agent profiles)');
   });
 
   it('aam-brief does not reference PROGRESS.md (file does not exist)', () => {

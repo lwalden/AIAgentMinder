@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [4.6.0] - 2026-05-15
+
+### Removed
+
+- **AAM correction-capture retired** — Claude Code's native Auto Memory (v2.1.59+) supersedes the AAM implementation. Deleted files: `project/.claude/rules/correction-capture.md`, `project/.claude/scripts/correction-capture-hook.sh`, `tests/correction-capture-hook.test.js`. PostToolUse hook registration removed from `settings.json.tpl`. Six session-profile agents (sprint-master, dev, debug, hotfix, qa, item-executor) updated to drop `correction-capture` from their universal-rules header.
+- **`settings-merge.js`** — added `correction-capture-hook` to the obsolete-pattern list and extended the merge to scrub obsolete entries from hook types the template no longer ships (so existing installs lose the orphan `PostToolUse` entry on next `sync`). When a hook type becomes empty after scrubbing, it is removed entirely.
+
+### Added
+
+- **`/ultrareview` reference in `aam-pr-pipeline.md`** — documents the native cloud multi-agent review as a user-triggered second-opinion step for high-risk PRs (separately billed; not auto-invoked by the pipeline).
+- **"Native Claude Code Features Worth Knowing" section in `customization-guide.md`** — covers `/less-permission-prompts` (run after `/aam-setup` to tune permissions), `skillOverrides` (opt-in skill visibility control), Auto Memory (now responsible for correction capture), and how both `claude --resume` and "resume working" patterns interact with AAM's sprint continuation.
+
+### Changed
+
+- **v4.6.0 migration entry** — `lib/migrations.js` adds a dedicated migration that deletes the two retired files from existing installs on next `sync`. The v5.0.0 entry (orchestrator release, pending) is unchanged.
+
+---
+
 ## [4.5.0] - 2026-04-18
 
 ### Added

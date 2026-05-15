@@ -568,3 +568,22 @@ When the pipeline escalates, the PR label (`needs-human-review`, `ci-failure`,
 `ai-cycle-{N}`) indicates the current state. The sprint workflow stops and
 notifies the user. Resolve the issue, then re-invoke `/aam-pr-pipeline` to
 resume.
+
+---
+
+## Optional Deeper Review: `/ultrareview`
+
+This pipeline runs review-fix-test-merge in your current session. For
+particularly high-risk PRs (security-sensitive, large refactor, novel
+architecture), you may want a deeper second opinion before letting the
+pipeline merge.
+
+Claude Code ships a built-in `/ultrareview` command that runs a multi-agent
+review of the current branch (or `/ultrareview <PR#>`) in Anthropic's cloud
+as a separate billed operation. It is user-triggered only — this pipeline
+cannot launch it automatically.
+
+Recommended pattern: when the pipeline escalates a high-risk PR with
+`needs-human-review`, the user can run `/ultrareview <PR#>`, review the
+output, then either fix manually or re-invoke `/aam-pr-pipeline` to let it
+proceed.

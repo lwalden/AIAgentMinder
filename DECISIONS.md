@@ -138,9 +138,15 @@ Chose: `Stop` hook (`sprint-stop-guard.sh`) that blocks premature turn endings d
 
 ---
 
-### Automated correction capture via PostToolUse hook | 2026-03 | Status: Active
+### Automated correction capture via PostToolUse hook | 2026-03 | Status: Superseded (see "Retire correction-capture — Auto Memory supersedes it", 2026-05)
 
 Chose: PostToolUse hook (`correction-capture-hook.sh`) that tracks sequential tool calls and detects corrections (failed → retry with different args) over (a) keeping the passive self-reporting rule only or (b) PreToolUse hook (can't see results). Why: PostToolUse receives `tool_response` with success/failure data, enabling mechanical detection. Logs to `.corrections.jsonl` with pattern keys (e.g., `Bash:npm`) for grouping. Outputs `hookSpecificOutput.additionalContext` on 2nd occurrence so Claude sees the alert. Excludes transient errors (ETIMEDOUT, ECONNREFUSED, rate limits). Tradeoff: fires on every tool call; mitigated by fast jq-check path and fail-open without jq.
+
+---
+
+### Retire correction-capture — Auto Memory supersedes it | 2026-05-15 | Status: Active
+
+Chose: Delete the `correction-capture.md` rule and `correction-capture-hook.sh` PostToolUse hook entirely, relying on Claude Code's native Auto Memory (v2.1.59+) for repeated-mistake capture, over (a) keeping AAM's implementation in parallel with Auto Memory or (b) refactoring AAM's hook to integrate with Auto Memory. Why: Auto Memory captures build commands, debugging insights, and repeated-mistake patterns across sessions automatically, without an AAM-specific shell hook on every tool call. Field experience from this repo's primary user: the AAM implementation provided no observed value over the native equivalent. The two-strike "propose a permanent `.claude/rules/` entry" loop was the unique part; in practice it didn't fire often enough to justify the PostToolUse cost. Tradeoff: AAM loses control over what gets captured and how it's surfaced — Auto Memory is opaque-ish. Acceptable given the maintenance burden of the prior implementation and the consistent behavior of the native feature. Migration: v4.6.0 deletes both files; the settings-merge logic gained an obsolete-pattern entry so existing installs are cleaned up on next `sync`.
 
 ---
 

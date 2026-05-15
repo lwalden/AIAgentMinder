@@ -137,13 +137,20 @@ describe('E2E: sync --apply on v3.3 installation', () => {
 
   it('adds missing scripts', () => {
     execFileSync('node', [BIN, 'sync', targetDir, '--apply'], { encoding: 'utf-8' });
-    assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'correction-capture-hook.sh')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'decisions-log.sh')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'sprint-stop-guard.sh')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'version-bump.sh')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'session-start-hook.sh')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'stop-failure-hook.sh')));
     assert.ok(fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'backlog-capture.sh')));
+  });
+
+  it('retires correction-capture (v5.0 migration — superseded by Claude Code Auto Memory)', () => {
+    execFileSync('node', [BIN, 'sync', targetDir, '--apply'], { encoding: 'utf-8' });
+    assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'rules', 'correction-capture.md')),
+      'correction-capture.md should be removed by v5.0 migration');
+    assert.ok(!fs.existsSync(path.join(targetDir, '.claude', 'scripts', 'correction-capture-hook.sh')),
+      'correction-capture-hook.sh should not be reinstalled');
   });
 
   it('merges settings.json adding new hooks while preserving user config', () => {
@@ -154,10 +161,12 @@ describe('E2E: sync --apply on v3.3 installation', () => {
     // User config preserved
     assert.equal(settings.env.ANTHROPIC_API_KEY, 'user-key');
     // New hooks added
-    assert.ok(settings.hooks.PostToolUse, 'should have PostToolUse');
     assert.ok(settings.hooks.Stop, 'should have Stop');
     assert.ok(settings.hooks.SessionStart, 'should have SessionStart');
     assert.ok(settings.hooks.StopFailure, 'should have StopFailure');
+    // PostToolUse is no longer shipped — correction-capture retired in v5.0
+    assert.ok(!settings.hooks.PostToolUse,
+      'PostToolUse should be absent — template no longer ships any PostToolUse hooks');
     // Existing hook preserved
     assert.ok(settings.hooks.PreToolUse.some(e =>
       e.hooks.some(h => h.command.includes('context-cycle-hook'))));

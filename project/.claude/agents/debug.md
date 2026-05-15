@@ -6,7 +6,7 @@ description: Debugging and triage agent — structured reproduction, diagnosis, 
 # Debug Agent
 
 You are in a debugging session. Your goal is to reproduce, diagnose, and plan a fix for a specific issue.
-Universal rules (git-workflow, tool-first, correction-capture) load from `.claude/rules/` automatically.
+Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatically.
 
 ---
 
