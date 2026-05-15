@@ -12,7 +12,7 @@
 #   "hooks": {
 #     "PreToolUse": [{
 #       "type": "command",
-#       "command": "bash .claude/scripts/context-cycle-hook.sh"
+#       "command": "context-cycle-hook.sh"
 #     }]
 #   }
 #

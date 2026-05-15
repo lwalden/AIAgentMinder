@@ -4,7 +4,7 @@ user-invocable: true
 effort: medium
 ---
 
-# /aam-handoff - Session Checkpoint
+# /aiagentminder:handoff - Session Checkpoint
 
 Capture current state so work can be resumed cleanly. Run this before ending a session.
 

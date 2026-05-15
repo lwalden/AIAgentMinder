@@ -1,6 +1,6 @@
 # ==============================================================================
 # Core .gitignore -- secrets, IDE files, OS artifacts
-# Stack-specific entries are added by /setup based on your tech stack.
+# Stack-specific entries are added by /aiagentminder:setup based on your tech stack.
 # For comprehensive language gitignores, see: https://github.com/github/gitignore
 # ==============================================================================
 
@@ -82,4 +82,4 @@ __pycache__/
 # Uncomment if you use Claude Code's auto memory feature:
 # .claude/memory/
 
-# Stack-specific entries added below by /setup:
+# Stack-specific entries added below by /aiagentminder:setup:

@@ -4,7 +4,7 @@ user-invocable: true
 effort: high
 ---
 
-# /aam-grill - Plan Interrogation
+# /aiagentminder:grill - Plan Interrogation
 
 Stress-test a plan or design by walking every branch of the decision tree. This is the intensive counterpart to `approach-first.md` — use it when a design is non-obvious, high-stakes, or involves multiple interdependent decisions.
 
@@ -82,9 +82,9 @@ If yes, append each decision to DECISIONS.md in the project's existing format, i
 
 ## When to Use This
 
-- **Use `/aam-grill`** when a design is non-obvious, high-stakes, or has multiple interdependent decisions.
+- **Use `/aiagentminder:grill`** when a design is non-obvious, high-stakes, or has multiple interdependent decisions.
 - **Use `approach-first.md`** for routine check-ins — state intent, confirm, proceed.
-- Consider running `/aam-grill` before architecture changes touching more than 5 files.
+- Consider running `/aiagentminder:grill` before architecture changes touching more than 5 files.
 
 ---
 

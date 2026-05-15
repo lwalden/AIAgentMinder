@@ -104,7 +104,7 @@ Attempted agent: $subagent_type
 Allowed agents for $current_phase: ${allowed:-"(none — human checkpoint phase)"}
 
 Update the sprint phase before advancing:
-  bash .claude/scripts/sprint-update.sh phase <NEXT_PHASE>
+  sprint-update.sh phase <NEXT_PHASE>
 
 Phase order: PLAN → SPEC → APPROVE → EXECUTE → TEST → REVIEW → COMPLETE
 EOF

@@ -1,6 +1,6 @@
 ---
 name: security-reviewer
-description: Security-focused code reviewer — read-only, spawned by /aam-self-review
+description: Security-focused code reviewer — read-only, spawned by /aiagentminder:self-review
 disallowedTools:
   - Edit
   - Write

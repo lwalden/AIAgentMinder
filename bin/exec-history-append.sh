@@ -3,7 +3,7 @@
 # Zero-token-cost audit trail for the dispatch contract.
 #
 # Usage:
-#   bash .claude/scripts/exec-history-append.sh [label]
+#   exec-history-append.sh [label]
 #
 # The optional label is prepended to the header (e.g., "directive dispatched", "status: blocked").
 # If omitted, the script reads status + phase from the status file frontmatter.

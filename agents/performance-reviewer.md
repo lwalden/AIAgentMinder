@@ -1,6 +1,6 @@
 ---
 name: performance-reviewer
-description: Performance-focused code reviewer — read-only, spawned by /aam-self-review
+description: Performance-focused code reviewer — read-only, spawned by /aiagentminder:self-review
 disallowedTools:
   - Edit
   - Write

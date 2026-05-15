@@ -3,12 +3,12 @@
 # Writes .sprint-metrics.json incrementally during a sprint.
 #
 # Usage:
-#   bash .claude/scripts/sprint-metrics.sh init <sprint-id>
-#   bash .claude/scripts/sprint-metrics.sh item-start <item-id>
-#   bash .claude/scripts/sprint-metrics.sh item-complete <item-id>
-#   bash .claude/scripts/sprint-metrics.sh cycle <item-id>
-#   bash .claude/scripts/sprint-metrics.sh rework <item-id>
-#   bash .claude/scripts/sprint-metrics.sh finalize
+#   sprint-metrics.sh init <sprint-id>
+#   sprint-metrics.sh item-start <item-id>
+#   sprint-metrics.sh item-complete <item-id>
+#   sprint-metrics.sh cycle <item-id>
+#   sprint-metrics.sh rework <item-id>
+#   sprint-metrics.sh finalize
 
 METRICS_FILE=".sprint-metrics.json"
 NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -Iseconds)

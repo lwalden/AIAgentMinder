@@ -18,7 +18,7 @@
 
 ## MVP Goals
 
-<!-- Populated by /aam-brief with Phase 1 deliverables -->
+<!-- Populated by /aiagentminder:brief with Phase 1 deliverables -->
 
 ## Behavioral Rules
 

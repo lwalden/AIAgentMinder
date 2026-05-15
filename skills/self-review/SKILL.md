@@ -4,7 +4,7 @@ user-invocable: true
 effort: high
 ---
 
-# /aam-self-review - Pre-PR Code Review
+# /aiagentminder:self-review - Pre-PR Code Review
 
 Run a focused code review before creating a pull request. Spawns dedicated reviewer agents — each with a specific lens, read-only permissions, and its own context window.
 
@@ -103,7 +103,7 @@ After all subagents complete:
    [List all findings by severity: High → Medium → Low]
    ```
 
-2. **If High severity issues found:** Do not proceed to PR. Fix the issues and re-run `/aam-self-review` or `/aam-quality-gate`.
+2. **If High severity issues found:** Do not proceed to PR. Fix the issues and re-run `/aiagentminder:self-review` or `/aiagentminder:quality-gate`.
 
 3. **If Medium/Low issues only:** During autonomous sprint execution, fix them — do not ask whether to proceed. When invoked manually, ask the user: "Medium/Low issues found. Fix before PR, or proceed with issues noted in PR description? (fix / proceed)"
 
@@ -113,6 +113,6 @@ After all subagents complete:
 
 ## Integration with Sprint Workflow
 
-`/aam-self-review` is called by the sprint workflow before PR creation for every item. During autonomous sprint execution, address all findings by fixing them — do not prompt. Fix Medium/Low findings as well.
+`/aiagentminder:self-review` is called by the sprint workflow before PR creation for every item. During autonomous sprint execution, address all findings by fixing them — do not prompt. Fix Medium/Low findings as well.
 
-You can also invoke it manually at any time with `/aam-self-review`.
+You can also invoke it manually at any time with `/aiagentminder:self-review`.

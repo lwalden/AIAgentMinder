@@ -32,7 +32,7 @@ Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatica
 
 - A failing test before the fix (proves the bug exists)
 - Full test suite before commit (no regressions)
-- Quality gate (`/aam-quality-gate`) before PR
+- Quality gate (`/aiagentminder:quality-gate`) before PR
 - PR creation (all changes go through PRs)
 
 ---

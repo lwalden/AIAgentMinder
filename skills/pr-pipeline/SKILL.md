@@ -4,14 +4,14 @@ user-invocable: true
 effort: high
 ---
 
-# /aam-pr-pipeline - Autonomous PR Review Pipeline
+# /aiagentminder:pr-pipeline - Autonomous PR Review Pipeline
 
 Review, fix, test, and merge a pull request autonomously. Handles the full
 review→fix→test→merge loop with human escalation for high-risk or genuinely
 blocked cases.
 
 Invoked in-session by the sprint workflow after PR creation, or manually:
-`/aam-pr-pipeline` (uses current branch PR) or `/aam-pr-pipeline <PR-URL>`.
+`/aiagentminder:pr-pipeline` (uses current branch PR) or `/aiagentminder:pr-pipeline <PR-URL>`.
 
 ---
 
@@ -560,13 +560,13 @@ curl -s -X POST https://api.resend.com/emails \
 
 ## Integration with Sprint Workflow
 
-The sprint workflow invokes `/aam-pr-pipeline` in-session after creating a PR.
+The sprint workflow invokes `/aiagentminder:pr-pipeline` in-session after creating a PR.
 When the pipeline completes successfully (PR merged), control returns to the
 sprint workflow which continues to the next issue.
 
 When the pipeline escalates, the PR label (`needs-human-review`, `ci-failure`,
 `ai-cycle-{N}`) indicates the current state. The sprint workflow stops and
-notifies the user. Resolve the issue, then re-invoke `/aam-pr-pipeline` to
+notifies the user. Resolve the issue, then re-invoke `/aiagentminder:pr-pipeline` to
 resume.
 
 ---
@@ -585,5 +585,5 @@ cannot launch it automatically.
 
 Recommended pattern: when the pipeline escalates a high-risk PR with
 `needs-human-review`, the user can run `/ultrareview <PR#>`, review the
-output, then either fix manually or re-invoke `/aam-pr-pipeline` to let it
+output, then either fix manually or re-invoke `/aiagentminder:pr-pipeline` to let it
 proceed.

@@ -5,7 +5,7 @@ effort: high
 context: fork
 ---
 
-# /aam-quality-gate - Pre-PR Quality Checks
+# /aiagentminder:quality-gate - Pre-PR Quality Checks
 
 Run this before creating any pull request. Runs the full quality checklist — all checks, every time.
 
@@ -58,4 +58,4 @@ If invoked manually outside a sprint and the user explicitly requests an overrid
 
 ## Integration with Sprint Workflow
 
-This command is called automatically by the sprint workflow before each PR creation. During sprint execution, quality gate failures must be fixed — not overridden. You can also invoke it manually at any time with `/aam-quality-gate`.
+This command is called automatically by the sprint workflow before each PR creation. During sprint execution, quality gate failures must be fixed — not overridden. You can also invoke it manually at any time with `/aiagentminder:quality-gate`.

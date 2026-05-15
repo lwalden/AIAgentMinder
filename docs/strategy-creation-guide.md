@@ -1,8 +1,8 @@
 # Product Brief Creation Guide
 
-## The Quick Way: Use `/aam-brief`
+## The Quick Way: Use `/aiagentminder:brief`
 
-Open Claude Code in your project and run `/aam-brief`. Claude interviews you and generates `docs/strategy-roadmap.md`. This is the recommended approach. See [examples/demo-transcript.md](../examples/demo-transcript.md) for a walkthrough.
+Open Claude Code in your project and run `/aiagentminder:brief`. Claude interviews you and generates `docs/strategy-roadmap.md`. This is the recommended approach. See [examples/demo-transcript.md](../examples/demo-transcript.md) for a walkthrough.
 
 ## The Manual Way
 

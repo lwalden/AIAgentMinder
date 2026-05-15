@@ -60,4 +60,4 @@ When investigating a new bug:
 1. **Reproduce** — Get the error to happen reliably. Document exact steps, inputs, and environment.
 2. **Isolate** — Narrow to the smallest reproduction case. Binary search through recent changes if needed.
 3. **Diagnose** — Identify root cause, not just symptoms. Read the full function/module, not just the error line.
-4. **Plan** — Design a durable fix (not a patch). Consider edge cases. If the fix is complex, use `/aam-triage` for structured planning.
+4. **Plan** — Design a durable fix (not a patch). Consider edge cases. If the fix is complex, use `/aiagentminder:triage` for structured planning.

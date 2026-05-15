@@ -4,7 +4,7 @@ user-invocable: true
 effort: high
 ---
 
-# /aam-tdd - Test-Driven Development
+# /aiagentminder:tdd - Test-Driven Development
 
 Guided TDD workflow for implementing features through red-green-refactor cycles. This is the full methodology behind `code-quality.md`'s one-liner: "Write a failing test first. Implement the minimal solution. Refactor after green."
 
@@ -94,9 +94,9 @@ Run tests after each refactor step. Never refactor while RED — get to GREEN fi
 
 ## When to Use This
 
-- **Use `/aam-tdd`** when starting a new feature or when the test plan is non-obvious.
+- **Use `/aiagentminder:tdd`** when starting a new feature or when the test plan is non-obvious.
 - **Use `code-quality.md`** (loaded automatically) for day-to-day TDD discipline without the full structured workflow.
-- Pairs well with `/aam-triage` — triage produces a fix plan as RED-GREEN cycles that this skill can execute.
+- Pairs well with `/aiagentminder:triage` — triage produces a fix plan as RED-GREEN cycles that this skill can execute.
 
 ---
 

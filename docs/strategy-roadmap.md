@@ -239,27 +239,36 @@ Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, revi
 
 ---
 
-## v5.0 — Orchestrator + Instrumentation (planned)
+## v5.0 — Plugin Packaging + Worktree Isolation (shipped)
 
-Sprint-master routes to phase-specific specialist sub-agents (Approach C from `docs/spike-session-architecture.md`). Also instruments sprint execution for benchmarking — the assessment identified metrics as the missing evidence base for AAM's value claims.
+Distribution model changed from npm to Claude Code plugin. AAM is now installed via `/plugin marketplace add lwalden/AIAgentMinder` followed by `/plugin install aiagentminder@lwalden-aiagentminder`, then `/aiagentminder:setup` in the target project. The npm CLI (`npx aiagentminder init`) is retired.
 
-### Orchestrator Layer
+### Plugin Distribution
 
-- **Sprint-master agent** — Coordinates specialist sub-agents for each sprint phase (spec, execute, test, review). Routes context to the right agent instead of loading everything into one session.
-- **Phase-specific agent routing** — Each sprint state gets a purpose-built agent with only the rules and context it needs. Extends the v4.1 session profile pattern into the sprint state machine.
-- **Constraint:** Subagents cannot spawn sub-subagents. The orchestrator design must account for this (e.g., self-review's 5 reviewer lenses need to be orchestrator-dispatched, not nested).
+- **Repo restructured** to plugin convention: `agents/`, `skills/<name>/SKILL.md`, `bin/`, `hooks/hooks.json` at root. Project-bootstrap templates live in `templates/` and are copied into the target by `/aiagentminder:setup`.
+- **Skills namespaced** under `/aiagentminder:X` (e.g. `/aiagentminder:tdd`). The defensive `aam-` prefix is dropped since plugin namespacing handles collision avoidance.
+- **`/aiagentminder:setup` skill** replaces `npx aiagentminder init`. Interactive — detects existing installs, fingerprints codebase, prompts for project identity, runs `bin/aam-bootstrap.sh` for mechanical file copies, customizes `CLAUDE.md`, augments `.gitignore`.
+- **npm CLI retired.** `bin/aam.js`, `lib/init.js`, `lib/sync.js`, `lib/migrations.js`, `lib/settings-merge.js`, `lib/agents-md.js`, `lib/cli.js`, `lib/prompt.js`, `lib/detect.js` deleted. `lib/validate.js` kept for CI version-consistency checks.
 
-### Sprint Metrics Collection
+### Worktree-Isolated Sprint Items
 
-- **Lightweight telemetry** — Instrument sprint execution to capture: items completed per sprint, context cycles triggered, review findings count, defect escape rate (bugs found post-merge), tokens consumed per item.
-- **`.sprint-metrics.json`** — Per-sprint metrics file, written by `sprint-update.sh` at COMPLETE. Enables benchmarking AAM-governed sprints vs. unstructured development.
-- **Retrospective integration** — `/aam-retrospective` reads metrics for data-driven adaptive sizing instead of heuristic-only.
+- **`isolation: "worktree"`** — sprint-master spawns item-executor in an isolated git worktree off `origin/<default-branch>` (Claude Code's `worktree.baseRef: fresh`). Each item runs in its own working tree, eliminating contention between concurrent items and keeping unrelated in-flight work on `main` out of new items.
+- **Push-before-return contract** — item-executor pushes its branch to origin before reporting `done`. pr-pipeliner runs in the main worktree and fetches the branch.
+- **Output contract change** — `"done: branch={name} commit={hash}"` (was `"done: {hash}"`) so sprint-master can forward the branch name to pr-pipeliner during REVIEW.
+
+### `/goal` Compatibility
+
+- Documented Claude Code 2.1.139's native `/goal` command as a lightweight alternative to AAM's executive-layer dispatch mode. Sprint-master's human-checkpoint protocol is unchanged: `.sprint-human-checkpoint` + end-of-turn output stops the `/goal` evaluator from auto-resuming.
+
+### Cleanup
+
+- Retired `correction-capture` rule and PostToolUse hook (superseded by Claude Code's native Auto Memory, 2.1.59+).
+- Retired root meta-commands `/aam-setup` and `/aam-update` — replaced by the bundled `/aiagentminder:setup` skill.
 
 ### Community Presence (no code)
 
-- **List on buildwithclaude** — 2,663 stars, 95+ curated marketplaces. Primary Claude Code extension discovery hub.
-- **List on awesome-claude-code-toolkit** — 961 stars, #1 trending Feb 2026. Secondary discovery hub.
-- **Maintain `.claude-plugin/` manifest** — Already shipping. Positions AAM for any future Claude Code native marketplace.
+- **List on buildwithclaude** — Primary Claude Code extension discovery hub.
+- **List on awesome-claude-code-toolkit** — Secondary discovery hub.
 
 ---
 

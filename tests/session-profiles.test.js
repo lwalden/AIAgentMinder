@@ -117,8 +117,8 @@ describe('session profile agents: qa content', () => {
 
   it('references quality gate and self-review', () => {
     const content = fs.readFileSync(path.join(AGENTS_DIR, 'qa.md'), 'utf-8');
-    assert.ok(content.includes('/aam-quality-gate'), 'must reference quality gate');
-    assert.ok(content.includes('/aam-self-review'), 'must reference self-review');
+    assert.ok(content.includes('/aiagentminder:quality-gate'), 'must reference quality gate');
+    assert.ok(content.includes('/aiagentminder:self-review'), 'must reference self-review');
   });
 });
 

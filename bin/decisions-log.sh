@@ -3,7 +3,7 @@
 # Mechanically adds a formatted decision entry so the LLM doesn't burn tokens on file I/O.
 #
 # Usage:
-#   bash .claude/scripts/decisions-log.sh "Title" "X over Y" "reason" "cost"
+#   decisions-log.sh "Title" "X over Y" "reason" "cost"
 #
 # Arguments (positional, all required):
 #   $1 — title

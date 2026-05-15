@@ -1,6 +1,6 @@
 ---
 name: cost-reviewer
-description: Cost impact code reviewer — read-only, spawned by /aam-self-review
+description: Cost impact code reviewer — read-only, spawned by /aiagentminder:self-review
 disallowedTools:
   - Edit
   - Write

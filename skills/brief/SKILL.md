@@ -4,7 +4,7 @@ user-invocable: true
 effort: high
 ---
 
-# /aam-brief - Product Brief & Roadmap Creation
+# /aiagentminder:brief - Product Brief & Roadmap Creation
 
 You are helping the user create or update `docs/strategy-roadmap.md` for this project.
 This document is the "north star" for development -- it tells Claude the "why" behind decisions.
@@ -14,9 +14,9 @@ This document is the "north star" for development -- it tells Claude the "why" b
 ## Before Starting
 
 Read `CLAUDE.md` to understand the project identity (name, type, stack).
-If Project Identity is still placeholder brackets, run `/aam-setup` first.
+If Project Identity is still placeholder brackets, run `/aiagentminder:setup` first.
 
-> **Note:** Claude Code has a built-in `/plan` command that toggles Plan Mode (read-only exploration). This command (`/aam-brief`) is different — it produces a product brief and strategy roadmap.
+> **Note:** Claude Code has a built-in `/plan` command that toggles Plan Mode (read-only exploration). This command (`/aiagentminder:brief`) is different — it produces a product brief and strategy roadmap.
 
 ---
 
@@ -86,7 +86,7 @@ Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
 
 5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases."
 
-6. Tell the user: "AIAgentMinder is set up. Run `/aam-handoff` at the end of each session to checkpoint decisions and key context."
+6. Tell the user: "AIAgentMinder is set up. Run `/aiagentminder:handoff` at the end of each session to checkpoint decisions and key context."
 
 ---
 

@@ -13,7 +13,7 @@ Before writing code for any feature, check `docs/strategy-roadmap.md`:
 
 - In **MVP Features** → proceed.
 - In **Out of Scope** → stop: "This appears out of scope: [quote]. Confirm to proceed."
-- Not listed → "Not in roadmap — add to MVP, defer, mark out of scope, or capture to backlog (`bash .claude/scripts/backlog-capture.sh add`)?"
+- Not listed → "Not in roadmap — add to MVP, defer, mark out of scope, or capture to backlog (`backlog-capture.sh add`)?"
 
 Scope additions require explicit human confirmation.
 

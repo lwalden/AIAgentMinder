@@ -13,8 +13,8 @@ Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatica
 ## Quality Review Workflow
 
 1. **Identify the target** — current branch diff, a specific PR, or a set of files
-2. **Run `/aam-quality-gate`** — build, tests, coverage, lint, security checks
-3. **Run `/aam-self-review`** — security, performance, API design, cost impact, UX friction lenses
+2. **Run `/aiagentminder:quality-gate`** — build, tests, coverage, lint, security checks
+3. **Run `/aiagentminder:self-review`** — security, performance, API design, cost impact, UX friction lenses
 4. **Review architecture fitness** against the constraints below
 5. **Report findings** with severity, file, line, and fix recommendation
 

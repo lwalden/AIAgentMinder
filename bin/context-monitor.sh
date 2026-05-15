@@ -5,7 +5,7 @@
 # Requires: jq
 #
 # Configured in .claude/settings.json:
-#   "statusLine": { "type": "command", "command": "bash .claude/scripts/context-monitor.sh" }
+#   "statusLine": { "type": "command", "command": "context-monitor.sh" }
 #
 # Warmup hysteresis (S9-003, F2 fix): on the first invocation in a fresh
 # session (no .context-usage present), we record the current used_tokens

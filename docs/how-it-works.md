@@ -20,7 +20,7 @@ Claude reads `CLAUDE.md` automatically every session. `.claude/rules/*.md` files
 
 **During:** Code written to files immediately. Commits at natural checkpoints. Feature branches only. When sprint planning is enabled, Claude decomposes phase work into reviewable issues, works them one-by-one, and creates per-issue PRs — each sprint starts with user approval.
 
-**Ending:** Run `/aam-handoff` to write a 2-3 item priority note to auto-memory, update DECISIONS.md with session ADRs, and commit. Git commit discipline is enforced by `.claude/rules/git-workflow.md` — commits are intentional, not automatic.
+**Ending:** Run `/aiagentminder:handoff` to write a 2-3 item priority note to auto-memory, update DECISIONS.md with session ADRs, and commit. Git commit discipline is enforced by `.claude/rules/git-workflow.md` — commits are intentional, not automatic.
 
 **After context compaction:** The `compact-reorient.js` hook fires via the SessionStart `compact` matcher and outputs the first 15 lines of SPRINT.md (if active) to reorient Claude to the current sprint. Session Memory handles the broader context restoration.
 
@@ -42,32 +42,30 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 
 | Command | Purpose | Modifies Files? |
 |---------|---------|----------------|
-| `/aam-setup` | Initialize a project from the template (run from AIAgentMinder repo) | Yes |
-| `/aam-update` | Upgrade an existing installation — overwrites AIAgentMinder-owned files, surgical merge of CLAUDE.md (run from AIAgentMinder repo) | Yes |
-| `/aam-brief` | Create or update strategy-roadmap.md interactively | Yes |
-| `/aam-checkup` | Validate installation health — files, hooks, Node.js, version stamp, CLAUDE.md placeholders | No |
-| `/aam-scope-check` | Compare proposed work against roadmap — returns in-scope / out-of-scope / deferred verdict | No |
-| `/aam-revise` | Mid-stream plan revision — add, change, drop, or reprioritize features in the roadmap | Yes |
-| `/aam-handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
-| `/aam-quality-gate` | Pre-PR quality checks — full checklist (build, tests, coverage, lint, security) | No |
-| `/aam-self-review` | Specialist review subagents (security, performance, API design) — runs for every item | No |
-| `/aam-pr-pipeline` | Autonomous PR review-fix-test-merge pipeline. Escalates to human on blockers | No |
-| `/aam-milestone` | Project health assessment: phase progress, timeline, complexity budget, scope drift, known debt | No |
-| `/aam-retrospective` | Sprint retrospective with metrics and adaptive sizing guidance | No |
-| `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor | No |
-| `/aam-triage` | Structured bug triage — reproduce, diagnose, design fix plan, create issue | Yes |
-| `/aam-grill` | Plan interrogation — walk every decision branch before implementation | No |
-| `/aam-sync-issues` | Push current sprint issues to GitHub Issues (optional) | No |
+| `/aiagentminder:setup` | Initialize a project from the bundled templates. Re-run to refresh `.claude/rules/` and the version stamp after a plugin update. Detects existing installs and preserves user-owned files. | Yes |
+| `/aiagentminder:brief` | Create or update strategy-roadmap.md interactively | Yes |
+| `/aiagentminder:scope-check` | Compare proposed work against roadmap — returns in-scope / out-of-scope / deferred verdict | No |
+| `/aiagentminder:revise` | Mid-stream plan revision — add, change, drop, or reprioritize features in the roadmap | Yes |
+| `/aiagentminder:handoff` | End-of-session: write priorities to auto-memory, update DECISIONS.md, commit | Yes |
+| `/aiagentminder:quality-gate` | Pre-PR quality checks — full checklist (build, tests, coverage, lint, security) | No |
+| `/aiagentminder:self-review` | Specialist review subagents (security, performance, API design) — runs for every item | No |
+| `/aiagentminder:pr-pipeline` | Autonomous PR review-fix-test-merge pipeline. Escalates to human on blockers | No |
+| `/aiagentminder:milestone` | Project health assessment: phase progress, timeline, complexity budget, scope drift, known debt | No |
+| `/aiagentminder:retrospective` | Sprint retrospective with metrics and adaptive sizing guidance | No |
+| `/aiagentminder:tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor | No |
+| `/aiagentminder:triage` | Structured bug triage — reproduce, diagnose, design fix plan, create issue | Yes |
+| `/aiagentminder:grill` | Plan interrogation — walk every decision branch before implementation | No |
+| `/aiagentminder:sync-issues` | Push current sprint issues to GitHub Issues (optional) | No |
 
 ## Optional Features
 
 ### Code Quality Guidance
 
-When enabled, `project/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (TDD cycle, build-before-commit, small focused functions, and read-before-write). Enabled during `/aam-brief`, `/aam-setup`, or `/aam-update`. Delete the file to opt out.
+When enabled, `templates/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (TDD cycle, build-before-commit, small focused functions, and read-before-write). Enabled during `/aiagentminder:brief` or `/aiagentminder:setup`. Delete the file to opt out.
 
 ### Sprint Planning
 
-When enabled, `project/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` is created, and `@SPRINT.md` is added to CLAUDE.md. When you ask Claude to "start a sprint" or "begin Phase 1," it:
+When enabled, `templates/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` is created, and `@SPRINT.md` is added to CLAUDE.md. When you ask Claude to "start a sprint" or "begin Phase 1," it:
 1. Decomposes the phase work into discrete issues with acceptance criteria — waits for approval
 2. Writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for approval
 3. Executes items autonomously in sequence: TDD, full test suite, quality gate, self-review, PR pipeline — no permission prompts between items
@@ -86,8 +84,8 @@ The restart mechanism catches the signal and starts a fresh Claude instance in t
 
 | Mechanism | Setup | How it works |
 |-----------|-------|--------------|
-| **Profile hook** (recommended) | Run `.claude/scripts/install-profile-hook.ps1` once | PowerShell prompt function detects signal file after Claude exits |
-| **Sprint-runner wrapper** | Start sessions with `.claude/scripts/sprint-runner.ps1` | Loop-based wrapper restarts Claude on signal |
+| **Plugin auto-restart** (recommended) | None — bundled with the plugin | The SessionEnd hook writes `.sprint-continue-signal`; `session-start-continuation.sh` consumes it next launch |
+| **Sprint-runner wrapper** | Start sessions with `sprint-runner.sh` / `sprint-runner.ps1` (on PATH when plugin is enabled) | Loop-based wrapper restarts Claude on signal — useful for fully unattended sprint runs |
 | **Fallback** | None needed | Claude tells you what command to paste |
 
 The new session reads CLAUDE.md, rules, and SPRINT.md automatically (native loading), then reads the continuation file for ephemeral context. It resumes sprint execution from where the previous session left off.
@@ -96,12 +94,24 @@ The new session reads CLAUDE.md, rules, and SPRINT.md automatically (native load
 
 ## Governance Hooks
 
-One cross-platform hook (Node.js) configured in `settings.json`:
+Hooks ship with the plugin in `hooks/hooks.json`. They register
+automatically when the plugin is enabled — no `settings.json` edits
+required in your project.
 
 | Hook | Event | Script |
 |------|-------|--------|
-| Sprint reorientation post-compaction | SessionStart (compact matcher) | `compact-reorient.js` |
+| Context monitor | statusLine | `context-monitor.sh` |
+| Context cycle guard | PreToolUse | `context-cycle-hook.sh` |
+| Sprint phase guard | PreToolUse | `sprint-phase-guard.sh` |
+| Sprint stop guard | Stop | `sprint-stop-guard.sh` |
+| Session end cycle | SessionEnd | `session-end-cycle.sh` |
+| Session start continuation | SessionStart | `session-start-continuation.sh` |
+| Session start cycle reset | SessionStart | `session-start-cycle-reset.sh` |
+| Session start sprint detect | SessionStart | `session-start-hook.sh` |
+| Stop failure | StopFailure | `stop-failure-hook.sh` |
+| HLPM ping | SessionStart, SessionEnd | `hlpm-ping.sh` |
 
-The hook fires exclusively after context compaction, not on every session start. It outputs the first 15 lines of SPRINT.md (if an active sprint exists) to reorient Claude after context was compacted.
+All hooks reference `${CLAUDE_PLUGIN_ROOT}/bin/<script>.sh`, so they
+work from wherever Claude Code installed the plugin.
 
 Git commit discipline is enforced by `.claude/rules/git-workflow.md` (always-active rule). Commits are intentional, not automatic.

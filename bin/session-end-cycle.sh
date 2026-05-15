@@ -13,7 +13,7 @@
 #
 # Configured in .claude/settings.json:
 #   "hooks": { "SessionEnd": [{ "matcher": "", "hooks": [{ "type": "command",
-#              "command": "bash .claude/scripts/session-end-cycle.sh" }] }] }
+#              "command": "session-end-cycle.sh" }] }] }
 
 set -euo pipefail
 

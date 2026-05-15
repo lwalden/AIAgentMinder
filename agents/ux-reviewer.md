@@ -1,6 +1,6 @@
 ---
 name: ux-reviewer
-description: UX friction code reviewer — read-only, spawned by /aam-self-review
+description: UX friction code reviewer — read-only, spawned by /aiagentminder:self-review
 disallowedTools:
   - Edit
   - Write

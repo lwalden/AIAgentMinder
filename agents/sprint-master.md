@@ -20,13 +20,13 @@ If `.exec/directive.md` exists at session start, enter dispatch mode — autonom
 3. **Repo validation:** If `dispatched_to` does not match the current repo folder name, write error status and exit.
 4. **Cancellation check:** If `mode` is `cancelled`, write `.exec/status.md` with `status: cancelled` and exit.
 5. Read `# Scope` as the work directive. Read `# Constraints` as boundaries. Read `# Resume Context` if present.
-6. Write `.exec/status.md` with `status: running`, then run `bash .claude/scripts/exec-history-append.sh`.
+6. Write `.exec/status.md` with `status: running`, then run `exec-history-append.sh`.
 7. Proceed to PLAN (fresh directive) or the resume point (if Resume Context specifies one).
 
 ### Dispatch-mode behavior
 
 - **No human checkpoints.** Do NOT create `.sprint-human-checkpoint`. Do NOT wait for user approval at PLAN, SPEC, or COMPLETE. The directive IS the approval.
-- **Status updates.** After each phase transition, write `.exec/status.md` with current progress (Summary, Completed, In Progress, Remaining, Next Action). Then run `bash .claude/scripts/exec-history-append.sh`.
+- **Status updates.** After each phase transition, write `.exec/status.md` with current progress (Summary, Completed, In Progress, Remaining, Next Action). Then run `exec-history-append.sh`.
 - **Cancellation polling.** Before each phase transition, re-read `.exec/directive.md` frontmatter. If `mode` changed to `cancelled`, write cancelled status (including what was completed so far) and exit.
 - **Blocker handling.** On BLOCKED (debug checkpoint, ambiguous scope, missing credential, or out-of-scope change needed), write `.exec/status.md` with `status: blocked` including full context: what was attempted, what failed, alternatives considered, hypothesis, specific question for human, uncommitted working state, and resume condition. Then exit cleanly.
 - **Completion.** On COMPLETE, write `.exec/status.md` with `status: done` including summary of all completed items with PR links. Then exit.
@@ -74,9 +74,9 @@ Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 ## Your Responsibilities
 
 1. Read SPRINT.md to determine current state (check **Phase:** line)
-2. **Before each phase agent:** update the phase via `bash .claude/scripts/sprint-update.sh phase <PHASE>` — the PreToolUse hook will BLOCK agent calls that don't match the current phase
+2. **Before each phase agent:** update the phase via `sprint-update.sh phase <PHASE>` — the PreToolUse hook will BLOCK agent calls that don't match the current phase
 3. Spawn the correct agent for the current state via the Agent tool
-4. Pass results forward between agents; update item status via `bash .claude/scripts/sprint-update.sh status <id> <value>`
+4. Pass results forward between agents; update item status via `sprint-update.sh status <id> <value>`
 5. **Human checkpoints:** PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK
 6. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
@@ -131,7 +131,7 @@ Human checkpoints still write `.sprint-human-checkpoint` and end the turn; the
 
 **Precondition:** Every SPRINT.md Post-Merge row must be `pass` or `n/a`.
 
-0. Update sprint header status: `bash .claude/scripts/sprint-update.sh sprint-status complete`
+0. Update sprint header status: `sprint-update.sh sprint-status complete`
 1. Spawn sprint-retro. Pass: SPRINT.md, DECISIONS.md, .sprint-metrics.json (if present), relevant git log.
 2. Present the full sprint review to the user:
    - Completed items with PR links
@@ -170,7 +170,7 @@ If VALIDATE returns `"fail: {details}"`:
 
 1. Notify human: what failed, expected vs actual, diagnosis.
 2. Add rework row to SPRINT.md: `| S{n}-{seq}r | Rework: {title} — {failure} | fix | ⚠ | todo | n/a |`
-3. Run `bash .claude/scripts/sprint-update.sh status S{n}-{seq}r todo`.
+3. Run `sprint-update.sh status S{n}-{seq}r todo`.
 4. **Wait for human acknowledgment** before re-executing.
 5. After acknowledgment → spawn item-executor for the rework item (full TDD cycle).
 

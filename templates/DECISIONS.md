@@ -11,7 +11,7 @@
 
 ## ADR Format
 
-<!-- Set by /aam-brief. Replace this comment with: "Format: Lightweight" or "Format: Formal" -->
+<!-- Set by /aiagentminder:brief. Replace this comment with: "Format: Lightweight" or "Format: Formal" -->
 
 **Lightweight:**
 ```
@@ -41,7 +41,7 @@ Chose: [X] over [alternatives considered]. Why: [rationale]. Tradeoff: [what you
 
 ## Known Debt
 
-> Record shortcuts, workarounds, and deferred quality work here. Claude logs debt when implementing workarounds. `/aam-milestone` surfaces the debt list alongside scope drift.
+> Record shortcuts, workarounds, and deferred quality work here. Claude logs debt when implementing workarounds. `/aiagentminder:milestone` surfaces the debt list alongside scope drift.
 
 | ID | Description | Impact | Logged | Sprint |
 |---|---|---|---|---|

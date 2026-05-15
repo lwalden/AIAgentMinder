@@ -4,9 +4,9 @@ user-invocable: true
 effort: medium
 ---
 
-# /aam-retrospective - Sprint Retrospective
+# /aiagentminder:retrospective - Sprint Retrospective
 
-Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/aam-retrospective`.
+Generate a brief retrospective for the completed sprint. Called automatically at sprint completion, or invoke manually with `/aiagentminder:retrospective`.
 
 ---
 

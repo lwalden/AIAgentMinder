@@ -3,14 +3,14 @@
 # Mechanically updates table cells so the LLM doesn't burn tokens on file I/O.
 #
 # Usage:
-#   bash .claude/scripts/sprint-update.sh status <issue-id> <value>
-#   bash .claude/scripts/sprint-update.sh postmerge <issue-id> <value>
-#   bash .claude/scripts/sprint-update.sh sprint-status <value>
+#   sprint-update.sh status <issue-id> <value>
+#   sprint-update.sh postmerge <issue-id> <value>
+#   sprint-update.sh sprint-status <value>
 #
 # Examples:
-#   bash .claude/scripts/sprint-update.sh status S1-001 in-progress
-#   bash .claude/scripts/sprint-update.sh postmerge S1-002 pass
-#   bash .claude/scripts/sprint-update.sh sprint-status in-progress
+#   sprint-update.sh status S1-001 in-progress
+#   sprint-update.sh postmerge S1-002 pass
+#   sprint-update.sh sprint-status in-progress
 
 SPRINT_FILE="SPRINT.md"
 

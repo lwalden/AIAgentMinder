@@ -3,20 +3,20 @@
 # Mechanically manages backlog items so the LLM doesn't burn tokens on file I/O.
 #
 # Usage:
-#   bash .claude/scripts/backlog-capture.sh add <type> <title> [source]
-#   bash .claude/scripts/backlog-capture.sh list [--type=<type>]
-#   bash .claude/scripts/backlog-capture.sh promote <id>
-#   bash .claude/scripts/backlog-capture.sh detail <id> <text>
-#   bash .claude/scripts/backlog-capture.sh count [--type=<type>]
+#   backlog-capture.sh add <type> <title> [source]
+#   backlog-capture.sh list [--type=<type>]
+#   backlog-capture.sh promote <id>
+#   backlog-capture.sh detail <id> <text>
+#   backlog-capture.sh count [--type=<type>]
 #
 # Types: defect, feature, spike, chore
 #
 # Examples:
-#   bash .claude/scripts/backlog-capture.sh add feature "Auto-detect monorepo" "spike research"
-#   bash .claude/scripts/backlog-capture.sh list --type=defect
-#   bash .claude/scripts/backlog-capture.sh promote B-003
-#   bash .claude/scripts/backlog-capture.sh detail B-002 "Spike showed 3 repos with workspaces."
-#   bash .claude/scripts/backlog-capture.sh count
+#   backlog-capture.sh add feature "Auto-detect monorepo" "spike research"
+#   backlog-capture.sh list --type=defect
+#   backlog-capture.sh promote B-003
+#   backlog-capture.sh detail B-002 "Spike showed 3 repos with workspaces."
+#   backlog-capture.sh count
 
 BACKLOG_FILE="BACKLOG.md"
 VALID_TYPES="defect|feature|spike|chore"
