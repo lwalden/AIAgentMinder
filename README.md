@@ -1,14 +1,11 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-4.4.0-blue)
-[![npm](https://img.shields.io/npm/v/aiagentminder)](https://www.npmjs.com/package/aiagentminder)
+![Version](https://img.shields.io/badge/version-5.0.0-blue)
 
-A governance framework for Claude Code. Slash commands, rules files, hooks, and shell scripts that add sprint execution, quality enforcement, and context management to Claude Code projects.
+A Claude Code **plugin** that adds project governance for AI-assisted development: sprint execution with worktree-isolated items, quality gates, TDD workflow, scope control, architecture fitness, and structured planning. Built for solo developers and small teams.
 
-> **What this is:** An installable template — no runtime dependency, no MCP server, no database. Built for a solo developer who wants Claude Code to execute autonomously while maintaining engineering discipline.
->
-> **Command prefix:** All commands use the `aam-` prefix (e.g., `/aam-brief`, `/aam-handoff`) to avoid collision with Claude Code built-ins and other plugins.
+> **As of v5.0, AIAgentMinder is distributed as a Claude Code plugin.** The npm CLI (`npx aiagentminder init`) is retired; use the native `/plugin` flow instead.
 
 ---
 
@@ -16,25 +13,29 @@ A governance framework for Claude Code. Slash commands, rules files, hooks, and 
 
 ### Install
 
-```bash
-# Recommended: npx installer (interactive — asks about your project, copies files)
-npx aiagentminder init
+In Claude Code:
 
-# Or with all optional features enabled (no prompts)
-npx aiagentminder init --all
-
-# Or core governance only (no sprint planning, no architecture fitness)
-npx aiagentminder init --core
+```
+/plugin marketplace add lwalden/AIAgentMinder
+/plugin install aiagentminder@lwalden-aiagentminder
 ```
 
-Alternative: clone the repo and run `/aam-setup` from Claude Code.
+Then in your target project:
+
+```
+/aiagentminder:setup
+```
+
+`/aiagentminder:setup` runs interactively — it fingerprints your codebase, asks for project identity, writes a starter `CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, and `docs/strategy-roadmap.md`, and seeds `.claude/rules/` and `.gitignore`.
 
 ### After install
 
-1. Run `/aam-brief` to create your product brief and strategy roadmap.
-2. Start building: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
+1. Run `/aiagentminder:brief` to draft a product brief and strategy roadmap.
+2. Start building. With sprint planning: "Start a sprint for Phase 1."
 
-With sprint planning enabled: "Start a sprint for Phase 1."
+### Minimum Claude Code version
+
+v5.0 relies on Claude Code 2.1.139+ for worktree-isolated agent execution (`isolation: "worktree"`), the `/goal` command, and `${CLAUDE_PLUGIN_ROOT}` hook variable substitution.
 
 ---
 
@@ -59,7 +60,7 @@ AIAgentMinder addresses three gaps in Claude Code:
 | `docs/strategy-roadmap.md` | Product brief — features, phases, out-of-scope items |
 | `.claude/rules/*.md` | Universal rules (auto-loaded every session) |
 | `SPRINT.md` | Active sprint header and issue table (optional) |
-| `BACKLOG.md` | Work inbox — capture future work via `/aam-backlog` |
+| `BACKLOG.md` | Work inbox — capture future work via `/aiagentminder:backlog` |
 | `.pr-pipeline.json` | PR pipeline config — high-risk patterns, merge method, cross-model review |
 
 ### Rules
@@ -70,8 +71,9 @@ AIAgentMinder addresses three gaps in Claude Code:
 |------|-------------|
 | `git-workflow.md` | Branch naming, commit discipline, PR-only workflow |
 | `tool-first.md` | Use CLI/API tools instead of asking the user to do things manually |
-| `correction-capture.md` | Detects repeated wrong-first-approach patterns and proposes permanent rules |
 | `context-cycling.md` | Procedure for context cycling when the PreToolUse hook fires |
+
+Repeated-mistake capture used to ship as an AAM rule + hook; it was retired in favor of Claude Code's native **Auto Memory**.
 
 **Mode-specific rules** (loaded via session profile agents):
 
@@ -100,20 +102,20 @@ Use `claude --agent <name>` to load the right context for your task:
 
 | Command | Purpose |
 |---------|---------|
-| `/aam-brief` | Interview-driven product brief and strategy roadmap |
-| `/aam-revise` | Update the plan — add, drop, or reprioritize features with decision logging |
-| `/aam-scope-check` | Compare proposed work against the roadmap |
-| `/aam-handoff` | Session-end checkpoint — decisions, priorities, commit |
-| `/aam-quality-gate` | Pre-PR quality checklist (build, tests, coverage, lint, security) |
-| `/aam-self-review` | Pre-PR code review via specialist subagents (security, performance, API design, cost, UX friction) + judge pass |
-| `/aam-pr-pipeline` | Autonomous PR review-fix-test-merge pipeline |
-| `/aam-tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor |
-| `/aam-triage` | Structured bug triage — reproduce, diagnose, fix plan, GitHub issue |
-| `/aam-grill` | Plan interrogation — walk every decision branch before implementing |
-| `/aam-milestone` | Project health assessment across phase progress, timeline, scope drift |
-| `/aam-retrospective` | Sprint metrics and adaptive sizing guidance |
-| `/aam-backlog` | Capture, review, and promote backlog items (all I/O via `backlog-capture.sh`) |
-| `/aam-sync-issues` | Push sprint issues to GitHub Issues (optional) |
+| `/aiagentminder:brief` | Interview-driven product brief and strategy roadmap |
+| `/aiagentminder:revise` | Update the plan — add, drop, or reprioritize features with decision logging |
+| `/aiagentminder:scope-check` | Compare proposed work against the roadmap |
+| `/aiagentminder:handoff` | Session-end checkpoint — decisions, priorities, commit |
+| `/aiagentminder:quality-gate` | Pre-PR quality checklist (build, tests, coverage, lint, security) |
+| `/aiagentminder:self-review` | Pre-PR code review via specialist subagents (security, performance, API design, cost, UX friction) + judge pass |
+| `/aiagentminder:pr-pipeline` | Autonomous PR review-fix-test-merge pipeline |
+| `/aiagentminder:tdd` | Guided TDD workflow — plan, tracer bullet, RED-GREEN loop, refactor |
+| `/aiagentminder:triage` | Structured bug triage — reproduce, diagnose, fix plan, GitHub issue |
+| `/aiagentminder:grill` | Plan interrogation — walk every decision branch before implementing |
+| `/aiagentminder:milestone` | Project health assessment across phase progress, timeline, scope drift |
+| `/aiagentminder:retrospective` | Sprint metrics and adaptive sizing guidance |
+| `/aiagentminder:backlog` | Capture, review, and promote backlog items (all I/O via `backlog-capture.sh`) |
+| `/aiagentminder:sync-issues` | Push sprint issues to GitHub Issues (optional) |
 
 ### Hooks and scripts
 
@@ -122,7 +124,6 @@ Use `claude --agent <name>` to load the right context for your task:
 | `context-monitor.sh` | Status line data bridge — writes `.context-usage` with token thresholds |
 | `context-cycle-hook.sh` | PreToolUse hook — blocks non-cycle tools when context threshold is hit |
 | `context-cycle.sh` | Self-termination for context cycling (cross-platform) |
-| `correction-capture-hook.sh` | PostToolUse hook — detects correction patterns, logs to `.corrections.jsonl` |
 | `sprint-stop-guard.sh` | Stop hook — blocks premature turn endings during sprint execution |
 | `session-start-hook.sh` | SessionStart hook — detects continuation signals and active sprints |
 | `stop-failure-hook.sh` | StopFailure hook — logs API errors and preserves sprint state |
@@ -149,27 +150,27 @@ One-time setup: run `install-profile-hook.ps1` (Windows) or `install-profile-hoo
 
 | Step | Mechanism | What happens |
 |------|-----------|-------------|
-| **Plan** | `/aam-brief` | Interview-driven product brief with MVP features and phases |
-| **Revise** | `/aam-revise` | Update plan when requirements change — decision logging and sprint impact |
+| **Plan** | `/aiagentminder:brief` | Interview-driven product brief with MVP features and phases |
+| **Revise** | `/aiagentminder:revise` | Update plan when requirements change — decision logging and sprint impact |
 | **Decompose** | Sprint planning | Break features into 4–7 issues with acceptance criteria and risk tags |
 | **Spec** | Spec phase | Implementation spec per item — approach, TDD plan, post-merge validation |
 | **Execute** | Autonomous | TDD, full test suite, quality gate, self-review for every item — no permission prompts |
 | **Gate** | Quality pipeline | Quality checklist, specialist review, PR creation and autonomous merge |
 | **Validate** | Post-merge | Deployment-dependent tests. Failures create rework tasks within the sprint |
-| **Checkpoint** | `/aam-handoff` | Session-end — decisions, priorities to auto-memory, commit |
-| **Reflect** | `/aam-retrospective` | Sprint metrics, adaptive sizing, phase health assessment |
+| **Checkpoint** | `/aiagentminder:handoff` | Session-end — decisions, priorities to auto-memory, commit |
+| **Reflect** | `/aiagentminder:retrospective` | Sprint metrics, adaptive sizing, phase health assessment |
 
 ---
 
 ## Requirements
 
-- **Claude Code** — VS Code extension, CLI, or desktop app
-- **Node.js** — for the `npx aiagentminder init` installer (not needed at runtime)
+- **Claude Code 2.1.139+** — VS Code extension, CLI, or desktop app. Needed for plugin marketplace, agent worktree isolation, and `${CLAUDE_PLUGIN_ROOT}` hook variable substitution.
+- **Bash** — Windows users need Git Bash or WSL. macOS/Linux: built-in.
 - **jq** — for context monitoring (`winget install jqlang.jq` / `brew install jq` / `apt install jq`). Falls back to heuristics without it.
-- **Git** — project state tracked in git
-- **GitHub CLI (`gh`)** — optional, for PR pipeline and issue sync
+- **Git** — project state tracked in git.
+- **GitHub CLI (`gh`)** — optional, for PR pipeline and issue sync.
 
-Works on **Windows, macOS, and Linux**.
+Works on **Windows, macOS, and Linux**. Node.js is no longer required (v4.x npm CLI retired).
 
 ---
 
@@ -183,26 +184,27 @@ Works on **Windows, macOS, and Linux**.
 
 ## Non-Goals
 
-- **Not a ticket tracker.** Keeps a living plan in `docs/strategy-roadmap.md` and decomposes it into sprints on demand. Use `/aam-revise` to update. Layer GitHub Issues or Linear on top if you need persistent epics.
-- **Not a multi-agent orchestrator.** Session profiles select the right context per mode. Does not coordinate parallel agent instances (v5.0 plans orchestrator pattern).
+- **Not a ticket tracker.** Keeps a living plan in `docs/strategy-roadmap.md` and decomposes it into sprints on demand. Use `/aiagentminder:revise` to update. Layer GitHub Issues or Linear on top if you need persistent epics.
+- **Not a multi-agent orchestrator.** Sprint-master coordinates specialist sub-agents sequentially, with each item executing in its own isolated git worktree. Does not coordinate concurrent agents on overlapping work.
 - **Not a memory system replacement.** Complements Claude Code's native Session Memory, auto-memory, and `--continue`. Adds real-time context monitoring and autonomous cycling.
 
 ---
 
 ## Troubleshooting
 
-Run `npx aiagentminder sync . --dry-run` to verify your installation is current.
+Run `/plugin` and check the **Installed** tab — `aiagentminder` should appear without errors. Run `/reload-plugins` after upgrades.
 
 | Symptom | Fix |
 |---------|-----|
-| Commands not showing (VS Code) | Close and reopen the Claude Code panel |
-| Hooks not firing | Run `npx aiagentminder sync . --dry-run` to check settings.json |
+| Skills not showing (VS Code) | Run `/reload-plugins`, then close and reopen the Claude Code panel |
+| Hooks not firing | Run `/plugin` → check Errors tab. Verify the plugin is enabled, not just installed |
+| `/aiagentminder:setup` not found | Plugin not installed or not enabled. Run `/plugin install aiagentminder@lwalden-aiagentminder` |
 | Claude re-debates a past decision | Add it to DECISIONS.md; add `@DECISIONS.md` to CLAUDE.md to auto-load |
-| Claude builds something out of scope | Run `/aam-scope-check`; `scope-guardian.md` also catches this passively |
-| Claude asks you to do things manually | Verify `tool-first.md` exists in `.claude/rules/` |
-| Quality degrades late in session | Verify `jq` is installed and status line is in `.claude/settings.json` |
-| Context cycle doesn't restart | Verify profile hook is installed or use `sprint-runner.ps1` |
-| Upgrading | Run `npx aiagentminder sync [path] --apply` or `/aam-update` from the AIAgentMinder repo |
+| Claude builds something out of scope | Run `/aiagentminder:scope-check`; `scope-guardian.md` also catches this passively |
+| Claude asks you to do things manually | Verify `tool-first.md` exists in your project's `.claude/rules/` |
+| Quality degrades late in session | Verify `jq` is installed |
+| Context cycle doesn't restart | Sprint-runner wrapper (`sprint-runner.sh "<prompt>"`) gives an explicit restart loop |
+| Upgrading | `/plugin marketplace update lwalden-aiagentminder` → `/reload-plugins` → `/aiagentminder:setup` to refresh `.claude/rules/` |
 
 ---
 
@@ -210,7 +212,7 @@ Run `npx aiagentminder sync . --dry-run` to verify your installation is current.
 
 - [How It Works](docs/how-it-works.md) — context system, session lifecycle, hook details
 - [Customization Guide](docs/customization-guide.md) — optional features, architecture fitness, context cycling
-- [Product Brief Guide](docs/strategy-creation-guide.md) — using `/aam-brief` or writing the roadmap manually
+- [Product Brief Guide](docs/strategy-creation-guide.md) — using `/aiagentminder:brief` or writing the roadmap manually
 - [Roadmap](docs/strategy-roadmap.md) — version history and backlog
 
 ---

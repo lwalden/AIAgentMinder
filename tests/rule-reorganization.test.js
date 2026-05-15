@@ -5,12 +5,11 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RULES_DIR = path.resolve(__dirname, '..', 'project', '.claude', 'rules');
+const RULES_DIR = path.resolve(__dirname, '..', 'templates', '.claude', 'rules');
 
 const KEPT_RULES = [
   'git-workflow.md',
   'tool-first.md',
-  'correction-capture.md',
   'context-cycling.md',
   'README.md',
 ];
@@ -22,6 +21,8 @@ const REMOVED_RULES = [
   'code-quality.md',
   'architecture-fitness.md',
   'scope-guardian.md',
+  // Retired — Claude Code's native Auto Memory now handles correction capture.
+  'correction-capture.md',
 ];
 
 describe('rule reorganization: kept rules exist', () => {
@@ -56,11 +57,10 @@ describe('rule reorganization: context-cycling.md content', () => {
 });
 
 describe('rule reorganization: README.md updated', () => {
-  it('lists the 4 active universal rules', () => {
+  it('lists the active universal rules', () => {
     const content = fs.readFileSync(path.join(RULES_DIR, 'README.md'), 'utf-8');
     assert.ok(content.includes('git-workflow.md'), 'must list git-workflow');
     assert.ok(content.includes('tool-first.md'), 'must list tool-first');
-    assert.ok(content.includes('correction-capture.md'), 'must list correction-capture');
     assert.ok(content.includes('context-cycling.md'), 'must list context-cycling');
   });
 
@@ -75,9 +75,3 @@ describe('rule reorganization: README.md updated', () => {
   });
 });
 
-describe('rule reorganization: correction-capture.md preserved', () => {
-  it('still references PostToolUse hook', () => {
-    const content = fs.readFileSync(path.join(RULES_DIR, 'correction-capture.md'), 'utf-8');
-    assert.ok(content.includes('PostToolUse'), 'must reference PostToolUse hook');
-  });
-});

@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import {
   validatePluginJson,
   validateVersionConsistency,
+  validatePluginLayout,
   validateAll,
 } from '../lib/validate.js';
 
@@ -83,8 +84,8 @@ describe('validateVersionConsistency', () => {
       version: '3.3.0',
       description: 'test',
     }));
-    fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.mkdirSync(path.join(dir, 'templates', '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.3.0' }));
 
     const result = validateVersionConsistency(dir);
@@ -102,8 +103,8 @@ describe('validateVersionConsistency', () => {
       version: '2.0.0',
       description: 'test',
     }));
-    fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.mkdirSync(path.join(dir, 'templates', '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.3.0' }));
 
     const result = validateVersionConsistency(dir);
@@ -121,8 +122,8 @@ describe('validateVersionConsistency', () => {
       version: '3.3.0',
       description: 'test',
     }));
-    fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.mkdirSync(path.join(dir, 'templates', '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0' }));
 
     const result = validateVersionConsistency(dir);
@@ -133,22 +134,96 @@ describe('validateVersionConsistency', () => {
   });
 });
 
+describe('validatePluginLayout', () => {
+  it('passes on the actual AIAgentMinder repo', () => {
+    const result = validatePluginLayout(REPO_ROOT);
+    assert.equal(result.valid, true, `layout errors: ${result.errors.join('\n')}`);
+    assert.ok(result.summary.agents >= 15, `expected at least 15 agents, got ${result.summary.agents}`);
+    assert.ok(result.summary.skills >= 14, `expected at least 14 skills, got ${result.summary.skills}`);
+    assert.ok(result.summary.binScripts >= 15, `expected at least 15 bin scripts, got ${result.summary.binScripts}`);
+    assert.ok(result.summary.hooksScripts >= 5, `expected at least 5 hook scripts referenced, got ${result.summary.hooksScripts}`);
+  });
+
+  it('flags a missing agents directory', () => {
+    const dir = makeTempDir();
+    try {
+      // Build a minimal-but-broken plugin layout
+      fs.mkdirSync(path.join(dir, 'skills'), { recursive: true });
+      fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });
+      fs.mkdirSync(path.join(dir, 'hooks'), { recursive: true });
+      fs.mkdirSync(path.join(dir, 'templates'), { recursive: true });
+      fs.writeFileSync(path.join(dir, 'hooks', 'hooks.json'), '{}');
+      const result = validatePluginLayout(dir);
+      assert.equal(result.valid, false);
+      assert.ok(result.errors.some(e => e.includes('agents/')),
+        `expected an agents/ error, got: ${result.errors.join(', ')}`);
+    } finally {
+      cleanTempDir(dir);
+    }
+  });
+
+  it('flags a non-executable shell script in bin/', () => {
+    const dir = makeTempDir();
+    try {
+      fs.mkdirSync(path.join(dir, 'agents'), { recursive: true });
+      fs.writeFileSync(path.join(dir, 'agents', 'foo.md'), '---\nname: foo\n---\n');
+      fs.mkdirSync(path.join(dir, 'skills', 'foo'), { recursive: true });
+      fs.writeFileSync(path.join(dir, 'skills', 'foo', 'SKILL.md'), '---\ndescription: x\n---\n');
+      fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });
+      const scriptPath = path.join(dir, 'bin', 'notexec.sh');
+      fs.writeFileSync(scriptPath, '#!/bin/bash\necho hi\n', { mode: 0o644 });
+      fs.mkdirSync(path.join(dir, 'hooks'), { recursive: true });
+      fs.writeFileSync(path.join(dir, 'hooks', 'hooks.json'), '{}');
+      fs.mkdirSync(path.join(dir, 'templates'), { recursive: true });
+      const result = validatePluginLayout(dir);
+      assert.ok(result.errors.some(e => e.includes('notexec.sh') && e.includes('not executable')),
+        `expected non-executable error, got: ${result.errors.join(', ')}`);
+    } finally {
+      cleanTempDir(dir);
+    }
+  });
+
+  it('flags hooks.json referencing a missing script', () => {
+    const dir = makeTempDir();
+    try {
+      fs.mkdirSync(path.join(dir, 'agents'), { recursive: true });
+      fs.writeFileSync(path.join(dir, 'agents', 'foo.md'), 'x');
+      fs.mkdirSync(path.join(dir, 'skills'), { recursive: true });
+      fs.mkdirSync(path.join(dir, 'bin'), { recursive: true });
+      fs.mkdirSync(path.join(dir, 'hooks'), { recursive: true });
+      fs.writeFileSync(path.join(dir, 'hooks', 'hooks.json'), JSON.stringify({
+        hooks: { PreToolUse: [{ hooks: [{ type: 'command', command: 'bash "${CLAUDE_PLUGIN_ROOT}/bin/ghost.sh"' }] }] }
+      }));
+      fs.mkdirSync(path.join(dir, 'templates'), { recursive: true });
+      const result = validatePluginLayout(dir);
+      assert.ok(result.errors.some(e => e.includes('ghost.sh')),
+        `expected missing-script error, got: ${result.errors.join(', ')}`);
+    } finally {
+      cleanTempDir(dir);
+    }
+  });
+});
+
 describe('validateAll', () => {
   it('validates the actual AIAgentMinder repo', () => {
     const result = validateAll(REPO_ROOT);
-    // This test validates the real repo — all checks should pass
     assert.equal(result.pluginJson.valid, true, `plugin.json errors: ${result.pluginJson.errors.join(', ')}`);
     assert.equal(result.versions.valid, true, `version errors: ${result.versions.errors.join(', ')}`);
+    assert.equal(result.layout.valid, true, `layout errors: ${result.layout.errors.join('\n')}`);
   });
 
-  it('does not include skills validation', () => {
+  it('includes layout in the result', () => {
     const result = validateAll(REPO_ROOT);
-    assert.equal(result.skills, undefined, 'validateAll should not include skills key');
+    assert.ok(result.layout, 'validateAll must include layout');
+    assert.ok(typeof result.layout.summary === 'object');
   });
 
-  it('plugin.json should not reference skills directory', () => {
+  it('plugin.json does not reference component directories (auto-discovered)', () => {
     const pluginPath = path.join(REPO_ROOT, '.claude-plugin', 'plugin.json');
     const plugin = JSON.parse(fs.readFileSync(pluginPath, 'utf-8'));
-    assert.equal(plugin.skills, undefined, 'plugin.json should not have a skills field');
+    assert.equal(plugin.skills, undefined, 'plugin.json should not have a skills field — Claude Code auto-discovers');
+    assert.equal(plugin.agents, undefined, 'plugin.json should not have an agents field — Claude Code auto-discovers');
+    assert.equal(plugin.commands, undefined, 'plugin.json should not have a commands field — Claude Code auto-discovers');
+    assert.equal(plugin.hooks, undefined, 'plugin.json should not have a hooks field — hooks/hooks.json holds the config');
   });
 });

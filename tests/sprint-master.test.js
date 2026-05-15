@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const AGENTS_DIR = path.resolve(__dirname, '..', 'project', '.claude', 'agents');
+const AGENTS_DIR = path.resolve(__dirname, '..', 'agents');
 const AGENT_PATH = path.join(AGENTS_DIR, 'sprint-master.md');
 
 function readAgent() {
@@ -147,5 +147,23 @@ describe('sprint-master orchestrator agent', () => {
       content.includes('Cross-Session') || content.includes('Resumption'),
       'must include cross-session resumption instructions'
     );
+  });
+
+  it('spawns item-executor with worktree isolation', () => {
+    const content = readAgent();
+    assert.ok(content.includes('isolation: "worktree"') || content.includes("isolation: 'worktree'"),
+      'sprint-master must spawn item-executor with isolation: "worktree" so each item runs in its own git worktree');
+  });
+
+  it('passes branch name from item-executor to pr-pipeliner', () => {
+    const content = readAgent();
+    assert.ok(content.includes('branch name') || content.includes('branch=') || content.includes('branch_name'),
+      'sprint-master must capture branch name from item-executor and pass to pr-pipeliner');
+  });
+
+  it('documents /goal compatibility', () => {
+    const content = readAgent();
+    assert.ok(content.includes('/goal') || content.includes('`/goal`'),
+      'sprint-master must mention Claude Code native /goal so users running under /goal know human checkpoints still gate the loop');
   });
 });

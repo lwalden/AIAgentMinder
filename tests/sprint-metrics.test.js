@@ -7,7 +7,7 @@ import { execSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCRIPT = path.resolve(__dirname, '..', 'project', '.claude', 'scripts', 'sprint-metrics.sh');
+const SCRIPT = path.resolve(__dirname, '..', 'bin', 'sprint-metrics.sh');
 
 function run(args, cwd) {
   return execSync(`bash "${SCRIPT}" ${args}`, {
@@ -155,7 +155,7 @@ describe('sprint-metrics.sh', () => {
 });
 
 describe('aam-retrospective reads metrics', () => {
-  const RETRO_PATH = path.resolve(__dirname, '..', 'project', '.claude', 'skills', 'aam-retrospective.md');
+  const RETRO_PATH = path.resolve(__dirname, '..', 'skills', 'retrospective', 'SKILL.md');
 
   it('references .sprint-metrics.json when present', () => {
     const content = fs.readFileSync(RETRO_PATH, 'utf-8');

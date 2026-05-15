@@ -6,6 +6,61 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [5.0.0] - 2026-05-15
+
+### BREAKING CHANGES
+
+- **Distribution model changed from npm to Claude Code plugin.** `npx aiagentminder init` is retired. Install via `/plugin marketplace add lwalden/AIAgentMinder` followed by `/plugin install aiagentminder@lwalden-aiagentminder`. Then run `/aiagentminder:setup` in the target project.
+- **Repository layout restructured** to match the Claude Code plugin convention:
+  - `project/.claude/agents/*` → `agents/*` (at repo root)
+  - `project/.claude/skills/aam-X.md` → `skills/X/SKILL.md` (folder-per-skill format; the `aam-` prefix is dropped since plugin namespacing handles isolation)
+  - `project/.claude/scripts/*` → `bin/*`
+  - `project/.claude/settings.json.tpl` → `hooks/hooks.json` (uses `${CLAUDE_PLUGIN_ROOT}` for script paths)
+  - Project-bootstrap files (`CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, `SPRINT.md`, `.gitignore`, `docs/strategy-roadmap.md`) moved to `templates/` and copied into the target project by `/aiagentminder:setup`.
+- **Skill names are now namespaced** by the plugin. `/aam-tdd` becomes `/aiagentminder:tdd`, `/aam-brief` becomes `/aiagentminder:brief`, etc.
+
+### Removed
+
+- **npm CLI retired.** `bin/aam.js` deleted. The supporting modules in `lib/` (`init.js`, `sync.js`, `migrations.js`, `settings-merge.js`, `agents-md.js`, `cli.js`, `prompt.js`, `detect.js`) are gone. Plugin install / update via Claude Code's native flow replaces them.
+- **Meta-commands at `.claude/commands/`** (`aam-setup.md`, `aam-update.md`) — replaced by the `/aiagentminder:setup` skill that ships with the plugin.
+- **`v5-migration.test.js`** and the npm-CLI test suite (`cli.test.js`, `init.test.js`, `detect.test.js`, `agents-md.test.js`, `integration.test.js`, `migrations.test.js`, `settings-merge.test.js`, `sync*.test.js`, `manifest.test.js`).
+
+### Added
+
+- **`/aiagentminder:setup` skill** at `skills/setup/SKILL.md` — interactive bootstrap that replaces `npx aiagentminder init`. Detects existing installs, fingerprints codebase, prompts for project identity, runs `bin/aam-bootstrap.sh` for mechanical file copies, customizes `CLAUDE.md`, augments `.gitignore` with stack-specific entries.
+- **`bin/aam-bootstrap.sh`** — non-overwriting template copier called by the setup skill.
+- **Worktree-isolated sprint items** (v4.7 work, included here) — sprint-master spawns item-executor with `isolation: "worktree"`; item-executor pushes its branch before returning so pr-pipeliner can pick it up from the main worktree.
+- **`/goal` compatibility documentation** — sprint-master honors `.sprint-human-checkpoint`; `/goal`'s evaluator stops auto-resuming on waiting-for-human language.
+
+### Migration from v4.x npm installs
+
+If you previously installed via `npx aiagentminder init`:
+
+1. Uninstall the npm package: `npm uninstall -g aiagentminder` (or whatever scope you used).
+2. In Claude Code: `/plugin marketplace add lwalden/AIAgentMinder` then `/plugin install aiagentminder@lwalden-aiagentminder`.
+3. Re-run `/aiagentminder:setup` in your target project. It detects the existing install and updates the version stamp + `.claude/rules/`; user-owned files (CLAUDE.md, DECISIONS.md, BACKLOG.md, SPRINT.md, docs/strategy-roadmap.md) are preserved.
+4. If you had local references to `/aam-X` commands, update them to `/aiagentminder:X`.
+
+---
+
+## [4.6.0] - 2026-05-15
+
+### Removed
+
+- **AAM correction-capture retired** — Claude Code's native Auto Memory (v2.1.59+) supersedes the AAM implementation. Deleted files: `project/.claude/rules/correction-capture.md`, `project/.claude/scripts/correction-capture-hook.sh`, `tests/correction-capture-hook.test.js`. PostToolUse hook registration removed from `settings.json.tpl`. Six session-profile agents (sprint-master, dev, debug, hotfix, qa, item-executor) updated to drop `correction-capture` from their universal-rules header.
+- **`settings-merge.js`** — added `correction-capture-hook` to the obsolete-pattern list and extended the merge to scrub obsolete entries from hook types the template no longer ships (so existing installs lose the orphan `PostToolUse` entry on next `sync`). When a hook type becomes empty after scrubbing, it is removed entirely.
+
+### Added
+
+- **`/ultrareview` reference in `aam-pr-pipeline.md`** — documents the native cloud multi-agent review as a user-triggered second-opinion step for high-risk PRs (separately billed; not auto-invoked by the pipeline).
+- **"Native Claude Code Features Worth Knowing" section in `customization-guide.md`** — covers `/less-permission-prompts` (run after `/aam-setup` to tune permissions), `skillOverrides` (opt-in skill visibility control), Auto Memory (now responsible for correction capture), and how both `claude --resume` and "resume working" patterns interact with AAM's sprint continuation.
+
+### Changed
+
+- **v4.6.0 migration entry** — `lib/migrations.js` adds a dedicated migration that deletes the two retired files from existing installs on next `sync`. The v5.0.0 entry (orchestrator release, pending) is unchanged.
+
+---
+
 ## [4.5.0] - 2026-04-18
 
 ### Added

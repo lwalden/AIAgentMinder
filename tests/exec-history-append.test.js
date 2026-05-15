@@ -7,7 +7,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCRIPT = path.resolve(__dirname, '..', 'project', '.claude', 'scripts', 'exec-history-append.sh');
+const SCRIPT = path.resolve(__dirname, '..', 'bin', 'exec-history-append.sh');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'aam-exec-'));

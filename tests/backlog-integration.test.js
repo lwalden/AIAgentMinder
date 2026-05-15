@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PROJECT_DIR = path.resolve(__dirname, '..', 'project');
+const PROJECT_DIR = path.resolve(__dirname, '..');
 
 describe('backlog integration: sprint-planner agent', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'agents', 'sprint-planner.md');
+  const filePath = path.join(PROJECT_DIR, "agents", 'sprint-planner.md');
 
   it('PLAN phase references backlog-capture.sh list', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -22,7 +22,7 @@ describe('backlog integration: sprint-planner agent', () => {
 });
 
 describe('backlog integration: dev agent', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'agents', 'dev.md');
+  const filePath = path.join(PROJECT_DIR, "agents", 'dev.md');
 
   it('scope guardian offers backlog capture option', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -31,7 +31,7 @@ describe('backlog integration: dev agent', () => {
 });
 
 describe('backlog integration: /aam-revise skill', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'skills', 'aam-revise.md');
+  const filePath = path.join(PROJECT_DIR, "skills", "revise", "SKILL.md");
 
   it('includes backlog deferral option', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -41,7 +41,7 @@ describe('backlog integration: /aam-revise skill', () => {
 });
 
 describe('backlog integration: roadmap template', () => {
-  const filePath = path.join(PROJECT_DIR, 'docs', 'strategy-roadmap.md');
+  const filePath = path.join(PROJECT_DIR, "templates", "docs", "strategy-roadmap.md");
 
   it('does NOT contain "Backlog (unscheduled)" section', () => {
     const content = fs.readFileSync(filePath, 'utf-8');

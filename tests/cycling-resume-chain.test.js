@@ -21,8 +21,8 @@ import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PROJECT_ROOT = path.resolve(__dirname, '..');
-const SCRIPTS_DIR = path.join(PROJECT_ROOT, 'project', '.claude', 'scripts');
-const SETTINGS_TPL = path.join(PROJECT_ROOT, 'project', '.claude', 'settings.json.tpl');
+const SCRIPTS_DIR = path.join(PROJECT_ROOT, 'bin');
+const SETTINGS_TPL = path.join(PROJECT_ROOT, 'hooks', 'hooks.json');
 
 const SESSION_END = path.join(SCRIPTS_DIR, 'session-end-cycle.sh');
 const SESSION_START_CONT = path.join(SCRIPTS_DIR, 'session-start-continuation.sh');

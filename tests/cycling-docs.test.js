@@ -17,7 +17,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
 const RULE = fs.readFileSync(
-  path.join(ROOT, 'project', '.claude', 'rules', 'context-cycling.md'),
+  path.join(ROOT, 'templates', '.claude', 'rules', 'context-cycling.md'),
   'utf-8'
 );
 const DECISIONS = fs.readFileSync(path.join(ROOT, 'DECISIONS.md'), 'utf-8');

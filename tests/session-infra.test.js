@@ -5,11 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PROJECT_DIR = path.resolve(__dirname, '..', 'project');
-const COMMANDS_DIR = path.resolve(__dirname, '..', '.claude', 'commands');
+const REPO_ROOT = path.resolve(__dirname, '..');
 
 describe('sprint-runner.ps1: --agent parameter', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'scripts', 'sprint-runner.ps1');
+  const filePath = path.join(REPO_ROOT, 'bin', 'sprint-runner.ps1');
 
   it('has Agent parameter in param block', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -28,7 +27,7 @@ describe('sprint-runner.ps1: --agent parameter', () => {
 });
 
 describe('sprint-runner.sh: --agent parameter', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'scripts', 'sprint-runner.sh');
+  const filePath = path.join(REPO_ROOT, 'bin', 'sprint-runner.sh');
 
   it('documents --agent in usage comments', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -42,7 +41,7 @@ describe('sprint-runner.sh: --agent parameter', () => {
 });
 
 describe('session-start-hook.sh: agent mismatch warning', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'scripts', 'session-start-hook.sh');
+  const filePath = path.join(REPO_ROOT, 'bin', 'session-start-hook.sh');
 
   it('still detects sprint continuation signals', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -55,27 +54,28 @@ describe('session-start-hook.sh: agent mismatch warning', () => {
   });
 });
 
-describe('/aam-setup: installs session profile agents', () => {
-  const filePath = path.join(COMMANDS_DIR, 'aam-setup.md');
+describe('/aiagentminder:setup skill (v5.0)', () => {
+  const filePath = path.join(REPO_ROOT, 'skills', 'setup', 'SKILL.md');
 
-  it('references .claude/agents/ directory', () => {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('.claude/agents/'), 'must reference agents directory');
-  });
-});
-
-describe('/aam-update: delegates to CLI sync', () => {
-  const filePath = path.join(COMMANDS_DIR, 'aam-update.md');
-
-  it('references the sync CLI command', () => {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('bin/aam.js sync') || content.includes('aiagentminder sync'),
-      'must reference the sync CLI command');
+  it('exists in skills/setup/SKILL.md', () => {
+    assert.ok(fs.existsSync(filePath), 'setup skill must exist at skills/setup/SKILL.md');
   });
 
-  it('handles CLAUDE.md as a hybrid manual merge', () => {
+  it('writes the version stamp to .claude/aiagentminder-version', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('CLAUDE.md') && content.includes('Surgical Merge'),
-      'must handle CLAUDE.md surgical merge');
+    assert.ok(content.includes('aiagentminder-version'),
+      'must reference the version stamp file');
+  });
+
+  it('invokes the bootstrap helper script', () => {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    assert.ok(content.includes('aam-bootstrap.sh'),
+      'must reference the bin/aam-bootstrap.sh helper for mechanical file copies');
+  });
+
+  it('handles existing-install detection', () => {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    assert.ok(content.toLowerCase().includes('existing install') || content.toLowerCase().includes('already installed'),
+      'must detect existing installations and not blindly overwrite');
   });
 });

@@ -85,5 +85,4 @@ Default on (installed by setup, optional during update):
 |------|---------|
 | `code-quality.md` | TDD, review-before-commit, build-before-commit |
 | `sprint-workflow.md` | State machine sprint execution with mandatory quality |
-| `correction-capture.md` | Self-monitors for repeated wrong-first-approach patterns |
 | `architecture-fitness.md` | Project-customizable structural constraints |
