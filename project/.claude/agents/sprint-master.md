@@ -123,6 +123,10 @@ stop asking permission, NOT skip quality steps.
 **Ask human ONLY when:** PLAN approval, SPEC approval, BLOCKED, REWORK, or
 debug checkpoint (3 failed attempts at the same error in a sub-agent).
 
+**Native `/goal` compatibility:** behavior unchanged when running under `/goal`.
+Human checkpoints still write `.sprint-human-checkpoint` and end the turn; the
+`/goal` evaluator reads waiting-for-human language and stops auto-resuming.
+
 ## COMPLETE
 
 **Precondition:** Every SPRINT.md Post-Merge row must be `pass` or `n/a`.

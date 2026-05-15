@@ -224,6 +224,46 @@ type `/aam-grill`, but Claude won't suggest it), `name-only` (description
 collapsed). Useful if a specific AAM skill consistently activates when you
 don't want it.
 
+### `/goal` for autonomous sprint runs
+
+Claude Code's native `/goal` command (2.1.139+) sets a completion condition
+and auto-resumes turns until a small-model evaluator declares the condition
+met. Useful when you want to kick off a sprint and come back later instead
+of approving each turn.
+
+**Recommended pattern** for solo execution:
+
+```
+/goal "complete sprint S5: every item merged via pr-pipeliner, sprint marked
+COMPLETE in SPRINT.md, no items blocked or in rework"
+
+claude --agent sprint-master
+```
+
+Or, more common in practice — run interactively up through the SPEC approval
+checkpoint, then issue `/goal` once specs are approved so the execute-through-
+merge loop runs unattended.
+
+**How it interacts with AAM's enforcement layer:**
+
+- Sprint-master's Stop hook and human checkpoints are unchanged — when
+  sprint-master writes `.sprint-human-checkpoint` (PLAN, SPEC, COMPLETE) and
+  ends the turn, `/goal`'s evaluator reads "waiting for human" and stops
+  resuming. Your approval is still required at the gates AAM was designed
+  around.
+- BLOCKED and REWORK still escalate to you the same way. `/goal` cannot
+  bypass these because sprint-master explicitly ends the turn after writing
+  the blocker report; the evaluator sees the escalation language and stops.
+- After your approval, just keep typing — `/goal` is still active for the
+  session and will resume driving the loop forward.
+
+**Difference from AAM's dispatch mode:** dispatch mode (`.exec/directive.md`)
+is for executive-layer orchestration (HLPM-style: status files, history
+audit, cancellation polling). `/goal` is a lightweight alternative for solo
+developers — no directive file, no status file, just a completion condition.
+Pick dispatch mode when you need the audit trail; pick `/goal` for everyday
+"finish this sprint while I'm at lunch."
+
 ### Auto Memory
 
 Claude Code records build commands, debugging insights, and repeated mistake

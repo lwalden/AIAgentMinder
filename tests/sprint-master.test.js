@@ -160,4 +160,10 @@ describe('sprint-master orchestrator agent', () => {
     assert.ok(content.includes('branch name') || content.includes('branch=') || content.includes('branch_name'),
       'sprint-master must capture branch name from item-executor and pass to pr-pipeliner');
   });
+
+  it('documents /goal compatibility', () => {
+    const content = readAgent();
+    assert.ok(content.includes('/goal') || content.includes('`/goal`'),
+      'sprint-master must mention Claude Code native /goal so users running under /goal know human checkpoints still gate the loop');
+  });
 });
