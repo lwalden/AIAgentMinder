@@ -3,10 +3,9 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { getCoreFiles } from '../lib/init.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const AGENTS_DIR = path.resolve(__dirname, '..', 'project', '.claude', 'agents');
+const AGENTS_DIR = path.resolve(__dirname, '..', 'agents');
 
 const REVIEWER_AGENTS = [
   { file: 'security-reviewer.md', keywords: ['injection', 'auth', 'secrets'] },
@@ -18,7 +17,7 @@ const REVIEWER_AGENTS = [
 
 describe('review lens agents: file existence', () => {
   for (const { file } of REVIEWER_AGENTS) {
-    it(`${file} exists in project/.claude/agents/`, () => {
+    it(`${file} exists in agents/`, () => {
       assert.ok(fs.existsSync(path.join(AGENTS_DIR, file)), `${file} not found`);
     });
   }
@@ -57,11 +56,11 @@ describe('review lens agents: no diff placeholder', () => {
   }
 });
 
-describe('review lens agents: in getCoreFiles()', () => {
-  it('all 5 reviewer agents are in the core file list', () => {
-    const files = getCoreFiles();
+describe('review lens agents: in plugin agents/ dir', () => {
+  it('all 5 reviewer agents are at agents/<name>.md', () => {
     for (const { file } of REVIEWER_AGENTS) {
-      assert.ok(files.includes(`.claude/agents/${file}`), `${file} must be in getCoreFiles()`);
+      assert.ok(fs.existsSync(path.join(AGENTS_DIR, file)),
+        `${file} must exist at agents/${file}`);
     }
   });
 });

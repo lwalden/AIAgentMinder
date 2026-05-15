@@ -3,17 +3,17 @@
 # Updates all 4 version files atomically so the LLM doesn't burn tokens on file I/O.
 #
 # Usage:
-#   bash .claude/scripts/version-bump.sh <semver>
+#   bash bin/version-bump.sh <semver>
 #
 # Examples:
-#   bash .claude/scripts/version-bump.sh 3.4.0
-#   bash .claude/scripts/version-bump.sh 4.0.0
+#   bash bin/version-bump.sh 5.0.0
+#   bash bin/version-bump.sh 5.1.0
 #
 # Updates:
-#   project/.claude/aiagentminder-version  (source of truth)
-#   package.json                           (npm)
-#   .claude-plugin/plugin.json             (plugin manifest)
-#   .claude-plugin/marketplace.json        (marketplace listing)
+#   templates/.claude/aiagentminder-version  (source of truth — what gets copied to target projects)
+#   package.json                             (npm metadata)
+#   .claude-plugin/plugin.json               (plugin manifest)
+#   .claude-plugin/marketplace.json          (marketplace listing)
 
 die() { echo "Error: $1" >&2; exit 1; }
 
@@ -29,7 +29,7 @@ if ! echo "$VERSION" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+(-[a-zA-Z0-9.]+)?$'; the
 fi
 
 # Check required files exist
-VERSION_FILE="project/.claude/aiagentminder-version"
+VERSION_FILE="templates/.claude/aiagentminder-version"
 PKG_FILE="package.json"
 PLUGIN_FILE=".claude-plugin/plugin.json"
 MARKETPLACE_FILE=".claude-plugin/marketplace.json"

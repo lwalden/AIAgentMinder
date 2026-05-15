@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const RULES_DIR = path.resolve(__dirname, '..', 'project', '.claude', 'rules');
+const RULES_DIR = path.resolve(__dirname, '..', 'templates', '.claude', 'rules');
 
 const KEPT_RULES = [
   'git-workflow.md',

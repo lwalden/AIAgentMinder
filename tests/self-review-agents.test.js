@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SKILL_PATH = path.resolve(__dirname, '..', 'project', '.claude', 'skills', 'aam-self-review.md');
+const SKILL_PATH = path.resolve(__dirname, '..', 'skills', 'self-review', 'SKILL.md');
 
 describe('self-review skill: agent-based architecture', () => {
   it('references reviewer agent names', () => {

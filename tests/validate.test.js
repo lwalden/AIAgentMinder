@@ -83,8 +83,8 @@ describe('validateVersionConsistency', () => {
       version: '3.3.0',
       description: 'test',
     }));
-    fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.mkdirSync(path.join(dir, 'templates', '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.3.0' }));
 
     const result = validateVersionConsistency(dir);
@@ -102,8 +102,8 @@ describe('validateVersionConsistency', () => {
       version: '2.0.0',
       description: 'test',
     }));
-    fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.mkdirSync(path.join(dir, 'templates', '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '3.3.0' }));
 
     const result = validateVersionConsistency(dir);
@@ -121,8 +121,8 @@ describe('validateVersionConsistency', () => {
       version: '3.3.0',
       description: 'test',
     }));
-    fs.mkdirSync(path.join(dir, 'project', '.claude'), { recursive: true });
-    fs.writeFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), '3.3.0\n');
+    fs.mkdirSync(path.join(dir, 'templates', '.claude'), { recursive: true });
+    fs.writeFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), '3.3.0\n');
     fs.writeFileSync(path.join(dir, 'package.json'), JSON.stringify({ version: '1.0.0' }));
 
     const result = validateVersionConsistency(dir);

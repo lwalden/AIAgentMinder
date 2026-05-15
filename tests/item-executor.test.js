@@ -5,7 +5,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const AGENT_PATH = path.resolve(__dirname, '..', 'project', '.claude', 'agents', 'item-executor.md');
+const AGENT_PATH = path.resolve(__dirname, '..', 'agents', 'item-executor.md');
 
 function readAgent() {
   return fs.readFileSync(AGENT_PATH, 'utf-8');

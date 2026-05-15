@@ -1,14 +1,11 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-4.4.0-blue)
-[![npm](https://img.shields.io/npm/v/aiagentminder)](https://www.npmjs.com/package/aiagentminder)
+![Version](https://img.shields.io/badge/version-5.0.0-blue)
 
-A governance framework for Claude Code. Slash commands, rules files, hooks, and shell scripts that add sprint execution, quality enforcement, and context management to Claude Code projects.
+A Claude Code **plugin** that adds project governance for AI-assisted development: sprint execution with worktree-isolated items, quality gates, TDD workflow, scope control, architecture fitness, and structured planning. Built for solo developers and small teams.
 
-> **What this is:** An installable template — no runtime dependency, no MCP server, no database. Built for a solo developer who wants Claude Code to execute autonomously while maintaining engineering discipline.
->
-> **Command prefix:** All commands use the `aam-` prefix (e.g., `/aam-brief`, `/aam-handoff`) to avoid collision with Claude Code built-ins and other plugins.
+> **As of v5.0, AIAgentMinder is distributed as a Claude Code plugin.** The npm CLI (`npx aiagentminder init`) is retired; use the native `/plugin` flow instead.
 
 ---
 
@@ -16,25 +13,29 @@ A governance framework for Claude Code. Slash commands, rules files, hooks, and 
 
 ### Install
 
-```bash
-# Recommended: npx installer (interactive — asks about your project, copies files)
-npx aiagentminder init
+In Claude Code:
 
-# Or with all optional features enabled (no prompts)
-npx aiagentminder init --all
-
-# Or core governance only (no sprint planning, no architecture fitness)
-npx aiagentminder init --core
+```
+/plugin marketplace add lwalden/AIAgentMinder
+/plugin install aiagentminder@lwalden-aiagentminder
 ```
 
-Alternative: clone the repo and run `/aam-setup` from Claude Code.
+Then in your target project:
+
+```
+/aiagentminder:setup
+```
+
+`/aiagentminder:setup` runs interactively — it fingerprints your codebase, asks for project identity, writes a starter `CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, and `docs/strategy-roadmap.md`, and seeds `.claude/rules/` and `.gitignore`.
 
 ### After install
 
-1. Run `/aam-brief` to create your product brief and strategy roadmap.
-2. Start building: "Read CLAUDE.md and docs/strategy-roadmap.md, then start Phase 1."
+1. Run `/aiagentminder:brief` to draft a product brief and strategy roadmap.
+2. Start building. With sprint planning: "Start a sprint for Phase 1."
 
-With sprint planning enabled: "Start a sprint for Phase 1."
+### Minimum Claude Code version
+
+v5.0 relies on Claude Code 2.1.139+ for worktree-isolated agent execution (`isolation: "worktree"`), the `/goal` command, and `${CLAUDE_PLUGIN_ROOT}` hook variable substitution.
 
 ---
 

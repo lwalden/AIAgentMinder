@@ -7,7 +7,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCRIPT = path.resolve(__dirname, '..', 'project', '.claude', 'scripts', 'sprint-update.sh');
+const SCRIPT = path.resolve(__dirname, '..', 'bin', 'sprint-update.sh');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'aam-sprint-'));

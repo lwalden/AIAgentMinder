@@ -5,10 +5,10 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const PROJECT_DIR = path.resolve(__dirname, '..', 'project');
+const PROJECT_DIR = path.resolve(__dirname, '..');
 
 describe('BACKLOG.md template', () => {
-  const filePath = path.join(PROJECT_DIR, 'BACKLOG.md');
+  const filePath = path.join(PROJECT_DIR, "templates", "BACKLOG.md");
 
   it('exists in project/', () => {
     assert.ok(fs.existsSync(filePath), 'BACKLOG.md not found in project/');
@@ -27,7 +27,7 @@ describe('BACKLOG.md template', () => {
 });
 
 describe('/aam-backlog skill', () => {
-  const filePath = path.join(PROJECT_DIR, '.claude', 'skills', 'aam-backlog.md');
+  const filePath = path.join(PROJECT_DIR, "skills", "backlog", "SKILL.md");
 
   it('exists in project/.claude/skills/', () => {
     assert.ok(fs.existsSync(filePath), 'aam-backlog.md not found');

@@ -7,7 +7,7 @@ import os from 'node:os';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const SCRIPT = path.resolve(__dirname, '..', 'project', '.claude', 'scripts', 'version-bump.sh');
+const SCRIPT = path.resolve(__dirname, '..', 'bin', 'version-bump.sh');
 
 function makeTempDir() {
   return fs.mkdtempSync(path.join(os.tmpdir(), 'aam-vbump-'));
@@ -28,7 +28,7 @@ function run(args, cwd) {
 /** Scaffold the 4 version files in a temp directory matching repo layout. */
 function scaffoldVersionFiles(dir, version = '3.3.0') {
   // project/.claude/aiagentminder-version
-  const templateDir = path.join(dir, 'project', '.claude');
+  const templateDir = path.join(dir, 'templates', '.claude');
   fs.mkdirSync(templateDir, { recursive: true });
   fs.writeFileSync(path.join(templateDir, 'aiagentminder-version'), version + '\n');
 
@@ -70,7 +70,7 @@ describe('version-bump.sh: updates all version points', () => {
 
   it('updates aiagentminder-version file', () => {
     run(['3.4.0'], dir);
-    const content = fs.readFileSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'), 'utf-8');
+    const content = fs.readFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), 'utf-8');
     assert.equal(content.trim(), '3.4.0');
   });
 
@@ -136,7 +136,7 @@ describe('version-bump.sh: validation', () => {
   });
 
   it('exits non-zero when aiagentminder-version file is missing', () => {
-    fs.unlinkSync(path.join(dir, 'project', '.claude', 'aiagentminder-version'));
+    fs.unlinkSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'));
     assert.throws(() => {
       run(['3.4.0'], dir);
     }, /not found/i);

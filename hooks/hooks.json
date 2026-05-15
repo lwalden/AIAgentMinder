@@ -1,7 +1,7 @@
 {
   "statusLine": {
     "type": "command",
-    "command": "bash .claude/scripts/context-monitor.sh"
+    "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/context-monitor.sh\""
   },
   "hooks": {
     "PreToolUse": [
@@ -10,7 +10,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/context-cycle-hook.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/context-cycle-hook.sh\""
           }
         ]
       },
@@ -19,7 +19,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/sprint-phase-guard.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/sprint-phase-guard.sh\""
           }
         ]
       }
@@ -30,7 +30,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/sprint-stop-guard.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/sprint-stop-guard.sh\""
           }
         ]
       }
@@ -41,11 +41,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/session-end-cycle.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-end-cycle.sh\""
           },
           {
             "type": "command",
-            "command": "bash .claude/scripts/hlpm-ping.sh session_end"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/hlpm-ping.sh\" session_end"
           }
         ]
       }
@@ -56,11 +56,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/session-start-continuation.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-start-continuation.sh\""
           },
           {
             "type": "command",
-            "command": "bash .claude/scripts/hlpm-ping.sh session_start"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/hlpm-ping.sh\" session_start"
           }
         ]
       },
@@ -69,11 +69,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/session-start-continuation.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-start-continuation.sh\""
           },
           {
             "type": "command",
-            "command": "bash .claude/scripts/hlpm-ping.sh session_start"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/hlpm-ping.sh\" session_start"
           }
         ]
       },
@@ -82,11 +82,11 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/session-start-cycle-reset.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-start-cycle-reset.sh\""
           },
           {
             "type": "command",
-            "command": "bash .claude/scripts/session-start-hook.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-start-hook.sh\""
           }
         ]
       }
@@ -97,7 +97,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash .claude/scripts/stop-failure-hook.sh"
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/stop-failure-hook.sh\""
           }
         ]
       }

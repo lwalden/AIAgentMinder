@@ -13,7 +13,7 @@ function cleanTempDir(dir) {
   fs.rmSync(dir, { recursive: true, force: true });
 }
 
-const SCRIPT_PATH = path.resolve(import.meta.dirname, '..', 'project', '.claude', 'scripts', 'context-monitor.sh');
+const SCRIPT_PATH = path.resolve(import.meta.dirname, '..', 'bin', 'context-monitor.sh');
 
 function runMonitor(inputJson, cwd) {
   const tmpInput = path.join(cwd, '.ctx-test-input.json');

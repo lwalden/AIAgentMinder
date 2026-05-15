@@ -4,10 +4,9 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-import { getCoreFiles } from '../lib/init.js';
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const AGENTS_DIR = path.resolve(__dirname, '..', 'project', '.claude', 'agents');
+const AGENTS_DIR = path.resolve(__dirname, '..', 'agents');
+const BIN_DIR = path.resolve(__dirname, '..', 'bin');
 
 function readAgent(name) {
   return fs.readFileSync(path.join(AGENTS_DIR, `${name}.md`), 'utf-8');
@@ -192,30 +191,27 @@ describe('orchestrator integration: no circular dependencies', () => {
   });
 });
 
-describe('orchestrator integration: sync manifest', () => {
-  it('sprint-master is in getCoreFiles manifest', () => {
-    const coreFiles = getCoreFiles();
+describe('orchestrator integration: plugin layout', () => {
+  it('sprint-master.md is at the plugin root agents/ dir', () => {
     assert.ok(
-      coreFiles.includes('.claude/agents/sprint-master.md'),
-      'sprint-master must be in sync manifest'
+      fs.existsSync(path.join(AGENTS_DIR, 'sprint-master.md')),
+      'sprint-master must live at agents/sprint-master.md per plugin convention'
     );
   });
 
-  it('all phase agents are in getCoreFiles manifest', () => {
-    const coreFiles = getCoreFiles();
+  it('all phase agents are at agents/<name>.md', () => {
     for (const agent of PHASE_AGENTS) {
       assert.ok(
-        coreFiles.includes(`.claude/agents/${agent}.md`),
-        `${agent} must be in sync manifest`
+        fs.existsSync(path.join(AGENTS_DIR, `${agent}.md`)),
+        `${agent} must live at agents/${agent}.md`
       );
     }
   });
 
-  it('sprint-metrics.sh is in getCoreFiles manifest', () => {
-    const coreFiles = getCoreFiles();
+  it('sprint-metrics.sh is at the plugin bin/ dir', () => {
     assert.ok(
-      coreFiles.includes('.claude/scripts/sprint-metrics.sh'),
-      'sprint-metrics.sh must be in sync manifest'
+      fs.existsSync(path.join(BIN_DIR, 'sprint-metrics.sh')),
+      'sprint-metrics.sh must live at bin/sprint-metrics.sh'
     );
   });
 });

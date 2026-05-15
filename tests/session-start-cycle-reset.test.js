@@ -10,9 +10,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const SCRIPT = path.resolve(
   __dirname,
   '..',
-  'project',
-  '.claude',
-  'scripts',
+  'bin',
   'session-start-cycle-reset.sh'
 );
 
