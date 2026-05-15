@@ -56,17 +56,3 @@ What I need: {specific question}
 ```
 
 Wait for the user. Does not apply when user said "keep trying" or "figure it out."
-
-## Correction Capture
-
-When the PostToolUse hook sends a "Correction Pattern Detected" alert in `hookSpecificOutput.additionalContext`, or when the same wrong-first approach recurs a second time in the session:
-
-```
-Correction Pattern Detected — {summary}
-What keeps happening: Tried {A}, failed ({reason}), switched to {B}. Occurrence: {N}.
-Proposed instruction: {draft rule — one paragraph}
-Where to add: `.claude/rules/{name}.md` (project) or `~/.claude/rules/{name}.md` (user-level)
-Create this instruction?
-```
-
-Write the instruction file only after explicit user approval. If declined, drop it.

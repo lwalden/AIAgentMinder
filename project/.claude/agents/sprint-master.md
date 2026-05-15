@@ -53,9 +53,9 @@ PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE �
 | PLAN | sprint-planner | roadmap, DECISIONS.md, sizing hints | Proposed issue table |
 | SPEC | sprint-speccer | Approved issues, source paths | Specs per item |
 | APPROVE | *(human checkpoint)* | Present specs, wait | Approved specs |
-| EXECUTE | item-executor | Item spec, branch convention | "done: {hash}" or "blocked: {reason}" |
+| EXECUTE | item-executor | Item spec, branch convention | "done: branch={name} commit={hash}" or "blocked: {reason}" |
 | TEST | quality-reviewer + review lenses | git diff, config | "pass" or "findings: {list}" |
-| REVIEW | pr-pipeliner | PR number, config | "merged" or "escalated: {reason}" |
+| REVIEW | pr-pipeliner | PR number, **branch name**, config | "merged" or "escalated: {reason}" |
 | MERGE | *(inline)* | — | checkout main, update status |
 | VALIDATE | item-executor | Post-merge spec | "pass" or "fail: {details}" |
 | COMPLETE | sprint-retro → *(human checkpoint)* | SPRINT.md, git log, metrics | Retrospective report → archive |
@@ -81,6 +81,14 @@ Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 6. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
 **Phase update is mandatory.** The sprint-phase-guard hook blocks agent calls that don't match the **Phase:** line in SPRINT.md. You cannot skip phases — the hook enforces the state machine order.
+
+## Spawning item-executor
+
+Always spawn with `isolation: "worktree"`: each item runs in its own git
+worktree off the configured base ref (default `origin/<default-branch>`).
+Capture the branch name from `"done: branch={name} commit={hash}"` — you
+pass it to pr-pipeliner during REVIEW. On `"partial: ..."`, include
+"resume on branch {branch_name}" in the next spawn's prompt.
 
 ## Human Checkpoint Protocol (mechanical enforcement)
 

@@ -158,6 +158,43 @@ These ship in Claude Code itself — no AAM configuration required. They pair
 well with AAM but are entirely opt-in. AAM is designed for solo and small-team
 use; these features are equally appropriate at that scale.
 
+### Minimum Claude Code Version
+
+AAM v4.6+ relies on several Claude Code features that landed in May 2026:
+
+- **Agent worktree isolation** with `worktree.baseRef` (2.1.121+) — sprint items
+  run in isolated git worktrees off `origin/<default-branch>` so they don't
+  collide with each other or with your in-progress work in the main worktree.
+- **Auto Memory** (2.1.59+) — supersedes the retired AAM correction-capture.
+
+Use Claude Code 2.1.139 or newer. Older versions will still work for everything
+except worktree-isolated sprint items (sprint-master falls back to in-place
+execution if the Agent tool rejects `isolation: "worktree"` — your tests still
+gate the merge, but parallelism is reduced).
+
+Known issue: [anthropics/claude-code#47548](https://github.com/anthropics/claude-code/issues/47548)
+— under specific conditions, `isolation: "worktree"` has historically been
+observed to switch the parent worktree's branch rather than create an isolated
+one. If you hit this, file a bug upstream and disable worktree mode by
+removing `isolation: "worktree"` from sprint-master's item-executor spawn block.
+
+### Worktree base ref
+
+Claude Code's `worktree.baseRef` setting (in `~/.claude/settings.json`)
+controls where new worktrees branch from:
+
+```json
+{ "worktree": { "baseRef": "fresh" } }
+```
+
+- `fresh` (default, **recommended for sprints**) — branches off
+  `origin/<default-branch>`. Keeps unpushed commits out of new items, so a
+  half-done feature on `main` in your main worktree doesn't leak into the
+  next sprint item.
+- `head` — branches off local `HEAD`. Use only when you specifically want
+  the worktree to inherit your current state.
+
+
 ### `/less-permission-prompts`
 
 Native command that scans your recent transcripts for routine read-only Bash
@@ -226,7 +263,6 @@ When a new version of AIAgentMinder is released, run `/aam-update` from the AIAg
 **Overwritten if present, prompted if absent (optional features):**
 - `.claude/rules/code-quality.md`
 - `.claude/rules/sprint-workflow.md`
-- `.claude/rules/correction-capture.md`
 - `.claude/rules/architecture-fitness.md`
 
 **Surgically merged:**

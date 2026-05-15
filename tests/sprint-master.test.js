@@ -148,4 +148,16 @@ describe('sprint-master orchestrator agent', () => {
       'must include cross-session resumption instructions'
     );
   });
+
+  it('spawns item-executor with worktree isolation', () => {
+    const content = readAgent();
+    assert.ok(content.includes('isolation: "worktree"') || content.includes("isolation: 'worktree'"),
+      'sprint-master must spawn item-executor with isolation: "worktree" so each item runs in its own git worktree');
+  });
+
+  it('passes branch name from item-executor to pr-pipeliner', () => {
+    const content = readAgent();
+    assert.ok(content.includes('branch name') || content.includes('branch=') || content.includes('branch_name'),
+      'sprint-master must capture branch name from item-executor and pass to pr-pipeliner');
+  });
 });

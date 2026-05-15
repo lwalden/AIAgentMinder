@@ -75,4 +75,32 @@ describe('item-executor agent', () => {
       'must define context-limit graceful degradation'
     );
   });
+
+  it('documents worktree isolation', () => {
+    const content = readAgent();
+    assert.ok(content.includes('Worktree') || content.includes('worktree'),
+      'must mention worktree isolation');
+    assert.ok(content.includes('isolation') || content.includes('isolated'),
+      'must reference the isolation contract');
+  });
+
+  it('output contract includes branch name on done', () => {
+    const content = readAgent();
+    assert.ok(content.includes('branch=') || content.includes('branch_name'),
+      'done contract must return the branch name so sprint-master can pass it to pr-pipeliner');
+  });
+
+  it('requires pushing the branch before returning done', () => {
+    const content = readAgent();
+    assert.ok(content.includes('git push') || content.includes('push the branch') || content.includes('push to origin'),
+      'item-executor must push its branch to origin since pr-pipeliner runs in the main worktree');
+  });
+
+  it('no longer references the retired correction-capture hook', () => {
+    const content = readAgent();
+    assert.ok(!content.includes('Correction Capture'),
+      'correction-capture was retired in v4.6.0 — Auto Memory supersedes it');
+    assert.ok(!content.includes('Correction Pattern Detected'),
+      'correction-capture alert references must be removed');
+  });
 });

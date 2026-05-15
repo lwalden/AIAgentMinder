@@ -1,12 +1,22 @@
 ---
 name: item-executor
-description: Sprint item executor — TDD implementation agent. Receives a spec, creates a branch, writes tests, implements, and reports done or blocked.
+description: Sprint item executor — TDD implementation agent. Receives a spec, runs in an isolated git worktree, writes tests, implements, and reports done or blocked.
 ---
 
 # Item Executor
 
 Implement a single sprint item end-to-end using TDD. Receive a spec and branch naming from sprint-master.
 Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatically.
+
+## Worktree Isolation
+
+You are invoked by sprint-master with `isolation: "worktree"`. Claude Code creates an isolated git worktree off the base ref (default: `origin/<default-branch>`) and runs you inside it. Implications:
+
+- Your CWD is the isolated worktree, not the main repo.
+- The working tree starts clean from the base ref — no unpushed commits, no stash, no in-progress branches from elsewhere.
+- File paths in the spec are relative to the worktree, which mirrors the project layout. Use them as-is.
+- When you push your branch (`git push -u origin {branch}`), origin receives a normal branch — pr-pipeliner will operate on it from the main worktree later.
+- Worktree cleanup is automatic if you make no changes; the path + branch are returned to sprint-master when you do.
 
 ## Inputs
 
@@ -17,14 +27,16 @@ Universal rules (git-workflow, tool-first) load from `.claude/rules/` automatica
 ## Process
 
 1. Read the spec and relevant source files.
-2. **Save before switching:** Run `git status`. If there are uncommitted changes from prior work, commit them with a `wip:` prefix or stash before creating the new branch. Never `git checkout` with a dirty working tree.
-3. Create the feature branch.
-4. **TDD RED:** Write failing tests from the spec's test plan.
-5. **TDD GREEN:** Implement the minimal solution to pass all tests.
-6. **Refactor:** Clean up while tests stay green.
-7. Run Integration/E2E tests if the spec defines them.
-8. Run the full test suite — zero failures. Investigate unrelated failures as regressions.
-9. Commit.
+2. Create the feature branch (you start on the worktree's default checkout — typically a detached HEAD on the base ref or an auto-generated agent branch; either way, create your named branch from there).
+3. **TDD RED:** Write failing tests from the spec's test plan.
+4. **TDD GREEN:** Implement the minimal solution to pass all tests.
+5. **Refactor:** Clean up while tests stay green.
+6. Run Integration/E2E tests if the spec defines them.
+7. Run the full test suite — zero failures. Investigate unrelated failures as regressions.
+8. Commit.
+9. **Push the branch:** `git push -u origin {branch}` so the main worktree (where pr-pipeliner runs) can see it.
+
+The "save before switching" step from the legacy non-worktree flow is no longer needed — the worktree starts clean.
 
 ## Architecture Fitness
 
@@ -47,22 +59,9 @@ What I need: {specific question}
 
 Does not apply when user said "keep trying" or "figure it out."
 
-## Correction Capture
-
-When the PostToolUse hook sends a "Correction Pattern Detected" alert in `hookSpecificOutput.additionalContext`, or when the same wrong-first approach recurs a second time:
-
-```
-Correction Pattern Detected — {summary}
-What keeps happening: Tried {A}, failed ({reason}), switched to {B}. Occurrence: {N}.
-Proposed instruction: {draft rule — one paragraph}
-Where to add: `.claude/rules/{name}.md` (project) or `~/.claude/rules/{name}.md` (user-level)
-Create this instruction?
-```
-
-Write the instruction file only after explicit user approval. If declined, drop it.
-
 ## Output Contract
 
-- **Done:** `"done: {commit_hash}"` — all tests pass, committed on branch
+- **Done:** `"done: branch={branch_name} commit={commit_hash}"` — all tests pass, committed AND pushed to origin
 - **Blocked:** `"blocked: {reason}"` — needs human input or unresolved dependency
-- **Partial:** `"partial: {completed} / remaining: {left} / branch: {name} / last_commit: {hash}"` — return when context pressure prevents tool use; sprint-master spawns a fresh instance to continue
+- **Partial:** `"partial: completed={completed} remaining={left} branch={name} commit={hash}"` — return when context pressure prevents tool use; sprint-master spawns a fresh instance to continue (on the same branch, in a fresh worktree off the same base ref + your last commit)
+

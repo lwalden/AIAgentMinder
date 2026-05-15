@@ -12,12 +12,17 @@ Universal rules load from `.claude/rules/` automatically.
 
 ## Inputs (provided by sprint-master)
 
-- PR number and branch name
+- PR number and branch name (item-executor returns this in `"done: branch={name} commit={hash}"`)
 - `.pr-pipeline.json` config — if absent, use defaults: `{ "maxCycles": 3, "autoMerge": true }`
 - Item risk tag (if `[risk]`, apply stricter review)
 
+You run in the main repo worktree, not the item-executor's isolated worktree —
+that one is already cleaned up. The branch lives on origin; check it out locally
+before reviewing.
+
 ## Process
 
+0. **Checkout the branch:** `git fetch origin {branch} && git checkout {branch}`. Required because item-executor ran in an isolated worktree and pushed the branch; you start in main.
 1. **Build:** Verify the project compiles/transpiles without errors.
 2. **Lint:** Run lint if configured — zero errors allowed.
 3. **Review:** Read the PR diff. Check for correctness, style, test coverage.
