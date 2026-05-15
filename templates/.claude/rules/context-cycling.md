@@ -14,7 +14,7 @@ When you see "BLOCKED — CONTEXT CYCLE REQUIRED":
 2. **Type `/exit`** to end the session cleanly.
 
 That's it. Do NOT manually write `.sprint-continuation.md` or
-`.sprint-continue-signal`. Do NOT run `context-cycle.sh` (obsolete).
+`.sprint-continue-signal` — the SessionEnd hook builds them.
 
 Tools allowed during an active cycle: **Bash, Write, Read, Edit**. All
 others are blocked. The cycle protocol's purpose is preventing *new

@@ -1,8 +1,4 @@
 {
-  "statusLine": {
-    "type": "command",
-    "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/context-monitor.sh\""
-  },
   "hooks": {
     "PreToolUse": [
       {

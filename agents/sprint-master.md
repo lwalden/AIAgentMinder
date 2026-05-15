@@ -90,6 +90,8 @@ Capture the branch name from `"done: branch={name} commit={hash}"` — you
 pass it to pr-pipeliner during REVIEW. On `"partial: ..."`, include
 "resume on branch {branch_name}" in the next spawn's prompt.
 
+**Fallback (Claude Code < 2.1.121):** if the Agent call fails because `isolation` is unrecognized, retry once without it, warn the user ("Worktree isolation unavailable; running in-place. Consider upgrading."), and use the fallback for the rest of the session. Same TDD contract, no isolation between items.
+
 ## Human Checkpoint Protocol (mechanical enforcement)
 
 **In dispatch mode:** Skip all human checkpoints below. The directive IS the approval. Proceed autonomously through PLAN → SPEC → EXECUTE without waiting. Write status updates instead of checkpoint files.
@@ -123,9 +125,7 @@ stop asking permission, NOT skip quality steps.
 **Ask human ONLY when:** PLAN approval, SPEC approval, BLOCKED, REWORK, or
 debug checkpoint (3 failed attempts at the same error in a sub-agent).
 
-**Native `/goal` compatibility:** behavior unchanged when running under `/goal`.
-Human checkpoints still write `.sprint-human-checkpoint` and end the turn; the
-`/goal` evaluator reads waiting-for-human language and stops auto-resuming.
+**Native `/goal` compatibility:** behavior unchanged. Human checkpoints still write `.sprint-human-checkpoint` and end the turn; `/goal`'s evaluator reads waiting-for-human language and stops auto-resuming. See `docs/customization-guide.md` → "`/goal` for autonomous sprint runs" for the full pattern.
 
 ## COMPLETE
 

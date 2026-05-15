@@ -119,20 +119,26 @@ Use `claude --agent <name>` to load the right context for your task:
 
 ### Hooks and scripts
 
+All scripts ship in the plugin's `bin/` directory and are on the Bash tool's PATH while the plugin is enabled. Hooks register automatically via `hooks/hooks.json` — no manual install step.
+
 | Script | Purpose |
 |--------|---------|
-| `context-monitor.sh` | Status line data bridge — writes `.context-usage` with token thresholds |
+| `context-monitor.sh` | Status line data bridge — writes `.context-usage` with token thresholds (wired into your project's `.claude/settings.json` by `/aiagentminder:setup`) |
 | `context-cycle-hook.sh` | PreToolUse hook — blocks non-cycle tools when context threshold is hit |
-| `context-cycle.sh` | Self-termination for context cycling (cross-platform) |
+| `sprint-phase-guard.sh` | PreToolUse hook — blocks agent calls that don't match the current sprint phase |
 | `sprint-stop-guard.sh` | Stop hook — blocks premature turn endings during sprint execution |
-| `session-start-hook.sh` | SessionStart hook — detects continuation signals and active sprints |
+| `session-end-cycle.sh` | SessionEnd hook — builds `.sprint-continuation.md` for cross-session resume |
+| `session-start-continuation.sh` | SessionStart hook — injects continuation context into the new session |
+| `session-start-cycle-reset.sh` | SessionStart hook — wipes stale `.context-usage` so resumed sessions don't auto-cycle |
+| `session-start-hook.sh` | SessionStart hook — detects active sprints and agent profile mismatches |
 | `stop-failure-hook.sh` | StopFailure hook — logs API errors and preserves sprint state |
+| `hlpm-ping.sh` | SessionStart/SessionEnd — notifies an optional HLPM executive layer if `HLPM_DIR` env var is set |
 | `sprint-update.sh` | Zero-token-cost SPRINT.md status updates (no LLM file I/O) |
 | `version-bump.sh` | Zero-token-cost version bump across all version points |
 | `decisions-log.sh` | Zero-token-cost DECISIONS.md entry appender |
 | `backlog-capture.sh` | Zero-token-cost BACKLOG.md management (add, list, promote, detail, count) |
-| `sprint-runner.ps1/.sh` | Wrapper that auto-restarts Claude on context cycle |
-| `install-profile-hook.ps1/.sh` | One-time setup for automatic context cycling |
+| `sprint-runner.ps1/.sh` | Wrapper that auto-restarts Claude on context cycle (optional, for dedicated unattended sprint sessions) |
+| `aam-bootstrap.sh` | Internal — file copies + settings.json merge for `/aiagentminder:setup` |
 
 ### Context cycling
 
@@ -140,9 +146,9 @@ Claude's output quality degrades as context fills up. AIAgentMinder detects this
 
 1. **Monitoring:** `context-monitor.sh` receives token metrics after every assistant message. Model-specific thresholds: 500k tokens for Sonnet, 580k for Opus (recalibrated for 1M context).
 2. **Enforcement:** `context-cycle-hook.sh` (PreToolUse) blocks non-essential tools when the threshold is hit, forcing Claude to save state and cycle.
-3. **Recovery:** Claude commits work, writes a continuation file, self-terminates. A fresh session starts automatically via profile hook or sprint-runner.
+3. **Recovery:** Claude commits work; `session-end-cycle.sh` writes `.sprint-continuation.md`; the next `claude` launch's `session-start-continuation.sh` injects it. No restart wrapper required — the plugin's hook chain handles it.
 
-One-time setup: run `install-profile-hook.ps1` (Windows) or `install-profile-hook.sh` (macOS/Linux).
+For fully unattended sprint runs (kick off and walk away), the `sprint-runner.sh` wrapper restarts Claude in a tight loop on context cycle. It's optional — the in-plugin hook chain handles the common case without it.
 
 ---
 

@@ -46,7 +46,8 @@ describe('rule reorganization: context-cycling.md content', () => {
     const content = fs.readFileSync(path.join(RULES_DIR, 'context-cycling.md'), 'utf-8');
     assert.ok(content.includes('.context-usage'), 'must reference .context-usage file');
     assert.ok(content.includes('should_cycle'), 'must reference should_cycle flag');
-    assert.ok(content.includes('context-cycle.sh'), 'must reference context-cycle.sh script');
+    assert.ok(content.includes('SessionEnd'), 'must reference SessionEnd hook (the continuation builder)');
+    assert.ok(content.includes('/exit'), 'must reference the /exit cycle procedure');
   });
 
   it('is concise (under 30 lines)', () => {
