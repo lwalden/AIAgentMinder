@@ -6,8 +6,14 @@
 # Called by SessionStart (startup matcher) and SessionEnd hooks with the
 # event name as $1 (session_start | session_end).
 #
-# Silent fail in three cases:
-#   - HLPM not present on this machine (cross-machine safe)
+# Opt-in: this script is a no-op unless the user explicitly sets the
+# HLPM_DIR environment variable to the absolute path of their HLPM
+# checkout (e.g. `export HLPM_DIR=/Users/me/src/highest-level-project-management`).
+# Without HLPM_DIR set, exit silently — most AAM users don't have HLPM.
+#
+# Silent fail in four cases:
+#   - HLPM_DIR not set (most users)
+#   - HLPM_DIR set but the directory doesn't exist
 #   - HLPM_PING_DISABLED=1 environment variable set (per-session opt-out)
 #   - Running inside HLPM itself (HLPM uses its own hlpm-log-session-end.sh)
 set -euo pipefail
@@ -18,11 +24,12 @@ EVENT="${1:-}"
 
 [[ "${HLPM_PING_DISABLED:-0}" == "1" ]] && exit 0
 
-HLPM_DIR="D:/Source/highest-level-project-management"
+HLPM_DIR="${HLPM_DIR:-}"
+[[ -n "$HLPM_DIR" ]] || exit 0
+[[ -d "$HLPM_DIR" ]] || exit 0
+
 LOG_FILE="$HLPM_DIR/events.jsonl"
 MAX_LINES=10000
-
-[[ -d "$HLPM_DIR" ]] || exit 0
 
 REPO_ROOT=$(git rev-parse --show-toplevel 2>/dev/null || pwd)
 REPO=$(basename "$REPO_ROOT")

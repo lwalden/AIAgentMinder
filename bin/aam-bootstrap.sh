@@ -61,4 +61,49 @@ fi
 # docs/strategy-roadmap.md — preserve if user already has one
 copy_if_absent "$TEMPLATES/docs/strategy-roadmap.md" "docs/strategy-roadmap.md"
 
+# .claude/settings.json — wire the context-monitor statusLine.
+# Claude Code plugin manifests don't support shipping a statusLine setting
+# (per the docs, plugin settings.json only honors `agent` and
+# `subagentStatusLine`), so we surgically inject the config into the user's
+# project-level .claude/settings.json at install time.
+#
+# Behavior: additive only. If the user already has a statusLine config,
+# we leave it alone and warn — they may have customized it intentionally.
+SETTINGS_FILE=".claude/settings.json"
+STATUSLINE_CMD='bash "${CLAUDE_PLUGIN_ROOT}/bin/context-monitor.sh"'
+
+merge_statusline() {
+  mkdir -p .claude
+  if [ ! -f "$SETTINGS_FILE" ]; then
+    cat > "$SETTINGS_FILE" <<EOF
+{
+  "statusLine": {
+    "type": "command",
+    "command": "$STATUSLINE_CMD"
+  }
+}
+EOF
+    echo "create $SETTINGS_FILE (statusLine wired)"
+    return
+  fi
+
+  if ! command -v jq >/dev/null 2>&1; then
+    echo "warn   jq not found; cannot safely merge $SETTINGS_FILE — add statusLine manually:"
+    echo "       \"statusLine\": { \"type\": \"command\", \"command\": \"$STATUSLINE_CMD\" }"
+    return
+  fi
+
+  if jq -e '.statusLine' "$SETTINGS_FILE" >/dev/null 2>&1; then
+    echo "skip   $SETTINGS_FILE already has a statusLine (preserving user config)"
+    return
+  fi
+
+  jq --arg cmd "$STATUSLINE_CMD" \
+     '.statusLine = { "type": "command", "command": $cmd }' \
+     "$SETTINGS_FILE" > "${SETTINGS_FILE}.tmp" && mv "${SETTINGS_FILE}.tmp" "$SETTINGS_FILE"
+  echo "update $SETTINGS_FILE (statusLine added)"
+}
+
+merge_statusline
+
 echo "bootstrap complete"

@@ -41,7 +41,15 @@ Inspect the project root for stack signals (do this via Read/Glob tools, not by 
 | `.gitlab-ci.yml` | GitLab CI |
 | `pytest.ini`, `jest.config.*`, `xunit`, etc. | Specific test runner |
 
-Form a short summary like "Node.js + TypeScript + Next.js, Jest, GitHub Actions" and use it to seed default answers below.
+Form a short summary like "Node.js + TypeScript + Next.js, Jest, GitHub Actions" and use it as **proposed defaults** for the interview in step 3.
+
+**Confidence rules (important — never guess silently):**
+
+- If the project root has clear, unambiguous signals (e.g. exactly one of `package.json`, `Cargo.toml`, `go.mod`, etc., plus matching framework files), state the fingerprint as a default and let the user confirm or override in step 3.
+- If the signals are ambiguous (multiple stacks present, monorepo with several subprojects, or no recognized signal at all), **do not invent a default** — ask the user directly: "I found `<signals>`. What's the primary stack here?" Treat type and stack as required interview answers in that case.
+- If you cannot determine the project type at all, ask the user before continuing rather than assuming "other."
+
+Default answers in step 3 must clearly indicate when they came from the fingerprint vs. when they're filled with placeholder text the user must replace.
 
 ### 3. Project identity interview
 
@@ -60,7 +68,7 @@ Ask the user for these in one go (numbered list, then wait for a single response
 bash "${CLAUDE_PLUGIN_ROOT}/bin/aam-bootstrap.sh"
 ```
 
-This copies the non-substituted template files into the target:
+This copies the non-substituted template files into the target and wires the context-monitor status line into `.claude/settings.json`:
 
 - `templates/.claude/rules/*.md` → `.claude/rules/`
 - `templates/.claude/aiagentminder-version` → `.claude/aiagentminder-version`
@@ -68,8 +76,11 @@ This copies the non-substituted template files into the target:
 - `templates/BACKLOG.md` → `BACKLOG.md` (if not already present)
 - `templates/.pr-pipeline.json` → `.pr-pipeline.json` (only if user wants the PR pipeline)
 - `templates/docs/strategy-roadmap.md` → `docs/strategy-roadmap.md` (if not already present)
+- `.claude/settings.json` — additively merged with a `statusLine` entry pointing at `${CLAUDE_PLUGIN_ROOT}/bin/context-monitor.sh`. The merge respects existing user config: if the user already has a `statusLine`, it's preserved untouched.
 
-The script never overwrites existing user files — it skips and reports.
+The script never overwrites user-owned files — it skips and reports. If `jq` is not installed, the statusLine step is skipped with a printed instruction so the user can add it manually.
+
+Why the statusLine is injected here instead of shipped in the plugin's `hooks/hooks.json`: Claude Code's plugin manifest format reserves plugin-level `settings.json` for the `agent` and `subagentStatusLine` keys only — a plugin cannot ship a project-level `statusLine` directly.
 
 ### 5. Customize CLAUDE.md
 

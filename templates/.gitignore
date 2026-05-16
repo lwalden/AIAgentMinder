@@ -1,6 +1,6 @@
 # ==============================================================================
-# Core .gitignore -- secrets, IDE files, OS artifacts
-# Stack-specific entries are added by /aiagentminder:setup based on your tech stack.
+# Core .gitignore -- secrets, IDE files, OS artifacts.
+# AIAgentMinder setup appends stack-specific entries to the bottom of this file.
 # For comprehensive language gitignores, see: https://github.com/github/gitignore
 # ==============================================================================
 

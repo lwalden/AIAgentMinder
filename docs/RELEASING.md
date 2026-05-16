@@ -26,9 +26,9 @@ version bump is what triggers a user-visible update notification.
 1. All PRs for this version are merged to `main`.
 2. `git checkout main && git pull`.
 3. Full test suite passes: `npm test`.
-4. Plugin manifest validation passes:
+4. Plugin manifest + layout validation passes:
    ```bash
-   node -e "import('./lib/validate.js').then(m => { const r = m.validateAll(process.cwd()); if (!r.pluginJson.valid || !r.versions.valid) { console.error(r); process.exit(1); } else { console.log('valid'); } })"
+   npm run validate
    ```
 5. (Optional but recommended) Smoke-test the plugin locally with
    `--plugin-dir`:
@@ -64,9 +64,8 @@ Also update manually:
 
 ```bash
 npm test
-cat templates/.claude/aiagentminder-version   # should show new version
-node -e "import('./lib/validate.js').then(m => { const r = m.validateAll(process.cwd()); console.log(r.versions.versions); })"
-# All four version points should match X.Y.Z
+npm run validate
+# Outputs all four version stamps + a layout summary. All four versions should match X.Y.Z.
 ```
 
 ## Commit & Tag

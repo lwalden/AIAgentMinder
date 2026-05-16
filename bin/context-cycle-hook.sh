@@ -65,7 +65,7 @@ This tool call ($tool_name) is blocked. Execute the CONTEXT_CYCLE protocol now
 2. Type /exit to end the session cleanly
 
 The SessionEnd hook will build the continuation file automatically.
-Do NOT manually write .sprint-continuation.md or run context-cycle.sh.
+Do NOT manually write .sprint-continuation.md.
 EOF
         exit 2
       fi
@@ -140,7 +140,7 @@ You MUST do the following NOW (only Bash, Write, Read, and Edit are allowed):
 2. Type /exit to end the session cleanly
 
 The SessionEnd hook will build the continuation file automatically.
-Do NOT manually write .sprint-continuation.md or run context-cycle.sh.
+Do NOT manually write .sprint-continuation.md.
 Do NOT attempt to continue sprint work. Every non-cycle tool call will be blocked.
 EOF
 exit 2
