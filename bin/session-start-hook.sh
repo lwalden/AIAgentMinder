@@ -31,9 +31,7 @@ fi
 
 # Output JSON if we have context to inject
 if [[ -n "$CONTEXT" ]]; then
-  # Escape for JSON
-  ESCAPED=$(printf '%s' "$CONTEXT" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\n/\\n/g')
-  printf '{"hookSpecificOutput":{"additionalContext":"%s"}}' "$ESCAPED"
+  jq -c -n --arg ctx "$CONTEXT" '{hookSpecificOutput: {additionalContext: $ctx}}'
 fi
 
 exit 0

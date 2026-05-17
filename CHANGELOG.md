@@ -6,6 +6,24 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [5.0.3] - 2026-05-17
+
+### Fixed
+
+Cleanup pass against open issues #95 and #152.
+
+- **`bin/hlpm-ping.sh`** — Build the event JSON with `jq -n --arg` instead of `printf`. Eliminates an escape-safety bug: repos, branches, or HLPM event names containing quotes, backslashes, or control characters previously produced corrupt JSON in `events.jsonl`. (issue #152)
+- **`bin/session-start-hook.sh`** — Same fix for the `hookSpecificOutput.additionalContext` payload. The old `sed`-based escape chain didn't cover all JSON-significant characters; `jq` does it correctly. (issue #152)
+- **`skills/scope-check/SKILL.md`** — Added "Capture to backlog" as a fourth option in the "Not in roadmap" verdict, calling `backlog-capture.sh`. Completes the last open acceptance criterion on the backlog feature. (issue #95)
+- **`templates/docs/strategy-roadmap.md`** — Replaced four user-facing references to retired commands: `/aam-brief` → `/aiagentminder:brief` (×2), `/aam-revise` → `/aiagentminder:revise`, `/aam-backlog` → `/aiagentminder:backlog`. These ship to every install via `/aiagentminder:setup`. (issue #95 follow-up)
+- **`docs/strategy-roadmap.md`** — Updated one prescriptive `/aam-backlog` reference in the Direction section. Historical "Shipped:" entries left unchanged. (issue #95 follow-up)
+
+### Not addressed
+
+- **Empty-matcher PreToolUse on `sprint-phase-guard.sh`** (issue #152) — Changing the matcher would alter the reminder-injection behavior across non-Task tool calls. The issue itself notes this needs design thought. Defer to a separate design discussion rather than ship a behavior change in a patch release.
+
+---
+
 ## [5.0.2] - 2026-05-17
 
 ### Fixed

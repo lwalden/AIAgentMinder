@@ -39,7 +39,12 @@ REPO=$(basename "$REPO_ROOT")
 
 TS=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
 BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
-EVENT_JSON=$(printf '{"ts":"%s","repo":"%s","event":"%s","branch":"%s"}' "$TS" "$REPO" "$EVENT" "$BRANCH")
+EVENT_JSON=$(jq -c -n \
+  --arg ts "$TS" \
+  --arg repo "$REPO" \
+  --arg event "$EVENT" \
+  --arg branch "$BRANCH" \
+  '{ts: $ts, repo: $repo, event: $event, branch: $branch}')
 
 # Inline trim-on-append (mirrors hlpm-log-append.sh in HLPM).
 if [[ -f "$LOG_FILE" ]]; then
