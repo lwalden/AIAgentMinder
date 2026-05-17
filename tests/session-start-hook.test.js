@@ -56,13 +56,16 @@ describe('session-start-hook.sh', () => {
     }
   });
 
-  it('injects continuation context when .sprint-continuation.md exists', () => {
-    fs.writeFileSync(path.join(dir, '.sprint-continuation.md'), '# Sprint Continuation State\n**Sprint:** S2\n');
+  it('does not inject anything for a stale .sprint-continuation.md (cycle protocol retired)', () => {
+    fs.writeFileSync(path.join(dir, '.sprint-continuation.md'), '# stale leftover\n');
     const result = runHook(sessionStartInput(), dir);
     assert.equal(result.exitCode, 0);
-    const parsed = JSON.parse(result.stdout.trim());
-    assert.ok(parsed.hookSpecificOutput?.additionalContext?.includes('CONTEXT CYCLE'),
-      'should inject CONTEXT CYCLE instruction');
+    const trimmed = result.stdout.trim();
+    if (trimmed) {
+      const parsed = JSON.parse(trimmed);
+      const ctx = parsed.hookSpecificOutput?.additionalContext || '';
+      assert.ok(!ctx.includes('CONTEXT CYCLE'), 'CONTEXT CYCLE protocol should no longer fire');
+    }
   });
 
   it('injects sprint reminder when SPRINT.md has in-progress sprint', () => {

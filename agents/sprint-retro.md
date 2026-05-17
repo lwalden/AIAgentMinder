@@ -26,7 +26,7 @@ and recommend sizing for the next sprint. Universal rules load from `.claude/rul
 
 - **Planned vs completed:** count of issues planned, completed, rework, blocked
 - **Scope changes:** items added or removed after approval
-- **Context cycles:** count of context cycling events during the sprint
+- **Context warnings:** count of distinct sessions during the sprint where the context-warning hook fired (estimate from chat logs; rough proxy for session-length pressure)
 - **Review findings:** total findings by severity across all items
 - **Decisions logged:** count and list of DECISIONS.md entries from this sprint
 

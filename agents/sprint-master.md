@@ -30,7 +30,7 @@ If `.exec/directive.md` exists at session start, enter dispatch mode — autonom
 - **Cancellation polling.** Before each phase transition, re-read `.exec/directive.md` frontmatter. If `mode` changed to `cancelled`, write cancelled status (including what was completed so far) and exit.
 - **Blocker handling.** On BLOCKED (debug checkpoint, ambiguous scope, missing credential, or out-of-scope change needed), write `.exec/status.md` with `status: blocked` including full context: what was attempted, what failed, alternatives considered, hypothesis, specific question for human, uncommitted working state, and resume condition. Then exit cleanly.
 - **Completion.** On COMPLETE, write `.exec/status.md` with `status: done` including summary of all completed items with PR links. Then exit.
-- **Context cycling.** Before cycling, write `.exec/status.md` so the executive layer knows current state. Include the resume point in `.sprint-continuation.md`.
+- **Context warnings.** If the Stop hook surfaces a context-over-threshold warning, finish the current logical unit, write `.exec/status.md` with current progress, then exit. The executive layer (or human) will resume in a fresh session.
 - **Permissions.** Read `permissions` from directive frontmatter. Enforce:
   - `prs_merge`: pr-pipeliner may merge only when the permission allows (e.g., `allow-on-quality-gate-pass` means merge only after quality gate passes)
   - `external_api_spend: deny`: never call paid external APIs unless directive explicitly allows
@@ -43,7 +43,7 @@ If `.exec/directive.md` exists at session start, enter dispatch mode — autonom
 ```
 PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE → VALIDATE] → COMPLETE
                                                      ↑
-                              CONTEXT_CYCLE | BLOCKED | REWORK (any state)
+                                        BLOCKED | REWORK (any state)
 ```
 
 ## Routing Table
@@ -176,13 +176,14 @@ If VALIDATE returns `"fail: {details}"`:
 
 ## Cross-Session Resumption
 
-If starting a new session (or after context cycling):
+If starting a new session:
 
 1. **Check for dispatch directive first.** If `.exec/directive.md` exists, enter Dispatch Mode (see above). The directive takes precedence over interactive resumption.
-2. Read `SPRINT.md` — determine current sprint ID, item statuses.
+2. Read `SPRINT.md` — determine current sprint ID, item statuses, current phase.
 3. Read `TaskList` — identify in-progress or pending tasks.
-4. If `.sprint-continuation.md` exists, read it and delete it.
-5. Resume from the first `todo` or `in-progress` item in SPRINT.md.
+4. Resume from the first `todo` or `in-progress` item in SPRINT.md.
+
+If the previous session ran `/aiagentminder:handoff`, Claude Code's native Auto Memory will surface the "Next Session" block automatically — use it for the resume point alongside SPRINT.md state.
 
 ## What You Do NOT Do
 
@@ -190,10 +191,6 @@ If starting a new session (or after context cycling):
 - Review code (quality-reviewer + lens agents do that)
 - Make architectural decisions (escalate to human)
 
-## Context Cycling
+## Context Warnings
 
-If the PreToolUse hook fires with "CONTEXT CYCLE REQUIRED":
-1. Commit all uncommitted work.
-2. Type `/exit`.
-
-The SessionEnd hook automatically builds `.sprint-continuation.md` with phase, item, and branch state. Do NOT manually write continuation files.
+If a Stop hook injects a context-over-threshold warning: finish the current logical unit, suggest the user run `/aiagentminder:handoff` and `/exit`, or keep going (warning re-fires next turn). No tool blocking, no `.sprint-continuation.md` — the choice is the user's.

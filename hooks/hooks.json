@@ -2,16 +2,7 @@
   "hooks": {
     "PreToolUse": [
       {
-        "matcher": "",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/context-cycle-hook.sh\""
-          }
-        ]
-      },
-      {
-        "matcher": "",
+        "matcher": "Agent",
         "hooks": [
           {
             "type": "command",
@@ -27,6 +18,14 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/sprint-stop-guard.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/context-warning-hook.sh\""
+          },
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/sprint-phase-reminder.sh\""
           }
         ]
       }
@@ -35,10 +34,6 @@
       {
         "matcher": "",
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-end-cycle.sh\""
-          },
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/hlpm-ping.sh\" session_end"
@@ -52,10 +47,6 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-start-continuation.sh\""
-          },
-          {
-            "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/hlpm-ping.sh\" session_start"
           }
         ]
@@ -63,10 +54,6 @@
       {
         "matcher": "resume",
         "hooks": [
-          {
-            "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/session-start-continuation.sh\""
-          },
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/hlpm-ping.sh\" session_start"

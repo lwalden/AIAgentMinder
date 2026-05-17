@@ -7,6 +7,18 @@
 
 ---
 
+### Replace autonomous context-cycle protocol with a passive Stop-hook warning | 2026-05 | Status: Active
+
+Chose: Retire the v5.0 auto-cycle system (PreToolUse blocking, `.sprint-continuation.md` writing via SessionEnd, `session-start-continuation.sh` consumption, `.sprint-tool-count` fallback) and replace it with a single `Stop` hook (`context-warning-hook.sh`) that injects an advisory message when `.context-usage` says `should_cycle=true`. The user picks wrap-up (`/aiagentminder:handoff` + `/exit` → "resume work" via Auto Memory) or continue. Also split `sprint-phase-guard.sh`: phase blocking stays on `PreToolUse` but moves from empty matcher to `matcher: "Agent"`; periodic phase reminders move to a new `Stop` hook `sprint-phase-reminder.sh`.
+
+Why: The autonomous protocol never worked reliably in practice. Specifically: (a) requires slash commands the user can't issue from the mobile Claude app (the primary monitoring surface for long CLI sessions); (b) self-termination disconnects the mobile observer from the session; (c) is dormant on Claude Code web (no `.context-usage` produced) yet docs and rules suggested the protocol applies there; (d) blocks tool calls during finalization, forcing Bash-via-Python rewrites; (e) the empty-matcher PreToolUse spawned bash on every tool call (flagged in #152); (f) bundled phase-blocking + reminder injection in one script, which meant a single matcher had to serve two different trigger surfaces.
+
+Alternatives considered: (a) keep the protocol but harden it — rejected; the fundamental failure modes are environmental (mobile, web) not implementation bugs; (b) leave the matcher empty and just optimize the script — rejected; doesn't address #152's actual concern and leaves the autonomous protocol's UX problems unresolved; (c) move reminders to UserPromptSubmit instead of Stop — considered; Stop is closer to a natural decision point and fires at the right cadence (per turn) without requiring user input to surface; (d) drop reminders entirely — considered but kept since they're cheap and useful for orientation, and pairing with the new context-warning Stop hook gives a consistent "Stop is where guidance lands" pattern.
+
+Tradeoff: Sprint runs no longer have an autonomous-cycling safety net. Users running long unattended `sprint-runner.sh` loops must either size sprints to fit a single session or insert their own checkpoint cadence. Mitigated by: the per-turn warning re-fires until the user wraps up, `/aiagentminder:handoff` produces a clean Auto Memory record, and `claude --continue` still works for general resumption. Net code reduction: 3 scripts (~344 lines) + 3 test files (~566 lines) deleted; 2 new scripts (~80 lines) + 2 new tests (~140 lines) added. Shipped in v5.1.0.
+
+---
+
 ## Format: Lightweight
 
 ```

@@ -47,12 +47,13 @@ describe('sprint-master orchestrator agent', () => {
     }
   });
 
-  it('references REWORK and CONTEXT_CYCLE states', () => {
+  it('references REWORK state and the v5.1 context-warning behavior', () => {
     const content = readAgent();
     assert.ok(content.includes('REWORK'), 'must reference REWORK state');
     assert.ok(
-      content.includes('CONTEXT_CYCLE') || content.includes('context cycle') || content.includes('context cycling'),
-      'must reference context cycling'
+      content.toLowerCase().includes('context warning') ||
+        content.toLowerCase().includes('over threshold'),
+      'must document how to respond to context warnings'
     );
   });
 

@@ -6,21 +6,41 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [5.0.3] - 2026-05-17
+## [5.1.0] - 2026-05-17
+
+### Changed
+
+#### Context management redesigned (BREAKING for projects relying on auto-cycle)
+
+The v5.0 autonomous context-cycle protocol — PreToolUse tool-blocking, SessionEnd writing `.sprint-continuation.md`, SessionStart consuming it, `.sprint-tool-count` fallback — is retired. Replaced with a single `Stop` hook (`bin/context-warning-hook.sh`) that injects an advisory message when `.context-usage` says `should_cycle=true`. The user picks the next step:
+
+- **Wrap up cleanly:** run `/aiagentminder:handoff` (writes "Next Session" into Claude Code's native Auto Memory), commit, `/exit`. Start the next session and say "resume work".
+- **Keep going:** the warning re-fires every turn while still over threshold. No tool blocking, no auto-restart.
+
+Rationale and trade-offs: see DECISIONS.md → "Replace autonomous context-cycle protocol with a passive Stop-hook warning". Short version: the autonomous flow required slash commands users can't issue from the mobile Claude app, self-termination disconnected mobile observers, and the protocol was dormant on Claude Code web anyway.
+
+**Deleted:** `bin/context-cycle-hook.sh`, `bin/session-end-cycle.sh`, `bin/session-start-continuation.sh`, `tests/context-cycle-hook.test.js`, `tests/cycling-resume-chain.test.js`, `tests/cycling-docs.test.js`. Renamed `templates/.claude/rules/context-cycling.md` → `context-warnings.md` with a complete rewrite. Net: 5 scripts → 2 scripts (`context-warning-hook.sh`, `sprint-phase-reminder.sh`), tests still 100% green.
+
+**Migration on re-running `/aiagentminder:setup`:** the setup skill now deletes leftover state files from the retired protocol if present (`.sprint-continuation.md`, `.sprint-continue-signal`, `.sprint-tool-count`, `.sprint-phase-guard-count`) and the old `.claude/rules/context-cycling.md`.
+
+#### `sprint-phase-guard.sh` split into two single-purpose hooks (issue #152)
+
+The previous hook bundled two unrelated responsibilities (Agent-only phase blocking + every-Nth-call reminder injection) behind an empty PreToolUse matcher, spawning bash on every tool call. Now:
+
+- `bin/sprint-phase-guard.sh` — `PreToolUse` with `matcher: "Agent"`. Just phase blocking. Doesn't fire on Bash/Read/Edit/Write.
+- `bin/sprint-phase-reminder.sh` — `Stop` hook. One-line phase-appropriate reminder per assistant turn during an active sprint. No counter file, no every-Nth gating.
 
 ### Fixed
 
-Cleanup pass against open issues #95 and #152.
-
-- **`bin/hlpm-ping.sh`** — Build the event JSON with `jq -n --arg` instead of `printf`. Eliminates an escape-safety bug: repos, branches, or HLPM event names containing quotes, backslashes, or control characters previously produced corrupt JSON in `events.jsonl`. (issue #152)
-- **`bin/session-start-hook.sh`** — Same fix for the `hookSpecificOutput.additionalContext` payload. The old `sed`-based escape chain didn't cover all JSON-significant characters; `jq` does it correctly. (issue #152)
+- **`bin/hlpm-ping.sh`** — Event JSON built with `jq -n --arg` instead of `printf`/`sed`. Repos, branches, or event names containing quotes, backslashes, tabs, or control chars no longer corrupt `events.jsonl`. (issue #152)
+- **`bin/session-start-hook.sh`** — Same `jq` fix for the `additionalContext` payload. Also trimmed to just active-sprint detection now that the cycle protocol is gone.
 - **`skills/scope-check/SKILL.md`** — Added "Capture to backlog" as a fourth option in the "Not in roadmap" verdict, calling `backlog-capture.sh`. Completes the last open acceptance criterion on the backlog feature. (issue #95)
 - **`templates/docs/strategy-roadmap.md`** — Replaced four user-facing references to retired commands: `/aam-brief` → `/aiagentminder:brief` (×2), `/aam-revise` → `/aiagentminder:revise`, `/aam-backlog` → `/aiagentminder:backlog`. These ship to every install via `/aiagentminder:setup`. (issue #95 follow-up)
-- **`docs/strategy-roadmap.md`** — Updated one prescriptive `/aam-backlog` reference in the Direction section. Historical "Shipped:" entries left unchanged. (issue #95 follow-up)
+- **`docs/strategy-roadmap.md`** — Updated one prescriptive `/aam-backlog` reference. Historical "Shipped:" entries left unchanged. (issue #95 follow-up)
 
-### Not addressed
+### Notes
 
-- **Empty-matcher PreToolUse on `sprint-phase-guard.sh`** (issue #152) — Changing the matcher would alter the reminder-injection behavior across non-Task tool calls. The issue itself notes this needs design thought. Defer to a separate design discussion rather than ship a behavior change in a patch release.
+This release intentionally simplifies. Net change: ~910 lines of cycle-protocol code and tests deleted; ~220 lines of replacement code/tests added; ~5 doc references retired or rewritten. The handoff/resume-work workflow (Claude Code Auto Memory based) is unaffected — it never depended on the cycle protocol.
 
 ---
 

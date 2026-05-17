@@ -20,6 +20,8 @@ the target project's repo root, NOT in the AIAgentMinder repo itself.
 Read `.claude/aiagentminder-version` if it exists.
 
 - **If present:** Tell the user "AIAgentMinder is already installed (version X)." This skill is also the re-sync / upgrade path — only the version stamp and plugin-managed files (e.g. `.claude/rules/`) are refreshed; user-owned files (`CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, `SPRINT.md`, `docs/strategy-roadmap.md`) are preserved. If they want a newer plugin version on disk first, ask them to run `/plugin update aiagentminder` before continuing.
+
+  **v5.1+ upgrade cleanup.** When upgrading from a pre-5.1 install, delete any leftover artifacts of the retired auto-cycle protocol if present in the project root: `.sprint-continuation.md`, `.sprint-continue-signal`, `.sprint-tool-count`, `.sprint-phase-guard-count`. Also remove the old `.claude/rules/context-cycling.md` file (replaced by `context-warnings.md`). Use `rm -f` — silent when the files don't exist.
 - **If absent:** Continue to step 2.
 
 ### 2. Codebase fingerprint
@@ -100,8 +102,6 @@ Plus universal AAM state files (these are ephemeral, never commit):
 
 ```
 .context-usage
-.sprint-continuation.md
-.sprint-continue-signal
 .sprint-human-checkpoint
 .sprint-metrics.json
 .exec/
@@ -119,7 +119,7 @@ Created/updated:
 - DECISIONS.md        (architectural decision log — empty starter)
 - BACKLOG.md          (work inbox — empty)
 - docs/strategy-roadmap.md  (product brief — empty, run /aiagentminder:brief to fill)
-- .claude/rules/      (universal rules: git-workflow, tool-first, context-cycling)
+- .claude/rules/      (universal rules: git-workflow, tool-first, context-warnings)
 - .claude/aiagentminder-version  ({version})
 - .gitignore          (stack-specific + AAM state files)
 
