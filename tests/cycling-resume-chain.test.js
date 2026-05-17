@@ -82,6 +82,9 @@ function seedCycleState(dir) {
   execFileSync('git', ['config', 'user.email', 'test@example.com'], { cwd: dir });
   execFileSync('git', ['config', 'user.name', 'Test'], { cwd: dir });
   execFileSync('git', ['config', 'core.hooksPath', '/dev/null'], { cwd: dir });
+  // Disable commit signing so throwaway fixture commits don't hit any
+  // signing wrapper configured at the system or user level.
+  execFileSync('git', ['config', 'commit.gpgsign', 'false'], { cwd: dir });
   execFileSync('git', ['add', '.'], { cwd: dir });
   execFileSync('git', ['commit', '-q', '--no-verify', '-m', 'seed'], { cwd: dir });
 }

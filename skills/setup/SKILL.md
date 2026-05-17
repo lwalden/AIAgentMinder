@@ -19,7 +19,7 @@ the target project's repo root, NOT in the AIAgentMinder repo itself.
 
 Read `.claude/aiagentminder-version` if it exists.
 
-- **If present:** Tell the user "AIAgentMinder is already installed (version X)." Ask if they want to re-run setup or upgrade. If upgrade, stop and direct them to `/aiagentminder:update`. If re-run, continue but note that user files will be preserved.
+- **If present:** Tell the user "AIAgentMinder is already installed (version X)." This skill is also the re-sync / upgrade path — only the version stamp and plugin-managed files (e.g. `.claude/rules/`) are refreshed; user-owned files (`CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, `SPRINT.md`, `docs/strategy-roadmap.md`) are preserved. If they want a newer plugin version on disk first, ask them to run `/plugin update aiagentminder` before continuing.
 - **If absent:** Continue to step 2.
 
 ### 2. Codebase fingerprint
@@ -134,5 +134,3 @@ Next steps:
 - Install hooks or scripts — those live in the plugin (`${CLAUDE_PLUGIN_ROOT}/bin/`)
   and are picked up automatically by Claude Code's plugin system.
 - Modify `~/.claude/settings.json` — plugin hooks register themselves.
-- Detect / migrate from a prior `npx aiagentminder init` install — that's
-  handled by `/aiagentminder:update`.

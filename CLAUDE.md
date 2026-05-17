@@ -6,9 +6,9 @@
 ## Project Identity
 
 **Project:** aiagentminder
-**Description:** Claude Code project governance framework — installable template commands, rules, and hooks
-**Type:** cli-tool
-**Stack:** Markdown / Node.js (CLI only) / Bash (scripts)
+**Description:** Claude Code plugin for project governance — agents, skills, hooks, and templates installable via the plugin marketplace
+**Type:** claude-code-plugin
+**Stack:** Markdown / Bash (hook scripts) / Node.js (test harness + `lib/validate.js` only)
 
 **Developer Profile:**
 
@@ -17,29 +17,25 @@
 
 ## Current State
 
-v3.3 shipped. npm/npx installer, codebase fingerprinting, architecture fitness defaults, plugin marketplace, GitHub Releases. See docs/strategy-roadmap.md for details.
+v5.0 shipped — distributed as a Claude Code plugin, npm CLI retired. See `docs/strategy-roadmap.md` and `CHANGELOG.md`.
 
 ## Behavioral Rules
 
 ### Source of Truth
 
-- `project/` — installable template; these files are copied to target projects by `/aam-setup`
-- `.claude/commands/` at repo root — meta-commands only (`aam-setup.md`, `aam-update.md`)
-- `.claude/rules/` at repo root — governs THIS repo's sessions; not installed to targets
+- `agents/`, `skills/<name>/SKILL.md`, `bin/`, `hooks/hooks.json`, `.claude-plugin/` — the **plugin payload** that ships to users via the marketplace
+- `templates/` — the **bootstrap files** copied into target projects by `/aiagentminder:setup` (e.g. `CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, `SPRINT.md`, `docs/strategy-roadmap.md`, `.claude/rules/*`)
+- Root-level files in this repo (this `CLAUDE.md`, `DECISIONS.md`, `README.md`, etc.) — govern THIS repo only; not installed anywhere
 
-Never edit `project/` files and the root governance files as if they're the same thing. Changes to the template go in `project/`. Changes to how we work on this repo go in `.claude/rules/`.
+Never edit `templates/` files and the equivalent root files as if they're the same thing. Changes to what target projects receive go in `templates/`. Changes to how we work on this repo go in the matching root file.
 
 ### Scope
 
 `docs/strategy-roadmap.md` is the authoritative scope document, matching the convention used in target projects.
 
-### Git Workflow
-
-See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each session.
-
 ### Decision Recording
 
-Log significant decisions in DECISIONS.md. Key architectural decisions are already recorded there.
+Log significant decisions in `DECISIONS.md`.
 
 ## Context Budget
 

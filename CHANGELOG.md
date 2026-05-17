@@ -6,6 +6,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [5.0.2] - 2026-05-17
+
+### Fixed
+
+- **`skills/setup/SKILL.md`** — Removed stale references to a non-existent `/aiagentminder:update` skill. The setup skill is itself the re-sync / upgrade path: users re-run `/aiagentminder:setup` (optionally after `/plugin update aiagentminder`) rather than invoking a separate update command. Updated both the "existing install" branch in step 1 and the "What this skill does NOT do" exclusions.
+- **`tests/cycling-resume-chain.test.js`** — Fixture commits now set `commit.gpgsign=false` in the temp repo so the test runs cleanly in environments with a system- or user-level commit-signing wrapper. Throwaway tmp-dir commits should not invoke production signing infrastructure. Restored 4 previously-failing subtests; full suite now 343/343 green.
+- **`CLAUDE.md`** — Replaced v3.3-era content (npm CLI references, `project/` directory, retired `/aam-setup`/`/aam-update` meta-commands, `.claude/commands/` source-of-truth section, broken `.claude/rules/git-workflow.md` pointer) with v5.0-accurate layout (`agents/`, `skills/<name>/SKILL.md`, `bin/`, `hooks/`, `.claude-plugin/`, `templates/`). The file is hand-maintained (this repo is not an AAM target install — no `.claude/aiagentminder-version` stamp present).
+
+---
+
 ## [5.0.0] - 2026-05-15
 
 ### BREAKING CHANGES
