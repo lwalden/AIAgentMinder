@@ -72,25 +72,16 @@ When enabled, `templates/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md
 4. Runs post-merge validation; failures create rework tasks within the sprint
 5. Archives completed sprints to git history
 
-### Context Cycling
+### Context Warnings (v5.1+)
 
-Autonomous context management for long sprint sessions. When Claude detects context pressure mid-sprint, it:
+When context usage crosses the threshold, a Stop-hook injects an advisory warning at the end of the assistant turn. The warning is passive — no tools are blocked, no continuation file is written, and the session is never auto-restarted. The user picks:
 
-1. Commits all work and writes a continuation file (`.sprint-continuation.md`) with the resume point, completed items, and critical context
-2. Creates a signal file (`.sprint-continue-signal`)
-3. Self-terminates by tracing its own process tree and killing the Claude CLI process
+- **Wrap up cleanly:** run `/aiagentminder:handoff` (writes the "Next Session" block into Claude Code's native Auto Memory), commit any work, then `/exit`. Resume in the next session with "resume work" — Auto Memory carries the handoff forward natively.
+- **Keep going:** continue. The warning re-fires every turn while you're over threshold.
 
-The restart mechanism catches the signal and starts a fresh Claude instance in the same terminal with the same environment variables:
+This replaces the v5.0 autonomous cycle protocol (commit + write continuation + self-terminate + auto-restart). The autonomous pattern fought Claude Code's native context behavior and didn't work cleanly when users monitored CLI sessions from the mobile app. v5.1 keeps the threshold detection (`context-monitor.sh` writes `.context-usage`) and replaces the enforcement with a passive advisory.
 
-| Mechanism | Setup | How it works |
-|-----------|-------|--------------|
-| **Plugin auto-restart** (recommended) | None — bundled with the plugin | The SessionEnd hook writes `.sprint-continue-signal`; `session-start-continuation.sh` consumes it next launch |
-| **Sprint-runner wrapper** | Start sessions with `sprint-runner.sh` / `sprint-runner.ps1` (on PATH when plugin is enabled) | Loop-based wrapper restarts Claude on signal — useful for fully unattended sprint runs |
-| **Fallback** | None needed | Claude tells you what command to paste |
-
-The new session reads CLAUDE.md, rules, and SPRINT.md automatically (native loading), then reads the continuation file for ephemeral context. It resumes sprint execution from where the previous session left off.
-
-**Platform:** Cross-platform. Windows uses Git Bash `/proc/$$/winpid` + WMI tracing; macOS/Linux uses native `ps` ppid tracing. Profile hooks available for PowerShell (Windows) and bash/zsh (macOS/Linux).
+**Dormant by design** when `.context-usage` is absent — including on Claude Code web, where the status line that produces it doesn't run.
 
 ## Governance Hooks
 
@@ -101,11 +92,10 @@ required in your project.
 | Hook | Event | Script |
 |------|-------|--------|
 | Context monitor | statusLine | `context-monitor.sh` |
-| Context cycle guard | PreToolUse | `context-cycle-hook.sh` |
-| Sprint phase guard | PreToolUse | `sprint-phase-guard.sh` |
+| Context warning | Stop | `context-warning-hook.sh` |
+| Sprint phase guard | PreToolUse (matcher: Agent) | `sprint-phase-guard.sh` |
+| Sprint phase reminder | Stop | `sprint-phase-reminder.sh` |
 | Sprint stop guard | Stop | `sprint-stop-guard.sh` |
-| Session end cycle | SessionEnd | `session-end-cycle.sh` |
-| Session start continuation | SessionStart | `session-start-continuation.sh` |
 | Session start cycle reset | SessionStart | `session-start-cycle-reset.sh` |
 | Session start sprint detect | SessionStart | `session-start-hook.sh` |
 | Stop failure | StopFailure | `stop-failure-hook.sh` |

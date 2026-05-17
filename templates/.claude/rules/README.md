@@ -4,13 +4,13 @@ Universal rules loaded natively by Claude Code at every session start. These rul
 
 Mode-specific rules (sprint workflow, code quality, architecture fitness, approach-first, debug checkpoint, scope guardian) have moved to `.claude/agents/` — they load only when the relevant session profile is active.
 
-Context cycling is enforced by a `PreToolUse` hook (`context-cycle-hook.sh`) configured in `settings.json`, not by rules alone.
+Context-usage warnings are emitted by a `Stop` hook (`context-warning-hook.sh`) configured in `hooks/hooks.json`. The `context-warnings.md` rule below describes how to respond when one appears.
 
 | File | Purpose |
 |------|---------|
 | `git-workflow.md` | Git discipline — branch naming, commit discipline, PR workflow |
 | `tool-first.md` | Tool-first autonomy — use CLI/API tools instead of asking the user to do it |
-| `context-cycling.md` | Context cycling procedure — what to do when the PreToolUse hook fires |
+| `context-warnings.md` | How to respond when the context-usage warning fires |
 
 Repeated-mistake capture is handled by Claude Code's native **Auto Memory** — no AAM rule or hook required.
 

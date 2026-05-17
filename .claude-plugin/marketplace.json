@@ -14,7 +14,7 @@
         "repo": "lwalden/AIAgentMinder"
       },
       "description": "Project governance for AI-assisted development. Sprint execution, worktree-isolated items, quality gates, TDD workflow, scope control, architecture fitness, and codebase fingerprinting. Installs via /plugin marketplace add lwalden/AIAgentMinder.",
-      "version": "5.0.2",
+      "version": "5.1.0",
       "author": {
         "name": "lwalden"
       },

@@ -40,17 +40,18 @@ describe('sprint-runner.sh: --agent parameter', () => {
   });
 });
 
-describe('session-start-hook.sh: agent mismatch warning', () => {
+describe('session-start-hook.sh: active sprint detection', () => {
   const filePath = path.join(REPO_ROOT, 'bin', 'session-start-hook.sh');
 
-  it('still detects sprint continuation signals', () => {
-    const content = fs.readFileSync(filePath, 'utf-8');
-    assert.ok(content.includes('.sprint-continuation.md'), 'must check for continuation file');
-  });
-
-  it('still detects active sprints', () => {
+  it('detects active sprints', () => {
     const content = fs.readFileSync(filePath, 'utf-8');
     assert.ok(content.includes('in-progress'), 'must check for in-progress sprint');
+  });
+
+  it('no longer references the retired cycle continuation file', () => {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    assert.ok(!content.includes('.sprint-continuation.md'),
+      'session-start-hook should not reference the retired .sprint-continuation.md');
   });
 });
 

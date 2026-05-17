@@ -102,13 +102,12 @@ when enabled. No manual `settings.json` edits required.
 | Hook | Event | Script | What It Does |
 |------|-------|--------|-------------|
 | Context monitor | statusLine | `context-monitor.sh` | Writes `.context-usage` with token thresholds; status line bridge |
-| Context cycle guard | PreToolUse | `context-cycle-hook.sh` | Blocks non-cycle tools when threshold hit |
-| Sprint phase guard | PreToolUse | `sprint-phase-guard.sh` | Blocks agent calls that don't match SPRINT.md Phase |
+| Context warning | Stop | `context-warning-hook.sh` | Injects an advisory warning when `.context-usage` says we're over threshold (v5.1+) |
+| Sprint phase guard | PreToolUse (matcher: Agent) | `sprint-phase-guard.sh` | Blocks Agent calls that don't match SPRINT.md Phase |
+| Sprint phase reminder | Stop | `sprint-phase-reminder.sh` | Per-turn phase-appropriate reminder during an active sprint (v5.1+) |
 | Sprint stop guard | Stop | `sprint-stop-guard.sh` | Blocks premature turn endings during sprint execution |
-| Session end cycle | SessionEnd | `session-end-cycle.sh` | Builds `.sprint-continuation.md` for cross-session resume |
-| Session start continuation | SessionStart | `session-start-continuation.sh` | Injects continuation context into the new session |
-| Session start cycle reset | SessionStart | `session-start-cycle-reset.sh` | Wipes stale `.context-usage` so resumed sessions don't auto-cycle |
-| Session start sprint detect | SessionStart | `session-start-hook.sh` | Detects active sprint and agent mismatch |
+| Session start cycle reset | SessionStart | `session-start-cycle-reset.sh` | Wipes stale `.context-usage` so resumed sessions get a fresh threshold |
+| Session start sprint detect | SessionStart | `session-start-hook.sh` | Detects active sprint and surfaces a one-line reminder |
 | Stop failure | StopFailure | `stop-failure-hook.sh` | Logs API errors and preserves sprint state |
 | HLPM ping | SessionStart, SessionEnd | `hlpm-ping.sh` | Notifies optional HLPM executive layer of session lifecycle |
 
@@ -125,13 +124,23 @@ See the [Claude Code hooks documentation](https://docs.anthropic.com/en/docs/cla
 for the full event list and JSON input format.
 
 
-### Context Cycling (Sprint Sessions)
+### Context Warnings (v5.1+)
 
-Context cycling fires automatically — no install step. The plugin's
-hooks pipeline detects context pressure, writes
-`.sprint-continuation.md`, and self-terminates. On the next `claude`
-invocation, `session-start-continuation.sh` injects the continuation
-into the new session.
+When context usage crosses the threshold, a Stop-hook injects an
+advisory warning at the end of the assistant turn. The warning is
+passive: no tools are blocked, no continuation file is written, and the
+session is not auto-restarted. Two paths:
+
+- **Wrap up:** run `/aiagentminder:handoff` (writes the "Next Session"
+  block into Claude Code's native Auto Memory), commit any work, then
+  `/exit`. Resume with "resume work" in the next session.
+- **Keep going:** the warning re-fires next turn while you remain over
+  threshold.
+
+Earlier versions tried to enforce a cycle protocol (block tools, write
+`.sprint-continuation.md`, self-terminate). v5.1 retired that because it
+fought Claude Code's native context behavior and didn't work reliably
+when monitoring sessions from the mobile app.
 
 If you'd prefer a wrapper that auto-restarts Claude in a tight loop for
 dedicated sprint sessions:
@@ -285,10 +294,10 @@ Two session-resume patterns both work with AAM:
 
 - `claude --resume <session>` — native session picker with full or compacted
   resume modes. AAM does nothing to interfere.
-- "resume working" prompt on a fresh `claude` — AAM's
-  `session-start-continuation.sh` hook injects `.sprint-continuation.md` if
-  the prior session ended under context pressure during an active sprint,
-  pointing Claude back at SPRINT.md.
+- "resume work" prompt on a fresh `claude` — Claude Code's native Auto
+  Memory carries the "Next Session" block forward (populated by
+  `/aiagentminder:handoff`). AAM's `session-start-hook.sh` also surfaces
+  a one-line reminder if SPRINT.md shows an in-progress sprint.
 
 If you ran `/aiagentminder:handoff` at the end of the prior session, your "Next Session"
 priorities also live in Claude's native Auto Memory and are recalled
@@ -324,7 +333,7 @@ files (`.claude/rules/*`, `.claude/aiagentminder-version`) and leaves
 user-owned files alone.
 
 **Refreshed (AIAgentMinder-managed):**
-- `.claude/rules/git-workflow.md`, `tool-first.md`, `context-cycling.md`
+- `.claude/rules/git-workflow.md`, `tool-first.md`, `context-warnings.md`
 - `.claude/aiagentminder-version`
 
 **Protected (user-owned, never overwritten):**

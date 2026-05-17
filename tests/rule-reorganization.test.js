@@ -10,7 +10,7 @@ const RULES_DIR = path.resolve(__dirname, '..', 'templates', '.claude', 'rules')
 const KEPT_RULES = [
   'git-workflow.md',
   'tool-first.md',
-  'context-cycling.md',
+  'context-warnings.md',
   'README.md',
 ];
 
@@ -23,6 +23,9 @@ const REMOVED_RULES = [
   'scope-guardian.md',
   // Retired — Claude Code's native Auto Memory now handles correction capture.
   'correction-capture.md',
+  // Retired in v5.1.0 — auto-cycle protocol replaced by a passive
+  // context-usage warning hook; rule renamed to context-warnings.md.
+  'context-cycling.md',
 ];
 
 describe('rule reorganization: kept rules exist', () => {
@@ -41,19 +44,21 @@ describe('rule reorganization: removed rules do not exist', () => {
   }
 });
 
-describe('rule reorganization: context-cycling.md content', () => {
-  it('contains key context cycling markers', () => {
-    const content = fs.readFileSync(path.join(RULES_DIR, 'context-cycling.md'), 'utf-8');
+describe('rule reorganization: context-warnings.md content', () => {
+  it('contains key context-warning markers', () => {
+    const content = fs.readFileSync(path.join(RULES_DIR, 'context-warnings.md'), 'utf-8');
     assert.ok(content.includes('.context-usage'), 'must reference .context-usage file');
-    assert.ok(content.includes('should_cycle'), 'must reference should_cycle flag');
-    assert.ok(content.includes('SessionEnd'), 'must reference SessionEnd hook (the continuation builder)');
-    assert.ok(content.includes('/exit'), 'must reference the /exit cycle procedure');
+    assert.ok(content.includes('should_cycle'), 'must reference should_cycle flag (status-line contract)');
+    assert.ok(content.includes('/aiagentminder:handoff'), 'must point users at the handoff skill');
+    assert.ok(content.includes('Stop hook'), 'must explain the hook event that fires the warning');
   });
 
-  it('is concise (under 30 lines)', () => {
-    const content = fs.readFileSync(path.join(RULES_DIR, 'context-cycling.md'), 'utf-8');
-    const lines = content.split('\n').length;
-    assert.ok(lines <= 30, `context-cycling.md is ${lines} lines, expected <= 30`);
+  it('describes the new behavior, not the retired auto-cycle protocol', () => {
+    const content = fs.readFileSync(path.join(RULES_DIR, 'context-warnings.md'), 'utf-8');
+    assert.ok(!content.includes('BLOCKED'),
+      'context-warnings rule should not describe a blocking protocol');
+    assert.ok(!content.includes('.sprint-continuation.md'),
+      'context-warnings rule should not reference the retired continuation file');
   });
 });
 
@@ -62,7 +67,7 @@ describe('rule reorganization: README.md updated', () => {
     const content = fs.readFileSync(path.join(RULES_DIR, 'README.md'), 'utf-8');
     assert.ok(content.includes('git-workflow.md'), 'must list git-workflow');
     assert.ok(content.includes('tool-first.md'), 'must list tool-first');
-    assert.ok(content.includes('context-cycling.md'), 'must list context-cycling');
+    assert.ok(content.includes('context-warnings.md'), 'must list context-warnings');
   });
 
   it('does not list removed rules as active', () => {

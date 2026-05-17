@@ -235,7 +235,7 @@ Replaced `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync comman
 
 v4.2 shipped deterministic sync. The roadmap is informed by the March 2026 architecture assessment (`docs/architecture-assessment-2026-03.md`), which mapped AAM against 30+ competing tools. Key finding: AAM's moat is execution governance (sprint state machine + quality gates + context cycling), not rules — the market is converging on rules sync, but nobody else is attempting enforcement at this depth.
 
-Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, review, or promote items.
+Unscheduled work is tracked in `BACKLOG.md`. Run `/aiagentminder:backlog` to capture, review, or promote items.
 
 ---
 

@@ -81,10 +81,12 @@ describe('orchestrator integration: state machine coverage', () => {
     assert.ok(content.includes('REWORK'));
   });
 
-  it('sprint-master handles context cycling', () => {
+  it('sprint-master describes how to respond to context warnings', () => {
     const content = readAgent(SPRINT_MASTER);
     assert.ok(
-      content.includes('CONTEXT_CYCLE') || content.includes('context cycling') || content.includes('context cycle'),
+      content.toLowerCase().includes('context warning') ||
+        content.toLowerCase().includes('over threshold'),
+      'sprint-master must document the v5.1 context-warning behavior',
     );
   });
 });

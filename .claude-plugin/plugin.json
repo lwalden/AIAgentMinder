@@ -1,6 +1,6 @@
 {
   "name": "aiagentminder",
-  "version": "5.0.2",
+  "version": "5.1.0",
   "description": "Project governance for Claude Code: sprint execution, quality gates, worktree-isolated items, /goal-compatible autonomous mode, and structured planning. Solo and small-team focused.",
   "author": {
     "name": "lwalden",

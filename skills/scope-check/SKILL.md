@@ -58,7 +58,8 @@ Return one of these verdicts with a one-sentence recommendation:
 > This isn't in the roadmap. Options:
 > 1. Add it to the current phase MVP list (update docs/strategy-roadmap.md)
 > 2. Add it to a future phase
-> 3. Mark it explicitly out of scope
+> 3. Capture to backlog for later refinement — run `backlog-capture.sh add <type> "<title>" session` (see `/aiagentminder:backlog`)
+> 4. Mark it explicitly out of scope
 > Which do you prefer?
 
 **Outside sprint:**
