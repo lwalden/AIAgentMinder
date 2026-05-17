@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [5.0.2] - 2026-05-17
+
+### Fixed
+
+- **`skills/setup/SKILL.md`** — Removed stale references to a non-existent `/aiagentminder:update` skill. The setup skill is itself the re-sync / upgrade path: users re-run `/aiagentminder:setup` (optionally after `/plugin update aiagentminder`) rather than invoking a separate update command. Updated both the "existing install" branch in step 1 and the "What this skill does NOT do" exclusions.
+
+---
+
 ## [5.0.0] - 2026-05-15
 
 ### BREAKING CHANGES
