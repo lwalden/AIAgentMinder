@@ -22,9 +22,13 @@ Stale v5.0 cycle-protocol references in README that the v5.1.0 PR missed:
 - Top-level "What It Does" bullet on context management updated to drop the "autonomous context cycling across sessions" phrasing.
 - Footer doc-link description updated.
 
+### Roadmap reconciled
+
+- **`docs/strategy-roadmap.md`** — The v5.1 heading previously held an unbuilt "Portability & Ecosystem" scope (AGENTS.md bidirectional sync, cross-tool rule export, "Mechanical Enforcement" blog post, release automation). All three code items referenced the npm CLI retired in v5.0, so they were stale on arrival. Replaced the section with what v5.1 actually shipped (context redesign + web-compat docs), and moved the unbuilt portability work to a new "v5.2+ — Portability & Ecosystem (deferred indefinitely)" section noting the npm-CLI blocker and that any revival would require a fresh evaluation. Restored the "Future Direction (monitor)" heading that the section edit briefly orphaned.
+
 ### Notes
 
-Documentation-only release. No behavior change. No test impact (309/309 green). Existing v5.1.0 installs need only `/plugin update aiagentminder` to pick up the version stamp and refreshed README; no re-run of `/aiagentminder:setup` required.
+Documentation-only release. No behavior change. No test impact (309/309 green). Existing v5.1.0 installs need only `/plugin update aiagentminder` to pick up the version stamp and refreshed docs; no re-run of `/aiagentminder:setup` required.
 
 ---
 
