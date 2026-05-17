@@ -6,6 +6,28 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [5.1.1] - 2026-05-17
+
+### Changed
+
+- **`README.md`** — Added a "Where this works" callout right under the Quick Start. Calls out plainly that AAM runs on Claude Code CLI and the VS Code / JetBrains extensions, but **not** on `claude.ai/code` web sessions (no plugin loader → no slash commands, sub-agents, hooks, or `bin/` scripts). Notes that `/aiagentminder:setup`-installed repo artifacts (`CLAUDE.md`, `.claude/rules/*.md`, `SPRINT.md`, `BACKLOG.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`) remain usable from web because they live in the repo itself. Mobile / desktop app parity declared a non-goal.
+
+### Fixed
+
+Stale v5.0 cycle-protocol references in README that the v5.1.0 PR missed:
+
+- Hooks & scripts table updated to match v5.1.0 reality — removed the three deleted scripts (`context-cycle-hook.sh`, `session-end-cycle.sh`, `session-start-continuation.sh`), added the two replacements (`context-warning-hook.sh`, `sprint-phase-reminder.sh`), and noted `matcher: "Agent"` on `sprint-phase-guard.sh`.
+- Rules table: `context-cycling.md` → `context-warnings.md`.
+- "Context cycling" section → "Context warnings (v5.1+)" — rewrote to describe the advisory model and link to DECISIONS.md / CHANGELOG.md for the rationale.
+- Top-level "What It Does" bullet on context management updated to drop the "autonomous context cycling across sessions" phrasing.
+- Footer doc-link description updated.
+
+### Notes
+
+Documentation-only release. No behavior change. No test impact (309/309 green). Existing v5.1.0 installs need only `/plugin update aiagentminder` to pick up the version stamp and refreshed README; no re-run of `/aiagentminder:setup` required.
+
+---
+
 ## [5.1.0] - 2026-05-17
 
 ### Changed
