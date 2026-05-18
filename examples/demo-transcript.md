@@ -1,12 +1,12 @@
 # Demo: Planning and Building a Recipe API
 
-A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-handoff`, and the resume cycle.
+A walkthrough of three sessions using AIAgentMinder. Shows `/aiagentminder:brief`, `/aiagentminder:handoff`, and the resume cycle.
 
 ---
 
 ## Session 1: Planning
 
-> **User:** /aam-brief
+> **User:** /aiagentminder:brief
 
 > **Claude:** Where are you with your project idea? A) Rough concept B) Clear idea C) Partial plan D) Detailed plan
 
@@ -24,7 +24,7 @@ A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-h
 
 [Claude records format preference in DECISIONS.md, populates MVP Goals in CLAUDE.md]
 
-> **User:** /aam-handoff
+> **User:** /aiagentminder:handoff
 
 [Claude writes priorities to auto-memory, updates DECISIONS.md with ADR format choice, commits]
 
@@ -56,15 +56,15 @@ A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-h
 
 [Claude writes failing tests for auth, implements POST /auth/register and POST /auth/login — tests pass]
 
-[Runs `/aam-quality-gate` — Standard tier checks pass. Creates PR for S1-003.]
+[Runs `/aiagentminder:quality-gate` — Standard tier checks pass. Creates PR for S1-003.]
 
-[For the risk-tagged auth issue, Claude also runs `/aam-self-review` — security lens finds no issues.]
+[For the risk-tagged auth issue, Claude also runs `/aiagentminder:self-review` — security lens finds no issues.]
 
 > **User:** PR looks good. Continue.
 
 [Claude implements recipe CRUD routes with tests — all pass]
 
-> **User:** /aam-handoff
+> **User:** /aiagentminder:handoff
 
 [Claude writes priorities to auto-memory: "Next: ingredient search, favorites, rate limiting (Sprint 2)". Updates DECISIONS.md with Zod validation decision. Commits.]
 
@@ -78,7 +78,7 @@ A walkthrough of three sessions using AIAgentMinder. Shows `/aam-brief`, `/aam-h
 
 > **Claude:** Sprint S1: 5/5 issues complete. All PRs merged. Ready for sprint review.
 
-[Claude runs `/aam-retrospective` — 5 planned, 5 completed, 0 scope changes, 0 blocked, 1 decision logged. "First sprint — recommend 4–5 issues next sprint. No stress indicators."]
+[Claude runs `/aiagentminder:retrospective` — 5 planned, 5 completed, 0 scope changes, 0 blocked, 1 decision logged. "First sprint — recommend 4–5 issues next sprint. No stress indicators."]
 
 > **User:** Archive the sprint and start Sprint 2.
 
