@@ -57,20 +57,30 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 | `/aiagentminder:grill` | Plan interrogation — walk every decision branch before implementation | No |
 | `/aiagentminder:sync-issues` | Push current sprint issues to GitHub Issues (optional) | No |
 
-## Optional Features
+## Quality and Sprint Execution
 
-### Code Quality Guidance
+### Code Quality
 
-When enabled, `templates/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (TDD cycle, build-before-commit, small focused functions, and read-before-write). Enabled during `/aiagentminder:brief` or `/aiagentminder:setup`. Delete the file to opt out.
+Code-quality guidance used to ship as a standalone `.claude/rules/code-quality.md` file. It was retired in v4.x in favor of agent-based enforcement, which is harder to skip:
 
-### Sprint Planning
+- **Sprint items** run inside `item-executor`, which mandates TDD and runs the full test suite before declaring done.
+- **`quality-reviewer`** runs the quality gate (build, tests, coverage, lint, security) during the sprint REVIEW phase.
+- **`/aiagentminder:quality-gate`** invokes the same checks on demand outside a sprint.
+- **Session profile agents** `dev` and `qa` carry code-quality instructions in their agent definitions.
 
-When enabled, `templates/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` is created, and `@SPRINT.md` is added to CLAUDE.md. When you ask Claude to "start a sprint" or "begin Phase 1," it:
-1. Decomposes the phase work into discrete issues with acceptance criteria — waits for approval
-2. Writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for approval
-3. Executes items autonomously in sequence: TDD, full test suite, quality gate, self-review, PR pipeline — no permission prompts between items
-4. Runs post-merge validation; failures create rework tasks within the sprint
-5. Archives completed sprints to git history
+Net: the discipline is the same; the enforcement just moved from a rule file (easily ignored) to agents and hooks (mechanical).
+
+### Sprint Execution
+
+Sprint workflow used to ship as a standalone `.claude/rules/sprint-workflow.md` file. It was retired in the v5.0 orchestrator rework and replaced by the `sprint-master` sub-agent. When you say "start a sprint" or "begin Phase 1," `sprint-master` runs a state machine:
+
+1. **PLAN** — decomposes the phase work into 4–7 issues with acceptance criteria — waits for your approval.
+2. **SPEC** — writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for approval.
+3. **EXECUTE / TEST / REVIEW / MERGE** — per item, in an isolated git worktree: TDD, full test suite, quality gate, self-review, PR pipeline. No permission prompts between items.
+4. **VALIDATE** — post-merge validation; failures create rework tasks within the sprint.
+5. **COMPLETE** — sprint archived to git history.
+
+Phase boundaries are mechanically enforced by `sprint-phase-guard.sh` (PreToolUse, `matcher: "Agent"`) — sub-agents dispatched out of phase order are blocked at the tool layer.
 
 ### Context Warnings (v5.1+)
 

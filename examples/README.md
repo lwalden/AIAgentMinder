@@ -1,6 +1,6 @@
 # Examples
 
-These are sample outputs showing what AIAgentMinder's state files look like in practice, mid-way through a real project. They are **not templates to copy** — the actual templates live in `project/`.
+These are sample outputs showing what AIAgentMinder's state files look like in practice, mid-way through a real project. They are **not templates to copy** — the actual bootstrap templates live in `templates/` and are installed by `/aiagentminder:setup`.
 
 The fictional project is a REST API for a recipe sharing app (Node.js / Express / PostgreSQL), built by a solo developer. It's mid-Phase 1: the project scaffold exists, auth is partially working, and the first few endpoints are in place.
 

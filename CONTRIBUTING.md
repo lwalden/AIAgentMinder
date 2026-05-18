@@ -19,7 +19,10 @@ Ideas for new features, better defaults, or improved documentation are welcome. 
 ## Pull Requests
 
 1. Fork the repo and create a branch from `main`
-2. Make your changes in the `project/` directory (for template files) or root (for meta-docs)
+2. Make your changes:
+   - **Plugin payload** (ships to users via the marketplace): `agents/`, `skills/<name>/SKILL.md`, `bin/`, `hooks/hooks.json`, `.claude-plugin/`
+   - **Bootstrap templates** (copied into target projects by `/aiagentminder:setup`): `templates/`
+   - **Meta-docs** (this repo only): root-level `README.md`, `CLAUDE.md`, `DECISIONS.md`, `CHANGELOG.md`, `docs/`
 3. Keep changes focused -- one improvement per PR
 4. Update `CHANGELOG.md` if your change is user-facing
 5. Open a PR with a clear description of what and why

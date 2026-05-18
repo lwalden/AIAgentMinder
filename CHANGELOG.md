@@ -6,6 +6,42 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+Documentation-only — no version bump.
+
+### README rewrite (first major revision since v4.3)
+
+Rewritten with a value-first structure. Lead with concrete wins, surface the five hub features readers actually use day-to-day, push reference tables into collapsible `<details>` blocks so first-time visitors aren't drowning in command/rule/hook inventories.
+
+- **"The 30-second case"** — 5 concrete wins (autonomous sprints, cross-model self-review, autonomous PR pipeline, clean handoff, plan/decision discipline) replacing the prior abstract "What It Does" bullets.
+- **"Where this works"** promoted to a top-level section.
+- **"What you actually use"** — five hub features with trigger + outcome.
+- **"See it in action"** — links to `examples/demo-transcript.md`.
+- **"When NOT to use this"** — merged honesty section combining the prior "When to Use" and "Non-Goals".
+- **"Reference"** — collapsible blocks for skills, sub-agents, hooks/scripts, and installed files. Same content, out of the reader's face.
+
+Stale content removed:
+
+- **Mode-specific rules table** listed six retired rule files (`approach-first.md`, `debug-checkpoint.md`, `code-quality.md`, `scope-guardian.md`, `architecture-fitness.md`, `sprint-workflow.md`). All retired in v4.x; the README still listed them as if they shipped. Replaced with the current 3-rule baseline (`git-workflow`, `tool-first`, `context-warnings`).
+- **Session-profiles** demoted from a top-level section into the Reference → Sub-agents block.
+
+### Other documentation cleanup
+
+- **`SKILL.md` (repo root)** — Deleted. v0.x/v1.x placeholder labeled "Status: v3.3.0", referencing the retired `npx aiagentminder init` and `/aam-setup`. Modern plugin metadata lives in `.claude-plugin/plugin.json`.
+- **`examples/demo-transcript.md`** — Five stale `/aam-X` command references → `/aiagentminder:X`.
+- **`examples/README.md`** — `project/` directory reference → `templates/` (the directory was renamed in v5.0).
+- **`CONTRIBUTING.md`** — Same `project/` → `templates/` fix. Clarified the three change categories: plugin payload (ships via marketplace), bootstrap templates (installed by `/aiagentminder:setup`), and meta-docs (this repo only).
+- **`docs/how-it-works.md` + `docs/customization-guide.md`** — Both still described `code-quality.md` and `sprint-workflow.md` as opt-in rule files. Those rules were retired in v4.x and v5.0 when the methodology moved into agents (`item-executor`, `quality-reviewer`, `sprint-master`) and hooks (`sprint-phase-guard.sh`). Both sections rewritten to reflect agent-based enforcement. Section heading changed from "Optional Features" to "Quality and Sprint Execution".
+- **`docs/strategy-roadmap.md`** — The v5.1 heading previously held unbuilt "Portability & Ecosystem" scope (AGENTS.md bidirectional sync, cross-tool rule export, "Mechanical Enforcement" blog post, release automation). All three code items referenced the npm CLI retired in v5.0, so they were stale on arrival. Replaced the section with what v5.1 actually shipped, and moved the unbuilt portability work to "v5.2+ — Portability & Ecosystem (deferred indefinitely)" with a note about the npm-CLI blocker.
+- **`CLAUDE.md` (this repo only)** — Recorded a "Git / PR state — verify, don't assume" rule. After the user says "merged" or after any pause, refetch and check before continuing to operate on a branch as if its PR were still open.
+
+### Notes
+
+No code change. No version bump. No test impact (309/309 green). No re-run of `/aiagentminder:setup` required by users.
+
+---
+
 ## [5.1.1] - 2026-05-17
 
 ### Changed

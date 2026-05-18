@@ -28,49 +28,48 @@ Run `/aiagentminder:brief` to fill it interactively, or edit manually. At minimu
 
 ---
 
-## Optional Features
+## Quality and Sprint Execution
 
-### Code Quality Guidance
+### Code Quality
 
-A small set of development discipline instructions loaded natively at every session start. Covers TDD cycle, build-before-commit, small focused functions, and read-before-write.
+The standalone `.claude/rules/code-quality.md` rule was retired in v4.x. Code-quality enforcement now lives in agents and hooks rather than a rule file:
 
-**Enabled by default** during `/aiagentminder:setup` and `/aiagentminder:brief`.
-**Disable:** Delete `.claude/rules/code-quality.md` from your project.
+- **`item-executor`** (the EXECUTE-phase agent) mandates TDD and runs the full test suite before declaring an item done.
+- **`quality-reviewer`** runs the quality gate during the sprint REVIEW phase: build, tests, coverage, lint, security.
+- **`/aiagentminder:quality-gate`** invokes the same checks on demand outside a sprint.
+- **`dev`** and **`qa`** session profile agents carry code-quality instructions in their agent definitions for ad-hoc work outside sprints.
 
-The file lives at `.claude/rules/code-quality.md` and is refreshed when you re-run `/aiagentminder:setup` after a plugin update. Claude Code loads all `.md` files in `.claude/rules/` natively — no hooks needed.
+There is no opt-out switch — these are agent-internal, not a separate file. If you don't want them, don't dispatch the agents.
 
-### Sprint Planning
+### Sprint Execution
 
-A structured development workflow where Claude decomposes phase work into discrete issues, presents them for your review, then works them one-by-one with per-issue PRs. Sprint state is tracked in `SPRINT.md`, which is loaded via `@import` in CLAUDE.md when a sprint is active.
+The standalone `.claude/rules/sprint-workflow.md` rule was retired in the v5.0 orchestrator rework. The workflow is now driven by the `sprint-master` sub-agent, which Claude auto-dispatches when you say "start a sprint" or "begin Phase 1."
 
 **How sprints are scoped**
 
-A sprint in AIAgentMinder is not a time-boxed agile sprint — there's no two-week clock. A sprint is a coherent subset of a phase's work, typically 4–7 issues. Claude reads the phase's features and acceptance criteria from `docs/strategy-roadmap.md`, groups related work into a first sprint, and defers the rest to subsequent sprints. Multiple sprints per phase is normal for any non-trivial phase. Scope is bounded by thematic coherence and issue count, not by a calendar. When Claude presents the proposed sprint, it notes what phase work is deferred so you have the full picture before approving.
+A sprint in AIAgentMinder is not a time-boxed agile sprint — there's no two-week clock. A sprint is a coherent subset of a phase's work, typically 4–7 issues. `sprint-planner` (the PLAN-phase agent) reads the phase's features and acceptance criteria from `docs/strategy-roadmap.md`, groups related work into a first sprint, and defers the rest to subsequent sprints. Multiple sprints per phase is normal for any non-trivial phase. Scope is bounded by thematic coherence and issue count, not by a calendar.
 
-**Full lifecycle:**
-1. Tell Claude "start a sprint" or "begin Phase 1"
-2. Claude reads the roadmap, proposes issues with acceptance criteria — waits for your approval
-3. Claude writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for your approval
-4. Claude executes items autonomously in sequence: TDD, full test suite, quality gate, self-review, PR pipeline — no permission prompts between items
-5. Post-merge validation runs; failures create rework tasks within the sprint
-6. Sprint ends when all items pass quality gates, review, merge, and validation
-7. Claude presents a sprint review; you accept → sprint is archived to git history
-8. Start the next sprint
+**Full lifecycle** (run by `sprint-master`'s state machine):
+
+1. **PLAN** — `sprint-planner` proposes issues with acceptance criteria; waits for your approval.
+2. **SPEC** — `sprint-speccer` writes detailed implementation specs per item (approach, test plan, post-merge validation); waits for your approval.
+3. **EXECUTE / TEST / REVIEW / MERGE** (per item, in an isolated git worktree) — `item-executor` runs TDD and the full test suite; `quality-reviewer` runs the quality gate; PR pipeline merges. No permission prompts between items.
+4. **VALIDATE** — post-merge validation runs; failures create rework tasks within the sprint.
+5. **COMPLETE** — sprint archived to git history.
+
+Phase boundaries are mechanically enforced by `sprint-phase-guard.sh` (PreToolUse, `matcher: "Agent"`) — sub-agents dispatched out of phase order are blocked at the tool layer, not just gently reminded.
 
 **Blocked issues and user interaction**
 
-When Claude cannot complete an issue — missing information, an unresolved dependency, or a decision that requires your input — it marks the issue `blocked` in `SPRINT.md` and notifies you with a clear description of what's needed. Claude does not skip ahead to the next issue or make assumptions to work around the block. It stops and waits.
+When an item-executor cannot complete an issue — missing information, an unresolved dependency, or a decision that requires your input — sprint-master marks the issue `blocked` in `SPRINT.md` and notifies you with a clear description of what's needed. It does not skip ahead or make assumptions to work around the block.
 
-You resolve the block (answer the question, provide the missing resource, make the decision), then tell Claude to continue. Blocked issues don't invalidate the sprint — the sprint resumes once the blocker is cleared.
+You resolve the block, then tell Claude to continue. Blocked issues don't invalidate the sprint — the sprint resumes once the blocker is cleared.
 
 **End of sprint**
 
-A sprint ends when every issue is `done`. Claude presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. On acceptance, Claude archives the sprint — the active `SPRINT.md` content is replaced with a single summary line, preserved in full in git history. You can then ask to begin the next sprint.
+A sprint ends when every issue is `done`. `sprint-master` presents a sprint review: completed issues with PR links, decisions logged to `DECISIONS.md`, a plain-language summary of what was accomplished, and what the next sprint might address. On acceptance, the sprint archives to git history — the active `SPRINT.md` content is replaced with a single summary line, preserved in full in git history. You can then ask to begin the next sprint, or invoke `/aiagentminder:retrospective` for sprint metrics first.
 
-**Enabled by default** during `/aiagentminder:setup` and `/aiagentminder:brief`.
-**Disable:** Delete `.claude/rules/sprint-workflow.md`. SPRINT.md can be left or removed.
-
-Sprint workflow instructions live in `.claude/rules/sprint-workflow.md` (refreshed when you re-run `/aiagentminder:setup` after a plugin update). Sprint state lives in `SPRINT.md` (user-owned; `/aiagentminder:setup` never overwrites an active sprint).
+**Sprint state lives in `SPRINT.md`** (user-owned; `/aiagentminder:setup` never overwrites an active sprint).
 
 ---
 
