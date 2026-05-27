@@ -8,7 +8,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-Documentation-only — no version bump.
+### Fixed
+
+- **`sprint-phase-guard.sh` blocked every specialist agent on marketplace installs** — the guard matched `subagent_type` against bare agent names (`item-executor`, `sprint-planner`, …), but plugin-installed agents dispatch under the `aiagentminder:` namespace. A namespaced call (`aiagentminder:item-executor`) matched nothing and was blocked as a "phase violation," so a marketplace-installed sprint could only advance by disabling the guard (e.g. running with a non-`in-progress` status, which also silently disables the stop-guard and phase-reminder hooks). The guard now strips any plugin-namespace prefix before matching, so both bare (`claude --agent`) and namespaced (marketplace) dispatch work. Added `tests/sprint-phase-guard.test.js`.
+
+### Documentation (no version bump)
 
 ### README rewrite (first major revision since v4.3)
 

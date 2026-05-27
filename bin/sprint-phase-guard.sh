@@ -43,6 +43,11 @@ fi
 
 subagent_type=$(echo "$input" | jq -r '.tool_input.subagent_type // "general-purpose"' 2>/dev/null)
 
+# Strip any plugin namespace prefix: marketplace installs dispatch agents as
+# "aiagentminder:item-executor"; direct `claude --agent` uses bare names. The
+# allow-lists below are bare, so normalize both forms to the bare name.
+subagent_type="${subagent_type##*:}"
+
 # Session profiles and utility agents are always allowed
 case "$subagent_type" in
   dev|debug|hotfix|qa|general-purpose|Explore|Plan) exit 0 ;;
