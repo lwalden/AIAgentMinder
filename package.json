@@ -1,6 +1,6 @@
 {
   "name": "aiagentminder",
-  "version": "5.1.1",
+  "version": "5.1.2",
   "description": "Claude Code plugin: project governance for AI-assisted development — sprint execution, quality gates, worktree-isolated items, and structured planning. Install via /plugin marketplace add lwalden/AIAgentMinder.",
   "type": "module",
   "scripts": {
