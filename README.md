@@ -3,124 +3,48 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-5.1.1-blue)
 
-A Claude Code plugin that turns a multi-day feature into a single command. AIAgentMinder drives an autonomous sprint loop — plan, spec, approve, build with TDD, quality-gate, cross-model self-review, open the PR, watch CI, merge — and it mechanically enforces the parts solo Claude tends to skip when you stop watching.
+A set of skills, sub agents, and hooks for Claude Code governance for solo dev and small teams. Enforce your coding standards without repeating your instructions. Detects and enforces a stop BEFORE context degredation gets bad. Agents and skills to have agent run autonomous sprints and coding efforts that can go for hours accross multiple sesisons without losing context.
 
-Built for solo developers and small teams who want governance without the ceremony.
+Basically, I wanted Claude Code to have the skills I use daily as a developer, and figured we could include some product manager tasks as well. This plugin lets you effectivly manage AI development of large and complex projects that cannot be completed in just one to five sessions. When a project needs 100+ PRs over the span of months you need consistency from your tooling, excellent and self-updating memory, the ability to change direction rapidly, quickly quashing of defects that will arise, and deterministic enforcement of quality.
+
+Installs easily into existing or new repos. Works with a back of the napkin scetch of an idea, or a fully spec'ed plan.
 
 ---
 
 ## The 30-second case
 
-- **Run a sprint, walk away.** `Start a sprint for Phase 2.` AAM plans, takes your approval at the spec gate, then executes item-by-item in isolated git worktrees until the PRs are merged.
+- **Run a sprint, walk away.** `Start a sprint for Phase 2.` AAM plans, takes your approval at the spec gate, then executes item-by-item in isolated git worktrees until the PRs are ready for review or even merged.
 - **A different model reviews your code before you do.** `/aiagentminder:self-review` runs the change through five specialist lenses (security, performance, API design, cost, UX friction) plus a cross-model judge pass.
-- **PRs that fix themselves.** `/aiagentminder:pr-pipeline` reviews with full repo context, applies the fixes, waits on CI, and either merges or escalates with a reason.
 - **Clean cross-session resume.** `/aiagentminder:handoff` writes the resume state into Claude Code's native Auto Memory; in the next session, "resume work" picks up exactly where you stopped.
 - **Plan and decision discipline by default.** `scope-check` keeps work aligned with the roadmap, `DECISIONS.md` logging keeps the record honest, `BACKLOG.md` captures everything you can't do right now.
-
-These aren't instructions — they're mechanically enforced via Claude Code hooks (PreToolUse, Stop, SessionStart). See [DECISIONS.md](DECISIONS.md) for the architectural rationale.
 
 ---
 
 ## Quick Start
 
-In Claude Code:
+Step 1 - Install
+  In Claude Code:
 
-```
-/plugin marketplace add lwalden/AIAgentMinder
-/plugin install aiagentminder@lwalden-aiagentminder
-```
+  ```
+  /plugin marketplace add lwalden/AIAgentMinder
+  /plugin install aiagentminder@lwalden-aiagentminder
+  ```
 
-Then in your target project:
+Step 2 - Configure
+  In your target project:
 
-```
-/aiagentminder:setup
-```
+  ```
+  /aiagentminder:setup
+  ```
 
-`/aiagentminder:setup` runs interactively — it fingerprints your codebase, asks for project identity, writes a starter `CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, and `docs/strategy-roadmap.md`, and seeds `.claude/rules/` and `.gitignore`.
+  `/aiagentminder:setup` runs interactively — it fingerprints your codebase, asks for project identity, writes a starter `CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, and `docs/strategy-roadmap.md`, and seeds `.claude/rules/` and `.gitignore`.
 
-### First moves
+---
+
+### Suggested Next Steps
 
 1. `/aiagentminder:brief` to draft a product brief and strategy roadmap interactively.
-2. Start building. With sprint planning: `Start a sprint for Phase 1.`
-
-### Minimum Claude Code version
-
-v5.0 needs Claude Code **2.1.139+** for worktree-isolated agent execution (`isolation: "worktree"`), the `/goal` command, and `${CLAUDE_PLUGIN_ROOT}` hook variable substitution.
-
----
-
-## Where this works
-
-| Environment | Plugin works? | Notes |
-|---|---|---|
-| Claude Code CLI (macOS / Linux / Windows) | ✅ Full | Primary target. |
-| VS Code with the Claude Code extension | ✅ Full | Extension hosts a local Claude Code; same surface as CLI. |
-| JetBrains IDE extension | ✅ Full | Same as VS Code. |
-| **claude.ai/code (browser web sessions)** | ❌ No | Web sessions don't load plugins. No `/aiagentminder:*` commands, no sub-agents, no hooks, no `bin/` scripts on PATH. Only the artifacts that `/aiagentminder:setup` previously copied into the repo (`CLAUDE.md`, `.claude/rules/*.md`, `SPRINT.md`, `BACKLOG.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`) remain available, since they live in the repo itself. |
-
-A project bootstrapped from a local session is still readable from web — Claude will load `CLAUDE.md` and rules natively — but plugin-only workflows are CLI / IDE only. Mobile and Claude desktop app parity is not a goal.
-
----
-
-## What you actually use
-
-Five features carry most of the value. Each is one slash command or one Task dispatch.
-
-### 1. Autonomous sprint execution
-
-**Trigger:** `Start a sprint for Phase 2.`
-**What you get:** `sprint-master` orchestrates a state machine — `PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE → VALIDATE] → COMPLETE`. Each item runs in its own git worktree, isolated from other in-flight work. TDD is mandatory. Quality gate runs before every PR. You approve once at the spec gate; the rest is autonomous.
-
-### 2. Cross-model self-review
-
-**Trigger:** `/aiagentminder:self-review` (also runs automatically in the REVIEW phase of every sprint item)
-**What you get:** Five specialist sub-agents — `security-reviewer`, `performance-reviewer`, `api-reviewer`, `cost-reviewer`, `ux-reviewer` — each give a focused-lens read. A judge pass picks real findings from noise. Configurable to use a different model than the one that wrote the code, so the second opinion actually catches things the original author missed.
-
-### 3. Autonomous PR pipeline
-
-**Trigger:** `/aiagentminder:pr-pipeline <PR#>` (also invoked in-sprint after PR creation)
-**What you get:** `pr-pipeliner` reviews the PR with full repo context (not just the diff), applies the fixes itself, waits on external CI, and merges when green. Escalates with a reason on cycle limit, high-risk files, or unresolvable blockers. Configurable per repo via `.pr-pipeline.json`.
-
-### 4. Clean session handoff
-
-**Trigger:** `/aiagentminder:handoff`
-**What you get:** Writes a "Next Session" block into Claude Code's native Auto Memory — decisions made this session, the next concrete step, any blockers. In the next session, "resume work" picks up exactly where you stopped. Pairs with the context-warning hook, which advises you (no enforcement) when you approach the token threshold.
-
-### 5. Plan and decision discipline
-
-**Triggers:** `/aiagentminder:scope-check`, `/aiagentminder:revise`, `/aiagentminder:backlog`
-**What you get:** Before AAM lets new work into a sprint, `scope-check` compares it against `docs/strategy-roadmap.md`. If out of scope, you either revise the roadmap (logged in `DECISIONS.md`) or capture to `BACKLOG.md`. The plan, the record, and the work stay in sync.
-
-The full feature inventory (15 skills, 16 sub-agents, 9 hooks) is in the [Reference](#reference) section.
-
----
-
-## See it in action
-
-[examples/demo-transcript.md](examples/demo-transcript.md) walks through three sessions on a sample REST API: planning with `/aiagentminder:brief`, handing off mid-build with `/aiagentminder:handoff`, and resuming. Sample state files (`examples/CLAUDE.md`, `examples/DECISIONS.md`, `examples/strategy-roadmap.md`) show what a mid-project repo looks like.
-
----
-
-## When NOT to use this
-
-- **Single-session projects.** If your work fits in one Claude session and you don't need sprint governance or decision logging, plain `CLAUDE.md` is enough.
-- **Ad-hoc exploration.** AAM expects a roadmap. If you're poking around to figure out what to build, finish that first, then `/aiagentminder:setup`.
-- **Multi-agent concurrency on overlapping work.** `sprint-master` coordinates items sequentially in isolated worktrees. It does not orchestrate concurrent agents working on the same files.
-- **Browser-only workflow.** See [Where this works](#where-this-works) — plugin features aren't loaded in `claude.ai/code` web sessions.
-
-AAM adds structure. Only use it if the structure pays for itself.
-
----
-
-## Requirements
-
-- **Claude Code 2.1.139+** — VS Code / JetBrains extension or CLI.
-- **Bash** — Windows users need Git Bash or WSL; macOS/Linux built-in.
-- **jq** — for context monitoring (`winget install jqlang.jq` / `brew install jq` / `apt install jq`). Hooks degrade gracefully without it.
-- **Git** — required.
-- **GitHub CLI (`gh`)** — optional, for PR pipeline and issue sync.
-
-Works on Windows, macOS, and Linux. Node.js is no longer required (the v4.x npm CLI was retired in v5.0).
+2. Start building. Start a new session with 'claude --agent sprint-master' then prompt 'start sprint 1'
 
 ---
 
@@ -215,6 +139,85 @@ Zero-token-cost scripts replace LLM file I/O with deterministic bash. Significan
 Total always-loaded baseline: ~1,000 tokens per session.
 
 </details>
+
+---
+
+### Minimum Claude Code version
+
+v5.0.x+ needs Claude Code **2.1.139+** for worktree-isolated agent execution (`isolation: "worktree"`), the `/goal` command, and `${CLAUDE_PLUGIN_ROOT}` hook variable substitution.
+
+---
+
+## Where this works
+
+| Environment | Plugin works? | Notes |
+|---|---|---|
+| Claude Code CLI (macOS / Linux / Windows) | ✅ Full | Primary target. |
+| VS Code with the Claude Code extension | ✅ Full | Extension hosts a local Claude Code; same surface as CLI. |
+| JetBrains IDE extension | ✅ Full | Same as VS Code. |
+| **claude.ai/code (browser web sessions)** | ❌ No | Web sessions don't load plugins. No `/aiagentminder:*` commands, no sub-agents, no hooks, no `bin/` scripts on PATH. Only the artifacts that `/aiagentminder:setup` previously copied into the repo (`CLAUDE.md`, `.claude/rules/*.md`, `SPRINT.md`, `BACKLOG.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`) remain available, since they live in the repo itself. |
+
+A project bootstrapped from a local session is still readable from web — Claude will load `CLAUDE.md` and rules natively — but plugin-only workflows are CLI / IDE only. Mobile and Claude desktop app parity is not a goal.
+
+---
+
+## What you actually use
+
+### 1. Autonomous sprint execution
+
+**Trigger:** Run clause with the sprint-master agent: `claude --agent sprint-master Start a sprint for Phase 2.`
+**What you get:** `sprint-master` orchestrates a state machine — `PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE → VALIDATE] → COMPLETE`. Each item runs in its own git worktree, isolated from other in-flight work. TDD is mandatory. Quality gate runs before every PR. You approve once at the spec gate; the rest is autonomous.
+
+### 2. Cross-model self-review
+
+**Trigger:** `/aiagentminder:self-review` (also runs automatically in the REVIEW phase of every sprint item)
+**What you get:** Five specialist sub-agents — `security-reviewer`, `performance-reviewer`, `api-reviewer`, `cost-reviewer`, `ux-reviewer` — each give a focused-lens read. A judge pass picks real findings from noise. Configurable to use a different model than the one that wrote the code, so the second opinion actually catches things the original author missed.
+
+### 3. Autonomous PR pipeline
+
+**Trigger:** `/aiagentminder:pr-pipeline <PR#>` (also invoked in-sprint after PR creation)
+**What you get:** `pr-pipeliner` reviews the PR with full repo context (not just the diff), applies the fixes itself, waits on external CI, and merges when green. Escalates with a reason on cycle limit, high-risk files, or unresolvable blockers. Configurable per repo via `.pr-pipeline.json`.
+
+### 4. Clean session handoff
+
+**Trigger:** context status hook warning + `/aiagentminder:handoff`
+**What you get:** Scripting checks the sessions context usage after each turn. When a configurable limit is hit Claude warns the user the wrap up the session with the handoff skill; which writes a "Next Session" block into Claude Code's native Auto Memory — decisions made this session, the next concrete step, any blockers. In the next session, "resume work" picks up exactly where you stopped. 
+
+### 5. Plan and decision discipline
+
+**Triggers:** `/aiagentminder:scope-check`, `/aiagentminder:revise`, `/aiagentminder:backlog`
+**What you get:** Before AAM lets new work into a sprint, `scope-check` compares it against `docs/strategy-roadmap.md`. If out of scope, you either revise the roadmap (logged in `DECISIONS.md`) or capture to `BACKLOG.md`. The plan, the record, and the work stay in sync.
+
+The full feature inventory (15 skills, 16 sub-agents, 9 hooks) is in the [Reference](#reference) section.
+
+---
+
+## See it in action
+
+[examples/demo-transcript.md](examples/demo-transcript.md) walks through three sessions on a sample REST API: planning with `/aiagentminder:brief`, handing off mid-build with `/aiagentminder:handoff`, and resuming. Sample state files (`examples/CLAUDE.md`, `examples/DECISIONS.md`, `examples/strategy-roadmap.md`) show what a mid-project repo looks like.
+
+---
+
+## When NOT to use this
+
+- **Single-session projects.** If your work fits in one Claude session and you don't need sprint governance or decision logging, plain `CLAUDE.md` is enough.
+- **Ad-hoc exploration.** AAM expects a roadmap. If you're poking around to figure out what to build, finish that first, then `/aiagentminder:setup`.
+- **Multi-agent concurrency on overlapping work.** `sprint-master` coordinates items sequentially in isolated worktrees. It does not orchestrate concurrent agents working on the same files.
+- **Browser-only workflow.** See [Where this works](#where-this-works) — plugin features aren't loaded in `claude.ai/code` web sessions.
+
+AAM adds structure. Only use it if the structure pays for itself.
+
+---
+
+## Requirements
+
+- **Claude Code 2.1.139+** — VS Code / JetBrains extension or CLI.
+- **Bash** — Windows users need Git Bash or WSL; macOS/Linux built-in.
+- **jq** — for context monitoring (`winget install jqlang.jq` / `brew install jq` / `apt install jq`). Hooks degrade gracefully without it.
+- **Git** — required.
+- **GitHub CLI (`gh`)** — optional, for PR pipeline and issue sync.
+
+Works on Windows, macOS, and Linux. Node.js is no longer required (the v4.x npm CLI was retired in v5.0).
 
 ---
 
