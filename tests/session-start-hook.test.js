@@ -47,13 +47,10 @@ describe('session-start-hook.sh', () => {
   it('exits 0 with no output when no continuation signal exists', () => {
     const result = runHook(sessionStartInput(), dir);
     assert.equal(result.exitCode, 0);
-    const trimmed = result.stdout.trim();
-    // Either empty or valid JSON with no additionalContext
-    if (trimmed) {
-      const parsed = JSON.parse(trimmed);
-      assert.ok(!parsed.hookSpecificOutput?.additionalContext ||
-        parsed.hookSpecificOutput.additionalContext === '');
-    }
+    // No continuation file and no in-progress sprint => CONTEXT stays empty and
+    // the hook prints nothing. Assert truly-empty output so a regression that
+    // emits a spurious envelope on every session start is caught.
+    assert.equal(result.stdout.trim(), '');
   });
 
   it('does not inject anything for a stale .sprint-continuation.md (cycle protocol retired)', () => {
@@ -75,6 +72,19 @@ describe('session-start-hook.sh', () => {
     const parsed = JSON.parse(result.stdout.trim());
     assert.ok(parsed.hookSpecificOutput?.additionalContext?.includes('sprint'),
       'should mention active sprint');
+    assert.equal(parsed.hookSpecificOutput?.hookEventName, 'SessionStart',
+      'output envelope must include hookEventName: SessionStart (Claude Code rejects it otherwise)');
+  });
+
+  it('emits hookEventName "SessionStart" in the output envelope when injecting context', () => {
+    // Regression: a missing hookEventName makes Claude Code reject the hook
+    // output with "hookSpecificOutput is missing required field hookEventName",
+    // silently dropping the active-sprint reminder. See issue #170.
+    fs.writeFileSync(path.join(dir, 'SPRINT.md'), '**Status:** in-progress\n');
+    const result = runHook(sessionStartInput(), dir);
+    assert.equal(result.exitCode, 0);
+    const parsed = JSON.parse(result.stdout.trim());
+    assert.equal(parsed.hookSpecificOutput?.hookEventName, 'SessionStart');
   });
 
   it('does not inject sprint reminder when no active sprint', () => {

@@ -218,6 +218,12 @@ Chose: Re-scope the context-cycling system to fire only when (a) `SPRINT.md` Sta
 
 ---
 
+### SessionStart hook output must carry hookEventName; tests assert the envelope | 2026-05-28 | Status: Active
+
+Chose: Always include `"hookEventName":"SessionStart"` in `session-start-hook.sh`'s `hookSpecificOutput` JSON, and assert that envelope field (not just `additionalContext`) in `tests/session-start-hook.test.js`, over the prior output that emitted `additionalContext` alone. Why: Claude Code's SessionStart hook contract rejects a `hookSpecificOutput` object lacking `hookEventName` with "missing required field hookEventName" — which surfaced in the field as a `SessionStart hook error` and silently dropped the injected context. It shipped because the test suite asserted the payload (`additionalContext`) but never the envelope contract, so the malformed JSON passed CI. (Discovered against the v5.0 context-cycle resume path; v5.1.0 concurrently retired that protocol — see the entry above — so `session-start-hook.sh` now emits only the active-sprint reminder, which carried the identical defect via its `jq` output and is fixed the same way.) General principle: any hook emitting structured `hookSpecificOutput` must include the matching `hookEventName`, and hook tests must validate the full envelope Claude Code requires, not only the payload field under test. Tradeoff: none material — the envelope value is a fixed string per hook event. See issue #170 / PR #171.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.

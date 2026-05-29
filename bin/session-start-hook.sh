@@ -23,8 +23,11 @@ fi
 
 # Output JSON if we have context to inject
 if [[ -n "$CONTEXT" ]]; then
+  # hookEventName is REQUIRED by Claude Code's SessionStart hook contract;
+  # omitting it makes the runtime reject the output ("hookSpecificOutput is
+  # missing required field hookEventName") and the reminder is silently dropped.
   if command -v jq >/dev/null 2>&1; then
-    jq -c -n --arg ctx "$CONTEXT" '{hookSpecificOutput: {additionalContext: $ctx}}'
+    jq -c -n --arg ctx "$CONTEXT" '{hookSpecificOutput: {hookEventName: "SessionStart", additionalContext: $ctx}}'
   fi
 fi
 
