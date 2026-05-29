@@ -8,6 +8,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.1.3] - 2026-05-29
+
+### Added
+
+- **`/aiagentminder:setup` strips retired auto-cycle hook registrations on upgrade.** New `bin/strip-retired-hooks.sh` — a surgical, idempotent `jq` transform — removes any hook referencing a retired cycle script (`context-cycle-hook.sh`, `session-start-continuation.sh`, `session-end-cycle.sh`) from a project's `.claude/settings.json` and `.claude/settings.local.json`, pruning emptied groups/arrays while preserving every other hook and setting. Wired into `aam-bootstrap.sh` for both settings files (runs on the upgrade path). Pre-5.0 installs wired these hooks into the project's own settings; the plugin now registers hooks via `hooks.json`, and the leftover PreToolUse cycle hook spawned bash on every tool call and could block edits on Windows.
+- **GitHub Actions test gate.** `.github/workflows/ci.yml` runs `npm run validate` + `npm test` on `ubuntu-latest` for every push to `main` and every PR; `main` now requires the `test` check before merge. The repo had had no CI workflow since February, so PRs were merging ungated.
+
+### Fixed
+
+- **Stop instructing bash file-writes (Windows hang mitigation).** AAM no longer tells Claude to create or modify files via shell (`bash -c 'touch …'`, `date +%s > …`); a new `shell-and-files.md` rule routes file operations through the Write/Edit tools and the platform-native shell. On Windows (Git Bash/WSL) shelling out to write a file could hang the session mid-write. ADR logged in `DECISIONS.md`.
+- **`npm test` repaired.** The explicit test list in `package.json` referenced three test files deleted in the v5.1 cycling retirement (`context-cycle-hook`, `cycling-resume-chain`, `cycling-docs`), so `node --test` hard-failed with "Could not find" before running anything. It also omitted two existing test files (`context-warning-hook`, `sprint-phase-reminder`) that therefore never ran. The list now references only files that exist, including the new `strip-retired-hooks` test.
+
+### Changed
+
+- Synced the dogfooding `.claude/commands` ignore list in `.gitignore` — added `aam-self-review.md` (was untracked and dirtying the tree), dropped stale `aam-checkup.md` (removed in v4.2).
+
+### Notes
+
+Patch release. The setup hook-strip ships via the plugin and applies the next time `/aiagentminder:setup` runs in a target project (or on plugin update + setup re-run). CI green on ubuntu.
+
 ## [5.1.2] - 2026-05-27
 
 ### Fixed
