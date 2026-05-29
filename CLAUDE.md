@@ -6,7 +6,7 @@
 ## Project Identity
 
 **Project:** aiagentminder
-**Description:** Claude Code plugin for project governance — agents, skills, hooks, and templates installable via the plugin marketplace
+**Description:** An opinionated governance layer for Claude Code, built for solo developers — agents, skills, hooks, and templates installable via the plugin marketplace
 **Type:** claude-code-plugin
 **Stack:** Markdown / Bash (hook scripts) / Node.js (test harness + `lib/validate.js` only)
 

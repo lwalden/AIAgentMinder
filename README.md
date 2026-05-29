@@ -3,11 +3,11 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 ![Version](https://img.shields.io/badge/version-5.1.1-blue)
 
-A set of skills, sub agents, and hooks for Claude Code governance for solo dev and small teams. Enforce your coding standards without repeating your instructions. Detects and enforces a stop BEFORE context degredation gets bad. Agents and skills to have agent run autonomous sprints and coding efforts that can go for hours accross multiple sesisons without losing context.
+**AIAgentMinder (AAM) is an opinionated governance layer for Claude Code — a minder for your AI coding agent.** Built for the solo developer, it gives Claude Code the engineering discipline a team would normally supply, so AI-assisted work stays tested, reviewed, and in scope. It's a set of skills, subagents, and hooks that let you enforce your standards without repeating your instructions, stop a session *before* context degradation sets in, and run autonomous sprints that span hours and multiple sessions without losing the thread.
 
-Basically, I wanted Claude Code to have the skills I use daily as a developer, and figured we could include some product manager tasks as well. This plugin lets you effectivly manage AI development of large and complex projects that cannot be completed in just one to five sessions. When a project needs 100+ PRs over the span of months you need consistency from your tooling, excellent and self-updating memory, the ability to change direction rapidly, quickly quashing of defects that will arise, and deterministic enforcement of quality.
+Basically, I wanted Claude Code to have the skills I use daily as a developer — and figured a few product-manager tasks belonged in there too. This plugin lets you effectively manage AI development of large, complex projects that can't be finished in one to five sessions. When a project needs 100+ PRs over the span of months, you need consistency from your tooling, self-updating memory, the ability to change direction quickly, fast quashing of the defects that inevitably arise, and deterministic enforcement of quality.
 
-Installs easily into existing or new repos. Works with a back of the napkin scetch of an idea, or a fully spec'ed plan.
+Installs easily into existing or new repos. Works from a back-of-the-napkin sketch of an idea, or a fully spec'd plan.
 
 ---
 
