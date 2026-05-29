@@ -31,7 +31,10 @@ fi
 
 # Output JSON if we have context to inject
 if [[ -n "$CONTEXT" ]]; then
-  # Escape for JSON
+  # Escape for JSON. $CONTEXT is always one of a few hardcoded literal strings
+  # (set above from file *existence* checks, never from file contents), so this
+  # escaping is defensive only — no untrusted data reaches the payload. Keep it
+  # if $CONTEXT ever starts carrying file-derived values.
   ESCAPED=$(printf '%s' "$CONTEXT" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\n/\\n/g')
   # hookEventName is REQUIRED by Claude Code's SessionStart hook contract;
   # omitting it makes the runtime reject the output ("hookSpecificOutput is

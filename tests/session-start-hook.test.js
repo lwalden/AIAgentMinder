@@ -47,13 +47,10 @@ describe('session-start-hook.sh', () => {
   it('exits 0 with no output when no continuation signal exists', () => {
     const result = runHook(sessionStartInput(), dir);
     assert.equal(result.exitCode, 0);
-    const trimmed = result.stdout.trim();
-    // Either empty or valid JSON with no additionalContext
-    if (trimmed) {
-      const parsed = JSON.parse(trimmed);
-      assert.ok(!parsed.hookSpecificOutput?.additionalContext ||
-        parsed.hookSpecificOutput.additionalContext === '');
-    }
+    // No continuation file and no in-progress sprint => CONTEXT stays empty and
+    // the hook prints nothing. Assert truly-empty output so a regression that
+    // emits a spurious envelope on every session start is caught.
+    assert.equal(result.stdout.trim(), '');
   });
 
   it('injects continuation context when .sprint-continuation.md exists', () => {
