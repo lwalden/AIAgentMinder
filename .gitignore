@@ -58,7 +58,6 @@ logs/
 # Dogfooding — AIAgentMinder self-install (not part of template source)
 # Commands (template originals live in project/.claude/commands/)
 .claude/commands/aam-brief.md
-.claude/commands/aam-checkup.md
 .claude/commands/aam-grill.md
 .claude/commands/aam-handoff.md
 .claude/commands/aam-milestone.md
@@ -67,6 +66,7 @@ logs/
 .claude/commands/aam-retrospective.md
 .claude/commands/aam-revise.md
 .claude/commands/aam-scope-check.md
+.claude/commands/aam-self-review.md
 .claude/commands/aam-sync-issues.md
 .claude/commands/aam-tdd.md
 .claude/commands/aam-triage.md
