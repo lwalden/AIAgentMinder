@@ -129,6 +129,7 @@ Zero-token-cost scripts replace LLM file I/O with deterministic bash. Significan
 | `CLAUDE.md` | Yes | Project identity and behavioral rules |
 | `.claude/rules/git-workflow.md` | Yes | Branch naming, commit discipline, PR-only workflow |
 | `.claude/rules/tool-first.md` | Yes | Use tools, don't ask the user |
+| `.claude/rules/shell-and-files.md` | Yes | Write/Edit for files (not shell); platform-native shell — avoids Windows Git Bash file-write hangs |
 | `.claude/rules/context-warnings.md` | Yes | How to respond to the context-warning hook |
 | `DECISIONS.md` | On-demand (`@DECISIONS.md`) | Architectural decision log |
 | `docs/strategy-roadmap.md` | On-demand | Product brief and phase plan |

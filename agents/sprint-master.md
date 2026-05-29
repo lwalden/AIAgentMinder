@@ -101,15 +101,15 @@ pass it to pr-pipeliner during REVIEW. On `"partial: ..."`, include
 At PLAN and SPEC checkpoints, use this procedure — do NOT rely on text reminders alone:
 
 **After sprint-planner returns (PLAN checkpoint):**
-1. Write empty `.sprint-human-checkpoint` file: `bash -c 'touch .sprint-human-checkpoint'`
+1. Create an empty `.sprint-human-checkpoint` file with the Write tool (empty content).
 2. Present the proposed issue list to the user and wait.
 3. The Stop hook allows the turn to end because `.sprint-human-checkpoint` exists.
-4. When the user approves: delete the file (`bash -c 'rm -f .sprint-human-checkpoint'`), then spawn sprint-speccer.
+4. When the user approves: delete `.sprint-human-checkpoint` (`Remove-Item` on Windows, `rm -f` on Unix), then spawn sprint-speccer.
 
 **After sprint-speccer returns (SPEC → APPROVE checkpoint):**
-1. Write empty `.sprint-human-checkpoint` file: `bash -c 'touch .sprint-human-checkpoint'`
+1. Create an empty `.sprint-human-checkpoint` file with the Write tool (empty content).
 2. Present all specs to the user and wait.
-3. When the user approves: delete the file (`bash -c 'rm -f .sprint-human-checkpoint'`), then proceed to APPROVE.
+3. When the user approves: delete `.sprint-human-checkpoint` (`Remove-Item` on Windows, `rm -f` on Unix), then proceed to APPROVE.
 
 Never proceed to the next state in the same turn as writing the checkpoint file.
 
@@ -137,11 +137,11 @@ debug checkpoint (3 failed attempts at the same error in a sub-agent).
    - Completed items with PR links
    - Decisions logged, risk items and outcomes, rework and resolution
    - Retrospective metrics and sizing recommendation (from sprint-retro output)
-3. **Write empty `.sprint-human-checkpoint`:** `bash -c 'touch .sprint-human-checkpoint'`
+3. **Create an empty `.sprint-human-checkpoint`** with the Write tool (empty content).
 4. End your turn and wait. The Stop hook allows the stop while this file exists.
 
 → User accepts:
-5. `bash -c 'rm -f .sprint-human-checkpoint'`
+5. Delete `.sprint-human-checkpoint` (`Remove-Item` on Windows, `rm -f` on Unix).
 6. Create the archive PR — fully automated, no human action required:
    ```
    git checkout -b chore/sprint-S{n}-archive
