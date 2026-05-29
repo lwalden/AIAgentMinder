@@ -36,5 +36,8 @@ case "$current_phase" in
   *)        exit 0 ;;
 esac
 
-jq -c -n --arg msg "$msg" '{hookSpecificOutput: {additionalContext: $msg}}'
+# Stop hooks surface advisory text via the top-level `systemMessage` field.
+# (`hookSpecificOutput.additionalContext` is only valid for context-injecting
+# events like SessionStart/UserPromptSubmit and is rejected on a Stop event.)
+jq -c -n --arg msg "$msg" '{systemMessage: $msg}'
 exit 0

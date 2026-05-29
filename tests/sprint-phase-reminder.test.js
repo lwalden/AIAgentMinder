@@ -64,28 +64,48 @@ describe('sprint-phase-reminder.sh', () => {
     writeSprint(dir, 'in-progress', 'PLAN');
     const r = run(dir);
     const parsed = JSON.parse(r.stdout.trim());
-    assert.match(parsed.hookSpecificOutput.additionalContext, /PLAN phase/);
+    assert.match(parsed.systemMessage, /PLAN phase/);
   });
 
   it('emits EXECUTE reminder with current item id', () => {
     writeSprint(dir, 'in-progress', 'EXECUTE', 'S9-005');
     const r = run(dir);
     const parsed = JSON.parse(r.stdout.trim());
-    const ctx = parsed.hookSpecificOutput.additionalContext;
+    const ctx = parsed.systemMessage;
     assert.match(ctx, /EXECUTE phase/);
     assert.match(ctx, /TDD/);
     assert.match(ctx, /S9-005/);
   });
 
-  it('emits valid JSON for every supported phase', () => {
+  it('emits a valid Stop-hook payload for every supported phase', () => {
     for (const phase of ['PLAN', 'SPEC', 'EXECUTE', 'TEST', 'REVIEW', 'COMPLETE']) {
       writeSprint(dir, 'in-progress', phase);
       const r = run(dir);
       assert.equal(r.exitCode, 0, `phase ${phase} should exit 0`);
+      let parsed;
       assert.doesNotThrow(
-        () => JSON.parse(r.stdout.trim()),
+        () => { parsed = JSON.parse(r.stdout.trim()); },
         `phase ${phase} should produce valid JSON`
       );
+      // Stop-hook contract: reminder rides on top-level systemMessage, never
+      // hookSpecificOutput.additionalContext (invalid for the Stop event).
+      assert.ok(parsed.systemMessage, `phase ${phase} must emit systemMessage`);
+      assert.equal(
+        parsed.hookSpecificOutput,
+        undefined,
+        `phase ${phase} must not emit hookSpecificOutput on a Stop hook`
+      );
+    }
+  });
+
+  // Regression guard for the contract that the original bug violated: if a hook
+  // ever emits hookSpecificOutput, it MUST carry hookEventName (Claude Code
+  // rejects it otherwise). Stop hooks here use systemMessage and emit none.
+  it('never emits hookSpecificOutput without hookEventName', () => {
+    writeSprint(dir, 'in-progress', 'PLAN');
+    const parsed = JSON.parse(run(dir).stdout.trim());
+    if (parsed.hookSpecificOutput !== undefined) {
+      assert.ok(parsed.hookSpecificOutput.hookEventName, 'hookSpecificOutput requires hookEventName');
     }
   });
 });
