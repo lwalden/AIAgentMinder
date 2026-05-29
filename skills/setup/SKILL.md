@@ -119,7 +119,7 @@ Created/updated:
 - DECISIONS.md        (architectural decision log — empty starter)
 - BACKLOG.md          (work inbox — empty)
 - docs/strategy-roadmap.md  (product brief — empty, run /aiagentminder:brief to fill)
-- .claude/rules/      (universal rules: git-workflow, tool-first, context-warnings)
+- .claude/rules/      (universal rules: git-workflow, tool-first, shell-and-files, context-warnings)
 - .claude/aiagentminder-version  ({version})
 - .gitignore          (stack-specific + AAM state files)
 

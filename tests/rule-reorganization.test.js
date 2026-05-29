@@ -10,6 +10,7 @@ const RULES_DIR = path.resolve(__dirname, '..', 'templates', '.claude', 'rules')
 const KEPT_RULES = [
   'git-workflow.md',
   'tool-first.md',
+  'shell-and-files.md',
   'context-warnings.md',
   'README.md',
 ];
@@ -62,11 +63,22 @@ describe('rule reorganization: context-warnings.md content', () => {
   });
 });
 
+describe('rule reorganization: shell-and-files.md content', () => {
+  it('steers file ops to Write/Edit and shell choice to the platform', () => {
+    const content = fs.readFileSync(path.join(RULES_DIR, 'shell-and-files.md'), 'utf-8');
+    assert.ok(/Write and Edit tools/i.test(content), 'must point file ops at the Write/Edit tools');
+    assert.ok(content.includes('PowerShell'), 'must name PowerShell as the Windows shell');
+    assert.ok(/heredoc|cat >|touch|bash -c/i.test(content),
+      'must call out the shell file-write patterns to avoid');
+  });
+});
+
 describe('rule reorganization: README.md updated', () => {
   it('lists the active universal rules', () => {
     const content = fs.readFileSync(path.join(RULES_DIR, 'README.md'), 'utf-8');
     assert.ok(content.includes('git-workflow.md'), 'must list git-workflow');
     assert.ok(content.includes('tool-first.md'), 'must list tool-first');
+    assert.ok(content.includes('shell-and-files.md'), 'must list shell-and-files');
     assert.ok(content.includes('context-warnings.md'), 'must list context-warnings');
   });
 

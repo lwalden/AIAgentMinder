@@ -49,8 +49,8 @@ If `negativeTestEnforcement.enabled` is `false` in `.pr-pipeline.json`, skip thi
 
 After running checks:
 
-- **All pass:** Write the gate-pass marker for hook enforcement: `bash -c 'date +%s > .quality-gate-pass'`. Then announce: "Quality gate passed. Creating PR."
-- **Failures found:** List each failure with the specific file and line. Fix all failures before creating the PR. During autonomous sprint execution, fix failures without asking — do not prompt for override. Remove stale marker if present: `bash -c 'rm -f .quality-gate-pass'`.
+- **All pass:** Record the gate-pass marker with the Write tool — write the current timestamp to `.quality-gate-pass`. Then announce: "Quality gate passed. Creating PR."
+- **Failures found:** List each failure with the specific file and line. Fix all failures before creating the PR. During autonomous sprint execution, fix failures without asking — do not prompt for override. Remove a stale `.quality-gate-pass` if present (`Remove-Item` on Windows, `rm -f` on Unix).
 
 If invoked manually outside a sprint and the user explicitly requests an override: create the PR and add a note to the PR description: "Quality gate override: [reason for override]."
 

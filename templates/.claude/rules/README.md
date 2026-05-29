@@ -10,6 +10,7 @@ Context-usage warnings are emitted by a `Stop` hook (`context-warning-hook.sh`) 
 |------|---------|
 | `git-workflow.md` | Git discipline — branch naming, commit discipline, PR workflow |
 | `tool-first.md` | Tool-first autonomy — use CLI/API tools instead of asking the user to do it |
+| `shell-and-files.md` | File ops via Write/Edit (not shell); platform-native shell (PowerShell on Windows) — avoids Git Bash file-write hangs |
 | `context-warnings.md` | How to respond when the context-usage warning fires |
 
 Repeated-mistake capture is handled by Claude Code's native **Auto Memory** — no AAM rule or hook required.
