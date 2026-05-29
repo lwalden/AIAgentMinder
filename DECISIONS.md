@@ -224,6 +224,12 @@ Chose: Always include `"hookEventName":"SessionStart"` in `session-start-hook.sh
 
 ---
 
+### Windows: stop AAM instructing bash file-writes; ship shell-and-files rule | 2026-05-29 | Status: Active
+
+Chose: Add a shipped universal rule (`templates/.claude/rules/shell-and-files.md`) directing file creation/editing through the Write/Edit tools (never shell heredocs/redirects/`touch`) and shell commands through the platform-native shell (PowerShell on Windows), and replace AAM's own bash file-writes — `sprint-master`'s `bash -c 'touch/rm .sprint-human-checkpoint'` and the quality gate's `bash -c 'date +%s > .quality-gate-pass'` — with Write-tool / platform-neutral equivalents. Why: on Windows, Claude Code's Bash tool (Git Bash) intermittently hangs writing files via the shell — the harness doesn't detect the subprocess finishing. AAM amplified exposure by shipping no shell/file guidance and by explicitly instructing bash file-writes, which normalizes bash for the whole session. Separately discovered live: the retired v5.0 `context-cycle-hook.sh` (a blocking PreToolUse hook) was still wired into this repo's local `.claude/settings.local.json`, spawning bash on every tool call and blocking/erroring on Windows when `should_cycle=true`; v5.1 retired the hook from the plugin but the `/aiagentminder:setup` upgrade path does not strip it from target settings — a fleet-wide gap. Alternatives considered: (a) rewrite all ```bash fences platform-neutral — rejected, huge and most commands (git/gh/npm) run in either shell; (b) ship `.ps1` equivalents of the zero-token scripts — deferred (Tier 2); (c) rely on the user's global PowerShell preference — rejected, AAM's in-context bash instructions override it. Tradeoff: mitigation, not a guaranteed fix of the underlying Git Bash hang; existing installs need a `/aiagentminder:setup` re-run to pick up the rule, and the stale settings hook still needs a separate cleanup. See PR #173.
+
+---
+
 ## Known Debt
 
 > Record shortcuts, workarounds, and deferred quality work here.
