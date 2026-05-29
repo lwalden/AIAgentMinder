@@ -8,6 +8,16 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.1.4] - 2026-05-29
+
+### Fixed
+
+- **Stop hooks no longer emit invalid output.** `sprint-phase-reminder.sh` and `context-warning-hook.sh` emitted `{hookSpecificOutput: {additionalContext: …}}` on the Stop event, which current Claude Code rejects — `hookSpecificOutput` requires a `hookEventName`, and the Stop event has no `additionalContext` channel (only SessionStart/UserPromptSubmit/PostToolUse do). The result was a "Stop hook error: hookSpecificOutput is missing required field `hookEventName`" on every turn of an in-progress sprint and whenever context was over threshold. Both hooks now emit the top-level `systemMessage` field. Present since v5.1.0 (the sibling `session-start-hook.sh` was already correct). Tests updated to assert the valid Stop-hook contract plus a regression guard. (#177, #178)
+
+### Changed
+
+- CI workflow pins `actions/checkout@v5` and `actions/setup-node@v5` — the v4 actions run on Node 20, deprecated for GitHub Actions on June 2 2026.
+
 ## [5.1.3] - 2026-05-29
 
 ### Added
