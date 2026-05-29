@@ -1,0 +1,42 @@
+name: CI
+
+# Linux is the authoritative environment for this repo's test suite: the hook
+# and helper scripts are bash and depend on a POSIX toolchain (bash, jq, grep,
+# sort, tr), which is present out of the box on ubuntu runners. These tests do
+# not run reliably on native Windows — that is precisely why this gate exists.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    name: test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Show tool versions
+        run: |
+          node --version
+          jq --version
+          bash --version | head -n1
+
+      # No dependencies to install — the suite uses node:test and pure-Node
+      # helpers only (package.json declares no dependencies).
+      - name: Validate plugin layout
+        run: npm run validate
+
+      - name: Run test suite
+        run: npm test
