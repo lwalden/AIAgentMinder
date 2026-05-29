@@ -106,4 +106,21 @@ EOF
 
 merge_statusline
 
+# Strip retired auto-cycle hook registrations left behind by pre-5.0 installs.
+# Those installs wired the context-cycle protocol into the project's own
+# settings file(s); the plugin now registers hooks via hooks.json, and the
+# leftover PreToolUse cycle hook can block edits on Windows. Idempotent no-op
+# when nothing matches. Applies to both the shared and local settings files.
+strip_retired_hooks() {
+  local script="${PLUGIN_ROOT}/bin/strip-retired-hooks.sh"
+  [ -f "$script" ] || return 0
+  local f
+  for f in ".claude/settings.json" ".claude/settings.local.json"; do
+    [ -f "$f" ] || continue
+    bash "$script" "$f"
+  done
+}
+
+strip_retired_hooks
+
 echo "bootstrap complete"
