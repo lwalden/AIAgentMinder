@@ -6,40 +6,40 @@
 ## Project Identity
 
 **Project:** aiagentminder
-**Description:** Claude Code project governance framework — installable template commands, rules, and hooks
-**Type:** cli-tool
-**Stack:** Markdown / Node.js (CLI only) / Bash (scripts)
+**Description:** Claude Code plugin for project governance — agents, skills, hooks, and templates installable via the plugin marketplace
+**Type:** claude-code-plugin
+**Stack:** Markdown / Bash (hook scripts) / Node.js (test harness + `lib/validate.js` only)
 
 **Developer Profile:**
 
 - Experienced developer, familiar with Claude Code internals
 - Medium autonomy — confirm architectural changes; proceed freely on doc and command file edits
 
-## Current State
+### Current State
 
-v3.3 shipped. npm/npx installer, codebase fingerprinting, architecture fitness defaults, plugin marketplace, GitHub Releases. See docs/strategy-roadmap.md for details.
+v5.1 shipped — see `docs/strategy-roadmap.md` and `CHANGELOG.md` for the running state of versions, sprints, and roadmap.
 
-## Behavioral Rules
+### Git / PR state — verify, don't assume
 
-### Source of Truth
+After a user says "merged" (or after any pause), refetch and check before continuing to operate on a branch as if its PR were still open. Don't update PR descriptions or treat merged branches as PRs-in-flight. Before adding commits to a branch with a closed/merged PR, decide: new PR, or restart the branch. Check `gh pr list` / `git log origin/main..HEAD` first.
 
-- `project/` — installable template; these files are copied to target projects by `/aam-setup`
-- `.claude/commands/` at repo root — meta-commands only (`aam-setup.md`, `aam-update.md`)
-- `.claude/rules/` at repo root — governs THIS repo's sessions; not installed to targets
+### Behavioral Rules
 
-Never edit `project/` files and the root governance files as if they're the same thing. Changes to the template go in `project/`. Changes to how we work on this repo go in `.claude/rules/`.
+#### Source of Truth
 
-### Scope
+- `agents/`, `skills/<name>/SKILL.md`, `bin/`, `hooks/hooks.json`, `.claude-plugin/` — the **plugin payload** that ships to users via the marketplace
+- `templates/` — the **bootstrap files** copied into target projects by `/aiagentminder:setup` (e.g. `CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, `SPRINT.md`, `docs/strategy-roadmap.md`, `.claude/rules/*`)
+- Root-level files in this repo (this `CLAUDE.md`, `DECISIONS.md`, `README.md`, etc.) — govern THIS repo only; not installed anywhere
+
+Never edit `templates/` files and the equivalent root files as if they're the same thing. Changes to what target projects receive go in `templates/`. Changes to how we work on this repo go in the matching root file.
+
+#### Scope
 
 `docs/strategy-roadmap.md` is the authoritative scope document, matching the convention used in target projects.
 
-### Git Workflow
+#### Decision Recording
 
-See `.claude/rules/git-workflow.md` — loaded natively by Claude Code each session.
-
-### Decision Recording
-
-Log significant decisions in DECISIONS.md. Key architectural decisions are already recorded there.
+Log significant decisions in `DECISIONS.md`.
 
 ## Context Budget
 

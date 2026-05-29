@@ -53,15 +53,16 @@ describe('session-start-hook.sh', () => {
     assert.equal(result.stdout.trim(), '');
   });
 
-  it('injects continuation context when .sprint-continuation.md exists', () => {
-    fs.writeFileSync(path.join(dir, '.sprint-continuation.md'), '# Sprint Continuation State\n**Sprint:** S2\n');
+  it('does not inject anything for a stale .sprint-continuation.md (cycle protocol retired)', () => {
+    fs.writeFileSync(path.join(dir, '.sprint-continuation.md'), '# stale leftover\n');
     const result = runHook(sessionStartInput(), dir);
     assert.equal(result.exitCode, 0);
-    const parsed = JSON.parse(result.stdout.trim());
-    assert.ok(parsed.hookSpecificOutput?.additionalContext?.includes('CONTEXT CYCLE'),
-      'should inject CONTEXT CYCLE instruction');
-    assert.equal(parsed.hookSpecificOutput?.hookEventName, 'SessionStart',
-      'output envelope must include hookEventName: SessionStart (Claude Code rejects it otherwise)');
+    const trimmed = result.stdout.trim();
+    if (trimmed) {
+      const parsed = JSON.parse(trimmed);
+      const ctx = parsed.hookSpecificOutput?.additionalContext || '';
+      assert.ok(!ctx.includes('CONTEXT CYCLE'), 'CONTEXT CYCLE protocol should no longer fire');
+    }
   });
 
   it('injects sprint reminder when SPRINT.md has in-progress sprint', () => {
@@ -78,8 +79,8 @@ describe('session-start-hook.sh', () => {
   it('emits hookEventName "SessionStart" in the output envelope when injecting context', () => {
     // Regression: a missing hookEventName makes Claude Code reject the hook
     // output with "hookSpecificOutput is missing required field hookEventName",
-    // which breaks context-cycle resume. See issue #170.
-    fs.writeFileSync(path.join(dir, '.sprint-continuation.md'), '# Sprint Continuation State\n');
+    // silently dropping the active-sprint reminder. See issue #170.
+    fs.writeFileSync(path.join(dir, 'SPRINT.md'), '**Status:** in-progress\n');
     const result = runHook(sessionStartInput(), dir);
     assert.equal(result.exitCode, 0);
     const parsed = JSON.parse(result.stdout.trim());

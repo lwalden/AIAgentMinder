@@ -1,28 +1,20 @@
 #!/usr/bin/env bash
-# sprint-phase-guard.sh — PreToolUse hook that enforces sprint phase ordering
-# and periodically reinforces critical rules.
-#
-# Phase-skip guard (2a): When the Agent tool is called, checks subagent_type
-# against the current sprint phase. Blocks phase agents that don't match.
-#
-# Rule reinforcement (2d): Every Nth tool call, injects a phase-appropriate
-# one-line reminder via stdout to combat rules-drift in long sessions.
+# sprint-phase-guard.sh — PreToolUse hook (matcher: "Agent") that enforces
+# sprint phase ordering. Blocks Agent calls whose subagent_type does not
+# match the current sprint phase.
 #
 # No-op when: no SPRINT.md, sprint not in-progress, no **Phase:** line.
 #
-# Configured in .claude/settings.json as a second PreToolUse entry
-# (runs after context-cycle-hook.sh).
+# Periodic phase reminders are handled separately by
+# bin/sprint-phase-reminder.sh on the Stop event — keep this script
+# single-purpose so it can stay cheap and Agent-scoped.
 
 set -euo pipefail
 trap 'exit 0' ERR
 
 SPRINT_FILE="SPRINT.md"
-COUNTER_FILE=".sprint-phase-guard-count"
-REMINDER_INTERVAL=20
 
 input=$(cat)
-
-# --- Preconditions: sprint must be active ---
 
 if [ ! -f "$SPRINT_FILE" ]; then
   exit 0
@@ -37,40 +29,24 @@ if [ "$sprint_status" != "in-progress" ]; then
   exit 0
 fi
 
-# Read current phase. No Phase line = no enforcement (backwards compat).
 current_phase=$(sed -n 's/^\*\*Phase:\*\* //p' "$SPRINT_FILE" 2>/dev/null | tr -d '\r' | head -1)
 if [ -z "$current_phase" ]; then
   exit 0
 fi
 
+# Defensive: only act on Agent tool (the hook is registered with matcher
+# "Agent", but check anyway in case the registration is overridden).
 tool_name=$(echo "$input" | jq -r '.tool_name // "unknown"' 2>/dev/null)
-
-# --- 2d: Periodic rule reinforcement ---
-
-count=0
-[ -f "$COUNTER_FILE" ] && count=$(cat "$COUNTER_FILE" 2>/dev/null || echo 0)
-count=$((count + 1))
-echo "$count" > "$COUNTER_FILE"
-
-if [ $((count % REMINDER_INTERVAL)) -eq 0 ]; then
-  current_item=$(grep -E '\| *in-progress *\|' "$SPRINT_FILE" 2>/dev/null | head -1 | awk -F'|' '{gsub(/^ +| +$/, "", $2); print $2}' || true)
-  case "$current_phase" in
-    PLAN)     echo "REMINDER: PLAN phase. Propose sprint items via sprint-planner. Do not write code." ;;
-    SPEC)     echo "REMINDER: SPEC phase. Write implementation specs via sprint-speccer. Do not write code yet.${current_item:+ Item: $current_item}" ;;
-    EXECUTE)  echo "REMINDER: EXECUTE phase. TDD: write tests first, then implement.${current_item:+ Item: $current_item}" ;;
-    TEST)     echo "REMINDER: TEST phase. Review lenses are READ-ONLY. Do not edit source files.${current_item:+ Item: $current_item}" ;;
-    REVIEW)   echo "REMINDER: REVIEW phase. Run pr-pipeliner: build, lint, test, merge.${current_item:+ Item: $current_item}" ;;
-    COMPLETE) echo "REMINDER: Sprint complete. Run sprint-retro and present results." ;;
-  esac
-fi
-
-# --- 2a: Phase-skip guard (Agent tool calls only) ---
-
 if [ "$tool_name" != "Agent" ]; then
   exit 0
 fi
 
 subagent_type=$(echo "$input" | jq -r '.tool_input.subagent_type // "general-purpose"' 2>/dev/null)
+
+# Strip any plugin namespace prefix: marketplace installs dispatch agents as
+# "aiagentminder:item-executor"; direct `claude --agent` uses bare names. The
+# allow-lists below are bare, so normalize both forms to the bare name.
+subagent_type="${subagent_type##*:}"
 
 # Session profiles and utility agents are always allowed
 case "$subagent_type" in

@@ -6,6 +6,118 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [Unreleased]
+
+## [5.1.2] - 2026-05-27
+
+### Fixed
+
+- **`sprint-phase-guard.sh` blocked every specialist agent on marketplace installs** — the guard matched `subagent_type` against bare agent names (`item-executor`, `sprint-planner`, …), but plugin-installed agents dispatch under the `aiagentminder:` namespace. A namespaced call (`aiagentminder:item-executor`) matched nothing and was blocked as a "phase violation," so a marketplace-installed sprint could only advance by disabling the guard (e.g. running with a non-`in-progress` status, which also silently disables the stop-guard and phase-reminder hooks). The guard now strips any plugin-namespace prefix before matching, so both bare (`claude --agent`) and namespaced (marketplace) dispatch work. Added `tests/sprint-phase-guard.test.js`.
+
+### Documentation
+
+### README rewrite (first major revision since v4.3)
+
+Rewritten with a value-first structure. Lead with concrete wins, surface the five hub features readers actually use day-to-day, push reference tables into collapsible `<details>` blocks so first-time visitors aren't drowning in command/rule/hook inventories.
+
+- **"The 30-second case"** — 5 concrete wins (autonomous sprints, cross-model self-review, autonomous PR pipeline, clean handoff, plan/decision discipline) replacing the prior abstract "What It Does" bullets.
+- **"Where this works"** promoted to a top-level section.
+- **"What you actually use"** — five hub features with trigger + outcome.
+- **"See it in action"** — links to `examples/demo-transcript.md`.
+- **"When NOT to use this"** — merged honesty section combining the prior "When to Use" and "Non-Goals".
+- **"Reference"** — collapsible blocks for skills, sub-agents, hooks/scripts, and installed files. Same content, out of the reader's face.
+
+Stale content removed:
+
+- **Mode-specific rules table** listed six retired rule files (`approach-first.md`, `debug-checkpoint.md`, `code-quality.md`, `scope-guardian.md`, `architecture-fitness.md`, `sprint-workflow.md`). All retired in v4.x; the README still listed them as if they shipped. Replaced with the current 3-rule baseline (`git-workflow`, `tool-first`, `context-warnings`).
+- **Session-profiles** demoted from a top-level section into the Reference → Sub-agents block.
+
+### Other documentation cleanup
+
+- **`SKILL.md` (repo root)** — Deleted. v0.x/v1.x placeholder labeled "Status: v3.3.0", referencing the retired `npx aiagentminder init` and `/aam-setup`. Modern plugin metadata lives in `.claude-plugin/plugin.json`.
+- **`examples/demo-transcript.md`** — Five stale `/aam-X` command references → `/aiagentminder:X`.
+- **`examples/README.md`** — `project/` directory reference → `templates/` (the directory was renamed in v5.0).
+- **`CONTRIBUTING.md`** — Same `project/` → `templates/` fix. Clarified the three change categories: plugin payload (ships via marketplace), bootstrap templates (installed by `/aiagentminder:setup`), and meta-docs (this repo only).
+- **`docs/how-it-works.md` + `docs/customization-guide.md`** — Both still described `code-quality.md` and `sprint-workflow.md` as opt-in rule files. Those rules were retired in v4.x and v5.0 when the methodology moved into agents (`item-executor`, `quality-reviewer`, `sprint-master`) and hooks (`sprint-phase-guard.sh`). Both sections rewritten to reflect agent-based enforcement. Section heading changed from "Optional Features" to "Quality and Sprint Execution".
+- **`docs/strategy-roadmap.md`** — The v5.1 heading previously held unbuilt "Portability & Ecosystem" scope (AGENTS.md bidirectional sync, cross-tool rule export, "Mechanical Enforcement" blog post, release automation). All three code items referenced the npm CLI retired in v5.0, so they were stale on arrival. Replaced the section with what v5.1 actually shipped, and moved the unbuilt portability work to "v5.2+ — Portability & Ecosystem (deferred indefinitely)" with a note about the npm-CLI blocker.
+- **`CLAUDE.md` (this repo only)** — Recorded a "Git / PR state — verify, don't assume" rule. After the user says "merged" or after any pause, refetch and check before continuing to operate on a branch as if its PR were still open.
+
+### Notes
+
+Patch release. The only code change is the `sprint-phase-guard.sh` fix above; everything else is documentation. Tests 315/315 green. The hook ships via the plugin, so users pick up the fix on plugin update — no `/aiagentminder:setup` re-run required.
+
+---
+
+## [5.1.1] - 2026-05-17
+
+### Changed
+
+- **`README.md`** — Added a "Where this works" callout right under the Quick Start. Calls out plainly that AAM runs on Claude Code CLI and the VS Code / JetBrains extensions, but **not** on `claude.ai/code` web sessions (no plugin loader → no slash commands, sub-agents, hooks, or `bin/` scripts). Notes that `/aiagentminder:setup`-installed repo artifacts (`CLAUDE.md`, `.claude/rules/*.md`, `SPRINT.md`, `BACKLOG.md`, `DECISIONS.md`, `docs/strategy-roadmap.md`) remain usable from web because they live in the repo itself. Mobile / desktop app parity declared a non-goal.
+
+### Fixed
+
+Stale v5.0 cycle-protocol references in README that the v5.1.0 PR missed:
+
+- Hooks & scripts table updated to match v5.1.0 reality — removed the three deleted scripts (`context-cycle-hook.sh`, `session-end-cycle.sh`, `session-start-continuation.sh`), added the two replacements (`context-warning-hook.sh`, `sprint-phase-reminder.sh`), and noted `matcher: "Agent"` on `sprint-phase-guard.sh`.
+- Rules table: `context-cycling.md` → `context-warnings.md`.
+- "Context cycling" section → "Context warnings (v5.1+)" — rewrote to describe the advisory model and link to DECISIONS.md / CHANGELOG.md for the rationale.
+- Top-level "What It Does" bullet on context management updated to drop the "autonomous context cycling across sessions" phrasing.
+- Footer doc-link description updated.
+
+### Notes
+
+Documentation-only release. No behavior change. No test impact (309/309 green). Existing v5.1.0 installs need only `/plugin update aiagentminder` to pick up the version stamp and refreshed README; no re-run of `/aiagentminder:setup` required.
+
+---
+
+## [5.1.0] - 2026-05-17
+
+### Changed
+
+#### Context management redesigned (BREAKING for projects relying on auto-cycle)
+
+The v5.0 autonomous context-cycle protocol — PreToolUse tool-blocking, SessionEnd writing `.sprint-continuation.md`, SessionStart consuming it, `.sprint-tool-count` fallback — is retired. Replaced with a single `Stop` hook (`bin/context-warning-hook.sh`) that injects an advisory message when `.context-usage` says `should_cycle=true`. The user picks the next step:
+
+- **Wrap up cleanly:** run `/aiagentminder:handoff` (writes "Next Session" into Claude Code's native Auto Memory), commit, `/exit`. Start the next session and say "resume work".
+- **Keep going:** the warning re-fires every turn while still over threshold. No tool blocking, no auto-restart.
+
+Rationale and trade-offs: see DECISIONS.md → "Replace autonomous context-cycle protocol with a passive Stop-hook warning". Short version: the autonomous flow required slash commands users can't issue from the mobile Claude app, self-termination disconnected mobile observers, and the protocol was dormant on Claude Code web anyway.
+
+**Deleted:** `bin/context-cycle-hook.sh`, `bin/session-end-cycle.sh`, `bin/session-start-continuation.sh`, `tests/context-cycle-hook.test.js`, `tests/cycling-resume-chain.test.js`, `tests/cycling-docs.test.js`. Renamed `templates/.claude/rules/context-cycling.md` → `context-warnings.md` with a complete rewrite. Net: 5 scripts → 2 scripts (`context-warning-hook.sh`, `sprint-phase-reminder.sh`), tests still 100% green.
+
+**Migration on re-running `/aiagentminder:setup`:** the setup skill now deletes leftover state files from the retired protocol if present (`.sprint-continuation.md`, `.sprint-continue-signal`, `.sprint-tool-count`, `.sprint-phase-guard-count`) and the old `.claude/rules/context-cycling.md`.
+
+#### `sprint-phase-guard.sh` split into two single-purpose hooks (issue #152)
+
+The previous hook bundled two unrelated responsibilities (Agent-only phase blocking + every-Nth-call reminder injection) behind an empty PreToolUse matcher, spawning bash on every tool call. Now:
+
+- `bin/sprint-phase-guard.sh` — `PreToolUse` with `matcher: "Agent"`. Just phase blocking. Doesn't fire on Bash/Read/Edit/Write.
+- `bin/sprint-phase-reminder.sh` — `Stop` hook. One-line phase-appropriate reminder per assistant turn during an active sprint. No counter file, no every-Nth gating.
+
+### Fixed
+
+- **`bin/hlpm-ping.sh`** — Event JSON built with `jq -n --arg` instead of `printf`/`sed`. Repos, branches, or event names containing quotes, backslashes, tabs, or control chars no longer corrupt `events.jsonl`. (issue #152)
+- **`bin/session-start-hook.sh`** — Same `jq` fix for the `additionalContext` payload. Also trimmed to just active-sprint detection now that the cycle protocol is gone.
+- **`skills/scope-check/SKILL.md`** — Added "Capture to backlog" as a fourth option in the "Not in roadmap" verdict, calling `backlog-capture.sh`. Completes the last open acceptance criterion on the backlog feature. (issue #95)
+- **`templates/docs/strategy-roadmap.md`** — Replaced four user-facing references to retired commands: `/aam-brief` → `/aiagentminder:brief` (×2), `/aam-revise` → `/aiagentminder:revise`, `/aam-backlog` → `/aiagentminder:backlog`. These ship to every install via `/aiagentminder:setup`. (issue #95 follow-up)
+- **`docs/strategy-roadmap.md`** — Updated one prescriptive `/aam-backlog` reference. Historical "Shipped:" entries left unchanged. (issue #95 follow-up)
+
+### Notes
+
+This release intentionally simplifies. Net change: ~910 lines of cycle-protocol code and tests deleted; ~220 lines of replacement code/tests added; ~5 doc references retired or rewritten. The handoff/resume-work workflow (Claude Code Auto Memory based) is unaffected — it never depended on the cycle protocol.
+
+---
+
+## [5.0.2] - 2026-05-17
+
+### Fixed
+
+- **`skills/setup/SKILL.md`** — Removed stale references to a non-existent `/aiagentminder:update` skill. The setup skill is itself the re-sync / upgrade path: users re-run `/aiagentminder:setup` (optionally after `/plugin update aiagentminder`) rather than invoking a separate update command. Updated both the "existing install" branch in step 1 and the "What this skill does NOT do" exclusions.
+- **`tests/cycling-resume-chain.test.js`** — Fixture commits now set `commit.gpgsign=false` in the temp repo so the test runs cleanly in environments with a system- or user-level commit-signing wrapper. Throwaway tmp-dir commits should not invoke production signing infrastructure. Restored 4 previously-failing subtests; full suite now 343/343 green.
+- **`CLAUDE.md`** — Replaced v3.3-era content (npm CLI references, `project/` directory, retired `/aam-setup`/`/aam-update` meta-commands, `.claude/commands/` source-of-truth section, broken `.claude/rules/git-workflow.md` pointer) with v5.0-accurate layout (`agents/`, `skills/<name>/SKILL.md`, `bin/`, `hooks/`, `.claude-plugin/`, `templates/`). The file is hand-maintained (this repo is not an AAM target install — no `.claude/aiagentminder-version` stamp present).
+
+---
+
 ## [5.0.0] - 2026-05-15
 
 ### BREAKING CHANGES

@@ -235,7 +235,7 @@ Replaced `/aam-update`'s 404-line hardcoded prompt with a CLI-driven sync comman
 
 v4.2 shipped deterministic sync. The roadmap is informed by the March 2026 architecture assessment (`docs/architecture-assessment-2026-03.md`), which mapped AAM against 30+ competing tools. Key finding: AAM's moat is execution governance (sprint state machine + quality gates + context cycling), not rules — the market is converging on rules sync, but nobody else is attempting enforcement at this depth.
 
-Unscheduled work is tracked in `BACKLOG.md`. Run `/aam-backlog` to capture, review, or promote items.
+Unscheduled work is tracked in `BACKLOG.md`. Run `/aiagentminder:backlog` to capture, review, or promote items.
 
 ---
 
@@ -272,38 +272,47 @@ Distribution model changed from npm to Claude Code plugin. AAM is now installed 
 
 ---
 
-## v5.1 — Portability & Ecosystem (planned)
+## v5.1 — Context Redesign + Web-Compat Docs (shipped)
 
-The assessment found AAM "behind" on cross-platform portability and ecosystem presence. These features don't chase multi-tool support (AAM's governance workflow is legitimately Claude Code-specific) but ensure AAM's *rules and conventions* are portable to teams using mixed tooling.
+Two-patch release line that resimplified AAM's context management and clarified where the plugin runs.
 
-### AGENTS.md Bidirectional Sync
+### v5.1.0 — Auto-cycle protocol retired
 
-- **Import** — `npx aiagentminder agents-md --import` reads an existing AGENTS.md and merges compatible sections into AAM's rules. Enables adoption in repos that already have AGENTS.md conventions.
-- **Export** — Already shipping (`npx aiagentminder agents-md`). Keep current with AGENTS.md spec evolution (60K+ repos, Linux Foundation stewardship).
+- **`context-warning-hook.sh`** — new `Stop` hook that injects an advisory warning when `.context-usage` shows over-threshold. User picks `/aiagentminder:handoff` + `/exit` or keeps going. No tool blocking, no auto-restart, no `.sprint-continuation.md` writing.
+- **Deleted** — `context-cycle-hook.sh`, `session-end-cycle.sh`, `session-start-continuation.sh`, and three corresponding test files (~910 lines). Replaced with `context-warning-hook.sh` + `sprint-phase-reminder.sh` (~220 lines).
+- **`sprint-phase-guard.sh` split** (issue #152) — phase blocking stays on `PreToolUse` but moves to `matcher: "Agent"`. Per-turn phase reminders move to a new `Stop` hook (`sprint-phase-reminder.sh`). Eliminates the empty-matcher per-tool-call bash spawn.
+- **JSON safety** (issue #152) — `hlpm-ping.sh` and `session-start-hook.sh` rebuilt with `jq -n --arg` instead of `printf`/`sed`. Repos/branches/events with quotes, backslashes, or control chars no longer corrupt JSON.
+- **Backlog acceptance criterion completed** (issue #95) — "Capture to backlog" added as fourth option in `skills/scope-check/SKILL.md`.
+- **Stale command refs cleaned up** — five `/aam-X` references in templates and roadmap updated to `/aiagentminder:X`.
+- Rationale: see DECISIONS.md → "Replace autonomous context-cycle protocol with a passive Stop-hook warning".
 
-### Cross-Tool Rule Export
+### v5.1.1 — Web-session compatibility callout
 
-- **`npx aiagentminder export`** — Generates tool-specific instruction files from AAM's universal rules. `--format cursorrules|copilot|agents-md`. One-way export — AAM remains the source of truth; generated files are disposable.
-- **Scope:** Rules and conventions only. The governance workflow (hooks, stop guards, context cycling) is not portable and won't be exported. This is a feature, not a limitation.
-
-### Publish "Mechanical Enforcement" Insight
-
-- **Blog post / documentation** — Articulate the core insight from `docs/spike-v4-research.md`: transformer attention is probabilistic, so AI governance must be mechanical (hooks), not instructional (prompts). This is the conceptual foundation that justifies AAM's hook-heavy architecture over the "just write better instructions" approach used by competitors.
-- **Positioning:** Establishes AAM as the thought leader in AI development governance, not just a tool.
+- **`README.md`** — Added "Where this works" table directly under Quick Start. States plainly that AAM runs on Claude Code CLI and the VS Code / JetBrains extensions but **not** on `claude.ai/code` web sessions (no plugin loader → no slash commands, sub-agents, hooks, or `bin/` scripts). Notes that `/aiagentminder:setup`-installed repo artifacts remain readable from web because they live in the repo itself. Mobile / Claude desktop app parity declared a non-goal.
+- **README cleanup** — folded in stale v5.0 cycle-protocol references the v5.1.0 PR missed: hook/script table, rules table, "Context cycling" section, top-level "What It Does" bullet, doc-link footer.
 
 ---
 
-### Release Automation
+## v5.2+ — Portability & Ecosystem (deferred indefinitely)
 
-- **GitHub Actions publish workflow** — Automate npm publish + plugin manifest validation on GitHub Release creation. Currently manual (see `docs/RELEASING.md`). Deferred from S1 (PR #84 closed — npm infrastructure not yet configured). Lower priority than v5.0/v5.1 work.
+Originally scoped as v5.1. Three items, all blocked on the v5.0 npm CLI removal, plus a marketing item that has no technical blocker but doesn't fit the current direction:
 
-### Future Direction (monitor)
+- **AGENTS.md bidirectional sync** — Originally `npx aiagentminder agents-md --import`. Deferred: the npm CLI was retired in v5.0; reshape required (plugin skill or `bin/` script) before this can be built. The export side (`npx aiagentminder agents-md`) likewise no longer exists.
+- **Cross-tool rule export** — Originally `npx aiagentminder export --format cursorrules|copilot|agents-md`. Same blocker as above.
+- **Release automation (GitHub Actions publish)** — Originally targeted npm publish. Plugin distribution doesn't go through npm anymore; if revived, would need to be reshaped around plugin marketplace + GitHub Release publishing. Deferred from S1 (PR #84 closed).
+- **"Mechanical Enforcement" blog post** — No technical blocker, but pure marketing work; not on the current build path.
+
+No active intent to revisit. If you want any of these, file an issue and we'll evaluate fresh against the v5.1 architecture.
+
+---
+
+## Future Direction (monitor)
 
 - **Claude Code native marketplace** — If Anthropic launches one, be a first-mover. `.claude-plugin/` manifest already positions AAM.
 - **Agent Teams stability** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. When it exits experimental, multi-agent sprint execution becomes possible.
 - **Path-scoped rules** — Copilot supports `.instructions.md` per path; Cursor supports glob-scoped rules. If Claude Code adds native path-scoped rule support, adopt immediately. Relevant for monorepos with mixed stacks.
 - **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks and stop guards.
-- **AGENTS.md spec evolution** — Track spec changes. Bidirectional sync (v5.1) depends on spec stability.
+- **AGENTS.md spec evolution** — Track spec changes. Currently moot — bidirectional sync deferred indefinitely (see v5.2+).
 
 ### Dropped
 

@@ -57,40 +57,41 @@ SPRINT.md is archived to git history when a sprint completes, keeping context co
 | `/aiagentminder:grill` | Plan interrogation — walk every decision branch before implementation | No |
 | `/aiagentminder:sync-issues` | Push current sprint issues to GitHub Issues (optional) | No |
 
-## Optional Features
+## Quality and Sprint Execution
 
-### Code Quality Guidance
+### Code Quality
 
-When enabled, `templates/.claude/rules/code-quality.md` is copied to the target project. Claude Code's native rules loading picks it up automatically every session (TDD cycle, build-before-commit, small focused functions, and read-before-write). Enabled during `/aiagentminder:brief` or `/aiagentminder:setup`. Delete the file to opt out.
+Code-quality guidance used to ship as a standalone `.claude/rules/code-quality.md` file. It was retired in v4.x in favor of agent-based enforcement, which is harder to skip:
 
-### Sprint Planning
+- **Sprint items** run inside `item-executor`, which mandates TDD and runs the full test suite before declaring done.
+- **`quality-reviewer`** runs the quality gate (build, tests, coverage, lint, security) during the sprint REVIEW phase.
+- **`/aiagentminder:quality-gate`** invokes the same checks on demand outside a sprint.
+- **Session profile agents** `dev` and `qa` carry code-quality instructions in their agent definitions.
 
-When enabled, `templates/.claude/rules/sprint-workflow.md` is copied, `SPRINT.md` is created, and `@SPRINT.md` is added to CLAUDE.md. When you ask Claude to "start a sprint" or "begin Phase 1," it:
-1. Decomposes the phase work into discrete issues with acceptance criteria — waits for approval
-2. Writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for approval
-3. Executes items autonomously in sequence: TDD, full test suite, quality gate, self-review, PR pipeline — no permission prompts between items
-4. Runs post-merge validation; failures create rework tasks within the sprint
-5. Archives completed sprints to git history
+Net: the discipline is the same; the enforcement just moved from a rule file (easily ignored) to agents and hooks (mechanical).
 
-### Context Cycling
+### Sprint Execution
 
-Autonomous context management for long sprint sessions. When Claude detects context pressure mid-sprint, it:
+Sprint workflow used to ship as a standalone `.claude/rules/sprint-workflow.md` file. It was retired in the v5.0 orchestrator rework and replaced by the `sprint-master` sub-agent. When you say "start a sprint" or "begin Phase 1," `sprint-master` runs a state machine:
 
-1. Commits all work and writes a continuation file (`.sprint-continuation.md`) with the resume point, completed items, and critical context
-2. Creates a signal file (`.sprint-continue-signal`)
-3. Self-terminates by tracing its own process tree and killing the Claude CLI process
+1. **PLAN** — decomposes the phase work into 4–7 issues with acceptance criteria — waits for your approval.
+2. **SPEC** — writes detailed implementation specs per item (approach, test plan, post-merge validation) — waits for approval.
+3. **EXECUTE / TEST / REVIEW / MERGE** — per item, in an isolated git worktree: TDD, full test suite, quality gate, self-review, PR pipeline. No permission prompts between items.
+4. **VALIDATE** — post-merge validation; failures create rework tasks within the sprint.
+5. **COMPLETE** — sprint archived to git history.
 
-The restart mechanism catches the signal and starts a fresh Claude instance in the same terminal with the same environment variables:
+Phase boundaries are mechanically enforced by `sprint-phase-guard.sh` (PreToolUse, `matcher: "Agent"`) — sub-agents dispatched out of phase order are blocked at the tool layer.
 
-| Mechanism | Setup | How it works |
-|-----------|-------|--------------|
-| **Plugin auto-restart** (recommended) | None — bundled with the plugin | The SessionEnd hook writes `.sprint-continue-signal`; `session-start-continuation.sh` consumes it next launch |
-| **Sprint-runner wrapper** | Start sessions with `sprint-runner.sh` / `sprint-runner.ps1` (on PATH when plugin is enabled) | Loop-based wrapper restarts Claude on signal — useful for fully unattended sprint runs |
-| **Fallback** | None needed | Claude tells you what command to paste |
+### Context Warnings (v5.1+)
 
-The new session reads CLAUDE.md, rules, and SPRINT.md automatically (native loading), then reads the continuation file for ephemeral context. It resumes sprint execution from where the previous session left off.
+When context usage crosses the threshold, a Stop-hook injects an advisory warning at the end of the assistant turn. The warning is passive — no tools are blocked, no continuation file is written, and the session is never auto-restarted. The user picks:
 
-**Platform:** Cross-platform. Windows uses Git Bash `/proc/$$/winpid` + WMI tracing; macOS/Linux uses native `ps` ppid tracing. Profile hooks available for PowerShell (Windows) and bash/zsh (macOS/Linux).
+- **Wrap up cleanly:** run `/aiagentminder:handoff` (writes the "Next Session" block into Claude Code's native Auto Memory), commit any work, then `/exit`. Resume in the next session with "resume work" — Auto Memory carries the handoff forward natively.
+- **Keep going:** continue. The warning re-fires every turn while you're over threshold.
+
+This replaces the v5.0 autonomous cycle protocol (commit + write continuation + self-terminate + auto-restart). The autonomous pattern fought Claude Code's native context behavior and didn't work cleanly when users monitored CLI sessions from the mobile app. v5.1 keeps the threshold detection (`context-monitor.sh` writes `.context-usage`) and replaces the enforcement with a passive advisory.
+
+**Dormant by design** when `.context-usage` is absent — including on Claude Code web, where the status line that produces it doesn't run.
 
 ## Governance Hooks
 
@@ -101,11 +102,10 @@ required in your project.
 | Hook | Event | Script |
 |------|-------|--------|
 | Context monitor | statusLine | `context-monitor.sh` |
-| Context cycle guard | PreToolUse | `context-cycle-hook.sh` |
-| Sprint phase guard | PreToolUse | `sprint-phase-guard.sh` |
+| Context warning | Stop | `context-warning-hook.sh` |
+| Sprint phase guard | PreToolUse (matcher: Agent) | `sprint-phase-guard.sh` |
+| Sprint phase reminder | Stop | `sprint-phase-reminder.sh` |
 | Sprint stop guard | Stop | `sprint-stop-guard.sh` |
-| Session end cycle | SessionEnd | `session-end-cycle.sh` |
-| Session start continuation | SessionStart | `session-start-continuation.sh` |
 | Session start cycle reset | SessionStart | `session-start-cycle-reset.sh` |
 | Session start sprint detect | SessionStart | `session-start-hook.sh` |
 | Stop failure | StopFailure | `stop-failure-hook.sh` |
