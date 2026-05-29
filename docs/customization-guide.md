@@ -169,8 +169,8 @@ Create `.claude/commands/your-command.md` files for project-specific workflows:
 ## Native Claude Code Features Worth Knowing
 
 These ship in Claude Code itself — no AAM configuration required. They pair
-well with AAM but are entirely opt-in. AAM is designed for solo and small-team
-use; these features are equally appropriate at that scale.
+well with AAM but are entirely opt-in. AAM is designed for solo developers;
+these features are equally appropriate at that scale.
 
 ### Minimum Claude Code Version
 
