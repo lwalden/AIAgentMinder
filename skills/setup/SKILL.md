@@ -22,6 +22,8 @@ Read `.claude/aiagentminder-version` if it exists.
 - **If present:** Tell the user "AIAgentMinder is already installed (version X)." This skill is also the re-sync / upgrade path — only the version stamp and plugin-managed files (e.g. `.claude/rules/`) are refreshed; user-owned files (`CLAUDE.md`, `DECISIONS.md`, `BACKLOG.md`, `SPRINT.md`, `docs/strategy-roadmap.md`) are preserved. If they want a newer plugin version on disk first, ask them to run `/plugin update aiagentminder` before continuing.
 
   **v5.1+ upgrade cleanup.** When upgrading from a pre-5.1 install, delete any leftover artifacts of the retired auto-cycle protocol if present in the project root: `.sprint-continuation.md`, `.sprint-continue-signal`, `.sprint-tool-count`, `.sprint-phase-guard-count`. Also remove the old `.claude/rules/context-cycling.md` file (replaced by `context-warnings.md`). Use `rm -f` — silent when the files don't exist.
+
+  The bootstrap script (step 4) additionally strips any **retired auto-cycle hook registrations** (`context-cycle-hook.sh`, `session-start-continuation.sh`, `session-end-cycle.sh`) from the project's `.claude/settings.json` and `.claude/settings.local.json`. Pre-5.0 installs wired these into the project's own settings; the plugin now registers hooks via `hooks.json`, and the leftover PreToolUse cycle hook spawns bash on every tool call and can block edits on Windows. The strip is surgical (all other hooks and settings are preserved) and idempotent.
 - **If absent:** Continue to step 2.
 
 ### 2. Codebase fingerprint
@@ -79,6 +81,7 @@ This copies the non-substituted template files into the target and wires the con
 - `templates/.pr-pipeline.json` → `.pr-pipeline.json` (only if user wants the PR pipeline)
 - `templates/docs/strategy-roadmap.md` → `docs/strategy-roadmap.md` (if not already present)
 - `.claude/settings.json` — additively merged with a `statusLine` entry pointing at `${CLAUDE_PLUGIN_ROOT}/bin/context-monitor.sh`. The merge respects existing user config: if the user already has a `statusLine`, it's preserved untouched.
+- `.claude/settings.json` and `.claude/settings.local.json` — retired auto-cycle hook registrations (`context-cycle-hook.sh`, `session-start-continuation.sh`, `session-end-cycle.sh`) left by pre-5.0 installs are stripped via `${CLAUDE_PLUGIN_ROOT}/bin/strip-retired-hooks.sh`. Surgical and idempotent; all other hooks and settings are preserved. Skipped with a printed instruction if `jq` is unavailable.
 
 The script never overwrites user-owned files — it skips and reports. If `jq` is not installed, the statusLine step is skipped with a printed instruction so the user can add it manually.
 
