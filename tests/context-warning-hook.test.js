@@ -47,12 +47,12 @@ describe('context-warning-hook.sh', () => {
     assert.equal(r.stdout.trim(), '');
   });
 
-  it('emits an additionalContext warning when should_cycle=true', () => {
+  it('emits a systemMessage warning when should_cycle=true', () => {
     writeUsage(dir, { should_cycle: true, used_tokens: 700000, threshold: 580000, used_pct: 70 });
     const r = run(dir);
     assert.equal(r.exitCode, 0);
     const parsed = JSON.parse(r.stdout.trim());
-    const ctx = parsed.hookSpecificOutput?.additionalContext || '';
+    const ctx = parsed.systemMessage || '';
     assert.match(ctx, /Context over threshold/);
     assert.match(ctx, /700000/);
     assert.match(ctx, /580000/);
@@ -62,22 +62,31 @@ describe('context-warning-hook.sh', () => {
     writeUsage(dir, { should_cycle: true, used_tokens: 700000, threshold: 580000, used_pct: 70 });
     const r = run(dir);
     const parsed = JSON.parse(r.stdout.trim());
-    assert.match(parsed.hookSpecificOutput.additionalContext, /\/aiagentminder:handoff/);
+    assert.match(parsed.systemMessage, /\/aiagentminder:handoff/);
   });
 
   it('warning text does NOT prescribe an auto-cycle protocol (no BLOCKED, no .sprint-continuation.md)', () => {
     writeUsage(dir, { should_cycle: true, used_tokens: 700000, threshold: 580000, used_pct: 70 });
     const r = run(dir);
     const parsed = JSON.parse(r.stdout.trim());
-    const ctx = parsed.hookSpecificOutput.additionalContext;
+    const ctx = parsed.systemMessage;
     assert.doesNotMatch(ctx, /BLOCKED/);
     assert.doesNotMatch(ctx, /sprint-continuation/);
     assert.doesNotMatch(ctx, /CONTEXT CYCLE/);
   });
 
-  it('output is valid JSON consumable by Claude Code hooks', () => {
+  it('emits a valid Stop-hook payload (systemMessage, no hookSpecificOutput)', () => {
     writeUsage(dir, { should_cycle: true, used_tokens: 700000, threshold: 580000, used_pct: 70 });
     const r = run(dir);
-    assert.doesNotThrow(() => JSON.parse(r.stdout.trim()));
+    let parsed;
+    assert.doesNotThrow(() => { parsed = JSON.parse(r.stdout.trim()); });
+    // Stop-hook contract: warning rides on top-level systemMessage, never
+    // hookSpecificOutput.additionalContext (invalid for the Stop event).
+    assert.ok(parsed.systemMessage, 'must emit systemMessage');
+    assert.equal(parsed.hookSpecificOutput, undefined, 'must not emit hookSpecificOutput on a Stop hook');
+    // Regression guard: any hookSpecificOutput, if present, must carry hookEventName.
+    if (parsed.hookSpecificOutput !== undefined) {
+      assert.ok(parsed.hookSpecificOutput.hookEventName, 'hookSpecificOutput requires hookEventName');
+    }
   });
 });

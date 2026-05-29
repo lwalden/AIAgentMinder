@@ -36,5 +36,8 @@ Two paths:
 EOF
 )
 
-jq -c -n --arg msg "$MSG" '{hookSpecificOutput: {additionalContext: $msg}}'
+# Stop hooks surface advisory text via the top-level `systemMessage` field.
+# (`hookSpecificOutput.additionalContext` is only valid for context-injecting
+# events like SessionStart/UserPromptSubmit and is rejected on a Stop event.)
+jq -c -n --arg msg "$MSG" '{systemMessage: $msg}'
 exit 0

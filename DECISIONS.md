@@ -7,6 +7,16 @@
 
 ---
 
+### Stop hooks surface advisory text via top-level `systemMessage`, not `hookSpecificOutput.additionalContext` | 2026-05 | Status: Active
+
+Chose: The two passive Stop hooks (`sprint-phase-reminder.sh`, `context-warning-hook.sh`) emit their advisory through the top-level `systemMessage` field, over `{hookSpecificOutput: {additionalContext: …}}`. Why: Claude Code rejects the latter on a Stop event — `hookSpecificOutput` requires a `hookEventName`, and the Stop event has **no `additionalContext` channel at all** (that channel exists only for context-injecting events: SessionStart, UserPromptSubmit, PostToolUse). The malformed output produced "Stop hook error: hookSpecificOutput is missing required field hookEventName" on every turn of an in-progress sprint and whenever over threshold (#177). The sibling `session-start-hook.sh` was already correct (`hookEventName: "SessionStart"`); these two were missed when the passive hooks landed in v5.1.0, and adding `hookEventName` alone would not fix them because Stop has no `additionalContext` channel. Reminders stay on the Stop event (consistent with the prior decision to fire at the per-turn decision point rather than UserPromptSubmit) — only the output field changed.
+
+Alternatives considered: (a) add `hookEventName: "Stop"` and keep `additionalContext` — rejected; Stop has no `additionalContext` channel, so it stays invalid/dropped; (b) move reminders to UserPromptSubmit (where `additionalContext` is valid) — deferred; it changes firing cadence and re-opens a question already settled in favor of Stop.
+
+Tradeoff: `systemMessage` renders as a visible system note each turn rather than silent context injection, so the phase reminder is now user-visible (acceptable — arguably clearer; the context warning was always meant to be visible). The unit tests had asserted `hookSpecificOutput.additionalContext` and only checked "valid JSON," so they encoded the bug; updated to assert `systemMessage` plus a regression guard that any `hookSpecificOutput`, if present, must carry `hookEventName`.
+
+---
+
 ### Replace autonomous context-cycle protocol with a passive Stop-hook warning | 2026-05 | Status: Active
 
 Chose: Retire the v5.0 auto-cycle system (PreToolUse blocking, `.sprint-continuation.md` writing via SessionEnd, `session-start-continuation.sh` consumption, `.sprint-tool-count` fallback) and replace it with a single `Stop` hook (`context-warning-hook.sh`) that injects an advisory message when `.context-usage` says `should_cycle=true`. The user picks wrap-up (`/aiagentminder:handoff` + `/exit` → "resume work" via Auto Memory) or continue. Also split `sprint-phase-guard.sh`: phase blocking stays on `PreToolUse` but moves from empty matcher to `matcher: "Agent"`; periodic phase reminders move to a new `Stop` hook `sprint-phase-reminder.sh`.
