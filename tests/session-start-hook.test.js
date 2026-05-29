@@ -63,6 +63,8 @@ describe('session-start-hook.sh', () => {
     const parsed = JSON.parse(result.stdout.trim());
     assert.ok(parsed.hookSpecificOutput?.additionalContext?.includes('CONTEXT CYCLE'),
       'should inject CONTEXT CYCLE instruction');
+    assert.equal(parsed.hookSpecificOutput?.hookEventName, 'SessionStart',
+      'output envelope must include hookEventName: SessionStart (Claude Code rejects it otherwise)');
   });
 
   it('injects sprint reminder when SPRINT.md has in-progress sprint', () => {
@@ -72,6 +74,19 @@ describe('session-start-hook.sh', () => {
     const parsed = JSON.parse(result.stdout.trim());
     assert.ok(parsed.hookSpecificOutput?.additionalContext?.includes('sprint'),
       'should mention active sprint');
+    assert.equal(parsed.hookSpecificOutput?.hookEventName, 'SessionStart',
+      'output envelope must include hookEventName: SessionStart (Claude Code rejects it otherwise)');
+  });
+
+  it('emits hookEventName "SessionStart" in the output envelope when injecting context', () => {
+    // Regression: a missing hookEventName makes Claude Code reject the hook
+    // output with "hookSpecificOutput is missing required field hookEventName",
+    // which breaks context-cycle resume. See issue #170.
+    fs.writeFileSync(path.join(dir, '.sprint-continuation.md'), '# Sprint Continuation State\n');
+    const result = runHook(sessionStartInput(), dir);
+    assert.equal(result.exitCode, 0);
+    const parsed = JSON.parse(result.stdout.trim());
+    assert.equal(parsed.hookSpecificOutput?.hookEventName, 'SessionStart');
   });
 
   it('does not inject sprint reminder when no active sprint', () => {

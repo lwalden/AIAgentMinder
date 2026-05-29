@@ -33,7 +33,10 @@ fi
 if [[ -n "$CONTEXT" ]]; then
   # Escape for JSON
   ESCAPED=$(printf '%s' "$CONTEXT" | sed 's/\\/\\\\/g; s/"/\\"/g; s/\t/\\t/g; s/\n/\\n/g')
-  printf '{"hookSpecificOutput":{"additionalContext":"%s"}}' "$ESCAPED"
+  # hookEventName is REQUIRED by Claude Code's SessionStart hook contract;
+  # omitting it makes the runtime reject the output ("hookSpecificOutput is
+  # missing required field hookEventName") and breaks context-cycle resume.
+  printf '{"hookSpecificOutput":{"hookEventName":"SessionStart","additionalContext":"%s"}}' "$ESCAPED"
 fi
 
 exit 0
