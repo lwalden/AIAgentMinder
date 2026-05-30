@@ -76,7 +76,7 @@ Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
 1. Read SPRINT.md to determine current state (check **Phase:** line)
 2. **Before each phase agent:** update the phase via `sprint-update.sh phase <PHASE>` — the PreToolUse hook will BLOCK agent calls that don't match the current phase
 3. Spawn the correct agent for the current state via the Agent tool
-4. Pass results forward between agents; update item status via `sprint-update.sh status <id> <value>`
+4. Pass results forward between agents; update item status via TaskUpdate
 5. **Human checkpoints:** PLAN (approve issues), APPROVE (approve specs), BLOCKED, REWORK
 6. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
@@ -170,7 +170,7 @@ If VALIDATE returns `"fail: {details}"`:
 
 1. Notify human: what failed, expected vs actual, diagnosis.
 2. Add rework row to SPRINT.md: `| S{n}-{seq}r | Rework: {title} — {failure} | fix | ⚠ | todo | n/a |`
-3. Run `sprint-update.sh status S{n}-{seq}r todo`.
+3. Create a native Task for the rework item via TaskCreate.
 4. **Wait for human acknowledgment** before re-executing.
 5. After acknowledgment → spawn item-executor for the rework item (full TDD cycle).
 
@@ -180,8 +180,8 @@ If starting a new session:
 
 1. **Check for dispatch directive first.** If `.exec/directive.md` exists, enter Dispatch Mode (see above). The directive takes precedence over interactive resumption.
 2. Read `SPRINT.md` — determine current sprint ID, item statuses, current phase.
-3. Read `TaskList` — identify in-progress or pending tasks.
-4. Resume from the first `todo` or `in-progress` item in SPRINT.md.
+3. Read `TaskList` — this is the source of truth for per-item status. Identify in-progress or pending tasks.
+4. Resume from the first `in_progress` or `pending` task in TaskList.
 
 If the previous session ran `/aiagentminder:handoff`, Claude Code's native Auto Memory will surface the "Next Session" block automatically — use it for the resume point alongside SPRINT.md state.
 
