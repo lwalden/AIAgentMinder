@@ -43,12 +43,12 @@ S9 archived (2026-05-07): 6 planned, 6 completed, 0 rework. 0 scope changes, 0 b
 **Phase:** EXECUTE
 **Issues:** 5 proposed
 
-| ID | Title | Type | Risk | Status | Post-Merge |
-|---|---|---|---|---|---|
-| S10-001 | Tasks-first status refactor — sprint-workflow.md + sprint-master.md | feature | | todo | n/a |
-| S10-002 | Prune sprint-update.sh status subcommand + tests | chore | | todo | n/a |
-| S10-003 | templates/SPRINT.md — remove Status column | chore | | todo | n/a |
-| S10-004 | Content-type lens selection in sprint-master TEST phase | feature | | todo | n/a |
-| S10-005 | self-review skill — lens ownership clarification + tests | chore | | todo | n/a |
+| ID | Title | Type | Risk | Post-Merge |
+|---|---|---|---|---|
+| S10-001 | Tasks-first status refactor — sprint-workflow.md + sprint-master.md | feature | | n/a |
+| S10-002 | Prune sprint-update.sh status subcommand + tests | chore | | n/a |
+| S10-003 | templates/SPRINT.md — remove Status column | chore | | n/a |
+| S10-004 | Content-type lens selection in sprint-master TEST phase | feature | | n/a |
+| S10-005 | self-review skill — lens ownership clarification + tests | chore | | n/a |
 
 ---

@@ -169,7 +169,7 @@ debug checkpoint (3 failed attempts at the same error in a sub-agent).
 If VALIDATE returns `"fail: {details}"`:
 
 1. Notify human: what failed, expected vs actual, diagnosis.
-2. Add rework row to SPRINT.md: `| S{n}-{seq}r | Rework: {title} — {failure} | fix | ⚠ | todo | n/a |`
+2. Add rework row to SPRINT.md: `| S{n}-{seq}r | Rework: {title} — {failure} | fix | ⚠ | n/a |`
 3. Create a native Task for the rework item via TaskCreate.
 4. **Wait for human acknowledgment** before re-executing.
 5. After acknowledgment → spawn item-executor for the rework item (full TDD cycle).
