@@ -139,6 +139,23 @@ describe('sprint-update.sh: phase subcommand', () => {
     assert.ok(content.includes('**Sprint:** S1 — Core features'));
     assert.ok(content.includes('**Status:** proposed'));
   });
+
+  it('inserts a Phase line after Status if no Phase line exists yet', () => {
+    const sprintWithoutPhase = `# SPRINT.md - Sprint Header\n\n> Sprint scope and status.\n\n**Sprint:** S1 — Core features\n**Status:** proposed\n**Issues:** 3 proposed\n`;
+    fs.writeFileSync(path.join(dir, 'SPRINT.md'), sprintWithoutPhase);
+    run(['phase', 'EXECUTE'], dir);
+    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
+    assert.ok(content.includes('**Status:** proposed\n**Phase:** EXECUTE'));
+  });
+
+  it('exits non-zero with wrong argument count', () => {
+    assert.throws(() => {
+      run(['phase'], dir);
+    }, /usage/i);
+    assert.throws(() => {
+      run(['phase', 'EXECUTE', 'BOGUS'], dir);
+    }, /usage/i);
+  });
 });
 
 describe('sprint-update.sh: error handling', () => {
