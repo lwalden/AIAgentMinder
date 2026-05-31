@@ -1,8 +1,8 @@
 # .claude/rules/
 
-Universal rules loaded natively by Claude Code at every session start. These rules apply to ALL session types (sprint, dev, debug, hotfix, qa, research).
+Universal rules loaded natively by Claude Code at every session start. These rules apply to ALL session types.
 
-Mode-specific rules (sprint workflow, code quality, architecture fitness, approach-first, debug checkpoint, scope guardian) have moved to `.claude/agents/` — they load only when the relevant session profile is active.
+Mode-specific rules (sprint workflow, code quality, architecture fitness, approach-first, debug checkpoint, scope guardian) are embedded inline in the plugin's agent definitions (`agents/dev.md`, `agents/sprint-master.md`, etc.) and load automatically when those agents are invoked via `claude --agent <name>`.
 
 Context-usage warnings are emitted by a `Stop` hook (`context-warning-hook.sh`) configured in `hooks/hooks.json`. The `context-warnings.md` rule below describes how to respond when one appears.
 
