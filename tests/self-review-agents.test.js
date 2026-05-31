@@ -37,4 +37,20 @@ describe('self-review skill: agent-based architecture', () => {
     const content = fs.readFileSync(SKILL_PATH, 'utf-8');
     assert.ok(content.includes('cross-model') || content.includes('Cross-Model'), 'must contain cross-model review');
   });
+
+  it('does not instruct always-run-all-five in autonomous mode', () => {
+    const content = fs.readFileSync(SKILL_PATH, 'utf-8');
+    assert.ok(
+      !content.includes('always run all five lenses'),
+      'autonomous mode must not unconditionally spawn all five — lens selection belongs to sprint-master'
+    );
+  });
+
+  it('documents that lens selection is the caller responsibility in autonomous mode', () => {
+    const content = fs.readFileSync(SKILL_PATH, 'utf-8');
+    assert.ok(
+      content.includes("caller's responsibility") || content.includes('caller responsibility'),
+      'must document that lens selection is delegated to the caller in autonomous mode'
+    );
+  });
 });

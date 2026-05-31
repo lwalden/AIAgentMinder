@@ -24,9 +24,12 @@ If the diff is empty: tell the user "No changes vs main — nothing to review."
 
 ## Step 2: Choose Review Lens
 
-During autonomous sprint execution: always run all five lenses — do not ask.
+**During autonomous sprint execution:** lens selection is the caller's responsibility
+(sprint-master selects lenses based on PR content type before invoking this skill).
+Run only the lenses passed in the invocation prompt. If no specific lenses are
+specified, ask the user which to apply (same as manual invocation below).
 
-When invoked manually, ask the user which lens to apply:
+**When invoked manually,** ask the user which lens to apply:
 
 **A) Security** — injection, auth bypass, data exposure, hardcoded secrets
 **B) Performance** — N+1 queries, unbounded loops, missing indexes, blocking I/O
