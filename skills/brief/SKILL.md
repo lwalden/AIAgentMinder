@@ -79,10 +79,13 @@ Do NOT generate `docs/strategy-roadmap.md` unless the user asks. Instead:
 
 3. **Populate `CLAUDE.md` Project Identity** with actual values from the audit.
 
-4. **Install all governance features** (all enabled by default — same as new projects):
-   - Copy `code-quality.md` from the AIAgentMinder template to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
-   - Copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`. Create `SPRINT.md` from template. Add `@SPRINT.md` to CLAUDE.md (after the Context Budget table — this is Claude Code's native import syntax, loads SPRINT.md every session). Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`. Add reminder to Human Actions: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
-   - Copy `architecture-fitness.md` from template to `[target]/.claude/rules/architecture-fitness.md`. Tell the user to customize it.
+4. **Set up SPRINT.md** (if not already present — setup may have created it):
+   - Copy `SPRINT.md` from `${CLAUDE_PLUGIN_ROOT}/templates/SPRINT.md` if `SPRINT.md` does not already exist in the project root.
+   - Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists).
+   - Add SPRINT.md row to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`.
+   - Add reminder to Human Actions: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
+
+   **Do NOT install `code-quality.md`, `sprint-workflow.md`, or `architecture-fitness.md` into `.claude/rules/`.** These rules are embedded inline in the plugin's `agents/dev.md` and `agents/sprint-master.md`. They load automatically when the user runs `claude --agent dev` or `claude --agent sprint-master`. Installing copies into `.claude/rules/` creates stale duplicates that drift from the agent definitions.
 
 5. **Ask:** "Do you want a `docs/strategy-roadmap.md` too? It's optional for existing projects -- useful if you want a north-star doc for future phases."
 
@@ -116,25 +119,20 @@ Ask questions in grouped rounds, not one at a time. Adapt based on project type.
 
 ### Round 3: Governance Setup
 
-**All governance features are enabled by default.** Do not ask the user to choose a tier or opt into individual features. Install everything:
-
-- **Code quality guidance:** TDD, review-before-commit, build-before-commit
-- **Sprint planning:** structured issue decomposition with spec phase, per-issue PRs, autonomous execution
-- **Architecture fitness rules:** structural constraints — user customizes after setup
+**All governance features are enabled by default via the plugin's agent definitions.** Do not ask the user to opt into individual features.
 
 Tell the user in one line:
-> "All governance features enabled — TDD, sprint planning, self-review, and architecture fitness rules. Edit `.claude/rules/` to disable any you don't want."
+> "Governance features (TDD, sprint workflow, architecture fitness, scope guardian) load automatically via the plugin agents — run `claude --agent dev` for feature work, `claude --agent sprint-master` for sprints."
 
-**Install all governance files:**
+**Install SPRINT.md (if not already present — setup may have created it):**
 
-1. Copy `code-quality.md` from the AIAgentMinder template (`project/.claude/rules/code-quality.md`) to `[target]/.claude/rules/code-quality.md` (create the directory if needed). Also copy `project/.claude/rules/README.md`.
-2. Copy `sprint-workflow.md` from template to `[target]/.claude/rules/sprint-workflow.md`.
-3. Create `SPRINT.md` from template (`project/SPRINT.md`) if it doesn't exist.
-4. Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists).
-5. Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`.
-6. Add to `docs/strategy-roadmap.md` Human Actions Needed: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
-7. Copy `architecture-fitness.md` from template to `[target]/.claude/rules/architecture-fitness.md`.
-8. Tell the user: "Architecture fitness rules copied. Open `.claude/rules/architecture-fitness.md` and replace the placeholder constraints with rules for your project's architecture."
+1. Check whether `SPRINT.md` already exists in the project root. If it does, skip to step 4.
+2. Copy `SPRINT.md` from `${CLAUDE_PLUGIN_ROOT}/templates/SPRINT.md`.
+3. Add `@SPRINT.md` to CLAUDE.md after the Context Budget table (Claude Code's native import syntax — loads SPRINT.md every session when the file exists).
+4. Add to CLAUDE.md Context Budget table: `| SPRINT.md | ~35 lines active | Archived when sprint completes |`.
+5. Add to `docs/strategy-roadmap.md` Human Actions Needed: "Review and approve sprint specs before Claude begins coding — every sprint starts with your approval."
+
+**Do NOT install `code-quality.md`, `sprint-workflow.md`, or `architecture-fitness.md` into `.claude/rules/`.** These are embedded inline in `agents/dev.md` and `agents/sprint-master.md` and load when those agents are invoked. Installing copies into `.claude/rules/` creates stale duplicates that drift from the agent definitions.
 
 ### Decision Forcing: Surface Hard-to-Reverse Choices
 
