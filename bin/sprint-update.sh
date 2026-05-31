@@ -3,21 +3,24 @@
 # Mechanically updates table cells so the LLM doesn't burn tokens on file I/O.
 #
 # Usage:
-#   sprint-update.sh status <issue-id> <value>
 #   sprint-update.sh postmerge <issue-id> <value>
 #   sprint-update.sh sprint-status <value>
+#   sprint-update.sh phase <value>
 #
 # Examples:
-#   sprint-update.sh status S1-001 in-progress
 #   sprint-update.sh postmerge S1-002 pass
 #   sprint-update.sh sprint-status in-progress
+#   sprint-update.sh phase EXECUTE
+#
+# Per-item status (in_progress/completed/blocked) is tracked via native Tasks
+# (TaskUpdate), not SPRINT.md. The status subcommand has been removed.
 
 SPRINT_FILE="SPRINT.md"
 
 die() { echo "Error: $1" >&2; exit 1; }
 
 if [ $# -lt 1 ]; then
-  die "Usage: sprint-update.sh <status|postmerge|sprint-status> [issue-id] <value>"
+  die "Usage: sprint-update.sh <postmerge|sprint-status|phase> [issue-id] <value>"
 fi
 
 subcmd="$1"
@@ -26,32 +29,6 @@ shift
 [ -f "$SPRINT_FILE" ] || die "SPRINT.md not found in current directory"
 
 case "$subcmd" in
-  status)
-    [ $# -eq 2 ] || die "Usage: sprint-update.sh status <issue-id> <value>"
-    issue_id="$1"
-    new_value="$2"
-
-    # Column 5 (Status) in the pipe-delimited table
-    # Find the row starting with | <issue-id> | and replace column 5
-    if ! grep -q "^| *${issue_id} *|" "$SPRINT_FILE"; then
-      die "Issue '${issue_id}' not found in SPRINT.md"
-    fi
-
-    awk -v id="$issue_id" -v val="$new_value" '
-    BEGIN { FS="|"; OFS="|" }
-    {
-      # Match table rows where field 2 (trimmed) equals the issue ID
-      trimmed = $2
-      gsub(/^ +| +$/, "", trimmed)
-      if (trimmed == id) {
-        # Replace field 6 (Status column, 1-indexed with leading empty field)
-        $6 = " " val " "
-      }
-      print
-    }
-    ' "$SPRINT_FILE" > "${SPRINT_FILE}.tmp" && mv "${SPRINT_FILE}.tmp" "$SPRINT_FILE"
-    ;;
-
   postmerge)
     [ $# -ge 2 ] || die "Usage: sprint-update.sh postmerge <issue-id> <value>"
     issue_id="$1"
@@ -69,8 +46,8 @@ case "$subcmd" in
       trimmed = $2
       gsub(/^ +| +$/, "", trimmed)
       if (trimmed == id) {
-        # Replace field 7 (Post-Merge column) — last data field before trailing |
-        $7 = " " val " "
+        # Replace field 6 (Post-Merge column in 5-column table: ID|Title|Type|Risk|Post-Merge)
+        $6 = " " val " "
       }
       print
     }
@@ -110,6 +87,6 @@ case "$subcmd" in
     ;;
 
   *)
-    die "Unknown subcommand '${subcmd}'. Usage: sprint-update.sh <status|postmerge|sprint-status|phase> [issue-id] <value>"
+    die "Unknown subcommand '${subcmd}'. Usage: sprint-update.sh <postmerge|sprint-status|phase> [issue-id] <value>"
     ;;
 esac
