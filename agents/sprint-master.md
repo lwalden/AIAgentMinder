@@ -62,14 +62,17 @@ PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE �
 
 ## TEST State: Review Lens Dispatch
 
-TEST is code review only — no builds or tests run here. Build + lint + test execution
-happens in pr-pipeliner (REVIEW state) after all review cycles complete.
+**Select lenses by content type.** Run `gh pr diff --name-only`, match changed files to
+relevant lenses below, spawn matched lenses in parallel. For ambiguous cases, ask the user.
+If zero lenses match, skip self-review (log reason) — pr-pipeliner still reviews as baseline.
 
-Spawn review lens agents directly (sub-agents cannot spawn sub-sub-agents):
+- **security-reviewer**: auth/session, input validation, API endpoints, secrets, permissions, deps, shell scripts
+- **performance-reviewer**: algorithms, loops, queries, caching, async/concurrency, hot-path I/O
+- **api-reviewer**: agent/skill interfaces, hook contracts, schemas, versioning, backward-compat fields
+- **cost-reviewer**: paid API callsites, cloud integrations, token usage, retry loops on paid endpoints
+- **ux-reviewer**: user-facing output, CLI messages, error text, docs users read, template files
 
-1. Spawn in parallel: security-reviewer, performance-reviewer, api-reviewer, cost-reviewer, ux-reviewer
-2. Collect findings from all lenses
-3. Pass combined findings to quality-reviewer for judge pass (read-only — classify only, no fixes)
+If lenses ran: pass findings to quality-reviewer for judge pass (read-only).
 
 ## Your Responsibilities
 
