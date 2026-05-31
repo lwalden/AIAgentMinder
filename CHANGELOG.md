@@ -8,6 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.2.0] - 2026-05-30
+
+### Added
+
+- **Content-type lens selection for sprint review.** `sprint-master` now selects review lenses based on PR content type rather than always spawning all five in parallel. Changed files are mapped to relevant lenses (security for auth/shell/deps, performance for algorithms/IO, api for interfaces/contracts, cost for paid-service callsites, ux for user-facing output). Ambiguous cases prompt the user; zero-match PRs skip self-review and rely on pr-pipeliner's built-in review as the baseline. Fixes compounding slowdowns when multiple sprint items run concurrently. (#180, PRs #184, #185)
+
+### Changed
+
+- **SPRINT.md no longer tracks per-item status.** The `Status` column is removed from the sprint issue table. Per-item status (`in_progress` / `completed` / `blocked`) is now tracked exclusively via native Tasks (TaskUpdate / TaskList), which persist cross-session without file I/O or concurrent-write risk. SPRINT.md retains: sprint header, sprint-level `Status:` field, and the Post-Merge validation column (no Tasks equivalent). Cross-session resume uses `TaskList` as the source of truth for in-flight item status. (#179, PRs #181, #183)
+- **`/aiagentminder:self-review` lens ownership delegated to caller in autonomous mode.** The skill no longer hard-codes "always run all five lenses" for sprint execution. The calling orchestrator (sprint-master) selects lenses and passes them in; the skill runs only what it receives. Manual invocation behavior is unchanged. (#180, PR #185)
+
+### Removed
+
+- **`sprint-update.sh status` subcommand removed.** The `status <issue-id> <value>` subcommand that wrote per-item status to SPRINT.md is no longer needed and has been deleted. Callers that referenced it should switch to TaskUpdate. The `postmerge`, `sprint-status`, and `phase` subcommands are unchanged. The `postmerge` awk script is corrected to write field 6 (was field 7) matching the new 5-column table format. (#179, PR #182)
+
 ## [5.1.4] - 2026-05-29
 
 ### Fixed

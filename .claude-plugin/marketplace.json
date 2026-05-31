@@ -14,7 +14,7 @@
         "repo": "lwalden/AIAgentMinder"
       },
       "description": "An opinionated governance layer for Claude Code, built for solo developers. Autonomous sprint execution, worktree-isolated items, quality gates, TDD workflow, scope control, architecture fitness, and pre-PR code review — workflow enforced by hooks, not just rules. Installs via /plugin marketplace add lwalden/AIAgentMinder.",
-      "version": "5.1.4",
+      "version": "5.2.0",
       "author": {
         "name": "lwalden"
       },
