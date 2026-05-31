@@ -1,6 +1,6 @@
 {
   "name": "aiagentminder",
-  "version": "5.1.4",
+  "version": "5.2.0",
   "description": "An opinionated governance layer for Claude Code, built for solo developers: autonomous sprint execution in isolated git worktrees, mandatory TDD, quality gates, pre-PR code review, and structured planning — workflow enforced by hooks, not just rules.",
   "author": {
     "name": "lwalden",
