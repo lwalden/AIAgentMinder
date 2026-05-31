@@ -25,6 +25,7 @@ function run(args, cwd) {
   });
 }
 
+// 5-column table format — Status column removed (tracked via Tasks)
 const SAMPLE_SPRINT = `# SPRINT.md - Sprint Header
 
 > Sprint scope and status.
@@ -34,62 +35,12 @@ const SAMPLE_SPRINT = `# SPRINT.md - Sprint Header
 **Phase:** Phase 1
 **Issues:** 3 proposed
 
-| ID | Title | Type | Risk | Status | Post-Merge |
-|---|---|---|---|---|---|
-| S1-001 | Add user auth | feature |  | todo | n/a |
-| S1-002 | Fix login bug [risk] | fix | ⚠ | todo | n/a |
-| S1-003 | Update docs | chore |  | todo | pending: verify deploy |
+| ID | Title | Type | Risk | Post-Merge |
+|---|---|---|---|---|
+| S1-001 | Add user auth | feature |  | n/a |
+| S1-002 | Fix login bug [risk] | fix | ⚠ | n/a |
+| S1-003 | Update docs | chore |  | pending: verify deploy |
 `;
-
-describe('sprint-update.sh: status subcommand', () => {
-  let dir;
-
-  beforeEach(() => {
-    dir = makeTempDir();
-    fs.writeFileSync(path.join(dir, 'SPRINT.md'), SAMPLE_SPRINT);
-  });
-
-  afterEach(() => { cleanTempDir(dir); });
-
-  it('updates a row status from todo to in-progress', () => {
-    run(['status', 'S1-001', 'in-progress'], dir);
-    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('| S1-001 | Add user auth | feature |  | in-progress | n/a |'));
-  });
-
-  it('updates a row status from todo to done', () => {
-    run(['status', 'S1-002', 'done'], dir);
-    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('| S1-002 | Fix login bug [risk] | fix | ⚠ | done | n/a |'));
-  });
-
-  it('updates a row status to blocked', () => {
-    run(['status', 'S1-001', 'blocked'], dir);
-    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('| S1-001 | Add user auth | feature |  | blocked | n/a |'));
-  });
-
-  it('does not affect other rows', () => {
-    run(['status', 'S1-001', 'in-progress'], dir);
-    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    // Other rows unchanged
-    assert.ok(content.includes('| S1-002 | Fix login bug [risk] | fix | ⚠ | todo | n/a |'));
-    assert.ok(content.includes('| S1-003 | Update docs | chore |  | todo | pending: verify deploy |'));
-  });
-
-  it('exits non-zero for unknown issue ID', () => {
-    assert.throws(() => {
-      run(['status', 'S1-999', 'done'], dir);
-    }, /not found/i);
-  });
-
-  it('preserves non-table content', () => {
-    run(['status', 'S1-001', 'done'], dir);
-    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('**Sprint:** S1 — Core features'));
-    assert.ok(content.includes('**Phase:** Phase 1'));
-  });
-});
 
 describe('sprint-update.sh: postmerge subcommand', () => {
   let dir;
@@ -104,26 +55,26 @@ describe('sprint-update.sh: postmerge subcommand', () => {
   it('updates post-merge from n/a to pass', () => {
     run(['postmerge', 'S1-001', 'pass'], dir);
     const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('| S1-001 | Add user auth | feature |  | todo | pass |'));
+    assert.ok(content.includes('| S1-001 | Add user auth | feature |  | pass |'));
   });
 
   it('updates post-merge from pending to fail', () => {
     run(['postmerge', 'S1-003', 'fail'], dir);
     const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('| S1-003 | Update docs | chore |  | todo | fail |'));
+    assert.ok(content.includes('| S1-003 | Update docs | chore |  | fail |'));
   });
 
   it('updates post-merge to pending with description', () => {
     run(['postmerge', 'S1-001', 'pending: check staging'], dir);
     const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    assert.ok(content.includes('| S1-001 | Add user auth | feature |  | todo | pending: check staging |'));
+    assert.ok(content.includes('| S1-001 | Add user auth | feature |  | pending: check staging |'));
   });
 
-  it('does not affect status column', () => {
-    run(['postmerge', 'S1-002', 'pass'], dir);
+  it('does not affect other rows', () => {
+    run(['postmerge', 'S1-001', 'pass'], dir);
     const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
-    // Status column should still be 'todo'
-    assert.ok(content.includes('| S1-002 | Fix login bug [risk] | fix | ⚠ | todo | pass |'));
+    assert.ok(content.includes('| S1-002 | Fix login bug [risk] | fix | ⚠ | n/a |'));
+    assert.ok(content.includes('| S1-003 | Update docs | chore |  | pending: verify deploy |'));
   });
 
   it('exits non-zero for unknown issue ID', () => {
@@ -165,6 +116,31 @@ describe('sprint-update.sh: sprint-status subcommand', () => {
   });
 });
 
+describe('sprint-update.sh: phase subcommand', () => {
+  let dir;
+
+  beforeEach(() => {
+    dir = makeTempDir();
+    fs.writeFileSync(path.join(dir, 'SPRINT.md'), SAMPLE_SPRINT);
+  });
+
+  afterEach(() => { cleanTempDir(dir); });
+
+  it('updates Phase line', () => {
+    run(['phase', 'EXECUTE'], dir);
+    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
+    assert.ok(content.includes('**Phase:** EXECUTE'));
+    assert.ok(!content.includes('**Phase:** Phase 1'));
+  });
+
+  it('preserves other sprint metadata when updating phase', () => {
+    run(['phase', 'REVIEW'], dir);
+    const content = fs.readFileSync(path.join(dir, 'SPRINT.md'), 'utf-8');
+    assert.ok(content.includes('**Sprint:** S1 — Core features'));
+    assert.ok(content.includes('**Status:** proposed'));
+  });
+});
+
 describe('sprint-update.sh: error handling', () => {
   let dir;
 
@@ -176,7 +152,7 @@ describe('sprint-update.sh: error handling', () => {
 
   it('exits non-zero when SPRINT.md does not exist', () => {
     assert.throws(() => {
-      run(['status', 'S1-001', 'done'], dir);
+      run(['postmerge', 'S1-001', 'done'], dir);
     }, /not found|no such file/i);
   });
 
@@ -191,6 +167,13 @@ describe('sprint-update.sh: error handling', () => {
     fs.writeFileSync(path.join(dir, 'SPRINT.md'), SAMPLE_SPRINT);
     assert.throws(() => {
       run(['bogus', 'S1-001', 'done'], dir);
+    }, /usage|unknown/i);
+  });
+
+  it('rejects the removed status subcommand', () => {
+    fs.writeFileSync(path.join(dir, 'SPRINT.md'), SAMPLE_SPRINT);
+    assert.throws(() => {
+      run(['status', 'S1-001', 'done'], dir);
     }, /usage|unknown/i);
   });
 });
