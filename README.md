@@ -248,6 +248,12 @@ Works on Windows, macOS, and Linux. Node.js is no longer required (the v4.x npm 
 
 ---
 
+## Related
+
+**[HLPM](https://github.com/lwalden/hlpm)** is the executive layer above AAM — a Claude Code plugin for managing a portfolio of repos from a single meta-tracker, with `/dispatch` to hand autonomous work to consumer repos, cross-repo drift detection, and a review cadence system. AAM's `hlpm-ping.sh` hook integrates with it out of the box.
+
+---
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
