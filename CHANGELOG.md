@@ -8,6 +8,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.2.1] - 2026-05-31
+
+### Added
+
+- **HLPM related-project link.** README now links to [HLPM](https://github.com/lwalden/hlpm), the executive portfolio layer that dispatches work to AAM consumer repos via `/dispatch`. AAM's `hlpm-ping.sh` hook already integrates with it; this surfaces the connection for new readers.
+
+### Fixed
+
+- **README version badge.** Badge was stuck at 5.1.1; corrected to track actual releases.
+
+---
+
 ## [5.2.0] - 2026-05-30
 
 ### Added
