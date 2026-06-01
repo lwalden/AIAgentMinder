@@ -1,7 +1,7 @@
 # AIAgentMinder
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-![Version](https://img.shields.io/badge/version-5.1.1-blue)
+![Version](https://img.shields.io/badge/version-5.2.1-blue)
 
 **AIAgentMinder (AAM) is an opinionated governance layer for Claude Code — a minder for your AI coding agent.** Built for the solo developer, it gives Claude Code the engineering discipline a team would normally supply, so AI-assisted work stays tested, reviewed, and in scope. It's a set of skills, subagents, and hooks that let you enforce your standards without repeating your instructions, stop a session *before* context degradation sets in, and run autonomous sprints that span hours and multiple sessions without losing the thread.
 
