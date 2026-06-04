@@ -59,7 +59,7 @@ Review this diff for [lens] issues. The diff is:
 {diff content}
 ```
 
-The agent's own instructions (in `.claude/agents/{name}.md`) define the focus areas and output format. Do not duplicate the lens-specific instructions in the prompt.
+Each reviewer agent's own definition (shipped with the plugin) defines its focus areas and output format. Do not duplicate the lens-specific instructions in the prompt.
 
 Run all selected lenses in parallel when possible — they are independent.
 
@@ -86,6 +86,12 @@ Spawn a judge subagent with the diff AND all lens findings:
 "You are a review quality judge. Evaluate whether the specialist reviews (security, performance, API design, cost impact, UX friction) were thorough: (1) Did any lens miss an obvious issue in its domain? (2) Are there cross-cutting concerns between lenses? (3) Did any lens flag a clear false positive? For each gap: which lens, file, line, severity, description. If thorough: 'Judge pass: all lenses covered their domains adequately.'"
 
 Judge findings get a `[judge]` tag. High severity judge findings block PR creation.
+
+If you ran the `quality-reviewer` agent for a block/pass verdict, persist its
+machine-readable result line to `.quality-review-result.json` with the Write
+tool. The `pre-pr-gate-hook` reads that file and blocks `gh pr create` when
+`decision` is `"block"` — this is what makes the judge decision enforced rather
+than advisory.
 
 ---
 

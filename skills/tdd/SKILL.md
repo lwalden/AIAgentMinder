@@ -6,7 +6,7 @@ effort: high
 
 # /aiagentminder:tdd - Test-Driven Development
 
-Guided TDD workflow for implementing features through red-green-refactor cycles. This is the full methodology behind `code-quality.md`'s one-liner: "Write a failing test first. Implement the minimal solution. Refactor after green."
+Guided TDD workflow for implementing features through red-green-refactor cycles. This is the full methodology behind the one-line TDD discipline embedded in the `dev` and `item-executor` agent profiles: "Write a failing test first. Implement the minimal solution. Refactor after green."
 
 **Core principle:** Tests verify behavior through public interfaces, not implementation details. A good test survives internal refactors because it doesn't care about internal structure.
 
@@ -14,7 +14,7 @@ Guided TDD workflow for implementing features through red-green-refactor cycles.
 
 ## Step 0: Read Context
 
-Read `.claude/rules/code-quality.md` if it exists — this skill complements that rule with the full structured methodology.
+The day-to-day TDD discipline lives inline in the `dev` and `item-executor` agent profiles; this skill is the full structured methodology behind it. No separate rule file is loaded.
 
 Also read `docs/strategy-roadmap.md` for scope context and any testing strategy notes.
 
@@ -95,7 +95,7 @@ Run tests after each refactor step. Never refactor while RED — get to GREEN fi
 ## When to Use This
 
 - **Use `/aiagentminder:tdd`** when starting a new feature or when the test plan is non-obvious.
-- **Use `code-quality.md`** (loaded automatically) for day-to-day TDD discipline without the full structured workflow.
+- **Rely on the `dev`/`item-executor` agent profiles** for day-to-day TDD discipline (their inline Code Quality rules) when you don't need the full structured workflow.
 - Pairs well with `/aiagentminder:triage` — triage produces a fix plan as RED-GREEN cycles that this skill can execute.
 
 ---

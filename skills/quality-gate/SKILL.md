@@ -49,10 +49,10 @@ If `negativeTestEnforcement.enabled` is `false` in `.pr-pipeline.json`, skip thi
 
 After running checks:
 
-- **All pass:** Record the gate-pass marker with the Write tool — write the current timestamp to `.quality-gate-pass`. Then announce: "Quality gate passed. Creating PR."
-- **Failures found:** List each failure with the specific file and line. Fix all failures before creating the PR. During autonomous sprint execution, fix failures without asking — do not prompt for override. Remove a stale `.quality-gate-pass` if present (`Remove-Item` on Windows, `rm -f` on Unix).
+- **All pass:** Record the gate-pass marker with the Write tool — write the current timestamp to `.quality-gate-pass`. Then announce: "Quality gate passed. Creating PR." The `pre-pr-gate-hook` reads this marker and blocks `gh pr create` until it exists and is fresh (default 60 min), so recording it is what unlocks PR creation.
+- **Failures found:** List each failure with the specific file and line. Fix all failures before creating the PR. During autonomous sprint execution, fix failures without asking — do not prompt for override. Remove a stale `.quality-gate-pass` if present (`Remove-Item` on Windows, `rm -f` on Unix) so the gate hook keeps PR creation blocked until the re-run passes.
 
-If invoked manually outside a sprint and the user explicitly requests an override: create the PR and add a note to the PR description: "Quality gate override: [reason for override]."
+If invoked manually outside a sprint and the user explicitly requests an override: record the `.quality-gate-pass` marker (the human override is the pass) so PR creation is unblocked, create the PR, and add a note to the PR description: "Quality gate override: [reason for override]."
 
 ---
 

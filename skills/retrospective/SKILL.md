@@ -99,10 +99,10 @@ From each archived line and from the current sprint's metrics (Step 2), identify
 
 **Feature coherence:** Always append: "Prefer fitting whole features over hitting an issue count. If a feature needs more issues than the range, plan the feature — but confirm with the user that context will stay manageable."
 
-Write the recommendation as the `<!-- sizing: {min}-{max} -->` comment in the SPRINT.md archive line (see sprint-workflow.md Sprint Completion). This comment persists for the next sprint planning step to read.
+Write the recommendation as the `<!-- sizing: {min}-{max} -->` comment in the SPRINT.md archive line (see the `sprint-master` agent's COMPLETE phase). This comment persists for the next sprint planning step to read.
 
 ---
 
 ## Integration
 
-This command is called automatically by `sprint-workflow.md` at sprint completion, before the user reviews and archives the sprint. It can also be run manually at any time.
+This command is invoked by the `sprint-master` agent (COMPLETE phase) at sprint completion — it spawns `sprint-retro` before the user reviews and archives the sprint. It can also be run manually at any time.
