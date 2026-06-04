@@ -117,3 +117,70 @@ describe('pre-pr-gate-hook.sh', () => {
     assert.equal(r.stdout.trim(), '');
   });
 });
+
+function git(cwd, args) {
+  // Disable commit/tag signing and user-config dependence so the helper works
+  // in any environment (CI, sandboxes with global signing enabled, etc.).
+  const cfg = [
+    '-c', 'commit.gpgsign=false',
+    '-c', 'tag.gpgsign=false',
+    '-c', 'user.email=t@t',
+    '-c', 'user.name=t',
+  ];
+  execFileSync('git', [...cfg, ...args], { cwd, stdio: 'pipe', env: { ...process.env } });
+}
+
+// Repo with a `main` base commit and a `feature` branch that adds `featureContent`.
+function repoWithFeature(dir, featureContent) {
+  git(dir, ['init', '-b', 'main', '-q']);
+  fs.writeFileSync(path.join(dir, 'README.md'), 'base\n');
+  git(dir, ['add', '.']);
+  git(dir, ['commit', '-q', '-m', 'base']);
+  git(dir, ['checkout', '-q', '-b', 'feature']);
+  fs.writeFileSync(path.join(dir, 'config.txt'), featureContent);
+  git(dir, ['add', '.']);
+  git(dir, ['commit', '-q', '-m', 'feature']);
+}
+
+describe('pre-pr-gate-hook.sh secret scan', () => {
+  let dir;
+  beforeEach(() => { dir = tmp(); });
+  afterEach(() => { fs.rmSync(dir, { recursive: true, force: true }); });
+
+  it('blocks a PR whose diff adds a high-confidence secret', () => {
+    repoWithFeature(dir, 'aws_key = AKIAABCDEFGHIJKLMNOP\n');
+    passMarker(dir);
+    const r = run(dir, { command: 'gh pr create --fill' });
+    assert.equal(r.exitCode, 2, r.stdout);
+    assert.match(r.stdout, /secret/i);
+  });
+
+  it('allows a PR whose diff has no secrets', () => {
+    repoWithFeature(dir, 'log_level = debug\nretries = 3\n');
+    passMarker(dir);
+    const r = run(dir, { command: 'gh pr create --fill' });
+    assert.equal(r.exitCode, 0, r.stdout);
+  });
+
+  it('skips the secret scan when AAM_PR_GATE_SECRETS=0', () => {
+    repoWithFeature(dir, 'aws_key = AKIAABCDEFGHIJKLMNOP\n');
+    passMarker(dir);
+    const r = run(dir, { command: 'gh pr create', env: { AAM_PR_GATE_SECRETS: '0' } });
+    assert.equal(r.exitCode, 0, r.stdout);
+  });
+
+  it('does not flag a secret that exists only in the base, not the diff', () => {
+    // Secret committed on main BEFORE branching → not an added line in main...HEAD.
+    git(dir, ['init', '-b', 'main', '-q']);
+    fs.writeFileSync(path.join(dir, 'legacy.txt'), 'token = AKIAABCDEFGHIJKLMNOP\n');
+    git(dir, ['add', '.']);
+    git(dir, ['commit', '-q', '-m', 'base with legacy secret']);
+    git(dir, ['checkout', '-q', '-b', 'feature']);
+    fs.writeFileSync(path.join(dir, 'new.txt'), 'clean change\n');
+    git(dir, ['add', '.']);
+    git(dir, ['commit', '-q', '-m', 'clean feature']);
+    passMarker(dir);
+    const r = run(dir, { command: 'gh pr create --fill' });
+    assert.equal(r.exitCode, 0, r.stdout);
+  });
+});
