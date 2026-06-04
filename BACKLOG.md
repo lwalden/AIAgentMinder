@@ -35,3 +35,13 @@ Was npx aiagentminder agents-md --import/export; the npm CLI was retired in v5.0
 ### B-003: Cross-tool rule export (cursorrules / copilot formats)
 
 Was npx aiagentminder export --format cursorrules|copilot|agents-md. Same npm-CLI-removal blocker as B-002. Tension with the 'own the Claude Code positioning' decision; field is consolidating on AGENTS.md (see B-002), so per-tool formats are lower value. Moved from roadmap deferred bucket 2026-06-04.
+| B-004 | chore | Document auto-mode compatibility + pre-pr-gate TTL expiry behavior | spike S1-003 | 2026-06-04 |
+| B-005 | spike | Verify (then maybe fix) sprint-stop-guard forced-continuation under Claude Code auto mode | spike S1-003 | 2026-06-04 |
+
+### B-004: Document auto-mode compatibility + pre-pr-gate TTL expiry behavior
+
+From the S1-003 auto-mode spike. PreToolUse gates are low-risk, but the pre-pr-gate TTL (default 60min) can expire during a long unattended auto-mode run, hard-blocking gh pr create with no interactive way to refresh the quality-gate marker. Action: document auto-mode behavior, recommend default/acceptEdits as AAM's primary mode, and note AAM_PR_GATE_BYPASS / AAM_PR_GATE_TTL_SECONDS as the levers. Docs-only.
+
+### B-005: Verify (then maybe fix) sprint-stop-guard forced-continuation under Claude Code auto mode
+
+From the S1-003 auto-mode spike. sprint-stop-guard (Stop hook) forces continuation while sprint items remain, which is in tension with auto mode's natural-stop design. No hard deadlock (stop_hook_active guard is present/correct). Before any fix: run a real sprint under auto mode and observe. The research-suggested mechanism (a CLAUDE_PERMISSION_MODE=auto env var; hook 'blocking'/'asyncRewake' fields) is UNVERIFIED — confirm it's real before relying on it. Only then consider making the stop guard allow the stop in auto mode and surface unfinished items next turn.
