@@ -17,7 +17,7 @@
 
 ### Current State
 
-v5.2.1 shipped — see `docs/strategy-roadmap.md` and `CHANGELOG.md` for the running state of versions, sprints, and roadmap.
+v5.3.0 shipped — see `docs/strategy-roadmap.md` and `CHANGELOG.md` for the running state of versions, sprints, and roadmap.
 
 ### Git / PR state — verify, don't assume
 
