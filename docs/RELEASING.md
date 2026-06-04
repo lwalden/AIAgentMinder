@@ -68,24 +68,40 @@ npm run validate
 # Outputs all four version stamps + a layout summary. All four versions should match X.Y.Z.
 ```
 
+CI enforces both of these on every PR and push to `main` (`.github/workflows/ci.yml`), so a red tree can't reach `main`.
+
 ## Commit & Tag
 
 ```bash
 git add -A
 git commit -m "chore(release): vX.Y.Z"
 git push
+git tag vX.Y.Z
+git push origin vX.Y.Z
 ```
 
 ## GitHub Release
+
+Pushing the `vX.Y.Z` tag triggers `.github/workflows/release.yml`, which:
+
+1. Re-runs `npm test` + `npm run validate`,
+2. **verifies all four version points equal the tag** (fails the run if the tag got ahead of the version bump), and
+3. **drafts** a GitHub Release with auto-generated notes.
+
+Then publish manually: open the draft on the Releases page, paste/curate the
+summary (title format `vX.Y.Z — one-line summary`), and hit Publish. The bump
+and the publish decision stay human — the workflow only validates and drafts.
+
+If you'd rather do it entirely by hand (or the workflow is unavailable), the
+equivalent one-liner still works and the release job is idempotent (it won't
+clobber an existing release for the tag):
 
 ```bash
 gh release create vX.Y.Z --generate-notes --title "vX.Y.Z — one-line summary"
 ```
 
-This creates the git tag and generates release notes from merged PRs.
-Once the tag is pushed, the marketplace.json on `main` reflects the new
-version; Claude Code clients with auto-update enabled pick it up on next
-launch.
+Once the tag is pushed, `marketplace.json` on `main` reflects the new version;
+Claude Code clients with auto-update enabled pick it up on next launch.
 
 ## Post-Release
 
