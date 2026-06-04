@@ -44,8 +44,10 @@ echo "$VERSION" > "$VERSION_FILE"
 if command -v jq >/dev/null 2>&1; then
   jq --arg v "$VERSION" '.version = $v' "$PKG_FILE" > "${PKG_FILE}.tmp" && mv "${PKG_FILE}.tmp" "$PKG_FILE"
 else
-  # Fallback: sed-based update for environments without jq
-  sed -i "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$PKG_FILE"
+  # Fallback for environments without jq. Use a temp file + mv rather than
+  # `sed -i`: in-place edit stalls on Windows/WSL against a 9p-mounted repo
+  # (BACKLOG B-001 — `version-bump.sh 5.1.3` hung). temp+mv mirrors the jq branch.
+  sed "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$PKG_FILE" > "${PKG_FILE}.tmp" && mv "${PKG_FILE}.tmp" "$PKG_FILE"
 fi
 
 # 3. Update plugin.json (if exists)
@@ -53,7 +55,7 @@ if [ -f "$PLUGIN_FILE" ]; then
   if command -v jq >/dev/null 2>&1; then
     jq --arg v "$VERSION" '.version = $v' "$PLUGIN_FILE" > "${PLUGIN_FILE}.tmp" && mv "${PLUGIN_FILE}.tmp" "$PLUGIN_FILE"
   else
-    sed -i "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$PLUGIN_FILE"
+    sed "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$PLUGIN_FILE" > "${PLUGIN_FILE}.tmp" && mv "${PLUGIN_FILE}.tmp" "$PLUGIN_FILE"
   fi
 fi
 
@@ -62,7 +64,7 @@ if [ -f "$MARKETPLACE_FILE" ]; then
   if command -v jq >/dev/null 2>&1; then
     jq --arg v "$VERSION" '.plugins[0].version = $v' "$MARKETPLACE_FILE" > "${MARKETPLACE_FILE}.tmp" && mv "${MARKETPLACE_FILE}.tmp" "$MARKETPLACE_FILE"
   else
-    sed -i "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$MARKETPLACE_FILE"
+    sed "s/\"version\": *\"[^\"]*\"/\"version\": \"$VERSION\"/" "$MARKETPLACE_FILE" > "${MARKETPLACE_FILE}.tmp" && mv "${MARKETPLACE_FILE}.tmp" "$MARKETPLACE_FILE"
   fi
 fi
 

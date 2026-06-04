@@ -165,3 +165,77 @@ describe('version-bump.sh: output', () => {
     assert.equal(output.trim(), '');
   });
 });
+
+/**
+ * Build a PATH directory that deliberately EXCLUDES jq (but keeps the tools the
+ * script needs) so we exercise the sed fallback branch — the one that hung on
+ * Windows/WSL with `sed -i` and is now temp-file + mv (B-001).
+ */
+function jqFreePathDir() {
+  const binDir = fs.mkdtempSync(path.join(os.tmpdir(), 'aam-nojq-'));
+  for (const tool of ['bash', 'sed', 'mv', 'grep', 'rm', 'cat']) {
+    try {
+      const resolved = execFileSync('sh', ['-c', `command -v ${tool}`], { encoding: 'utf-8' }).trim();
+      if (resolved) fs.symlinkSync(resolved, path.join(binDir, tool));
+    } catch { /* tool absent — skip */ }
+  }
+  return binDir;
+}
+
+describe('version-bump.sh: sed fallback (no jq)', () => {
+  let dir;
+  let binDir;
+
+  beforeEach(() => {
+    dir = makeTempDir();
+    scaffoldVersionFiles(dir, '3.3.0');
+    binDir = jqFreePathDir();
+  });
+
+  afterEach(() => {
+    cleanTempDir(dir);
+    fs.rmSync(binDir, { recursive: true, force: true });
+  });
+
+  function runNoJq(args) {
+    return execFileSync('bash', [SCRIPT, ...args], {
+      encoding: 'utf-8',
+      cwd: dir,
+      env: { PATH: binDir },
+    });
+  }
+
+  it('confirms jq is not resolvable on the restricted PATH', () => {
+    assert.throws(() => {
+      execFileSync('sh', ['-c', 'command -v jq'], { env: { PATH: binDir } });
+    }, 'jq should not be on the restricted PATH (otherwise the fallback is not exercised)');
+  });
+
+  it('updates all four version points via the sed fallback', () => {
+    runNoJq(['3.4.0']);
+    assert.equal(
+      fs.readFileSync(path.join(dir, 'templates', '.claude', 'aiagentminder-version'), 'utf-8').trim(),
+      '3.4.0'
+    );
+    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8')).version, '3.4.0');
+    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.claude-plugin', 'plugin.json'), 'utf-8')).version, '3.4.0');
+    assert.equal(JSON.parse(fs.readFileSync(path.join(dir, '.claude-plugin', 'marketplace.json'), 'utf-8')).plugins[0].version, '3.4.0');
+  });
+
+  it('leaves no .tmp files behind (temp-file + mv completed, not in-place)', () => {
+    runNoJq(['3.4.0']);
+    const stray = [
+      path.join(dir, 'package.json.tmp'),
+      path.join(dir, '.claude-plugin', 'plugin.json.tmp'),
+      path.join(dir, '.claude-plugin', 'marketplace.json.tmp'),
+    ].filter(p => fs.existsSync(p));
+    assert.deepEqual(stray, [], 'no leftover .tmp files');
+  });
+
+  it('keeps each JSON file valid and preserves sibling fields', () => {
+    runNoJq(['3.4.0']);
+    const pkg = JSON.parse(fs.readFileSync(path.join(dir, 'package.json'), 'utf-8'));
+    assert.equal(pkg.name, 'aiagentminder');
+    assert.equal(pkg.description, 'test');
+  });
+});
