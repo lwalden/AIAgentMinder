@@ -95,6 +95,18 @@ describe('pre-pr-gate-hook.sh', () => {
     assert.match(r.stdout, /1 critical, 2 high/);
   });
 
+  it('checks the gate marker (Gate 1) before the review file (Gate 2)', () => {
+    // No marker but a blocking review file present: must report the missing
+    // gate, proving Gate 1 is evaluated first and a missing marker dominates.
+    fs.writeFileSync(
+      path.join(dir, '.quality-review-result.json'),
+      JSON.stringify({ decision: 'block', critical: 1, high: 0 })
+    );
+    const r = run(dir, { command: 'gh pr create --fill' });
+    assert.equal(r.exitCode, 2);
+    assert.match(r.stdout, /Quality gate has not passed/);
+  });
+
   it('allows when the review result says pass', () => {
     passMarker(dir);
     fs.writeFileSync(
@@ -105,10 +117,23 @@ describe('pre-pr-gate-hook.sh', () => {
     assert.equal(r.exitCode, 0, r.stdout);
   });
 
-  it('also gates the MCP github PR-creation tool referenced in a command', () => {
-    const r = run(dir, { command: 'echo mcp__github__create_pull_request' });
+  it('gates the real MCP github PR-creation tool by name (no marker → block)', () => {
+    const r = run(dir, { toolName: 'mcp__github__create_pull_request', command: '' });
     assert.equal(r.exitCode, 2);
     assert.match(r.stdout, /Quality gate/);
+  });
+
+  it('allows the MCP github PR-creation tool when the gate passed', () => {
+    passMarker(dir);
+    const r = run(dir, { toolName: 'mcp__github__create_pull_request', command: '' });
+    assert.equal(r.exitCode, 0, r.stdout);
+  });
+
+  it('does not block a benign Bash command that merely names the MCP tool', () => {
+    // The MCP path is matched by tool name, not by string-grepping Bash commands,
+    // so mentioning the tool name in a shell command must not trigger the gate.
+    const r = run(dir, { command: 'echo mcp__github__create_pull_request >> notes.txt' });
+    assert.equal(r.exitCode, 0, r.stdout);
   });
 
   it('bypasses entirely when AAM_PR_GATE_BYPASS=1', () => {

@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
-# pre-pr-gate-hook.sh — PreToolUse hook (matcher: "Bash") that mechanically
-# enforces the quality gate at the PR boundary.
+# pre-pr-gate-hook.sh — PreToolUse hook that mechanically enforces the quality
+# gate at the PR boundary. Registered in hooks.json under TWO matchers: "Bash"
+# (catches `gh pr create`) and "mcp__github__create_pull_request" (catches the
+# GitHub MCP tool by name — that call has no command string to grep).
 #
 # Hard gate only (single-purpose by design — mirrors sprint-phase-guard.sh):
-# blocks `gh pr create` / `mcp__github__create_pull_request` unless ALL of:
+# blocks PR creation unless ALL of:
 #   1. `.quality-gate-pass` exists and is fresh (default < 60 min), AND
 #   2. `.quality-review-result.json`, IF present, does not say decision=block, AND
 #   3. the PR diff's added lines contain no high-confidence hardcoded secret
 #      (distinctive key formats only; AAM_PR_GATE_SECRETS=0 disables this gate).
 #
 # The marker files are WRITTEN by /aiagentminder:quality-gate (.quality-gate-pass)
-# and the quality-reviewer agent (.quality-review-result.json). This hook is the
-# READ side that makes the README's "deterministic enforcement of quality" claim
-# real instead of trusting the model to remember.
+# and — because the quality-reviewer judge is read-only — persisted from its
+# verdict by the caller (sprint-master TEST state / self-review) into
+# .quality-review-result.json. Gate 2 is therefore best-effort: flows that don't
+# run the judge (e.g. the pr-pipeliner baseline review) leave the file absent and
+# rely on Gate 1. This hook is the READ side that makes the README's
+# "deterministic enforcement of quality" claim real at the PR boundary.
 #
 # History: a working version of this hook shipped in v4.3.0 (PR #143) and was
 # deleted in v5.0 prep (commit d4415fa) under an inaccurate "empty placeholder"
@@ -23,7 +28,9 @@
 # sprint-phase-guard.sh). No-op = exit 0 with no output.
 #
 # Fail open everywhere: missing jq, unreadable input, or any error → allow.
-# A quality hook must never wedge a session shut.
+# A quality hook must never wedge a session shut. The ERR trap leaves a one-line
+# stderr breadcrumb so a silent self-disable (a future bug tripping fail-open) is
+# detectable rather than invisible.
 #
 # Bypass (per-session opt-out): set AAM_PR_GATE_BYPASS=1. Use when creating a PR
 # outside the AAM quality workflow (e.g. a docs-only or chore PR). The
@@ -31,7 +38,7 @@
 # human override flows through the gate normally without needing this env var.
 
 set -euo pipefail
-trap 'exit 0' ERR
+trap 'echo "pre-pr-gate-hook: internal error — allowing (fail-open)" >&2; exit 0' ERR
 
 # Per-session opt-out.
 [ "${AAM_PR_GATE_BYPASS:-0}" = "1" ] && exit 0
@@ -43,15 +50,22 @@ input=$(cat 2>/dev/null || true)
 command -v jq >/dev/null 2>&1 || exit 0
 
 tool_name=$(printf '%s' "$input" | jq -r '.tool_name // empty' 2>/dev/null || true)
-[ "$tool_name" = "Bash" ] || exit 0
 
-command=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null || true)
-[ -n "$command" ] || exit 0
-
-# Fast-path exit: only PR-creation commands are gated.
-if ! printf '%s' "$command" | grep -qE 'gh pr create|mcp__github__create_pull_request'; then
-  exit 0
-fi
+# Determine whether this call creates a PR. Two paths are gated:
+#   - Bash: `gh pr create` appears in the command string (the plugin's own flows)
+#   - the GitHub MCP tool, matched by tool name (no command string to grep)
+case "$tool_name" in
+  Bash)
+    command=$(printf '%s' "$input" | jq -r '.tool_input.command // empty' 2>/dev/null || true)
+    printf '%s' "$command" | grep -qE 'gh pr create' || exit 0
+    ;;
+  mcp__github__create_pull_request)
+    : # always a PR creation — gate directly
+    ;;
+  *)
+    exit 0
+    ;;
+esac
 
 MARKER=".quality-gate-pass"
 REVIEW=".quality-review-result.json"
@@ -112,7 +126,8 @@ if [ "${AAM_PR_GATE_SECRETS:-1}" = "1" ] && command -v git >/dev/null 2>&1; then
       # Distinctive credential formats. Categories are reported; values never are.
       secret_re='AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|sk_live_[0-9a-zA-Z]{24}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
       if printf '%s' "$added" | grep -qE "$secret_re"; then
-        hits=$(printf '%s' "$added" | grep -coE "$secret_re" 2>/dev/null || echo "1")
+        # Count matching lines (the grep -qE above guarantees at least one).
+        hits=$(printf '%s' "$added" | grep -cE "$secret_re")
         block "Likely hardcoded secret detected in ${hits} added line(s) of the PR diff (AWS/GitHub/Google/Slack/Stripe key or private key). Remove it (use env vars / a secret manager) before creating the PR. Set AAM_PR_GATE_SECRETS=0 to skip this scan if it is a false positive."
       fi
     fi
