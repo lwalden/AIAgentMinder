@@ -293,16 +293,26 @@ Two-patch release line that resimplified AAM's context management and clarified 
 
 ---
 
-## v5.2+ — Portability & Ecosystem (deferred indefinitely)
+## v5.3 — Pre-PR Quality Gate + Markdown Audit (shipped)
 
-Originally scoped as v5.1. Three items, all blocked on the v5.0 npm CLI removal, plus a marketing item that has no technical blocker but doesn't fit the current direction:
+Restored mechanical quality enforcement at the PR boundary, and ran a markdown audit of the agent/skill corpus against the current hook set and Opus 4.8.
 
-- **AGENTS.md bidirectional sync** — Originally `npx aiagentminder agents-md --import`. Deferred: the npm CLI was retired in v5.0; reshape required (plugin skill or `bin/` script) before this can be built. The export side (`npx aiagentminder agents-md`) likewise no longer exists.
-- **Cross-tool rule export** — Originally `npx aiagentminder export --format cursorrules|copilot|agents-md`. Same blocker as above.
-- **Release automation (GitHub Actions publish)** — Originally targeted npm publish. Plugin distribution doesn't go through npm anymore; if revived, would need to be reshaped around plugin marketplace + GitHub Release publishing. Deferred from S1 (PR #84 closed).
-- **"Mechanical Enforcement" blog post** — No technical blocker, but pure marketing work; not on the current build path.
+- **`pre-pr-gate-hook.sh`** — new `PreToolUse` hook (matchers `Bash` + `mcp__github__create_pull_request`) that blocks PR creation until `/aiagentminder:quality-gate` recorded a fresh pass, the `quality-reviewer` judge didn't return `block`, and the diff's added lines contain no high-confidence secret (AWS/GitHub/Google/Slack/Stripe keys, PEM private keys). Fail-open; knobs `AAM_PR_GATE_BYPASS=1`, `AAM_PR_GATE_SECRETS=0`, `AAM_PR_GATE_TTL_SECONDS`. Closes the loop on the `.quality-gate-pass` / `.quality-review-result.json` markers that `/aiagentminder:quality-gate` and `quality-reviewer` already wrote but nothing read. A working version shipped in v4.3.0 and was deleted in v5.0 prep under an inaccurate "empty placeholder" label.
+- **`quality-reviewer` gate-signal fix** — the read-only judge was instructed to write its result via a Bash command it cannot run; it now emits the result line for its caller (sprint-master TEST state / `/aiagentminder:self-review`) to persist.
+- **Markdown audit** — repointed stale `.claude/rules/` references in `tdd`/`grill`/`retrospective`/`pr-pipeline` to the agent profiles that now carry those standards (the v5.1 sweep caught `docs/` but missed the skills); fixed version drift (`sprint-master` worktree fallback `2.1.121` → `2.1.139`, root `CLAUDE.md`); imperative-tightened the `brief`/`revise` intros; canonicalized the Architecture Fitness block across agents.
+- Rationale: see DECISIONS.md → "Recreate the pre-PR quality gate hook".
 
-No active intent to revisit. If you want any of these, file an issue and we'll evaluate fresh against the v5.1 architecture.
+---
+
+## Planned — Release & Tooling Hardening
+
+Next build batch (sprint candidate). Small, cohesive, aligned with the Claude-Code-native positioning:
+
+- **Release automation** — GitHub Actions workflow: validate on PR (`npm test` + `npm run validate`), and on a `v*` tag draft the GitHub Release and confirm the marketplace version bump. Reshaped around plugin-marketplace + GitHub Release publishing — the original npm-publish framing is obsolete. The semver bump stays a human decision. Justified now that GitHub releases are part of the workflow (v5.3).
+- **`version-bump.sh` Windows resilience** (BACKLOG B-001) — replace `sed -i` in-place edits with the temp-file + `mv` pattern (or prefer `jq` consistently); it hung on Windows/WSL during the 5.1.3 release.
+- **Auto-mode compatibility spike** — verify AAM's stop guards and PreToolUse gates (including `pre-pr-gate-hook.sh`) don't fight Claude Code auto mode; promote findings to a fix item if needed.
+
+Portability work — **AGENTS.md bidirectional sync** and **cross-tool rule export** — is kept as candidates in `BACKLOG.md` (B-002, B-003), not pruned: both still need reshaping after the v5.0 npm-CLI removal, and sit in tension with the "own the Claude Code positioning" call. The "Mechanical Enforcement" blog post was dropped (marketing, not build work).
 
 ---
 
@@ -311,19 +321,17 @@ No active intent to revisit. If you want any of these, file an issue and we'll e
 - **Claude Code native marketplace** — If Anthropic launches one, be a first-mover. `.claude-plugin/` manifest already positions AAM.
 - **Agent Teams stability** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. When it exits experimental, multi-agent sprint execution becomes possible.
 - **Path-scoped rules** — Copilot supports `.instructions.md` per path; Cursor supports glob-scoped rules. If Claude Code adds native path-scoped rule support, adopt immediately. Relevant for monorepos with mixed stacks.
-- **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks and stop guards.
-- **AGENTS.md spec evolution** — Track spec changes. Currently moot — bidirectional sync deferred indefinitely (see v5.2+).
+- **AGENTS.md spec evolution** — Track spec changes. Relevant to the AGENTS.md sync work now held as a backlog candidate (BACKLOG B-002).
 
 ### Dropped
 
-- **`/aam-release` command** — Release automation (changelog, version bump, GitHub release). Not needed — GitHub releases aren't part of the current workflow.
 - **`/aam-handoff` JSON digest** — Speculative value. Nobody has asked for it.
 - **`/onboard` command** — `/aam-brief` Starting Point E (existing project audit) covers this use case.
 - **Quality tier selection** — Replaced with always-Comprehensive default in v3.0.
 - **`/aam-update` dry-run mode (as a prompt feature)** — Superseded by v4.2 deterministic sync. Dry-run is now a CLI flag (`npx aiagentminder sync --dry-run`), not a prompt behavior.
 - **HTTP hook support** — Node.js dependency already removed in v3.2.
 - **Versioning scheme reset to v1.0.0** — Resolved: continue v3.x with strict semver. See DECISIONS.md.
-- **Cross-platform portability as a major initiative** — Assessment: "own the Claude Code positioning rather than trying to be everything." The governance workflow (hooks, stop guards, context cycling) is inherently Claude Code-specific. Rules portability is addressed by v5.1 export, not by rebuilding the framework for other tools.
+- **Cross-platform portability as a major initiative** — Assessment: "own the Claude Code positioning rather than trying to be everything." The governance workflow (hooks, stop guards, context cycling) is inherently Claude Code-specific. Targeted rules portability, if pursued, is the AGENTS.md / cross-tool export work now held as backlog candidates (B-002, B-003) — not a framework rebuild for other tools.
 - **Worktree-native sprint items** — Each sprint item in `isolation: "worktree"`. Removed from monitor — not identified as a priority by the competitive assessment, and context cycling already handles multi-item session management.
 
 ---
@@ -338,5 +346,7 @@ No active intent to revisit. If you want any of these, file an issue and we'll e
 | 2026-03-30 | Changed: Release Automation note | PR #84 closed — npm infrastructure not yet configured. |
 | 2026-03-30 | Post-v4.2 hardening (S7) | Fix `init --force` settings merge, stale skill references, jq check in sync, branch cleanup, README rules table update for v4.1 session profiles. |
 | 2026-03-30 | Roadmap refinement from architecture assessment | Assessment (`docs/architecture-assessment-2026-03.md`) mapped AAM vs. 30+ tools. Refined v5.0 (added metrics collection, community listings), added v5.1 (AGENTS.md bidirectional sync, cross-tool export, mechanical enforcement publication), restructured Future Direction into monitor/dropped tiers, dropped cross-platform portability initiative and worktree-native items. |
+| 2026-06-04 | Shipped: v5.3 — pre-PR quality gate hook + markdown audit | Restored mechanical PR-boundary enforcement (the marker files were written but unread after the v4.3 gate hook was deleted in v5.0 prep); audit fixed stale `.claude/rules/` references, version drift, and duplication across the agent/skill corpus. |
+| 2026-06-04 | Reorganized: deferred bucket → planned / backlog / dropped | Portfolio review. Release automation, `version-bump.sh` Windows fix (B-001), and an auto-mode compat spike moved to **Planned — Release & Tooling Hardening**. AGENTS.md sync and cross-tool export moved to BACKLOG (B-002, B-003) rather than pruned. "Mechanical Enforcement" blog post dropped. Fixed two stale rationales: the `/aam-release` "not in the workflow" note (releases are now the workflow) and the "v5.1 export" reference (that export was never built). |
 
-*Last revised 2026-03-30 (architecture assessment refinement)*
+*Last revised 2026-06-04 (v5.3 shipped; deferred-bucket reorganization)*
