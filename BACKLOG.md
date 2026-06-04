@@ -25,3 +25,13 @@ Options to consider:
   already favors Write/Edit over shelling out).
 
 Low priority — releases are infrequent and the manual-edit workaround is quick.
+| B-002 | feature | AGENTS.md bidirectional sync (import + export rules) | roadmap | 2026-06-04 |
+| B-003 | feature | Cross-tool rule export (cursorrules / copilot formats) | roadmap | 2026-06-04 |
+
+### B-002: AGENTS.md bidirectional sync (import + export rules)
+
+Was npx aiagentminder agents-md --import/export; the npm CLI was retired in v5.0, so this needs reshaping as a plugin skill or bin/ script before it can be built. Moved from the roadmap's deferred bucket 2026-06-04 — kept as a real candidate rather than pruned.
+
+### B-003: Cross-tool rule export (cursorrules / copilot formats)
+
+Was npx aiagentminder export --format cursorrules|copilot|agents-md. Same npm-CLI-removal blocker as B-002. Tension with the 'own the Claude Code positioning' decision; field is consolidating on AGENTS.md (see B-002), so per-tool formats are lower value. Moved from roadmap deferred bucket 2026-06-04.
