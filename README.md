@@ -100,7 +100,7 @@ All scripts ship in `bin/` and are on PATH while the plugin is enabled. Hooks re
 | `context-monitor.sh` | statusLine | Writes `.context-usage` with token thresholds |
 | `context-warning-hook.sh` | Stop | Advisory warning when over threshold (v5.1+) |
 | `sprint-phase-guard.sh` | PreToolUse (`matcher: "Agent"`) | Blocks sub-agent dispatches that don't match SPRINT.md phase |
-| `pre-pr-gate-hook.sh` | PreToolUse (`matcher: "Bash"`) | Blocks `gh pr create` until the quality gate passed and the review judge didn't block; fail-open, `AAM_PR_GATE_BYPASS=1` to skip |
+| `pre-pr-gate-hook.sh` | PreToolUse (`matcher: "Bash"`) | Blocks `gh pr create` until the quality gate passed, the review judge didn't block, and the diff adds no high-confidence secret; fail-open, `AAM_PR_GATE_BYPASS=1` to skip |
 | `sprint-phase-reminder.sh` | Stop | One-line per-turn phase reminder during an active sprint |
 | `sprint-stop-guard.sh` | Stop | Blocks premature turn endings during sprint execution |
 | `session-start-cycle-reset.sh` | SessionStart | Wipes stale `.context-usage` |

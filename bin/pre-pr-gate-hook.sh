@@ -3,9 +3,11 @@
 # enforces the quality gate at the PR boundary.
 #
 # Hard gate only (single-purpose by design — mirrors sprint-phase-guard.sh):
-# blocks `gh pr create` / `mcp__github__create_pull_request` unless BOTH:
+# blocks `gh pr create` / `mcp__github__create_pull_request` unless ALL of:
 #   1. `.quality-gate-pass` exists and is fresh (default < 60 min), AND
-#   2. `.quality-review-result.json`, IF present, does not say decision=block.
+#   2. `.quality-review-result.json`, IF present, does not say decision=block, AND
+#   3. the PR diff's added lines contain no high-confidence hardcoded secret
+#      (distinctive key formats only; AAM_PR_GATE_SECRETS=0 disables this gate).
 #
 # The marker files are WRITTEN by /aiagentminder:quality-gate (.quality-gate-pass)
 # and the quality-reviewer agent (.quality-review-result.json). This hook is the
@@ -88,6 +90,32 @@ if [ -f "$REVIEW" ]; then
     critical=$(jq -r '.critical // 0' "$REVIEW" 2>/dev/null || echo 0)
     high=$(jq -r '.high // 0' "$REVIEW" 2>/dev/null || echo 0)
     block "Quality review blocked: ${critical} critical, ${high} high finding(s) unresolved."
+  fi
+fi
+
+# --- Gate 3: high-confidence secret scan of the PR diff ---
+# Stack-agnostic defense-in-depth. Scans ONLY added lines, ONLY for distinctive
+# key formats with near-zero false-positive rate (no generic password=/api_key=
+# heuristics — those are the security-reviewer lens's and quality-gate's job and
+# would make this hard gate too noisy). Fail open on any uncertainty: no git, not
+# a repo, no resolvable base ref, or grep error → skip silently rather than block.
+# Disable just this gate with AAM_PR_GATE_SECRETS=0.
+if [ "${AAM_PR_GATE_SECRETS:-1}" = "1" ] && command -v git >/dev/null 2>&1; then
+  base=""
+  for ref in origin/HEAD origin/main origin/master main master; do
+    if git rev-parse --verify --quiet "$ref" >/dev/null 2>&1; then base="$ref"; break; fi
+  done
+  if [ -n "$base" ]; then
+    # Added lines only (drop the +++ file headers); empty on any git error.
+    added=$(git diff "$base"...HEAD 2>/dev/null | grep -E '^\+' | grep -vE '^\+\+\+' || true)
+    if [ -n "$added" ]; then
+      # Distinctive credential formats. Categories are reported; values never are.
+      secret_re='AKIA[0-9A-Z]{16}|gh[pousr]_[A-Za-z0-9]{36}|github_pat_[A-Za-z0-9_]{22,}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[0-9A-Za-z_-]{35}|sk_live_[0-9a-zA-Z]{24}|-----BEGIN [A-Z ]*PRIVATE KEY-----'
+      if printf '%s' "$added" | grep -qE "$secret_re"; then
+        hits=$(printf '%s' "$added" | grep -coE "$secret_re" 2>/dev/null || echo "1")
+        block "Likely hardcoded secret detected in ${hits} added line(s) of the PR diff (AWS/GitHub/Google/Slack/Stripe key or private key). Remove it (use env vars / a secret manager) before creating the PR. Set AAM_PR_GATE_SECRETS=0 to skip this scan if it is a false positive."
+      fi
+    fi
   fi
 fi
 
