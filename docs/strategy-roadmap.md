@@ -293,6 +293,17 @@ Two-patch release line that resimplified AAM's context management and clarified 
 
 ---
 
+## v5.3 — Pre-PR Quality Gate + Markdown Audit (shipped)
+
+Restored mechanical quality enforcement at the PR boundary, and ran a markdown audit of the agent/skill corpus against the current hook set and Opus 4.8.
+
+- **`pre-pr-gate-hook.sh`** — new `PreToolUse` hook (matchers `Bash` + `mcp__github__create_pull_request`) that blocks PR creation until `/aiagentminder:quality-gate` recorded a fresh pass, the `quality-reviewer` judge didn't return `block`, and the diff's added lines contain no high-confidence secret (AWS/GitHub/Google/Slack/Stripe keys, PEM private keys). Fail-open; knobs `AAM_PR_GATE_BYPASS=1`, `AAM_PR_GATE_SECRETS=0`, `AAM_PR_GATE_TTL_SECONDS`. Closes the loop on the `.quality-gate-pass` / `.quality-review-result.json` markers that `/aiagentminder:quality-gate` and `quality-reviewer` already wrote but nothing read. A working version shipped in v4.3.0 and was deleted in v5.0 prep under an inaccurate "empty placeholder" label.
+- **`quality-reviewer` gate-signal fix** — the read-only judge was instructed to write its result via a Bash command it cannot run; it now emits the result line for its caller (sprint-master TEST state / `/aiagentminder:self-review`) to persist.
+- **Markdown audit** — repointed stale `.claude/rules/` references in `tdd`/`grill`/`retrospective`/`pr-pipeline` to the agent profiles that now carry those standards (the v5.1 sweep caught `docs/` but missed the skills); fixed version drift (`sprint-master` worktree fallback `2.1.121` → `2.1.139`, root `CLAUDE.md`); imperative-tightened the `brief`/`revise` intros; canonicalized the Architecture Fitness block across agents.
+- Rationale: see DECISIONS.md → "Recreate the pre-PR quality gate hook".
+
+---
+
 ## v5.2+ — Portability & Ecosystem (deferred indefinitely)
 
 Originally scoped as v5.1. Three items, all blocked on the v5.0 npm CLI removal, plus a marketing item that has no technical blocker but doesn't fit the current direction:
@@ -338,5 +349,6 @@ No active intent to revisit. If you want any of these, file an issue and we'll e
 | 2026-03-30 | Changed: Release Automation note | PR #84 closed — npm infrastructure not yet configured. |
 | 2026-03-30 | Post-v4.2 hardening (S7) | Fix `init --force` settings merge, stale skill references, jq check in sync, branch cleanup, README rules table update for v4.1 session profiles. |
 | 2026-03-30 | Roadmap refinement from architecture assessment | Assessment (`docs/architecture-assessment-2026-03.md`) mapped AAM vs. 30+ tools. Refined v5.0 (added metrics collection, community listings), added v5.1 (AGENTS.md bidirectional sync, cross-tool export, mechanical enforcement publication), restructured Future Direction into monitor/dropped tiers, dropped cross-platform portability initiative and worktree-native items. |
+| 2026-06-04 | Shipped: v5.3 — pre-PR quality gate hook + markdown audit | Restored mechanical PR-boundary enforcement (the marker files were written but unread after the v4.3 gate hook was deleted in v5.0 prep); audit fixed stale `.claude/rules/` references, version drift, and duplication across the agent/skill corpus. |
 
-*Last revised 2026-03-30 (architecture assessment refinement)*
+*Last revised 2026-06-04 (v5.3 shipped)*
