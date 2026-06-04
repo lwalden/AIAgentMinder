@@ -72,7 +72,7 @@ If zero lenses match, skip self-review (log reason) — pr-pipeliner still revie
 - **cost-reviewer**: paid API callsites, cloud integrations, token usage, retry loops on paid endpoints
 - **ux-reviewer**: user-facing output, CLI messages, error text, docs users read, template files
 
-If lenses ran: pass findings to quality-reviewer for judge pass (read-only).
+If lenses ran: pass findings to quality-reviewer for the judge pass (read-only), then persist the judge's result line to `.quality-review-result.json` with the Write tool — the `pre-pr-gate-hook` reads it and blocks `gh pr create` on a `block` decision.
 
 ## Your Responsibilities
 
@@ -93,7 +93,7 @@ Capture the branch name from `"done: branch={name} commit={hash}"` — you
 pass it to pr-pipeliner during REVIEW. On `"partial: ..."`, include
 "resume on branch {branch_name}" in the next spawn's prompt.
 
-**Fallback (Claude Code < 2.1.121):** if the Agent call fails because `isolation` is unrecognized, retry once without it, warn the user ("Worktree isolation unavailable; running in-place. Consider upgrading."), and use the fallback for the rest of the session. Same TDD contract, no isolation between items.
+**Fallback (Claude Code < 2.1.139):** if the Agent call fails because `isolation` is unrecognized, retry once without it, warn the user ("Worktree isolation unavailable; running in-place. Consider upgrading."), and use the fallback for the rest of the session. Same TDD contract, no isolation between items.
 
 ## Human Checkpoint Protocol (mechanical enforcement)
 
@@ -196,4 +196,4 @@ If the previous session ran `/aiagentminder:handoff`, Claude Code's native Auto 
 
 ## Context Warnings
 
-If a Stop hook injects a context-over-threshold warning: finish the current logical unit, suggest the user run `/aiagentminder:handoff` and `/exit`, or keep going (warning re-fires next turn). No tool blocking, no `.sprint-continuation.md` — the choice is the user's.
+If a Stop hook injects a context-over-threshold warning: finish the current logical unit, suggest the user run `/aiagentminder:handoff` and `/exit`, or keep going (warning re-fires next turn). No tool blocking, no auto-cycling — the choice is the user's.

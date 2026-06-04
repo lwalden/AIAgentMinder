@@ -6,7 +6,7 @@ effort: high
 
 # /aiagentminder:grill - Plan Interrogation
 
-Stress-test a plan or design by walking every branch of the decision tree. This is the intensive counterpart to `approach-first.md` — use it when a design is non-obvious, high-stakes, or involves multiple interdependent decisions.
+Stress-test a plan or design by walking every branch of the decision tree. This is the intensive counterpart to the Approach-First check embedded in the `dev` agent profile — use it when a design is non-obvious, high-stakes, or involves multiple interdependent decisions.
 
 ---
 
@@ -14,7 +14,7 @@ Stress-test a plan or design by walking every branch of the decision tree. This 
 
 Read the plan or design being questioned. Sources may include:
 
-- An approach statement from `approach-first.md`
+- An approach statement from the `dev` agent's Approach-First check
 - A feature description from `docs/strategy-roadmap.md`
 - A freeform plan the user describes
 - An existing design doc or PR description
@@ -83,7 +83,7 @@ If yes, append each decision to DECISIONS.md in the project's existing format, i
 ## When to Use This
 
 - **Use `/aiagentminder:grill`** when a design is non-obvious, high-stakes, or has multiple interdependent decisions.
-- **Use `approach-first.md`** for routine check-ins — state intent, confirm, proceed.
+- **Use the `dev` agent's Approach-First check** for routine check-ins — state intent, confirm, proceed.
 - Consider running `/aiagentminder:grill` before architecture changes touching more than 5 files.
 
 ---

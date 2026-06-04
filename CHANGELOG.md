@@ -8,6 +8,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **`pre-pr-gate-hook.sh` (PreToolUse, `matcher: "Bash"`).** Mechanically enforces the quality gate at the PR boundary: blocks `gh pr create` / `mcp__github__create_pull_request` unless `.quality-gate-pass` exists and is fresh (default 60 min, `AAM_PR_GATE_TTL_SECONDS`) and `.quality-review-result.json`, if present, is not `decision: block`. Fail-open on missing `jq`/errors; per-session opt-out via `AAM_PR_GATE_BYPASS=1`. Restores enforcement for marker files that `/aiagentminder:quality-gate` and `quality-reviewer` already wrote but nothing read. A working version shipped in v4.3.0 and was deleted in v5.0 prep under an inaccurate "empty placeholder" label — see DECISIONS.md. 10 unit tests added.
+
+### Fixed
+
+- **`quality-reviewer` could not emit its gate signal.** The agent is read-only (`disallowedTools: [Edit, Write, Bash]`) yet was told to write `.quality-review-result.json` via a Bash `echo` it cannot run. It now returns the result line in its output; the caller (sprint-master TEST state / `self-review` skill) persists it with the Write tool.
+- **Stale rule-file references in skills.** `tdd`, `grill`, `retrospective`, and `pr-pipeline` referred to retired `.claude/rules/` files (`code-quality.md`, `approach-first.md`, `sprint-workflow.md`, `architecture-fitness.md`) as if they still ship and auto-load — those standards moved inline into the `dev`/`item-executor`/`sprint-master` agent profiles in v4.x/v5.0. Repointed to the actual source. (`docs/` was swept for the same references in v5.1; the skills were missed.)
+- **Version inconsistencies.** `sprint-master.md`'s worktree-isolation fallback said "Claude Code < 2.1.121"; the documented minimum and the version that introduced `isolation: "worktree"` is 2.1.139 — corrected. Root `CLAUDE.md` Current State said "v5.1 shipped" → v5.2.1.
+- **`self-review` agent path.** Said reviewer agents live at `.claude/agents/{name}.md`; in a plugin install they ship with the plugin payload, not the target project.
+
 ## [5.2.1] - 2026-05-31
 
 ### Added

@@ -165,9 +165,11 @@ to understand context that isn't visible in the diff. Focus especially on:
 - Interfaces or types that changed code depends on
 - Existing error handling patterns in the file
 
-Also read:
-- `.claude/rules/architecture-fitness.md` if it exists
-- `.claude/rules/code-quality.md` if it exists
+Also read the project's own standards, if present:
+- `CLAUDE.md` — project identity and behavioral rules
+- any files under `.claude/rules/` — the project's loaded conventions
+  (architecture-fitness and code-quality standards ship inline in the `dev` and
+  `item-executor` agent profiles, not as standalone rule files)
 
 **Read prior review comments** to avoid re-flagging addressed issues:
 ```bash

@@ -100,6 +100,7 @@ All scripts ship in `bin/` and are on PATH while the plugin is enabled. Hooks re
 | `context-monitor.sh` | statusLine | Writes `.context-usage` with token thresholds |
 | `context-warning-hook.sh` | Stop | Advisory warning when over threshold (v5.1+) |
 | `sprint-phase-guard.sh` | PreToolUse (`matcher: "Agent"`) | Blocks sub-agent dispatches that don't match SPRINT.md phase |
+| `pre-pr-gate-hook.sh` | PreToolUse (`matcher: "Bash"`) | Blocks `gh pr create` until the quality gate passed and the review judge didn't block; fail-open, `AAM_PR_GATE_BYPASS=1` to skip |
 | `sprint-phase-reminder.sh` | Stop | One-line per-turn phase reminder during an active sprint |
 | `sprint-stop-guard.sh` | Stop | Blocks premature turn endings during sprint execution |
 | `session-start-cycle-reset.sh` | SessionStart | Wipes stale `.context-usage` |
@@ -189,7 +190,7 @@ A project bootstrapped from a local session is still readable from web — Claud
 **Triggers:** `/aiagentminder:scope-check`, `/aiagentminder:revise`, `/aiagentminder:backlog`
 **What you get:** Before AAM lets new work into a sprint, `scope-check` compares it against `docs/strategy-roadmap.md`. If out of scope, you either revise the roadmap (logged in `DECISIONS.md`) or capture to `BACKLOG.md`. The plan, the record, and the work stay in sync.
 
-The full feature inventory (15 skills, 16 sub-agents, 9 hooks) is in the [Reference](#reference) section.
+The full feature inventory (15 skills, 16 sub-agents, 10 hooks) is in the [Reference](#reference) section.
 
 ---
 

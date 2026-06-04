@@ -51,11 +51,15 @@ The sprint-master routes fix work to item-executor. You do not apply fixes.
 
 ## Machine-Readable Gate Signal
 
-After producing the text output above, write a structured result file for hook enforcement:
+You are read-only (no Edit/Write/Bash), so you cannot write files yourself. End
+your response with this structured result on its own line so the caller can
+persist it:
 
-```bash
-echo '{"decision": "<pass|block>", "critical": <N>, "high": <N>, "medium": <N>, "low": <N>, "timestamp": "'$(date -u +%Y-%m-%dT%H:%M:%SZ)'"}' > .quality-review-result.json
+```json
+{"decision": "<pass|block>", "critical": <N>, "high": <N>, "medium": <N>, "low": <N>, "timestamp": "<ISO-8601 UTC>"}
 ```
 
-This file is read by the PreToolUse PR gate hook to mechanically enforce review decisions.
-The hook blocks PR creation when `decision` is `"block"`.
+The caller (sprint-master in the TEST state, or the `/aiagentminder:self-review`
+skill) writes this to `.quality-review-result.json`. The `pre-pr-gate-hook`
+(PreToolUse, `matcher: "Bash"`) reads that file and blocks `gh pr create` when
+`decision` is `"block"`, mechanically enforcing the review decision.
