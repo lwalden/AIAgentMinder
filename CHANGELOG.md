@@ -8,15 +8,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.3.0] - 2026-06-04
+
 ### Added
 
 - **`pre-pr-gate-hook.sh` (PreToolUse, matchers `Bash` + `mcp__github__create_pull_request`).** Mechanically enforces the quality gate at the PR boundary: blocks `gh pr create` and the GitHub MCP PR-creation tool unless (1) `.quality-gate-pass` exists and is fresh (default 60 min, `AAM_PR_GATE_TTL_SECONDS`), (2) `.quality-review-result.json`, if present, is not `decision: block`, and (3) the PR diff's added lines contain no high-confidence hardcoded secret (distinctive AWS/GitHub/Google/Slack/Stripe key or private-key formats only — no noisy generic heuristics; `AAM_PR_GATE_SECRETS=0` disables that scan). Fail-open on missing `jq`/`git`/errors; per-session opt-out via `AAM_PR_GATE_BYPASS=1`. Restores enforcement for marker files that `/aiagentminder:quality-gate` and `quality-reviewer` already wrote but nothing read. A working version shipped in v4.3.0 and was deleted in v5.0 prep under an inaccurate "empty placeholder" label — see DECISIONS.md. 17 unit tests added.
+
+### Changed
+
+- **PR creation is now gated.** With `pre-pr-gate-hook.sh` active, `gh pr create` (and the GitHub MCP PR tool) is blocked until `/aiagentminder:quality-gate` has recorded a fresh pass this session. This is intended enforcement, but it changes ad-hoc PR creation: run the quality gate first, or set `AAM_PR_GATE_BYPASS=1` for a one-off PR outside the workflow. The quality-gate manual-override path now records the marker so explicit overrides flow through. Hooks don't run on Claude Code web, so this is CLI/IDE-only.
 
 ### Fixed
 
 - **`quality-reviewer` could not emit its gate signal.** The agent is read-only (`disallowedTools: [Edit, Write, Bash]`) yet was told to write `.quality-review-result.json` via a Bash `echo` it cannot run. It now returns the result line in its output; the caller (sprint-master TEST state / `self-review` skill) persists it with the Write tool.
 - **Stale rule-file references in skills.** `tdd`, `grill`, `retrospective`, and `pr-pipeline` referred to retired `.claude/rules/` files (`code-quality.md`, `approach-first.md`, `sprint-workflow.md`, `architecture-fitness.md`) as if they still ship and auto-load — those standards moved inline into the `dev`/`item-executor`/`sprint-master` agent profiles in v4.x/v5.0. Repointed to the actual source. (`docs/` was swept for the same references in v5.1; the skills were missed.)
-- **Version inconsistencies.** `sprint-master.md`'s worktree-isolation fallback said "Claude Code < 2.1.121"; the documented minimum and the version that introduced `isolation: "worktree"` is 2.1.139 — corrected. Root `CLAUDE.md` Current State said "v5.1 shipped" → v5.2.1.
+- **Version inconsistencies.** `sprint-master.md`'s worktree-isolation fallback said "Claude Code < 2.1.121"; the documented minimum and the version that introduced `isolation: "worktree"` is 2.1.139 — corrected. Root `CLAUDE.md` Current State said "v5.1 shipped" → updated to current.
 - **`self-review` agent path.** Said reviewer agents live at `.claude/agents/{name}.md`; in a plugin install they ship with the plugin payload, not the target project.
 
 ## [5.2.1] - 2026-05-31
