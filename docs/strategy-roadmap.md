@@ -304,7 +304,7 @@ Restored mechanical quality enforcement at the PR boundary, and ran a markdown a
 
 ---
 
-## v5.2+ — Portability & Ecosystem (deferred indefinitely)
+## Deferred — Portability & Ecosystem (no active intent)
 
 Originally scoped as v5.1. Three items, all blocked on the v5.0 npm CLI removal, plus a marketing item that has no technical blocker but doesn't fit the current direction:
 
@@ -323,7 +323,7 @@ No active intent to revisit. If you want any of these, file an issue and we'll e
 - **Agent Teams stability** — Claude Code agent teams (experimental, Feb 2026). Multi-agent sprints with TeammateIdle/TaskCreated/TaskCompleted hooks. When it exits experimental, multi-agent sprint execution becomes possible.
 - **Path-scoped rules** — Copilot supports `.instructions.md` per path; Cursor supports glob-scoped rules. If Claude Code adds native path-scoped rule support, adopt immediately. Relevant for monorepos with mixed stacks.
 - **Auto mode compatibility** — Claude Code auto mode (research preview, Mar 2026). Test interaction with AAM's PermissionRequest hooks and stop guards.
-- **AGENTS.md spec evolution** — Track spec changes. Currently moot — bidirectional sync deferred indefinitely (see v5.2+).
+- **AGENTS.md spec evolution** — Track spec changes. Currently moot — bidirectional sync deferred indefinitely (see Deferred — Portability & Ecosystem).
 
 ### Dropped
 
