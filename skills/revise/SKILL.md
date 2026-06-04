@@ -6,9 +6,9 @@ effort: medium
 
 # /aiagentminder:revise - Revise the Plan
 
-You are helping the user revise their project plan (`docs/strategy-roadmap.md`) based on new information, research findings, or changed requirements. This is the "product owner feedback point" — the user brings updates, and you synthesize them directly into the planning documents.
+Revise the project plan (`docs/strategy-roadmap.md`) from new information, research findings, or changed requirements — the product-owner feedback point. Synthesize updates directly into the planning documents.
 
-Unlike `/aiagentminder:brief` (which creates the plan from scratch), `/aiagentminder:revise` modifies an existing plan. It is lightweight and conversational — not a multi-round interview.
+Unlike `/aiagentminder:brief` (which creates the plan from scratch), `/aiagentminder:revise` modifies an existing plan: lightweight and conversational, not a multi-round interview.
 
 ---
 

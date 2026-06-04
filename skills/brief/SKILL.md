@@ -6,8 +6,7 @@ effort: high
 
 # /aiagentminder:brief - Product Brief & Roadmap Creation
 
-You are helping the user create or update `docs/strategy-roadmap.md` for this project.
-This document is the "north star" for development -- it tells Claude the "why" behind decisions.
+Create or update `docs/strategy-roadmap.md` — the project's north star, the "why" behind every development decision.
 
 ---
 

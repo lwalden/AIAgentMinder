@@ -40,10 +40,10 @@ The "save before switching" step from the legacy non-worktree flow is no longer 
 
 ## Architecture Fitness
 
-- Files over 300 lines: flag for decomposition. Generated files exempt.
-- No hardcoded credentials, keys, or tokens. Use env vars, `.env` (gitignored), or secret managers.
-- Tests independently runnable. No cross-test-file imports. Shared fixtures in a dedicated utilities location.
-- HTTP calls and DB access in dedicated service/client modules — not in handlers, UI, or CLI entrypoints.
+- **File size:** Flag files over 300 lines for decomposition. Generated files exempt.
+- **Secrets:** No hardcoded credentials, keys, or tokens. Use env vars, `.env` (gitignored), or a secret manager.
+- **Test isolation:** Tests independently runnable. No cross-test-file imports. Shared fixtures in a dedicated utilities location.
+- **Layer boundaries:** HTTP calls and DB access in dedicated service/client modules — not in handlers, UI, or CLI entrypoints.
 
 ## Debug Checkpoint
 
