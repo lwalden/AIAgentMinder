@@ -18,6 +18,15 @@
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/pre-pr-gate-hook.sh\""
           }
         ]
+      },
+      {
+        "matcher": "mcp__github__create_pull_request",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/bin/pre-pr-gate-hook.sh\""
+          }
+        ]
       }
     ],
     "Stop": [
