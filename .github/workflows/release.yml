@@ -1,0 +1,82 @@
+name: Release
+
+# Fires when a version tag is pushed (e.g. `git tag v5.3.0 && git push --tags`).
+# Two jobs in one gate:
+#   1. Re-run the test + layout validation that CI runs on PRs, so a tag can
+#      never ship a red tree.
+#   2. Verify every version point (the 4 files version-bump.sh updates) equals
+#      the tag — catches a tag that got ahead of the version bump.
+# Then DRAFT a GitHub Release with auto-generated notes. It's left as a draft on
+# purpose: the human reviews/curates the notes and publishes. The semver bump
+# and the decision to publish stay manual (see docs/RELEASING.md).
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write  # required to create the release
+
+jobs:
+  release:
+    name: validate + draft release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+
+      - name: Validate plugin layout
+        run: npm run validate
+
+      - name: Run test suite
+        run: npm test
+
+      - name: Verify version points match the tag
+        run: |
+          set -euo pipefail
+          tag="${GITHUB_REF_NAME#v}"
+          ver_file="$(tr -d '[:space:]' < templates/.claude/aiagentminder-version)"
+          pkg="$(jq -r '.version' package.json)"
+          plugin="$(jq -r '.version' .claude-plugin/plugin.json)"
+          market="$(jq -r '.plugins[0].version' .claude-plugin/marketplace.json)"
+
+          fail=0
+          for pair in \
+            "templates/.claude/aiagentminder-version=$ver_file" \
+            "package.json=$pkg" \
+            ".claude-plugin/plugin.json=$plugin" \
+            ".claude-plugin/marketplace.json=$market"; do
+            name="${pair%%=*}"; val="${pair#*=}"
+            if [ "$val" != "$tag" ]; then
+              echo "::error::$name is '$val', expected '$tag' (from tag $GITHUB_REF_NAME)"
+              fail=1
+            fi
+          done
+
+          if [ "$fail" -ne 0 ]; then
+            echo "Version points do not all match the tag. Run 'bash bin/version-bump.sh $tag', commit, then re-tag."
+            exit 1
+          fi
+          echo "All four version points match $tag."
+
+      - name: Draft GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          # Idempotent: if a release for this tag already exists (e.g. created by
+          # hand), don't fail the workflow — just report it.
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            echo "Release $GITHUB_REF_NAME already exists — leaving it as-is."
+          else
+            gh release create "$GITHUB_REF_NAME" \
+              --draft \
+              --generate-notes \
+              --title "$GITHUB_REF_NAME"
+            echo "Drafted release $GITHUB_REF_NAME — review the notes and publish from the GitHub Releases page."
+          fi
