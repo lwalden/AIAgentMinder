@@ -162,6 +162,22 @@ describe('sprint-master orchestrator agent', () => {
       'sprint-master must capture branch name from item-executor and pass to pr-pipeliner');
   });
 
+  it('records accepted judge findings via sprint-metrics.sh review-findings', () => {
+    const content = readAgent();
+    assert.ok(content.includes('review-findings'),
+      'TEST state must record the judge\'s accepted finding count via sprint-metrics.sh review-findings');
+    assert.ok(content.includes('sprint-metrics.sh'),
+      'must reference the sprint-metrics.sh script');
+  });
+
+  it('routes docs-only diffs to a claim-accuracy judge pass without code lenses', () => {
+    const content = readAgent();
+    assert.ok(content.toLowerCase().includes('docs-only'),
+      'must define the docs-only diff routing precedent');
+    assert.ok(content.includes('claim-accuracy') || content.includes('claim accuracy'),
+      'docs-only diffs must get a claim-accuracy judge pass');
+  });
+
   it('documents /goal compatibility', () => {
     const content = readAgent();
     assert.ok(content.includes('/goal') || content.includes('`/goal`'),
