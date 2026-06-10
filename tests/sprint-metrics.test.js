@@ -145,6 +145,68 @@ describe('sprint-metrics.sh', () => {
     assert.equal(metrics.totals.rework, 0, 'rework count must not increment for nonexistent item');
   });
 
+  it('review-findings sets the accepted finding count on the item', () => {
+    run('init S10', tmpDir);
+    run('item-start S10-001', tmpDir);
+    run('review-findings S10-001 3', tmpDir);
+    const metrics = readMetrics(tmpDir);
+    const item = metrics.items.find(i => i.id === 'S10-001');
+    assert.equal(item.reviewFindings, 3);
+  });
+
+  it('review-findings is a set, not an increment (idempotent re-run)', () => {
+    run('init S10', tmpDir);
+    run('item-start S10-001', tmpDir);
+    run('review-findings S10-001 3', tmpDir);
+    run('review-findings S10-001 3', tmpDir);
+    let metrics = readMetrics(tmpDir);
+    assert.equal(metrics.items[0].reviewFindings, 3, 're-running the same judge pass must not double-count');
+    run('review-findings S10-001 1', tmpDir);
+    metrics = readMetrics(tmpDir);
+    assert.equal(metrics.items[0].reviewFindings, 1, 'a later judge pass overwrites the count');
+  });
+
+  it('review-findings accepts zero', () => {
+    run('init S10', tmpDir);
+    run('item-start S10-001', tmpDir);
+    run('review-findings S10-001 0', tmpDir);
+    const metrics = readMetrics(tmpDir);
+    assert.equal(metrics.items[0].reviewFindings, 0);
+  });
+
+  it('review-findings rejects a non-numeric count', () => {
+    run('init S10', tmpDir);
+    run('item-start S10-001', tmpDir);
+    assert.throws(
+      () => run('review-findings S10-001 three', tmpDir),
+      /non-negative integer/,
+      'must reject non-numeric counts'
+    );
+    assert.throws(
+      () => run('review-findings S10-001 -1', tmpDir),
+      /non-negative integer/,
+      'must reject negative counts'
+    );
+  });
+
+  it('review-findings requires exactly two arguments', () => {
+    run('init S10', tmpDir);
+    assert.throws(
+      () => run('review-findings S10-001', tmpDir),
+      /Usage: sprint-metrics.sh review-findings/,
+      'must print usage on missing count'
+    );
+  });
+
+  it('review-findings on nonexistent item leaves the file unchanged', () => {
+    run('init S10', tmpDir);
+    run('item-start S10-001', tmpDir);
+    const before = readMetrics(tmpDir);
+    run('review-findings NONEXISTENT 5', tmpDir);
+    const after = readMetrics(tmpDir);
+    assert.deepEqual(after, before, 'unknown item id must not corrupt the metrics file');
+  });
+
   it('errors on missing metrics file for non-init commands', () => {
     assert.throws(
       () => run('item-start S8-001', tmpDir),
