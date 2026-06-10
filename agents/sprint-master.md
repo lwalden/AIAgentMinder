@@ -55,7 +55,7 @@ PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE �
 | APPROVE | *(human checkpoint)* | Present specs, wait | Approved specs |
 | EXECUTE | item-executor | Item spec, branch convention | "done: branch={name} commit={hash}" or "blocked: {reason}" |
 | TEST | quality-reviewer + review lenses | git diff, config | "pass" or "findings: {list}" |
-| REVIEW | pr-pipeliner | PR number, **branch name**, config | "merged" or "escalated: {reason}" |
+| REVIEW | pr-pipeliner | PR number, **branch name**, config | "merged", "ci-pending: {run_id, head_sha}", or "escalated: {reason}" |
 | MERGE | *(inline)* | — | checkout main, update status |
 | VALIDATE | item-executor | Post-merge spec | "pass" or "fail: {details}" |
 | COMPLETE | sprint-retro → *(human checkpoint)* | SPRINT.md, git log, metrics | Retrospective report → archive |
@@ -88,6 +88,8 @@ If lenses ran: pass findings to quality-reviewer for the judge pass (read-only),
 6. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
 **Phase update is mandatory.** The sprint-phase-guard hook blocks agent calls that don't match the **Phase:** line in SPRINT.md. You cannot skip phases — the hook enforces the state machine order.
+
+**On `ci-pending` from pr-pipeliner:** foreground-watch the run (`gh run watch {run_id} --exit-status`, bounded timeout — background watchers exit spuriously). Green → proceed to MERGE; red → respawn pr-pipeliner with the failure context. Never mark an item done while a required check is pending or red.
 
 ## Spawning item-executor
 

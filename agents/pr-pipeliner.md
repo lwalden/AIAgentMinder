@@ -34,6 +34,16 @@ Re-run build + lint after the final cycle before merging.
 
 6. **Merge:** Squash merge to main when all checks pass.
 
+## Long-Running Operations
+
+Test, build, and CI runs can outlast a single tool call. Known failure mode (any stack): GUI-subsystem executables (e.g. game-engine or IDE binaries on Windows) return from a naive shell invocation immediately while the real run continues — backgrounding the run and ending the turn kills it.
+
+- **Canonical test-runner seam:** if the project ships a runner at `.claude/scripts/run-*-tests.*` (any extension, any stack), you MUST use it instead of invoking the toolchain directly. It owns the correct blocking invocation, guards, and result parsing.
+- **Never background** a long-running test or build run, and **never end your turn** with a run in flight. If a run outlives one tool call, keep polling for completion in the SAME turn (bounded foreground waits). If your turn must end while CI is still running, commit + push first and return `ci-pending` (below) so sprint-master picks up the gate.
+- **Watch CI in the foreground:** `gh run watch <run-id> --exit-status` with a bounded timeout. Background watchers exit spuriously.
+- **Push at every durable boundary:** push each commit (review fixes included) before entering any wait. Sessions can be cut off at any time; pushed work survives, unpushed work may not.
+- **Retry transient `gh` 401s once** (immediate retry) before treating the call as failed — transient auth blips are a known field occurrence.
+
 ## Escalation Conditions
 
 Escalate to sprint-master as BLOCKED when:
@@ -49,6 +59,7 @@ Return to sprint-master:
 
 - `"merged: {merge_commit}"` — PR merged successfully
 - `"escalated: {reason}"` — needs human intervention
+- `"ci-pending: {run_id, head_sha}"` — all fixes committed and pushed; CI is running as the turn ends. sprint-master foreground-watches the run and resumes the merge gate — never report `merged` while a required check is pending or red.
 
 ## What You Do NOT Do
 

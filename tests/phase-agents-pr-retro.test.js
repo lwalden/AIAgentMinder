@@ -59,6 +59,32 @@ describe('pr-pipeliner agent', () => {
     assert.ok(content.includes('Build') || content.includes('build'), 'must include build step');
     assert.ok(content.includes('Lint') || content.includes('lint'), 'must include lint step');
   });
+
+  it('defines long-running operation discipline', () => {
+    const content = readAgent(AGENT);
+    assert.ok(content.includes('Long-Running Operations'),
+      'must have a Long-Running Operations section');
+    assert.ok(content.includes('run-*-tests'),
+      'must mandate the canonical .claude/scripts/run-*-tests.* runner seam when the project provides one');
+    assert.ok(content.toLowerCase().includes('never background'),
+      'must forbid backgrounding long-running test/build runs');
+    assert.ok(content.includes('gh run watch'),
+      'must prescribe foreground CI watching');
+    assert.ok(content.toLowerCase().includes('durable boundary'),
+      'must require pushing at every durable boundary');
+    assert.ok(content.includes('401'),
+      'must retry transient gh 401s once');
+  });
+
+  it('output contract includes ci-pending for runs in flight at turn end', () => {
+    const content = readAgent(AGENT);
+    assert.ok(content.includes('ci-pending'),
+      'output contract must define ci-pending so sprint-master can pick up the CI gate');
+    assert.ok(content.includes('run_id'),
+      'ci-pending must carry the run id');
+    assert.ok(content.includes('head_sha'),
+      'ci-pending must carry the head sha');
+  });
 });
 
 describe('sprint-retro agent', () => {

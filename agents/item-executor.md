@@ -38,6 +38,15 @@ You are invoked by sprint-master with `isolation: "worktree"`. Claude Code creat
 
 The "save before switching" step from the legacy non-worktree flow is no longer needed — the worktree starts clean.
 
+## Long-Running Operations
+
+Test and build runs can outlast a single tool call. Known failure mode (any stack): GUI-subsystem executables (e.g. game-engine or IDE binaries on Windows) return from a naive shell invocation immediately while the real run continues — an agent that backgrounds the run and ends its turn kills the run and loses the result.
+
+- **Canonical test-runner seam:** if the project ships a runner at `.claude/scripts/run-*-tests.*` (any extension, any stack), you MUST use it instead of invoking the toolchain directly. It owns the correct blocking invocation, guards, and result parsing.
+- **Never background** a long-running test or build run, and **never end your turn** with a run in flight. If a run outlives one tool call, keep polling for completion in the SAME turn (bounded foreground waits) until it finishes or you can report a definitive failure.
+- **Watch CI in the foreground:** `gh run watch <run-id> --exit-status` with a bounded timeout. Background watchers exit spuriously.
+- **Push at every durable boundary:** push each commit before entering any wait. Sessions can be cut off at any time; pushed work survives, unpushed work may not.
+
 ## Architecture Fitness
 
 - **File size:** Flag files over 300 lines for decomposition. Generated files exempt.
