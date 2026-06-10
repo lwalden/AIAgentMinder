@@ -378,16 +378,19 @@ If you previously ran `npx aiagentminder init`:
 4. **Update local references** to `/aam-X` commands to
    `/aiagentminder:X` in any docs or scripts you wrote.
 
-5. **(Optional) Remove old script and command files** that the npm
-   installer copied to your project — they no longer do anything since
-   hooks and scripts now live in the plugin install:
+5. **Retire old file copies and duplicate hooks** that the npm installer
+   left in your project — run the migration script (dry-run first, then
+   apply):
 
    ```bash
-   rm -rf .claude/scripts/ .claude/hooks/ .claude/commands/aam-*.md
+   bash strip-retired-hooks.sh migrate          # dry-run: prints the plan
+   bash strip-retired-hooks.sh migrate --apply  # moves stale copies, de-dups hooks
    ```
 
-   Keep `.claude/rules/`, `.claude/agents/` (if you have custom
-   project-level agents), and `.claude/settings.json` (custom hooks).
+   It only touches filenames AAM has ever shipped, skips anything you've
+   customized, moves (never deletes) into `.claude/legacy-retired-<ts>/`,
+   and preserves your own hooks and settings. Full walkthrough:
+   [docs/migration-guide.md](migration-guide.md).
 
 ---
 
