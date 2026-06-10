@@ -55,7 +55,7 @@ PLAN → SPEC → APPROVE → [per item: EXECUTE → TEST → REVIEW → MERGE �
 | APPROVE | *(human checkpoint)* | Present specs, wait | Approved specs |
 | EXECUTE | item-executor | Item spec, branch convention | "done: branch={name} commit={hash}" or "blocked: {reason}" |
 | TEST | quality-reviewer + review lenses | git diff, config | "pass" or "findings: {list}" |
-| REVIEW | pr-pipeliner | PR number, **branch name**, config | "merged" or "escalated: {reason}" |
+| REVIEW | pr-pipeliner | PR number, **branch name**, config | "merged", "ci-pending: {run_id, head_sha}", or "escalated: {reason}" |
 | MERGE | *(inline)* | — | checkout main, update status |
 | VALIDATE | item-executor | Post-merge spec | "pass" or "fail: {details}" |
 | COMPLETE | sprint-retro → *(human checkpoint)* | SPRINT.md, git log, metrics | Retrospective report → archive |
@@ -74,6 +74,10 @@ If zero lenses match, skip self-review (log reason) — pr-pipeliner still revie
 
 If lenses ran: pass findings to quality-reviewer for the judge pass (read-only), then persist the judge's result line to `.quality-review-result.json` with the Write tool — the `pre-pr-gate-hook` reads it and blocks `gh pr create` on a `block` decision.
 
+**After the judge pass:** record the ACCEPTED finding count (critical + high + medium + low from the judge's JSON summary) via `sprint-metrics.sh review-findings <item-id> <count>` — for every judged item, including clean passes (count 0).
+
+**Docs-only diffs** (DECISIONS.md, README, design docs — no code changed): skip the code lenses; route the diff straight to quality-reviewer for a claim-accuracy judge pass (every factual claim verified against the repo), and record findings the same way.
+
 ## Your Responsibilities
 
 1. Read SPRINT.md to determine current state (check **Phase:** line)
@@ -84,6 +88,8 @@ If lenses ran: pass findings to quality-reviewer for the judge pass (read-only),
 6. Error handling: retry agent once on failure, then escalate to human as BLOCKED
 
 **Phase update is mandatory.** The sprint-phase-guard hook blocks agent calls that don't match the **Phase:** line in SPRINT.md. You cannot skip phases — the hook enforces the state machine order.
+
+**On `ci-pending` from pr-pipeliner:** foreground-watch the run (`gh run watch {run_id} --exit-status`, bounded timeout — background watchers exit spuriously). Green → proceed to MERGE; red → respawn pr-pipeliner with the failure context. Never mark an item done while a required check is pending or red.
 
 ## Spawning item-executor
 
@@ -103,16 +109,10 @@ pass it to pr-pipeliner during REVIEW. On `"partial: ..."`, include
 
 At PLAN and SPEC checkpoints, use this procedure — do NOT rely on text reminders alone:
 
-**After sprint-planner returns (PLAN checkpoint):**
+**After sprint-planner returns (PLAN checkpoint) and after sprint-speccer returns (SPEC → APPROVE checkpoint):**
 1. Create an empty `.sprint-human-checkpoint` file with the Write tool (empty content).
-2. Present the proposed issue list to the user and wait.
-3. The Stop hook allows the turn to end because `.sprint-human-checkpoint` exists.
-4. When the user approves: delete `.sprint-human-checkpoint` (`Remove-Item` on Windows, `rm -f` on Unix), then spawn sprint-speccer.
-
-**After sprint-speccer returns (SPEC → APPROVE checkpoint):**
-1. Create an empty `.sprint-human-checkpoint` file with the Write tool (empty content).
-2. Present all specs to the user and wait.
-3. When the user approves: delete `.sprint-human-checkpoint` (`Remove-Item` on Windows, `rm -f` on Unix), then proceed to APPROVE.
+2. Present the proposed issues (PLAN) or specs (SPEC) to the user and wait — the Stop hook allows the turn to end while the file exists.
+3. When the user approves: delete `.sprint-human-checkpoint` (`Remove-Item` on Windows, `rm -f` on Unix), then proceed (spawn sprint-speccer after PLAN; APPROVE after SPEC).
 
 Never proceed to the next state in the same turn as writing the checkpoint file.
 

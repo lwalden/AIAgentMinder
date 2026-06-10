@@ -8,6 +8,7 @@
 #   sprint-metrics.sh item-complete <item-id>
 #   sprint-metrics.sh cycle <item-id>
 #   sprint-metrics.sh rework <item-id>
+#   sprint-metrics.sh review-findings <item-id> <accepted-count>
 #   sprint-metrics.sh finalize
 
 METRICS_FILE=".sprint-metrics.json"
@@ -15,7 +16,7 @@ NOW=$(date -u +"%Y-%m-%dT%H:%M:%SZ" 2>/dev/null || date -Iseconds)
 
 die() { echo "Error: $1" >&2; exit 1; }
 
-[ $# -ge 1 ] || die "Usage: sprint-metrics.sh <init|item-start|item-complete|cycle|rework|finalize> [args]"
+[ $# -ge 1 ] || die "Usage: sprint-metrics.sh <init|item-start|item-complete|cycle|rework|review-findings|finalize> [args]"
 
 subcmd="$1"
 shift
@@ -101,6 +102,22 @@ ENDJSON
       if (.items | any(.id == $id)) then
         .items = [.items[] | if .id == $id then .reworkCount += 1 else . end]
         | .totals.rework += 1
+      else . end
+    ' "$METRICS_FILE" > "${METRICS_FILE}.tmp" && mv "${METRICS_FILE}.tmp" "$METRICS_FILE"
+    ;;
+
+  review-findings)
+    # Record the judge's ACCEPTED finding count for an item (set, not increment —
+    # idempotent if the judge pass is re-run). Called by sprint-master after each
+    # quality-reviewer verdict.
+    [ $# -eq 2 ] || die "Usage: sprint-metrics.sh review-findings <item-id> <accepted-count>"
+    item_id="$1"
+    count="$2"
+    case "$count" in (*[!0-9]*|'') die "accepted-count must be a non-negative integer" ;; esac
+
+    jq --arg id "$item_id" --argjson n "$count" '
+      if (.items | any(.id == $id)) then
+        .items = [.items[] | if .id == $id then .reviewFindings = $n else . end]
       else . end
     ' "$METRICS_FILE" > "${METRICS_FILE}.tmp" && mv "${METRICS_FILE}.tmp" "$METRICS_FILE"
     ;;

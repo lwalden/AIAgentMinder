@@ -96,6 +96,22 @@ describe('item-executor agent', () => {
       'item-executor must push its branch to origin since pr-pipeliner runs in the main worktree');
   });
 
+  it('defines long-running operation discipline', () => {
+    const content = readAgent();
+    assert.ok(content.includes('Long-Running Operations'),
+      'must have a Long-Running Operations section');
+    assert.ok(content.includes('run-*-tests'),
+      'must mandate the canonical .claude/scripts/run-*-tests.* runner seam when the project provides one');
+    assert.ok(content.toLowerCase().includes('never background'),
+      'must forbid backgrounding long-running test/build runs');
+    assert.ok(content.includes('SAME turn') || content.includes('same turn'),
+      'must require polling in the same turn rather than ending with a run in flight');
+    assert.ok(content.includes('gh run watch'),
+      'must prescribe foreground CI watching');
+    assert.ok(content.toLowerCase().includes('durable boundary'),
+      'must require pushing at every durable boundary');
+  });
+
   it('no longer references the retired correction-capture hook', () => {
     const content = readAgent();
     assert.ok(!content.includes('Correction Capture'),

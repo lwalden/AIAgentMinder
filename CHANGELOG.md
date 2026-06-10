@@ -8,6 +8,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+## [5.4.0] - 2026-06-10
+
+### Added
+
+- **Legacy-install migration (`strip-retired-hooks.sh migrate` → `bin/legacy-migrate.sh`).** Pre-5.0 installs file-copied agents into `.claude/agents/`, scripts into `.claude/scripts/`, and hook registrations into project settings; projects upgraded since are hybrids with stale copies and double-firing hooks. The new migrate mode retires the stale copies and de-dups the hooks: manifest-driven (only filenames AAM has ever shipped are candidates — user files are never touched), customization-safe (divergent candidates are skipped by default; `--force-divergent` overrides), dry-run by default (`--apply` acts), and backup-first (retirement MOVES files to `.claude/legacy-retired-<UTC>/`, never `rm`). Hook de-dup removes project entries whose command basename matches a hook the plugin registers via `hooks.json`; a legacy `.claude/scripts/context-monitor.sh` statusLine is repointed at the plugin copy (statusLine wiring itself stays project-level by design). Scripts still referenced by surviving settings are kept. Post-migration, agents' bare script references keep resolving because the plugin's `bin/` is on the Bash tool's PATH — no project shim. Walkthrough: `docs/migration-guide.md`. 14 new tests. The original `strip-retired-hooks.sh <settings-file>` mode is unchanged (still used by `aam-bootstrap.sh`).
+- **`sprint-metrics.sh review-findings <item-id> <accepted-count>`.** The per-item `reviewFindings` field has been written at item-start since the schema landed, but nothing ever set it — a field sprint (dungeon-game S9) validated metrics end-to-end and every item read 0 despite real judge findings. Set (not increment) semantics keep re-runs of a judge pass idempotent. `sprint-master`'s TEST state now records the accepted finding count after every quality-reviewer judge pass, including clean passes (count 0).
+- **Long-Running Operations discipline in `item-executor` and `pr-pipeliner`.** Field root cause (dungeon-game S9): GUI-subsystem executables (e.g. game-engine binaries on Windows) return from a naive shell invocation immediately while the real run continues — an agent that backgrounds the run and ends its turn kills it (3h28m lost on one item). Both agents now must use the project's canonical `.claude/scripts/run-*-tests.*` runner when one ships, never background or abandon a test/build run in flight, watch CI in the foreground (`gh run watch --exit-status`, bounded timeout), and push at every durable boundary. `pr-pipeliner` gains a `"ci-pending: {run_id, head_sha}"` output contract (fixes pushed, CI running at turn end; sprint-master picks up the gate) and a single immediate retry on transient `gh` 401s.
+- **Docs-only review routing in `sprint-master`.** Docs-only diffs (DECISIONS.md, README, design docs) skip the code lenses and route straight to quality-reviewer for a claim-accuracy judge pass, recorded in metrics the same way — encodes the field precedent set by docs-only sprint items.
+
+### Fixed
+
+- **`correction-capture-hook.sh` added to the retired-hook strip pattern.** Retired in v4.6.0, but the strip introduced in v5.1.3 never listed it, so real pre-5.0 installs still had it registered (and firing) under PostToolUse.
+
+### Changed
+
+- `docs/customization-guide.md`'s pre-v5.0 migration step no longer suggests raw `rm -rf .claude/scripts/ …` — it points at the customization-safe migration script instead.
+
 ## [5.3.0] - 2026-06-04
 
 ### Added
