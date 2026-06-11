@@ -71,6 +71,9 @@ Decisions:
 Patterns:
   [One honest observation about what went well]
   [One honest observation about what was harder than expected — e.g., "S2-003 required rework due to staging env mismatch"]
+
+Tooling findings (about AIAgentMinder itself, not this project):
+  {None} OR {one line per finding: "{type}/{severity}: {summary}"} — see Step 5
 ```
 
 ---
@@ -100,6 +103,42 @@ From each archived line and from the current sprint's metrics (Step 2), identify
 **Feature coherence:** Always append: "Prefer fitting whole features over hitting an issue count. If a feature needs more issues than the range, plan the feature — but confirm with the user that context will stay manageable."
 
 Write the recommendation as the `<!-- sizing: {min}-{max} -->` comment in the SPRINT.md archive line (see the `sprint-master` agent's COMPLETE phase). This comment persists for the next sprint planning step to read.
+
+---
+
+## Step 5: Capture Tooling Findings
+
+Findings surfaced by the retro fall into two buckets:
+
+- **Project findings** — about this project's code, tests, or process. These stay
+  in this repo: capture follow-up work with `backlog-capture.sh add <type> "<title>" "retro"`
+  (see `/aiagentminder:backlog`) or leave as observations in the report.
+- **Tooling findings** — about AIAgentMinder itself: an agent misbehaving, a
+  shipped hook or `bin/` script failing, workflow friction, a platform issue
+  (e.g. a script hanging on Windows), or a missing capability. The project
+  backlog is the wrong home for these — they must be routed upstream.
+
+For **each** tooling finding, run:
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/bin/hlpm-finding.sh" <type> <severity> "<summary>" "<detail>" "<sprint-id>"
+```
+
+- `type`: `defect` | `friction` | `feature`
+- `severity`: `low` | `medium` | `high`
+- `detail`: include environment specifics — OS, shell, error text, what was
+  attempted. Triage happens later on the HLPM side, where the user decides
+  whether the finding is universal or environment-specific; it needs this context.
+- `sprint-id`: the sprint identifier (e.g. `S9`)
+
+The script appends the finding to the HLPM findings inbox for centralized
+triage. It is a **silent no-op when `HLPM_DIR` is not set** (no HLPM on this
+machine) — call it unconditionally; do not check for HLPM first. Never file
+GitHub issues against the AIAgentMinder repo from a retro — that is a
+human-gated decision made during HLPM triage.
+
+Always list tooling findings in the Step 3 report as well, so they stay
+visible even when no HLPM inbox exists.
 
 ---
 

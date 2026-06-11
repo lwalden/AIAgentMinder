@@ -128,4 +128,12 @@ describe('sprint-retro agent', () => {
       'must produce retrospective report'
     );
   });
+
+  it('routes tooling findings through hlpm-finding.sh, never GitHub issues', () => {
+    const content = readAgent(AGENT);
+    assert.ok(content.includes('hlpm-finding.sh'),
+      'must capture tooling findings via hlpm-finding.sh');
+    assert.ok(content.includes('Never file GitHub issues'),
+      'must forbid auto-filing upstream issues from a retro');
+  });
 });

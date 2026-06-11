@@ -8,6 +8,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Added
+
+- **Tooling-finding capture from retros (`bin/hlpm-finding.sh`).** Sprint retrospectives sometimes surface findings about AIAgentMinder itself (a shipped script hanging on a platform, agent misbehavior, workflow friction) rather than the project — previously these died in the retro report. The retrospective skill and `sprint-retro` agent now classify findings into project vs tooling, and route each tooling finding through the new `hlpm-finding.sh`, which appends a structured JSONL record (type, severity, summary, environment detail, repo, sprint, AAM version) to `$HLPM_DIR/tooling-findings.jsonl` for centralized triage by the user's HLPM executive layer. Same opt-in contract as `hlpm-ping.sh`: silent no-op without `HLPM_DIR`, so users without HLPM see no behavior change and nothing is ever auto-filed against the public AIAgentMinder repo. Unlike `events.jsonl`, the findings inbox is never trimmed — entries persist until HLPM's `/findings` triage disposes them.
+
 ## [5.4.0] - 2026-06-10
 
 ### Added
