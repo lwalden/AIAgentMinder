@@ -21,6 +21,14 @@ and recommend sizing for the next sprint. Universal rules load from `.claude/rul
 2. Compute metrics (see below).
 3. Generate the retrospective report.
 4. Recommend adaptive sizing for the next sprint.
+5. Capture tooling findings — observations about AIAgentMinder itself (agent
+   misbehavior, hook/script failures, workflow friction, platform issues),
+   as distinct from project findings. For each, run
+   `bash "${CLAUDE_PLUGIN_ROOT}/bin/hlpm-finding.sh" <type> <severity> "<summary>" "<detail>" "<sprint-id>"`
+   (types: defect|friction|feature; severities: low|medium|high; detail must
+   include environment specifics). The script silently no-ops when `HLPM_DIR`
+   is unset — call it unconditionally. Never file GitHub issues upstream from
+   a retro. See the retrospective skill, Step 5, for the full rubric.
 
 ## Metrics
 
@@ -46,5 +54,7 @@ Return the retrospective report as markdown, including:
 2. Metrics table
 3. Decisions logged
 4. Risk items and their outcomes
-5. Sizing recommendation for next sprint
-6. Archive entry ready for SPRINT.md
+5. Tooling findings (about AIAgentMinder itself) — listed in the report, and
+   each captured via `hlpm-finding.sh` per process step 5
+6. Sizing recommendation for next sprint
+7. Archive entry ready for SPRINT.md
